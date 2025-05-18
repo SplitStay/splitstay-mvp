@@ -1,6 +1,7 @@
 import { pgTable, text, serial, integer, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { relations } from "drizzle-orm";
 
 // Users
 export const users = pgTable("users", {
@@ -19,6 +20,14 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Users relations
+export const usersRelations = relations(users, ({ many }) => ({
+  bookingParticipants: many(bookingParticipants),
+  sentMessages: many(messages, { relationName: "sender" }),
+  reviewsGiven: many(reviews, { relationName: "reviewer" }),
+  reviewsReceived: many(reviews, { relationName: "reviewee" }),
+}));
+
 // Hotels
 export const hotels = pgTable("hotels", {
   id: serial("id").primaryKey(),
@@ -28,6 +37,11 @@ export const hotels = pgTable("hotels", {
   description: text("description"),
   amenities: text("amenities").array(),
 });
+
+// Hotels relations
+export const hotelsRelations = relations(hotels, ({ many }) => ({
+  bookings: many(bookings),
+}));
 
 // Bookings
 export const bookings = pgTable("bookings", {
@@ -41,6 +55,17 @@ export const bookings = pgTable("bookings", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Bookings relations
+export const bookingsRelations = relations(bookings, ({ one, many }) => ({
+  hotel: one(hotels, {
+    fields: [bookings.hotelId],
+    references: [hotels.id],
+  }),
+  participants: many(bookingParticipants),
+  messages: many(messages),
+  reviews: many(reviews),
+}));
+
 // Booking Participants
 export const bookingParticipants = pgTable("booking_participants", {
   id: serial("id").primaryKey(),
@@ -50,6 +75,18 @@ export const bookingParticipants = pgTable("booking_participants", {
   cost: integer("cost"), // Individual cost in cents
 });
 
+// Booking Participants relations
+export const bookingParticipantsRelations = relations(bookingParticipants, ({ one }) => ({
+  booking: one(bookings, {
+    fields: [bookingParticipants.bookingId],
+    references: [bookings.id],
+  }),
+  user: one(users, {
+    fields: [bookingParticipants.userId],
+    references: [users.id],
+  }),
+}));
+
 // Messages
 export const messages = pgTable("messages", {
   id: serial("id").primaryKey(),
@@ -58,6 +95,18 @@ export const messages = pgTable("messages", {
   content: text("content").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+// Messages relations
+export const messagesRelations = relations(messages, ({ one }) => ({
+  booking: one(bookings, {
+    fields: [messages.bookingId],
+    references: [bookings.id],
+  }),
+  sender: one(users, {
+    fields: [messages.senderId],
+    references: [users.id],
+  }),
+}));
 
 // Reviews
 export const reviews = pgTable("reviews", {
@@ -70,6 +119,24 @@ export const reviews = pgTable("reviews", {
   tags: text("tags").array(),
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+// Reviews relations
+export const reviewsRelations = relations(reviews, ({ one }) => ({
+  booking: one(bookings, {
+    fields: [reviews.bookingId],
+    references: [bookings.id],
+  }),
+  reviewer: one(users, {
+    fields: [reviews.reviewerId],
+    references: [users.id],
+    relationName: "reviewer",
+  }),
+  reviewee: one(users, {
+    fields: [reviews.revieweeId],
+    references: [users.id],
+    relationName: "reviewee",
+  }),
+}));
 
 // Schemas for inserts
 export const insertUserSchema = createInsertSchema(users).omit({

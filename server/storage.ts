@@ -1,4 +1,5 @@
 import {
+  users, hotels, bookings, bookingParticipants, messages, reviews,
   type User,
   type InsertUser,
   type Hotel,
@@ -14,6 +15,8 @@ import {
   type UserProfile,
   type BookingDetails
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, and, ilike, or, desc } from "drizzle-orm";
 
 // Storage interface
 export interface IStorage {
@@ -428,4 +431,408 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class DatabaseStorage implements IStorage {
+  // User operations
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db.insert(users).values(insertUser).returning();
+    return user;
+  }
+  
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users);
+  }
+
+  // Hotel operations
+  async getHotel(id: number): Promise<Hotel | undefined> {
+    const [hotel] = await db.select().from(hotels).where(eq(hotels.id, id));
+    return hotel;
+  }
+
+  async createHotel(hotel: InsertHotel): Promise<Hotel> {
+    const [newHotel] = await db.insert(hotels).values(hotel).returning();
+    return newHotel;
+  }
+
+  async getHotelsByLocation(location: string): Promise<Hotel[]> {
+    return await db.select().from(hotels).where(ilike(hotels.location, `%${location}%`));
+  }
+
+  // Booking operations
+  async getBooking(id: number): Promise<Booking | undefined> {
+    const [booking] = await db.select().from(bookings).where(eq(bookings.id, id));
+    return booking;
+  }
+
+  async createBooking(booking: InsertBooking): Promise<Booking> {
+    const [newBooking] = await db.insert(bookings).values(booking).returning();
+    return newBooking;
+  }
+
+  async getBookingsByUser(userId: number): Promise<Booking[]> {
+    const participantBookings = await db.select({
+      bookingId: bookingParticipants.bookingId
+    })
+    .from(bookingParticipants)
+    .where(eq(bookingParticipants.userId, userId));
+    
+    if (participantBookings.length === 0) {
+      return [];
+    }
+    
+    const bookingIds = participantBookings.map(p => p.bookingId);
+    
+    // Using multiple where conditions with or
+    return await db.select()
+      .from(bookings)
+      .where(
+        bookingIds.map(id => eq(bookings.id, id)).reduce((prev, curr) => or(prev, curr))
+      );
+  }
+
+  async updateBookingStatus(id: number, status: string): Promise<Booking | undefined> {
+    const [updatedBooking] = await db
+      .update(bookings)
+      .set({ status })
+      .where(eq(bookings.id, id))
+      .returning();
+    return updatedBooking;
+  }
+
+  async getBookingDetails(id: number): Promise<BookingDetails | undefined> {
+    const booking = await this.getBooking(id);
+    if (!booking) return undefined;
+
+    const hotel = await this.getHotel(booking.hotelId);
+    if (!hotel) return undefined;
+
+    const participantResults = await db
+      .select()
+      .from(bookingParticipants)
+      .where(eq(bookingParticipants.bookingId, id));
+      
+    const participants = [];
+    
+    for (const participant of participantResults) {
+      const user = await this.getUser(participant.userId);
+      if (user) {
+        participants.push({
+          ...participant,
+          user
+        });
+      }
+    }
+
+    return {
+      ...booking,
+      hotel,
+      participants
+    };
+  }
+
+  // Booking Participants operations
+  async getBookingParticipant(id: number): Promise<BookingParticipant | undefined> {
+    const [participant] = await db
+      .select()
+      .from(bookingParticipants)
+      .where(eq(bookingParticipants.id, id));
+    return participant;
+  }
+
+  async createBookingParticipant(participant: InsertBookingParticipant): Promise<BookingParticipant> {
+    const [newParticipant] = await db
+      .insert(bookingParticipants)
+      .values(participant)
+      .returning();
+    return newParticipant;
+  }
+
+  async getBookingParticipantsByBooking(bookingId: number): Promise<BookingParticipant[]> {
+    return await db
+      .select()
+      .from(bookingParticipants)
+      .where(eq(bookingParticipants.bookingId, bookingId));
+  }
+
+  async updateBookingParticipantStatus(id: number, status: string): Promise<BookingParticipant | undefined> {
+    const [updatedParticipant] = await db
+      .update(bookingParticipants)
+      .set({ status })
+      .where(eq(bookingParticipants.id, id))
+      .returning();
+    return updatedParticipant;
+  }
+
+  // Message operations
+  async getMessage(id: number): Promise<Message | undefined> {
+    const [message] = await db
+      .select()
+      .from(messages)
+      .where(eq(messages.id, id));
+    return message;
+  }
+
+  async createMessage(message: InsertMessage): Promise<Message> {
+    const [newMessage] = await db
+      .insert(messages)
+      .values(message)
+      .returning();
+    return newMessage;
+  }
+
+  async getMessagesByBooking(bookingId: number): Promise<Message[]> {
+    const results = await db
+      .select()
+      .from(messages)
+      .where(eq(messages.bookingId, bookingId))
+      .orderBy(messages.createdAt);
+      
+    return results;
+  }
+
+  // Review operations
+  async getReview(id: number): Promise<Review | undefined> {
+    const [review] = await db
+      .select()
+      .from(reviews)
+      .where(eq(reviews.id, id));
+    return review;
+  }
+
+  async createReview(review: InsertReview): Promise<Review> {
+    const [newReview] = await db
+      .insert(reviews)
+      .values(review)
+      .returning();
+    return newReview;
+  }
+
+  async getReviewsByReviewee(revieweeId: number): Promise<Review[]> {
+    return await db
+      .select()
+      .from(reviews)
+      .where(eq(reviews.revieweeId, revieweeId));
+  }
+
+  // Special operations
+  async findCompatibleUsers(userId: number, location: string, dateStart: Date, dateEnd: Date): Promise<UserProfile[]> {
+    const currentUser = await this.getUser(userId);
+    if (!currentUser) return [];
+
+    // Get all users except the current one
+    const otherUsers = await db
+      .select()
+      .from(users)
+      .where(
+        userId !== undefined ? and(eq(users.id, userId).not()) : undefined
+      );
+    
+    if (!otherUsers.length) return [];
+    
+    // Simple compatibility algorithm - similar to the one in MemStorage
+    return otherUsers.map(user => {
+      const sharedLanguages = user.languages.filter(lang => 
+        currentUser.languages.includes(lang)
+      ).length;
+      
+      // Calculate a match percentage
+      let matchPercentage = Math.floor(Math.random() * 40) + 50; // Between 50-90%
+      
+      if (sharedLanguages > 0) matchPercentage += 10;
+      if (user.gender === currentUser.gender) matchPercentage += 5;
+      
+      // Cap at 95%
+      matchPercentage = Math.min(matchPercentage, 95);
+      
+      // Assign a label based on percentage
+      let matchLabel = "";
+      if (matchPercentage >= 90) {
+        matchLabel = "Recommended Roommate";
+      } else if (matchPercentage >= 70) {
+        matchLabel = "Ideal Match";
+      } else if (matchPercentage >= 60) {
+        matchLabel = "Recommended";
+      }
+      
+      return {
+        ...user,
+        matchPercentage,
+        matchLabel
+      };
+    }).sort((a, b) => (b.matchPercentage || 0) - (a.matchPercentage || 0));
+  }
+}
+
+// Seed initial data for the database
+async function seedDatabase() {
+  try {
+    // Check if users already exist
+    const existingUsers = await db.select().from(users);
+    if (existingUsers.length > 0) {
+      console.log("Database already seeded");
+      return;
+    }
+
+    console.log("Seeding database...");
+
+    // Create users
+    const usersData: InsertUser[] = [
+      {
+        username: "alina",
+        password: "password123",
+        fullName: "Alina",
+        email: "alina@example.com",
+        profilePicture: "https://images.unsplash.com/photo-1614644147798-f8c0fc9da7f6?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&h=100",
+        age: "21-25",
+        gender: "female",
+        languages: ["English", "German"],
+        bio: "Spontaneous traveler who enjoys quiet time",
+        isVerified: true,
+        preferences: { sleepHabits: "early_bird", noiseLevel: "quiet" }
+      },
+      {
+        username: "sophie",
+        password: "password123",
+        fullName: "Sophie",
+        email: "sophie@example.com",
+        profilePicture: "https://images.unsplash.com/photo-1589571894960-20bbe2828d0a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&h=100",
+        age: "26-30",
+        gender: "female",
+        languages: ["English", "French"],
+        bio: "Musician on tour. Like to explore new places.",
+        isVerified: true,
+        preferences: { sleepHabits: "night_owl", noiseLevel: "moderate" }
+      },
+      {
+        username: "laura",
+        password: "password123",
+        fullName: "Laura",
+        email: "laura@example.com",
+        profilePicture: "https://images.unsplash.com/photo-1599842057874-37393e9342df?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&h=100",
+        age: "21-25",
+        gender: "female",
+        languages: ["English", "Dutch"],
+        bio: "Love meeting new people and sharing experiences.",
+        isVerified: true,
+        preferences: { sleepHabits: "early_bird", noiseLevel: "social" }
+      },
+      {
+        username: "hannah",
+        password: "password123",
+        fullName: "Hannah",
+        email: "hannah@example.com",
+        profilePicture: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&h=100",
+        age: "26-30",
+        gender: "female",
+        languages: ["English", "French"],
+        bio: "Spontaneous traveler who enjoys quiet hikes",
+        isVerified: true,
+        preferences: { sleepHabits: "flexible", noiseLevel: "quiet" }
+      },
+      {
+        username: "john",
+        password: "password123",
+        fullName: "John Doe",
+        email: "john@example.com",
+        profilePicture: "",
+        age: "31-35",
+        gender: "male",
+        languages: ["English", "Spanish"],
+        bio: "Business traveler, neat and organized.",
+        isVerified: true,
+        preferences: { sleepHabits: "early_bird", noiseLevel: "quiet" }
+      }
+    ];
+    
+    for (const userData of usersData) {
+      await db.insert(users).values(userData);
+    }
+    
+    // Create hotels
+    const hotelsData: InsertHotel[] = [
+      {
+        name: "MEININGER Hotel",
+        location: "Brussels",
+        address: "Quai du Batelage 12",
+        description: "Modern hotel in the heart of Brussels",
+        amenities: ["Free WiFi", "Air Conditioning", "Twin Beds"]
+      },
+      {
+        name: "City Central Hotel",
+        location: "Amsterdam",
+        address: "Prins Hendrikkade 59",
+        description: "Close to all major attractions",
+        amenities: ["Free WiFi", "Breakfast", "Twin Beds"]
+      },
+      {
+        name: "Urban Hostel",
+        location: "Paris",
+        address: "12 Rue de Rivoli",
+        description: "Affordable stay in central Paris",
+        amenities: ["Free WiFi", "Shared Kitchen", "Lockers"]
+      }
+    ];
+    
+    let hotelIds = [];
+    for (const hotelData of hotelsData) {
+      const [hotel] = await db.insert(hotels).values(hotelData).returning();
+      hotelIds.push(hotel.id);
+    }
+    
+    // Create a sample booking
+    const bookingData: InsertBooking = {
+      hotelId: hotelIds[0],
+      roomType: "twin",
+      checkInDate: new Date("2025-05-12"),
+      checkOutDate: new Date("2025-05-15"),
+      totalCost: 18900, // €189.00
+      status: "confirmed"
+    };
+    
+    const [booking] = await db.insert(bookings).values(bookingData).returning();
+    
+    // Add participants
+    await db.insert(bookingParticipants).values([
+      {
+        bookingId: booking.id,
+        userId: 1, // Alina
+        status: "confirmed",
+        cost: 9450 // €94.50
+      },
+      {
+        bookingId: booking.id,
+        userId: 2, // Sophie
+        status: "confirmed",
+        cost: 9450 // €94.50
+      }
+    ]);
+    
+    // Add a message
+    await db.insert(messages).values({
+      bookingId: booking.id,
+      senderId: 4, // Hannah
+      content: "Hi Sophie! Looking forward to our trip! 😊 Would you like to coordinate arrival times?"
+    });
+    
+    console.log("Database seeded successfully");
+  } catch (error) {
+    console.error("Error seeding database:", error);
+  }
+}
+
+// Initialize the database with seed data
+seedDatabase().catch(error => {
+  console.error("Failed to seed database:", error);
+});
+
+// Export the database storage implementation
+export const storage = new DatabaseStorage();
