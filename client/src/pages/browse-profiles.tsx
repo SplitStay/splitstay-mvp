@@ -207,7 +207,10 @@ const BrowseProfiles: React.FC = () => {
           variant="ghost" 
           size="icon" 
           className="text-gray-500"
-          onClick={() => setFilterDialogOpen(true)}
+          onClick={() => {
+            console.log("Opening filter dialog");
+            setFilterDialogOpen(true);
+          }}
         >
           <SlidersHorizontal className="h-5 w-5" />
         </Button>
@@ -276,6 +279,9 @@ const BrowseProfiles: React.FC = () => {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Filter Roommates</DialogTitle>
+            <p className="text-sm text-muted-foreground">
+              Customize your roommate search by selecting your preferences.
+            </p>
           </DialogHeader>
           
           <div className="space-y-6 py-4">
