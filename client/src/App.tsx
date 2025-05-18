@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Login from "@/pages/login";
 import SignUp from "@/pages/signup";
+import Dashboard from "@/pages/dashboard";
 import CreateProfile from "@/pages/create-profile";
 import FindRoommate from "@/pages/find-roommate";
 import BrowseProfiles from "@/pages/browse-profiles-fixed";
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/login" component={Login} />
       <Route path="/signup" component={SignUp} />
+      <Route path="/dashboard" component={Dashboard} />
       <Route path="/create-profile" component={CreateProfile} />
       <Route path="/find-roommate" component={FindRoommate} />
       <Route path="/browse-profiles" component={BrowseProfiles} />
