@@ -20,8 +20,20 @@ const RoommateCard: React.FC<RoommateCardProps> = ({
   className = "",
 }) => {
   const [reviewsOpen, setReviewsOpen] = useState(false);
-  const CardComponent = actionUrl ? Link : 'div';
-  const cardProps = actionUrl ? { href: actionUrl } : {};
+  
+  // Use a separate variable to track if the card should be clickable
+  // When reviews are open, we don't want the card to navigate
+  const isCardClickable = actionUrl && !reviewsOpen;
+  
+  const CardComponent = isCardClickable ? Link : 'div';
+  const cardProps = isCardClickable ? { href: actionUrl } : {};
+  
+  // Handle review click to prevent navigation
+  const handleReviewClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setReviewsOpen(!reviewsOpen);
+  };
   
   // Sample reviews - in a real app, these would come from the API
   const sampleReviews = [
@@ -97,16 +109,10 @@ const RoommateCard: React.FC<RoommateCardProps> = ({
                 <Collapsible 
                   open={reviewsOpen} 
                   onOpenChange={setReviewsOpen}
-                  className={actionUrl ? "pointer-events-none" : ""}
                 >
                   <CollapsibleTrigger 
-                    className="inline-flex items-center hover:underline"
-                    onClick={(e) => {
-                      if (actionUrl) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                      }
-                    }}
+                    className="inline-flex items-center hover:underline cursor-pointer"
+                    onClick={handleReviewClick}
                   >
                     <Star className="h-3 w-3 mr-1 fill-yellow-500 text-yellow-500" />
                     Positive reviews
