@@ -147,7 +147,7 @@ const SignUp: React.FC = () => {
           
           <Button 
             type="submit" 
-            className="w-full bg-navy hover:bg-navy/90 text-white py-6"
+            className="navy-button"
             disabled={isLoading}
           >
             {isLoading ? "Creating Account..." : "Create Account"}
