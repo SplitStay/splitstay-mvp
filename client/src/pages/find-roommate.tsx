@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Slider } from "@/components/ui/slider";
 import { format } from "date-fns";
 
 // Define location interface
