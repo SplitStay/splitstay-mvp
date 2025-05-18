@@ -615,7 +615,14 @@ const CreateProfile: React.FC = () => {
           Skip for Now
         </Button>
         <Button 
-          className="py-4 text-lg bg-navy hover:bg-navy/90 text-white"
+          type="button"
+          style={{
+            backgroundColor: "#001F3F", 
+            color: "white",
+            padding: "1rem 1.5rem",
+            fontSize: "1.125rem",
+            fontWeight: "500"
+          }}
           onClick={handleCreateProfile}
         >
           Continue
