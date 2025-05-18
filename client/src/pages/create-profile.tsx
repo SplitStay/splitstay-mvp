@@ -163,12 +163,47 @@ const CreateProfile: React.FC = () => {
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
+                <div className="p-3 border-b border-gray-200">
+                  <div className="flex justify-between items-center">
+                    <select 
+                      value={dateOfBirth ? dateOfBirth.getMonth() : new Date().getMonth()} 
+                      onChange={(e) => {
+                        const newMonth = parseInt(e.target.value);
+                        const newDate = dateOfBirth ? new Date(dateOfBirth) : new Date();
+                        newDate.setMonth(newMonth);
+                        setDateOfBirth(newDate);
+                      }}
+                      className="px-2 py-1 rounded border border-gray-300"
+                    >
+                      {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map((month, index) => (
+                        <option key={month} value={index}>{month}</option>
+                      ))}
+                    </select>
+                    <select 
+                      value={dateOfBirth ? dateOfBirth.getFullYear() : new Date().getFullYear()} 
+                      onChange={(e) => {
+                        const newYear = parseInt(e.target.value);
+                        const newDate = dateOfBirth ? new Date(dateOfBirth) : new Date();
+                        newDate.setFullYear(newYear);
+                        setDateOfBirth(newDate);
+                      }}
+                      className="px-2 py-1 rounded border border-gray-300"
+                    >
+                      {Array.from({ length: 80 }, (_, i) => new Date().getFullYear() - i).map(year => (
+                        <option key={year} value={year}>{year}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
                 <CalendarComponent
                   mode="single"
                   selected={dateOfBirth}
                   onSelect={setDateOfBirth}
                   disabled={(date) => date > new Date() || date < new Date("1920-01-01")}
                   initialFocus
+                  captionLayout="buttons"
+                  fromYear={1940}
+                  toYear={new Date().getFullYear()}
                 />
               </PopoverContent>
             </Popover>
