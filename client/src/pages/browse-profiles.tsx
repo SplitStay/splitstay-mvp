@@ -165,8 +165,99 @@ const BrowseProfiles: React.FC = () => {
   ];
 
   // Fetch compatible profiles - with fallback to demo profiles if the API fails
+  // Define the apply filters function
+  const applyFilters = useCallback(() => {
+    if (!profiles) return;
+    
+    // Check if any filters are active
+    const hasActiveAgeFilters = Object.values(filters.ageRanges).some(value => value);
+    const hasActiveLanguageFilters = Object.values(filters.languages).some(value => value);
+    const hasActiveSleepFilters = Object.values(filters.sleepingHabits).some(value => value);
+    const hasActiveNoiseFilters = Object.values(filters.noiseLevel).some(value => value);
+    
+    const isFilterActive = hasActiveAgeFilters || hasActiveLanguageFilters || 
+                          hasActiveSleepFilters || hasActiveNoiseFilters;
+    
+    setActiveFilters(isFilterActive);
+    
+    if (!isFilterActive) {
+      setFilteredProfiles(profiles);
+      return;
+    }
+    
+    // Apply filters
+    const filtered = profiles.filter(profile => {
+      // Age filter
+      if (hasActiveAgeFilters) {
+        const age = parseInt(profile.age || "0");
+        let ageMatch = false;
+        
+        if (filters.ageRanges["18-25"] && age >= 18 && age <= 25) ageMatch = true;
+        if (filters.ageRanges["26-30"] && age >= 26 && age <= 30) ageMatch = true;
+        if (filters.ageRanges["31-40"] && age >= 31 && age <= 40) ageMatch = true;
+        if (filters.ageRanges["40+"] && age > 40) ageMatch = true;
+        
+        if (!ageMatch) return false;
+      }
+      
+      // Language filter
+      if (hasActiveLanguageFilters) {
+        const selectedLanguages = Object.entries(filters.languages)
+          .filter(([_, selected]) => selected)
+          .map(([language]) => language);
+          
+        const hasMatchingLanguage = selectedLanguages.some(language => 
+          profile.languages && profile.languages.includes(language)
+        );
+        
+        if (!hasMatchingLanguage) return false;
+      }
+      
+      // Sleep habit filter
+      if (hasActiveSleepFilters) {
+        const isEarlyBird = profile.travelTraits && profile.travelTraits.some(
+          trait => trait.toLowerCase().includes("early")
+        );
+        const isNightOwl = profile.travelTraits && profile.travelTraits.some(
+          trait => trait.toLowerCase().includes("night")
+        );
+        
+        if (filters.sleepingHabits["Early bird"] && !isEarlyBird) return false;
+        if (filters.sleepingHabits["Night owl"] && !isNightOwl) return false;
+      }
+      
+      // Noise level filter
+      if (hasActiveNoiseFilters) {
+        const isQuiet = profile.travelTraits && profile.travelTraits.some(
+          trait => trait.toLowerCase().includes("quiet")
+        );
+        const isSocial = profile.travelTraits && profile.travelTraits.some(
+          trait => trait.toLowerCase().includes("social")
+        );
+        
+        if (filters.noiseLevel["Quiet"] && !isQuiet) return false;
+        if (filters.noiseLevel["Social"] && !isSocial) return false;
+      }
+      
+      return true;
+    });
+    
+    setFilteredProfiles(filtered);
+  }, [filters, profiles]);
+
+  // Update filtered profiles when profiles data changes
+  useEffect(() => {
+    if (profiles) {
+      // Initialize allProfiles with current profiles
+      setAllProfiles(profiles);
+      
+      // Apply existing filters (if any)
+      applyFilters();
+    }
+  }, [profiles, applyFilters]);
+
   const { data: profiles, isLoading } = useQuery({
-    queryKey: ['/api/matching', { userId, location: destination, startDate, endDate }],
+    queryKey: ['/api/matching'],
     queryFn: async () => {
       try {
         // Try to get data from API if we have search criteria
@@ -264,7 +355,8 @@ const BrowseProfiles: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-4">
-          {profiles?.map((profile) => (
+          {/* Use filtered profiles if there are active filters, otherwise use all profiles */}
+          {(filteredProfiles.length > 0 ? filteredProfiles : profiles)?.map((profile) => (
             <RoommateCard
               key={profile.id}
               profile={profile}
@@ -272,7 +364,46 @@ const BrowseProfiles: React.FC = () => {
             />
           ))}
           
-          {profiles?.length === 0 && (
+          {/* No results message for filter or search */}
+          {activeFilters && filteredProfiles.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              No roommates match your filter criteria.
+              <div className="mt-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    setFilters({
+                      ageRanges: {
+                        "18-25": false,
+                        "26-30": false,
+                        "31-40": false,
+                        "40+": false
+                      },
+                      languages: {
+                        "English": false,
+                        "French": false,
+                        "German": false,
+                        "Spanish": false
+                      },
+                      sleepingHabits: {
+                        "Early bird": false,
+                        "Night owl": false
+                      },
+                      noiseLevel: {
+                        "Quiet": false,
+                        "Social": false
+                      }
+                    });
+                    setActiveFilters(false);
+                    setFilteredProfiles(profiles || []);
+                  }}
+                >
+                  Clear Filters
+                </Button>
+              </div>
+            </div>
+          ) : profiles?.length === 0 && (
             <div className="text-center py-8 text-gray-500">
               No compatible roommates found for this destination and dates.
             </div>
