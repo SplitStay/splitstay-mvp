@@ -8,13 +8,20 @@ const Home: React.FC = () => {
 
   return (
     <div className="p-6 flex flex-col items-center">
-      {/* Removed extra spacing */}
-      
-      <p className="text-center text-gray-700 mb-10 mt-2 md:-mt-24">
-        Welcome to SplitStay — where<br />
-        solo travelers connect, match,<br />
-        and save.
-      </p>
+      {/* Logo section with proper spacing */}
+      <div className="flex flex-col items-center mb-12 pt-4">
+        <img 
+          src="/Splitstay Logo Transparent.png" 
+          alt="SplitStay Logo" 
+          className="h-20 mb-4"
+        />
+        <h1 className="text-3xl font-bold text-primary text-center mb-6">SplitStay</h1>
+        <p className="text-center text-gray-700 mt-2">
+          Welcome to SplitStay — where<br />
+          solo travelers connect, match,<br />
+          and save.
+        </p>
+      </div>
       
       <h2 className="text-2xl font-semibold text-primary text-center mb-6">Ready to find your perfect roommate?</h2>
       
