@@ -34,8 +34,7 @@ const BrowseProfiles: React.FC = () => {
     languages: {
       "English": false,
       "French": false,
-      "German": false,
-      "Spanish": false
+      "German": false
     },
     sleepingHabits: {
       "Early bird": false,
