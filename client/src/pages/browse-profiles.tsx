@@ -27,7 +27,8 @@ const BrowseProfiles: React.FC = () => {
     ageRanges: {
       "18-25": false,
       "26-30": false,
-      "31-40+": false
+      "31-40": false,
+      "40+": false
     },
     languages: {
       "English": false,
@@ -276,10 +277,10 @@ const BrowseProfiles: React.FC = () => {
       
       {/* Filter Dialog */}
       <Dialog open={filterDialogOpen} onOpenChange={setFilterDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Filter Roommates</DialogTitle>
-            <p className="text-sm text-muted-foreground">
+        <DialogContent className="max-w-md py-5" aria-describedby="filter-dialog-description">
+          <DialogHeader className="pb-3">
+            <DialogTitle className="text-center py-2 mt-2">Filter Roommates</DialogTitle>
+            <p className="text-sm text-muted-foreground text-center" id="filter-dialog-description">
               Customize your roommate search by selecting your preferences.
             </p>
           </DialogHeader>
@@ -410,7 +411,8 @@ const BrowseProfiles: React.FC = () => {
                   ageRanges: {
                     "18-25": false,
                     "26-30": false,
-                    "31-40+": false
+                    "31-40": false,
+                    "40+": false
                   },
                   languages: {
                     "English": false,
