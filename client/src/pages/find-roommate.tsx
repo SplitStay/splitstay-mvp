@@ -8,8 +8,8 @@ import { cn } from "@/lib/utils";
 
 const FindRoommate: React.FC = () => {
   const [_, navigate] = useLocation();
-  const [destination, setDestination] = useState("Brussels");
-  const [dates, setDates] = useState("May 12 - 15");
+  const [destination, setDestination] = useState("");
+  const [dates, setDates] = useState("");
   const [preferences, setPreferences] = useState({
     sleepHabits: "early_bird",
     noiseLevel: "quiet",
@@ -31,6 +31,12 @@ const FindRoommate: React.FC = () => {
   };
 
   const handleFindMatches = () => {
+    // Save the search criteria if needed
+    localStorage.setItem('splitstay_search', JSON.stringify({
+      destination,
+      dates,
+      preferences
+    }));
     navigate("/browse-profiles");
   };
 

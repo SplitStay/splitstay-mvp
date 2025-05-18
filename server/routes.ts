@@ -91,24 +91,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { userId, location, startDate, endDate } = req.query;
       
-      if (!userId || !location || !startDate || !endDate) {
-        return res.status(400).json({ message: "Missing required parameters" });
-      }
-      
-      const id = parseInt(userId as string, 10);
-      const dateStart = new Date(startDate as string);
-      const dateEnd = new Date(endDate as string);
+      // For demo purposes, we'll be more flexible with parameters
+      const id = userId ? parseInt(userId as string, 10) : 1; // Use user 1 as default
+      const locationStr = location ? (location as string) : "all";
+      const dateStart = startDate ? new Date(startDate as string) : new Date();
+      const dateEnd = endDate ? new Date(endDate as string) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // Default: 1 week from now
       
       const compatibleUsers = await storage.findCompatibleUsers(
         id, 
-        location as string, 
+        locationStr, 
         dateStart, 
         dateEnd
       );
       
       res.json(compatibleUsers);
     } catch (error) {
-      res.status(500).json({ message: "Failed to find compatible users" });
+      console.error("Matching API error:", error);
+      res.status(500).json({ message: "Failed to find compatible users", error: String(error) });
     }
   });
   

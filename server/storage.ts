@@ -16,7 +16,7 @@ import {
   type BookingDetails
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, ilike, or, desc } from "drizzle-orm";
+import { eq, and, ilike, or, desc, ne } from "drizzle-orm";
 
 // Storage interface
 export interface IStorage {
@@ -625,50 +625,54 @@ export class DatabaseStorage implements IStorage {
 
   // Special operations
   async findCompatibleUsers(userId: number, location: string, dateStart: Date, dateEnd: Date): Promise<UserProfile[]> {
-    const currentUser = await this.getUser(userId);
-    if (!currentUser) return [];
+    try {
+      const currentUser = await this.getUser(userId);
+      if (!currentUser) return [];
 
-    // Get all users except the current one
-    const otherUsers = await db
-      .select()
-      .from(users)
-      .where(
-        userId !== undefined ? and(eq(users.id, userId).not()) : undefined
-      );
-    
-    if (!otherUsers.length) return [];
-    
-    // Simple compatibility algorithm - similar to the one in MemStorage
-    return otherUsers.map(user => {
-      const sharedLanguages = user.languages.filter(lang => 
-        currentUser.languages.includes(lang)
-      ).length;
+      // Get all users except the current one
+      const allUsers = await db
+        .select()
+        .from(users);
+        
+      const otherUsers = allUsers.filter(user => user.id !== userId);
       
-      // Calculate a match percentage
-      let matchPercentage = Math.floor(Math.random() * 40) + 50; // Between 50-90%
+      if (!otherUsers.length) return [];
       
-      if (sharedLanguages > 0) matchPercentage += 10;
-      if (user.gender === currentUser.gender) matchPercentage += 5;
-      
-      // Cap at 95%
-      matchPercentage = Math.min(matchPercentage, 95);
-      
-      // Assign a label based on percentage
-      let matchLabel = "";
-      if (matchPercentage >= 90) {
-        matchLabel = "Recommended Roommate";
-      } else if (matchPercentage >= 70) {
-        matchLabel = "Ideal Match";
-      } else if (matchPercentage >= 60) {
-        matchLabel = "Recommended";
-      }
-      
-      return {
-        ...user,
-        matchPercentage,
-        matchLabel
-      };
-    }).sort((a, b) => (b.matchPercentage || 0) - (a.matchPercentage || 0));
+      // Simple compatibility algorithm 
+      return otherUsers.map(user => {
+        const sharedLanguages = user.languages.filter(lang => 
+          currentUser.languages.includes(lang)
+        ).length;
+        
+        // Calculate a match percentage
+        let matchPercentage = Math.floor(Math.random() * 40) + 50; // Between 50-90%
+        
+        if (sharedLanguages > 0) matchPercentage += 10;
+        if (user.gender === currentUser.gender) matchPercentage += 5;
+        
+        // Cap at 95%
+        matchPercentage = Math.min(matchPercentage, 95);
+        
+        // Assign a label based on percentage
+        let matchLabel = "";
+        if (matchPercentage >= 90) {
+          matchLabel = "Recommended Roommate";
+        } else if (matchPercentage >= 70) {
+          matchLabel = "Ideal Match";
+        } else if (matchPercentage >= 60) {
+          matchLabel = "Recommended";
+        }
+        
+        return {
+          ...user,
+          matchPercentage,
+          matchLabel
+        };
+      }).sort((a, b) => (b.matchPercentage || 0) - (a.matchPercentage || 0));
+    } catch (error) {
+      console.error("Error finding compatible users:", error);
+      return [];
+    }
   }
 }
 
