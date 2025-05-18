@@ -61,6 +61,7 @@ const FindRoommate: React.FC = () => {
     sleepHabits: "early_bird",
     noiseLevel: "quiet",
     roomType: "twin",
+    budget: [20, 120]
   });
   
   // Reference to the dropdown menu
@@ -545,6 +546,28 @@ const FindRoommate: React.FC = () => {
               onClick={() => handleRoomTypeClick("separate")}
               className="flex-1 justify-center"
             />
+          </div>
+        </div>
+        
+        <div className="space-y-2 pt-2">
+          <label className="block text-gray-700 font-medium">What's your ideal nightly rate?</label>
+          <div className="px-1 pt-4 pb-2">
+            <Slider
+              defaultValue={preferences.budget}
+              min={20}
+              max={120}
+              step={5}
+              onValueChange={(value) => {
+                setPreferences({
+                  ...preferences,
+                  budget: value
+                });
+              }}
+            />
+          </div>
+          <div className="flex justify-between mt-1 text-sm">
+            <span>${preferences.budget[0]}</span>
+            <span>${preferences.budget[1]}+</span>
           </div>
         </div>
         
