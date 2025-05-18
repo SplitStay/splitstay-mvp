@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ChevronRight, SlidersHorizontal, X, Moon, Sun, VolumeX, Users, Check } from "lucide-react";
@@ -21,8 +21,13 @@ const BrowseProfiles: React.FC = () => {
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [dates, setDates] = useState("");
   
+  // Profile state
+  const [allProfiles, setAllProfiles] = useState<UserProfile[]>([]);
+  const [filteredProfiles, setFilteredProfiles] = useState<UserProfile[]>([]);
+  
   // Filter dialog state
   const [filterDialogOpen, setFilterDialogOpen] = useState(false);
+  const [activeFilters, setActiveFilters] = useState(false);
   const [filters, setFilters] = useState({
     ageRanges: {
       "18-25": false,
@@ -446,7 +451,10 @@ const BrowseProfiles: React.FC = () => {
             <Button 
               size="sm"
               className="text-xs h-8 px-3 navy-button"
-              onClick={() => setFilterDialogOpen(false)}
+              onClick={() => {
+                applyFilters();
+                setFilterDialogOpen(false);
+              }}
             >
               Apply
             </Button>
