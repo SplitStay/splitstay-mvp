@@ -190,6 +190,11 @@ export type InsertReview = z.infer<typeof insertReviewSchema>;
 export type UserProfile = User & {
   matchPercentage?: number;
   matchLabel?: string;
+  age?: string;
+  gender?: string;
+  languages?: string[];
+  travelTraits?: string[];
+  positiveReviews?: boolean;
 };
 
 export type BookingDetails = Booking & {
