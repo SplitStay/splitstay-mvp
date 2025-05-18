@@ -566,8 +566,14 @@ const FindRoommate: React.FC = () => {
             />
           </div>
           <div className="flex justify-between mt-1 text-sm">
-            <span>${preferences.budget[0]}</span>
-            <span>${preferences.budget[1]}+</span>
+            <div>
+              <span className="text-xs text-gray-500">Min</span>
+              <span className="font-medium"> ${preferences.budget[0]}</span>
+            </div>
+            <div>
+              <span className="text-xs text-gray-500">Max</span>
+              <span className="font-medium"> ${preferences.budget[1]}+</span>
+            </div>
           </div>
         </div>
         
