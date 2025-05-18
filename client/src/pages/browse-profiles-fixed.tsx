@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, ChevronRight, SlidersHorizontal, X, Moon, Sun, VolumeX, Users, Check } from "lucide-react";
+import { ArrowLeft, ChevronRight, SlidersHorizontal, Moon, Sun, VolumeX, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SplitStayLogo } from "@/components/icons";
 import RoommateCard from "@/components/roommate-card";
@@ -20,10 +20,6 @@ const BrowseProfiles: React.FC = () => {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [dates, setDates] = useState("");
-  
-  // Profile state
-  const [allProfiles, setAllProfiles] = useState<UserProfile[]>([]);
-  const [filteredProfiles, setFilteredProfiles] = useState<UserProfile[]>([]);
   
   // Filter dialog state
   const [filterDialogOpen, setFilterDialogOpen] = useState(false);
@@ -50,63 +46,8 @@ const BrowseProfiles: React.FC = () => {
       "Social": false
     }
   });
-
-  // In a real app, this would use the actual logged-in user ID
-  // For demo purposes we'll use a fixed ID
-  const userId = 5; // John Doe
   
-  // Load search criteria from localStorage when component mounts
-  useEffect(() => {
-    const savedSearch = localStorage.getItem('splitstay_search');
-    console.log("Saved search data:", savedSearch);
-    
-    if (savedSearch) {
-      try {
-        const searchData = JSON.parse(savedSearch);
-        console.log("Parsed search data:", searchData);
-        
-        if (searchData.destination) {
-          console.log("Setting destination:", searchData.destination);
-          setDestination(searchData.destination);
-        }
-        
-        if (searchData.startDate && searchData.endDate) {
-          // Handle both string dates and Date objects
-          const start = typeof searchData.startDate === 'string' 
-            ? new Date(searchData.startDate) 
-            : searchData.startDate;
-          
-          const end = typeof searchData.endDate === 'string'
-            ? new Date(searchData.endDate)
-            : searchData.endDate;
-            
-          console.log("Start date:", start);
-          console.log("End date:", end);
-          
-          setStartDate(start);
-          setEndDate(end);
-          
-          // Format dates for display
-          try {
-            const formattedDates = `${format(start, 'MMM d')} – ${format(end, 'MMM d')}`;
-            console.log("Formatted dates:", formattedDates);
-            setDates(formattedDates);
-          } catch (formatError) {
-            console.error("Error formatting dates:", formatError);
-            setDates("Select dates");
-          }
-        }
-      } catch (error) {
-        console.error("Error parsing saved search data:", error);
-      }
-    } else {
-      // Provide fallback values for when no search data exists
-      setDestination("Select destination");
-      setDates("Select dates");
-    }
-  }, []);
-
-  // Define some hardcoded profiles for demo purposes
+  // Demo profiles
   const defaultProfiles: UserProfile[] = [
     {
       id: "1",
@@ -163,15 +104,16 @@ const BrowseProfiles: React.FC = () => {
       positiveReviews: true
     }
   ];
-
-  // Fetch compatible profiles - with fallback to demo profiles if the API fails
+  
+  // State for filtered profiles
+  const [filteredProfiles, setFilteredProfiles] = useState<UserProfile[]>([]);
+  
+  // Fetch profiles
   const { data: profiles, isLoading } = useQuery({
     queryKey: ['/api/matching'],
     queryFn: async () => {
       try {
-        // Try to get data from API if we have search criteria
         if (destination && startDate && endDate) {
-          // Format dates as ISO strings for the API
           const startDateStr = startDate.toISOString().split('T')[0];
           const endDateStr = endDate.toISOString().split('T')[0];
           
@@ -184,7 +126,6 @@ const BrowseProfiles: React.FC = () => {
           }
         }
         
-        // For demo purposes, return default profiles
         console.log("Using default profiles for demo");
         return defaultProfiles;
       } catch (error) {
@@ -194,8 +135,53 @@ const BrowseProfiles: React.FC = () => {
     }
   });
   
-  // Define the apply filters function
-  const applyFilters = useCallback(() => {
+  // Load saved search data on mount
+  useEffect(() => {
+    const savedSearchData = localStorage.getItem("splitstay_search");
+    
+    if (savedSearchData) {
+      console.log("Saved search data:", savedSearchData);
+      try {
+        const parsedData = JSON.parse(savedSearchData);
+        console.log("Parsed search data:", parsedData);
+        
+        if (parsedData.destination) {
+          console.log("Setting destination:", parsedData.destination);
+          setDestination(parsedData.destination);
+        }
+        
+        if (parsedData.startDate && parsedData.endDate) {
+          console.log("Start date:", parsedData.startDate);
+          console.log("End date:", parsedData.endDate);
+          
+          const start = new Date(parsedData.startDate);
+          const end = new Date(parsedData.endDate);
+          
+          setStartDate(start);
+          setEndDate(end);
+          
+          // Format dates for display
+          try {
+            const formattedDates = `${format(start, 'MMM d')} – ${format(end, 'MMM d')}`;
+            console.log("Formatted dates:", formattedDates);
+            setDates(formattedDates);
+          } catch (formatError) {
+            console.error("Error formatting dates:", formatError);
+            setDates("Select dates");
+          }
+        }
+      } catch (error) {
+        console.error("Error parsing saved search data:", error);
+      }
+    } else {
+      // Provide fallback values for when no search data exists
+      setDestination("Select destination");
+      setDates("Select dates");
+    }
+  }, []);
+  
+  // Apply filters when filter state changes
+  useEffect(() => {
     if (!profiles) return;
     
     // Check if any filters are active
@@ -273,46 +259,40 @@ const BrowseProfiles: React.FC = () => {
     
     setFilteredProfiles(filtered);
   }, [filters, profiles]);
-
-  // Update filtered profiles when profiles data changes
+  
+  // Initialize filtered profiles when profiles load
   useEffect(() => {
     if (profiles) {
-      // Initialize allProfiles with current profiles
-      setAllProfiles(profiles);
-      
-      // Apply existing filters (if any)
-      applyFilters();
+      setFilteredProfiles(profiles);
     }
-  }, [profiles, applyFilters]);
-
-  const { data: profiles, isLoading } = useQuery({
-    queryKey: ['/api/matching'],
-    queryFn: async () => {
-      try {
-        // Try to get data from API if we have search criteria
-        if (destination && startDate && endDate) {
-          // Format dates as ISO strings for the API
-          const startDateStr = startDate.toISOString().split('T')[0];
-          const endDateStr = endDate.toISOString().split('T')[0];
-          
-          const res = await fetch(
-            `/api/matching?userId=${userId}&location=${encodeURIComponent(destination)}&startDate=${startDateStr}&endDate=${endDateStr}`
-          );
-          
-          if (res.ok) {
-            return res.json() as Promise<UserProfile[]>;
-          }
-        }
-        
-        // For demo purposes, return default profiles
-        console.log("Using default profiles for demo");
-        return defaultProfiles;
-      } catch (error) {
-        console.error("Error fetching profiles:", error);
-        return defaultProfiles;
+  }, [profiles]);
+  
+  // Reset all filters
+  const resetFilters = () => {
+    setFilters({
+      ageRanges: {
+        "18-25": false,
+        "26-30": false,
+        "31-40": false,
+        "40+": false
+      },
+      languages: {
+        "English": false,
+        "French": false,
+        "German": false,
+        "Spanish": false
+      },
+      sleepingHabits: {
+        "Early bird": false,
+        "Night owl": false
+      },
+      noiseLevel: {
+        "Quiet": false,
+        "Social": false
       }
-    }
-  });
+    });
+    setActiveFilters(false);
+  };
 
   return (
     <div className="p-6">
@@ -384,8 +364,8 @@ const BrowseProfiles: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-4">
-          {/* Map through profiles */}
-          {profiles?.map((profile) => (
+          {/* Display filtered profiles when filters are active, otherwise show all profiles */}
+          {(activeFilters ? filteredProfiles : profiles)?.map((profile) => (
             <RoommateCard
               key={profile.id}
               profile={profile}
@@ -393,46 +373,24 @@ const BrowseProfiles: React.FC = () => {
             />
           ))}
           
-          {/* No results message for filter or search */}
-          {activeFilters && filteredProfiles.length === 0 ? (
+          {/* Show "no results" message if filters return no profiles */}
+          {activeFilters && filteredProfiles.length === 0 && (
             <div className="text-center py-8 text-gray-500">
               No roommates match your filter criteria.
               <div className="mt-2">
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => {
-                    setFilters({
-                      ageRanges: {
-                        "18-25": false,
-                        "26-30": false,
-                        "31-40": false,
-                        "40+": false
-                      },
-                      languages: {
-                        "English": false,
-                        "French": false,
-                        "German": false,
-                        "Spanish": false
-                      },
-                      sleepingHabits: {
-                        "Early bird": false,
-                        "Night owl": false
-                      },
-                      noiseLevel: {
-                        "Quiet": false,
-                        "Social": false
-                      }
-                    });
-                    setActiveFilters(false);
-                    setFilteredProfiles(profiles || []);
-                  }}
+                  onClick={resetFilters}
                 >
                   Clear Filters
                 </Button>
               </div>
             </div>
-          ) : profiles?.length === 0 && (
+          )}
+          
+          {/* Show "no profiles" message if there are no profiles at all */}
+          {!activeFilters && profiles?.length === 0 && (
             <div className="text-center py-8 text-gray-500">
               No compatible roommates found for this destination and dates.
             </div>
@@ -571,8 +529,6 @@ const BrowseProfiles: React.FC = () => {
                 ))}
               </div>
             </div>
-            
-            {/* No verified filter needed since all users are verified */}
           </div>
           
           <DialogFooter className="flex justify-between mt-1 pt-0 gap-2">
@@ -580,41 +536,14 @@ const BrowseProfiles: React.FC = () => {
               variant="outline"
               size="sm"
               className="text-xs h-8 px-3"
-              onClick={() => {
-                // Reset to initial filter state
-                setFilters({
-                  ageRanges: {
-                    "18-25": false,
-                    "26-30": false,
-                    "31-40": false,
-                    "40+": false
-                  },
-                  languages: {
-                    "English": false,
-                    "French": false,
-                    "German": false,
-                    "Spanish": false
-                  },
-                  sleepingHabits: {
-                    "Early bird": false,
-                    "Night owl": false
-                  },
-                  noiseLevel: {
-                    "Quiet": false,
-                    "Social": false
-                  }
-                });
-              }}
+              onClick={resetFilters}
             >
               Reset
             </Button>
             <Button 
               size="sm"
               className="text-xs h-8 px-3 navy-button"
-              onClick={() => {
-                applyFilters();
-                setFilterDialogOpen(false);
-              }}
+              onClick={() => setFilterDialogOpen(false)}
             >
               Apply
             </Button>

@@ -9,7 +9,7 @@ import Login from "@/pages/login";
 import SignUp from "@/pages/signup";
 import CreateProfile from "@/pages/create-profile";
 import FindRoommate from "@/pages/find-roommate";
-import BrowseProfiles from "@/pages/browse-profiles";
+import BrowseProfiles from "@/pages/browse-profiles-fixed";
 import RequestBooking from "@/pages/request-booking";
 import RequestSent from "@/pages/request-sent";
 import Chat from "@/pages/chat";
