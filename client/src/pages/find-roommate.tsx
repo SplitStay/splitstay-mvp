@@ -77,6 +77,7 @@ const FindRoommate: React.FC = () => {
     { city: "Dublin", country: "Ireland" },
     { city: "Eindhoven", country: "Netherlands" },
     { city: "Florence", country: "Italy" },
+    { city: "Frankfurt", country: "Germany" },
     { city: "Geneva", country: "Switzerland" },
     { city: "Istanbul", country: "Turkey" },
     { city: "Lisbon", country: "Portugal" },
@@ -90,6 +91,9 @@ const FindRoommate: React.FC = () => {
     { city: "Prague", country: "Czech Republic" },
     { city: "Rome", country: "Italy" },
     { city: "Rotterdam", country: "Netherlands" },
+    { city: "Santa Marta", country: "Colombia" },
+    { city: "Santa Marta", country: "Mexico" },
+    { city: "Santa Marta", country: "Spain" },
     { city: "Stockholm", country: "Sweden" },
     { city: "Utrecht", country: "Netherlands" },
     { city: "Venice", country: "Italy" },
@@ -195,14 +199,28 @@ const FindRoommate: React.FC = () => {
                   
                   // Auto-select current input text as destination
                   if (locationSearch.length > 0) {
-                    if (!locationSearch.includes(',')) {
-                      const fullLocation = `${locationSearch}, Netherlands`;
+                    // Check if this city exists in multiple countries
+                    const matchingLocations = globalLocations.filter(
+                      location => location.city.toLowerCase() === locationSearch.toLowerCase()
+                    );
+                    
+                    if (matchingLocations.length > 1) {
+                      // If multiple countries, keep dropdown open to let user choose
+                      setShowDropdown(true);
+                    } else if (matchingLocations.length === 1) {
+                      // If exactly one match, use that city and country
+                      const fullLocation = `${matchingLocations[0].city}, ${matchingLocations[0].country}`;
                       setDestination(fullLocation);
                       setLocationSearch(fullLocation);
+                      setShowDropdown(false);
+                    } else if (!locationSearch.includes(',')) {
+                      // For custom locations, ask user to choose a country
+                      setShowDropdown(true);
                     } else {
+                      // Input already has a country specified
                       setDestination(locationSearch);
+                      setShowDropdown(false);
                     }
-                    setShowDropdown(false);
                   }
                 }
               }}
@@ -244,30 +262,96 @@ const FindRoommate: React.FC = () => {
                     </div>
                   ))}
                   
-                {/* Custom entry option */}
-                <div
-                  className="p-3 bg-gray-50 hover:bg-gray-100 cursor-pointer text-navy font-medium border-t"
-                  onClick={() => {
-                    // Add Netherlands as default country if not specified
-                    if (!locationSearch.includes(',')) {
-                      const fullLocation = `${locationSearch}, Netherlands`;
-                      setDestination(fullLocation);
-                      setLocationSearch(fullLocation);
-                    } else {
-                      // Keep the location as is if it already has a country
-                      setDestination(locationSearch);
-                    }
-                    setShowDropdown(false);
-                  }}
-                >
-                  <span className="flex items-center">
-                    <span className="mr-2 text-navy">+</span>
-                    Use "{locationSearch}" as destination
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    You can enter any city, region, or country
-                  </span>
-                </div>
+                {/* Check if the city might exist in multiple countries */}
+                {(() => {
+                  // Get all matching cities by name (case insensitive)
+                  const matchingLocations = globalLocations.filter(
+                    location => location.city.toLowerCase() === locationSearch.toLowerCase()
+                  );
+                  
+                  // If this city exists in our database in multiple countries
+                  if (matchingLocations.length > 1) {
+                    return (
+                      <div className="border-t pt-2">
+                        <div className="px-3 py-1 text-xs text-gray-500 font-medium">
+                          This city exists in multiple countries:
+                        </div>
+                        {matchingLocations.map(location => (
+                          <div
+                            key={`${location.city}-${location.country}`}
+                            className="p-3 hover:bg-gray-100 cursor-pointer"
+                            onClick={() => {
+                              const fullLocation = `${location.city}, ${location.country}`;
+                              setDestination(fullLocation);
+                              setLocationSearch(fullLocation);
+                              setShowDropdown(false);
+                            }}
+                          >
+                            <span className="font-medium">{location.city}</span>
+                            <span className="text-gray-500">, {location.country}</span>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  }
+                  
+                  // Otherwise show custom entry option
+                  return (
+                    <div
+                      className="p-3 bg-gray-50 hover:bg-gray-100 cursor-pointer text-navy font-medium border-t"
+                      onClick={() => {
+                        // If user hasn't specified a country
+                        if (!locationSearch.includes(',')) {
+                          // List of common countries for suggestions
+                          const commonCountries = ["Germany", "France", "Spain", "United Kingdom", "Italy", "Netherlands"];
+                          
+                          // Show country selection dialog
+                          setShowDropdown(true);
+                          setLocationSearch(`${locationSearch}, `);
+                        } else {
+                          // Keep location as is if already has comma
+                          setDestination(locationSearch);
+                          setShowDropdown(false);
+                        }
+                      }}
+                    >
+                      <span className="flex items-center">
+                        <span className="mr-2 text-navy">+</span>
+                        Use "{locationSearch}" as destination
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {!locationSearch.includes(',') 
+                          ? "Add a country (e.g. Frankfurt, Germany)" 
+                          : "Use this custom location"}
+                      </span>
+                    </div>
+                  );
+                })()}
+                
+                {/* Suggest common countries if user is entering a custom city */}
+                {!locationSearch.includes(',') && !globalLocations.some(
+                  location => location.city.toLowerCase() === locationSearch.toLowerCase()
+                ) && locationSearch.length > 1 && (
+                  <div className="border-t">
+                    <div className="px-3 py-1 text-xs text-gray-500 font-medium">
+                      Popular countries:
+                    </div>
+                    {["Germany", "France", "Spain", "Italy", "United Kingdom"].map(country => (
+                      <div
+                        key={country}
+                        className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => {
+                          const fullLocation = `${locationSearch}, ${country}`;
+                          setDestination(fullLocation);
+                          setLocationSearch(fullLocation);
+                          setShowDropdown(false);
+                        }}
+                      >
+                        <span className="text-navy">{locationSearch}, {country}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
