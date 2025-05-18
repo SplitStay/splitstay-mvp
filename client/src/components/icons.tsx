@@ -78,14 +78,21 @@ export const LampIcon = ({ className = "" }: { className?: string }) => (
   </svg>
 );
 
-// Logo combination
-export const SplitStayLogo = ({ className = "" }: { className?: string }) => (
-  <div className={`flex items-center justify-center ${className}`}>
-    <img 
-      src="/assets/logo-transparent.png" 
-      alt="SplitStay Logo" 
-      className={`h-48 md:h-60 ${className}`}
-      style={{ marginBottom: "0" }}
-    />
-  </div>
-);
+// Logo component using the LOGO_TP.png file
+export const SplitStayLogo = ({ className = "", size = "medium" }: { className?: string; size?: "small" | "medium" | "large" }) => {
+  const sizeClass = {
+    small: "h-8 w-auto",
+    medium: "h-16 w-auto",
+    large: "h-24 w-auto"
+  };
+  
+  return (
+    <div className={`flex items-center justify-center ${className}`}>
+      <img 
+        src="/LOGO_TP.png" 
+        alt="SplitStay Logo" 
+        className={sizeClass[size]}
+      />
+    </div>
+  );
+};

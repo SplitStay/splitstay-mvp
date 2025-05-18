@@ -11,9 +11,9 @@ const Home: React.FC = () => {
       {/* Logo section with proper spacing */}
       <div className="flex flex-col items-center mb-12 pt-4">
         <img 
-          src="/Splitstay Logo Transparent.png" 
+          src="/LOGO_TP.png" 
           alt="SplitStay Logo" 
-          className="h-20 mb-4"
+          className="h-24 mb-4"
         />
         <h1 className="text-3xl font-bold text-primary text-center mb-6">SplitStay</h1>
         <p className="text-center text-gray-700 mt-2">
