@@ -30,9 +30,7 @@ const Home: React.FC = () => {
       {/* Action buttons */}
       <div className="w-full space-y-4">
         <Button
-          variant="outline"
-          size="lg"
-          className="w-full justify-between border-2 border-primary text-primary py-6 rounded-full"
+          className="navy-button flex justify-between"
           onClick={() => navigate("/signup")}
         >
           <div className="flex items-center">
