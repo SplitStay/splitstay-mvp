@@ -14,7 +14,7 @@ const Layout: React.FC<LayoutProps> = ({
 }) => {
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#F5F1EB" }}>
-      <header className="p-4" style={{ backgroundColor: "#F5F1EB" }}>
+      <header className="p-4 pt-0" style={{ backgroundColor: "#F5F1EB" }}>
         <div className="container mx-auto flex justify-center">
           <Link href="/">
             <div className="cursor-pointer">

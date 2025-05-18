@@ -8,11 +8,9 @@ const Home: React.FC = () => {
 
   return (
     <div className="p-6 flex flex-col items-center">
-      <div className="mb-4 mt-8">
-        {/* Empty space - Logo is in layout header */}
-      </div>
+      {/* Removed extra spacing */}
       
-      <p className="text-center text-gray-700 mb-10 mt-4">
+      <p className="text-center text-gray-700 mb-10 -mt-4">
         Welcome to SplitStay — where<br />
         solo travelers connect, match,<br />
         and save.

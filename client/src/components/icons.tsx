@@ -84,7 +84,7 @@ export const SplitStayLogo = ({ className = "" }: { className?: string }) => (
     <img 
       src="/assets/logo-transparent.png" 
       alt="SplitStay Logo" 
-      className={`h-32 ${className}`}
+      className={`h-64 ${className}`}
     />
   </div>
 );
