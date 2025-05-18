@@ -1,11 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import UserAvatar from "@/components/user-avatar";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Users } from "lucide-react";
+import { CheckCircle, Star, Users, ChevronDown, ChevronUp } from "lucide-react";
 import { Link } from "wouter";
 import { cn } from "@/lib/utils";
 import { UserProfile } from "@shared/schema";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface RoommateCardProps {
   profile: UserProfile;
@@ -18,8 +19,27 @@ const RoommateCard: React.FC<RoommateCardProps> = ({
   actionUrl,
   className = "",
 }) => {
+  const [reviewsOpen, setReviewsOpen] = useState(false);
   const CardComponent = actionUrl ? Link : 'div';
   const cardProps = actionUrl ? { href: actionUrl } : {};
+  
+  // Sample reviews - in a real app, these would come from the API
+  const sampleReviews = [
+    {
+      id: 1,
+      author: "Emily",
+      text: "Great roommate! Very respectful of shared spaces and quiet hours.",
+      rating: 5,
+      date: "April 2025"
+    },
+    {
+      id: 2,
+      author: "Michael",
+      text: "We had a pleasant stay sharing a room in Paris. Very organized and friendly.",
+      rating: 4,
+      date: "March 2025"
+    }
+  ];
 
   return (
     <CardComponent {...cardProps}>
@@ -73,10 +93,58 @@ const RoommateCard: React.FC<RoommateCardProps> = ({
                 <CheckCircle className="h-3 w-3 mr-1" />
                 Verified
               </span>
-              <span className="inline-flex items-center">
-                <Users className="h-3 w-3 mr-1" />
-                Positive reviews
-              </span>
+              {profile.positiveReviews && (
+                <Collapsible 
+                  open={reviewsOpen} 
+                  onOpenChange={setReviewsOpen}
+                  className={actionUrl ? "pointer-events-none" : ""}
+                >
+                  <CollapsibleTrigger 
+                    className="inline-flex items-center hover:underline"
+                    onClick={(e) => {
+                      if (actionUrl) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }
+                    }}
+                  >
+                    <Star className="h-3 w-3 mr-1 fill-yellow-500 text-yellow-500" />
+                    Positive reviews
+                    {reviewsOpen ? (
+                      <ChevronUp className="h-3 w-3 ml-1" />
+                    ) : (
+                      <ChevronDown className="h-3 w-3 ml-1" />
+                    )}
+                  </CollapsibleTrigger>
+                  
+                  <CollapsibleContent className="mt-2 border-t pt-2 border-gray-100">
+                    <div className="space-y-2">
+                      {sampleReviews.map(review => (
+                        <div key={review.id} className="text-xs text-gray-700">
+                          <div className="flex justify-between">
+                            <span className="font-medium">{review.author}</span>
+                            <span className="text-gray-500">{review.date}</span>
+                          </div>
+                          <div className="flex items-center mt-0.5">
+                            {[...Array(5)].map((_, i) => (
+                              <Star 
+                                key={i} 
+                                className={cn(
+                                  "h-2.5 w-2.5", 
+                                  i < review.rating 
+                                    ? "fill-yellow-500 text-yellow-500" 
+                                    : "text-gray-300"
+                                )}
+                              />
+                            ))}
+                          </div>
+                          <p className="mt-1">{review.text}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              )}
             </div>
           )}
         </CardContent>
