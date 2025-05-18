@@ -39,8 +39,8 @@ const Login: React.FC = () => {
           email: email
         }));
         
-        // Navigate to profile dashboard
-        navigate("/browse-profiles");
+        // Navigate to find-roommate page after login
+        navigate("/find-roommate");
       }, 1000);
     } catch (error) {
       setIsLoading(false);
@@ -66,8 +66,8 @@ const Login: React.FC = () => {
         provider: provider
       }));
       
-      // Navigate to profile dashboard
-      navigate("/browse-profiles");
+      // Navigate to find-roommate page after social login
+      navigate("/find-roommate");
     }, 1000);
   };
 
