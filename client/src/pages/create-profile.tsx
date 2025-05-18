@@ -98,6 +98,13 @@ const CreateProfile: React.FC = () => {
   // Complete list of travel traits for search
   const allTravelTraits: TravelTrait[] = [
     ...travelTraits,
+    { id: "fine_dining", label: "Fine Dining" },
+    { id: "chatterbox", label: "Chatterbox" },
+    { id: "party_animal", label: "Party Animal" },
+    { id: "nature_lover", label: "Nature Lover" },
+    { id: "city_lover", label: "City Lover" },
+    { id: "bookworm", label: "Bookworm" },
+    { id: "binge_watcher", label: "Binge Watcher" },
     { id: "coffee_lover", label: "Coffee Lover" },
     { id: "tea_enthusiast", label: "Tea Enthusiast" },
     { id: "foodie", label: "Foodie" },
