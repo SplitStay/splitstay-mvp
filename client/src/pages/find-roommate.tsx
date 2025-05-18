@@ -146,24 +146,29 @@ const FindRoommate: React.FC = () => {
               type="text"
               value={locationSearch}
               onChange={(e) => setLocationSearch(e.target.value)}
-              placeholder="Search any global destination"
+              placeholder="Enter any destination worldwide"
               className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-primary pr-10"
             />
             <Search className="absolute right-4 top-3.5 text-gray-400 h-5 w-5 pointer-events-none" />
             
-            {locationSearch.length > 0 && (
+            {locationSearch.length > 1 && (
               <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                {/* Show header text explaining entry options */}
+                <div className="p-2 bg-gray-50 border-b text-sm text-gray-500">
+                  Search for any city or enter a custom location
+                </div>
+                
                 {/* Show matching locations */}
                 {globalLocations
                   .filter(location => 
                     location.city.toLowerCase().includes(locationSearch.toLowerCase()) ||
                     location.country.toLowerCase().includes(locationSearch.toLowerCase())
                   )
-                  .slice(0, 10) // Limit to 10 results for better performance
+                  .slice(0, 8) // Limit to 8 results for better performance
                   .map(location => (
                     <div
                       key={`${location.city}-${location.country}`}
-                      className="p-2 hover:bg-gray-100 cursor-pointer"
+                      className="p-3 hover:bg-gray-100 cursor-pointer"
                       onClick={() => {
                         const fullLocation = `${location.city}, ${location.country}`;
                         setDestination(fullLocation);
@@ -175,31 +180,22 @@ const FindRoommate: React.FC = () => {
                     </div>
                   ))}
                   
-                {/* Allow custom city entry */}
-                {(globalLocations.filter(location => 
-                  location.city.toLowerCase().includes(locationSearch.toLowerCase())
-                ).length === 0 || 
-                !globalLocations.some(location => 
-                  location.city.toLowerCase() === locationSearch.toLowerCase()
-                )) && (
-                  <div
-                    className="p-2 hover:bg-gray-100 cursor-pointer text-navy font-medium"
-                    onClick={() => {
-                      // If there's a comma, assume it's in "City, Country" format
-                      if (locationSearch.includes(',')) {
-                        setDestination(locationSearch);
-                        // No need to change the search text
-                      } else {
-                        // Prompt for country
-                        const customLocation = `${locationSearch} (custom location)`;
-                        setDestination(customLocation);
-                        setLocationSearch(customLocation);
-                      }
-                    }}
-                  >
+                {/* Always show custom entry option */}
+                <div
+                  className="p-3 bg-gray-50 hover:bg-gray-100 cursor-pointer text-navy font-medium border-t"
+                  onClick={() => {
+                    setDestination(locationSearch);
+                    // Let user add country if needed
+                  }}
+                >
+                  <span className="flex items-center">
+                    <span className="mr-2 text-navy">+</span>
                     Use "{locationSearch}" as destination
-                  </div>
-                )}
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    You can enter any city, region, or country
+                  </span>
+                </div>
               </div>
             )}
           </div>
