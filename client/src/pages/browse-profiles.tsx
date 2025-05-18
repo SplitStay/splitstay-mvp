@@ -272,6 +272,197 @@ const BrowseProfiles: React.FC = () => {
           )}
         </div>
       )}
+      
+      {/* Filter Dialog */}
+      <Dialog open={filterDialogOpen} onOpenChange={setFilterDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>Filter Roommates</span>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={() => setFilterDialogOpen(false)}
+                className="h-7 w-7"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6 py-4">
+            {/* Age Range */}
+            <div>
+              <h3 className="font-medium mb-3">Age Range</h3>
+              <div className="grid grid-cols-2 gap-3">
+                {Object.entries(filters.ageRanges).map(([range, checked]) => (
+                  <div key={range} className="flex items-center space-x-2">
+                    <Checkbox 
+                      id={`age-${range}`} 
+                      checked={checked}
+                      onCheckedChange={(checked) => {
+                        setFilters({
+                          ...filters,
+                          ageRanges: {
+                            ...filters.ageRanges,
+                            [range]: !!checked
+                          }
+                        });
+                      }}
+                    />
+                    <Label htmlFor={`age-${range}`}>{range}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Languages */}
+            <div>
+              <h3 className="font-medium mb-3">Languages</h3>
+              <div className="grid grid-cols-2 gap-3">
+                {Object.entries(filters.languages).map(([language, checked]) => (
+                  <div key={language} className="flex items-center space-x-2">
+                    <Checkbox 
+                      id={`lang-${language}`} 
+                      checked={checked}
+                      onCheckedChange={(checked) => {
+                        setFilters({
+                          ...filters,
+                          languages: {
+                            ...filters.languages,
+                            [language]: !!checked
+                          }
+                        });
+                      }}
+                    />
+                    <Label htmlFor={`lang-${language}`}>{language}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Preferences */}
+            <div>
+              <h3 className="font-medium mb-3">Sleep Habits</h3>
+              <div className="grid grid-cols-2 gap-3">
+                {Object.entries(filters.sleepingHabits).map(([habit, checked]) => (
+                  <div 
+                    key={habit}
+                    className={cn(
+                      "flex items-center p-3 border-2 rounded-md cursor-pointer",
+                      checked ? "border-primary bg-blue-50" : "border-gray-200"
+                    )}
+                    onClick={() => {
+                      setFilters({
+                        ...filters,
+                        sleepingHabits: {
+                          ...filters.sleepingHabits,
+                          [habit]: !checked
+                        }
+                      });
+                    }}
+                  >
+                    {habit === "Early bird" ? (
+                      <Sun className="h-5 w-5 mr-2 text-orange-500" />
+                    ) : (
+                      <Moon className="h-5 w-5 mr-2 text-indigo-600" />
+                    )}
+                    <span>{habit}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="font-medium mb-3">Noise Level</h3>
+              <div className="grid grid-cols-2 gap-3">
+                {Object.entries(filters.noiseLevel).map(([level, checked]) => (
+                  <div 
+                    key={level}
+                    className={cn(
+                      "flex items-center p-3 border-2 rounded-md cursor-pointer",
+                      checked ? "border-primary bg-blue-50" : "border-gray-200"
+                    )}
+                    onClick={() => {
+                      setFilters({
+                        ...filters,
+                        noiseLevel: {
+                          ...filters.noiseLevel,
+                          [level]: !checked
+                        }
+                      });
+                    }}
+                  >
+                    {level === "Quiet" ? (
+                      <VolumeX className="h-5 w-5 mr-2 text-gray-600" />
+                    ) : (
+                      <Users className="h-5 w-5 mr-2 text-blue-500" />
+                    )}
+                    <span>{level}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Verified Only */}
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="verified-only" 
+                checked={filters.verifiedOnly}
+                onCheckedChange={(checked) => {
+                  setFilters({
+                    ...filters,
+                    verifiedOnly: !!checked
+                  });
+                }}
+              />
+              <Label htmlFor="verified-only" className="flex items-center">
+                <Check className="h-4 w-4 mr-1 text-green-500" />
+                Verified users only
+              </Label>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setFilters({
+                  ageRanges: {
+                    "18-25": false,
+                    "26-30": false,
+                    "31-40": false,
+                    "41+": false
+                  },
+                  languages: {
+                    "English": false,
+                    "French": false,
+                    "German": false,
+                    "Spanish": false
+                  },
+                  sleepingHabits: {
+                    "Early bird": false,
+                    "Night owl": false
+                  },
+                  noiseLevel: {
+                    "Quiet": false,
+                    "Social": false
+                  },
+                  verifiedOnly: false
+                });
+              }}
+            >
+              Reset
+            </Button>
+            <Button 
+              className="navy-button"
+              onClick={() => setFilterDialogOpen(false)}
+            >
+              Apply Filters
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
