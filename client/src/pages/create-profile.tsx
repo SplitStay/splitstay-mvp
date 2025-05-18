@@ -129,8 +129,8 @@ const CreateProfile: React.FC = () => {
             key={trait.id}
             className={`py-3 px-6 rounded-full text-lg font-medium transition-colors ${
               selectedTraits.includes(trait.id)
-                ? "bg-primary-light text-dark border-2 border-primary-light"
-                : "bg-white border-2 border-gray-300 text-gray-700 hover:border-primary-light"
+                ? "bg-yellow-100 text-gray-800 border-2 border-yellow-300"
+                : "bg-white border-2 border-gray-300 text-gray-700 hover:border-yellow-300"
             }`}
             onClick={() => toggleTrait(trait.id)}
           >
