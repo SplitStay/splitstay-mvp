@@ -162,12 +162,21 @@ const FindRoommate: React.FC = () => {
     navigate("/browse-profiles");
   };
 
-  // Prevent form submission when Enter is pressed
-  const handleInputKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
+  // Handle document click to close dropdown when clicking outside
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
     }
-  };
+    
+    // Add event listener
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      // Clean up
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dropdownRef]);
   
   return (
     <div className="p-6">
@@ -226,11 +235,20 @@ const FindRoommate: React.FC = () => {
                   }
                 }
               }}
+              onBlur={() => {
+                // Small delay to allow for clicking on dropdown items
+                setTimeout(() => {
+                  if (!dropdownRef.current?.contains(document.activeElement)) {
+                    setShowDropdown(false);
+                  }
+                }, 200);
+              }}
               placeholder="Enter any destination worldwide"
               className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-primary pr-10"
             />
             <Search className="absolute right-4 top-3.5 text-gray-400 h-5 w-5 pointer-events-none" />
             
+            {/* Only show dropdown when showDropdown state is true */}
             {showDropdown && locationSearch.length > 1 && (
               <div 
                 ref={dropdownRef}
@@ -342,8 +360,16 @@ const FindRoommate: React.FC = () => {
                       className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
                       onClick={() => {
                         setLocationSearch(`${locationSearch}, `);
-                        // Keep dropdown open to let user type country
-                        setShowDropdown(true);
+                        // Keep focus on input so user can type country
+                        setTimeout(() => {
+                          const input = document.querySelector('input[type="text"]') as HTMLInputElement;
+                          if (input) {
+                            input.focus();
+                            // Position cursor at end of text
+                            const length = input.value.length;
+                            input.setSelectionRange(length, length);
+                          }
+                        }, 50);
                       }}
                     >
                       <span className="text-navy font-medium">Type a country for {locationSearch}</span>
