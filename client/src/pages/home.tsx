@@ -81,9 +81,8 @@ const Home: React.FC = () => {
       {/* Login */}
       <div className="mt-10 w-full">
         <Button
-          variant="outline"
           size="lg"
-          className="w-full border-2 border-primary text-primary py-6 rounded-full"
+          className="w-full bg-navy hover:bg-navy/90 text-white py-6 rounded-full"
           onClick={() => navigate("/browse-profiles")} // For demo, navigate to profiles
         >
           Log in
