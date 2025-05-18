@@ -80,9 +80,11 @@ export const LampIcon = ({ className = "" }: { className?: string }) => (
 
 // Logo combination
 export const SplitStayLogo = ({ className = "" }: { className?: string }) => (
-  <div className={`flex items-center justify-center space-x-1 ${className}`}>
-    <TwinBedIcon className="w-8 h-8" />
-    <LampIcon className="w-6 h-6" />
-    <TwinBedIcon className="w-8 h-8" />
+  <div className={`flex items-center justify-center ${className}`}>
+    <img 
+      src="/assets/logo.jpg" 
+      alt="SplitStay Logo" 
+      className="h-16"
+    />
   </div>
 );
