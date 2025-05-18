@@ -61,7 +61,8 @@ const CreateProfile: React.FC = () => {
     "English", "Spanish", "French", "German", "Chinese", "Japanese", "Portuguese", 
     "Russian", "Arabic", "Hindi", "Bengali", "Korean", "Italian", "Turkish", "Vietnamese", 
     "Tamil", "Urdu", "Polish", "Dutch", "Greek", "Thai", "Indonesian", "Malay", "Swahili", 
-    "Hebrew", "Swedish", "Danish", "Norwegian", "Finnish", "Czech", "Hungarian", "Romanian"
+    "Hebrew", "Swedish", "Danish", "Norwegian", "Finnish", "Czech", "Hungarian", "Romanian",
+    "Tagalog", "Filipino", "Ukrainian", "Persian", "Punjabi", "Telugu", "Marathi", "Kannada"
   ];
   
   // State for language search and selection
@@ -268,7 +269,7 @@ const CreateProfile: React.FC = () => {
             <div className="flex w-full rounded-md overflow-hidden">
               <Button 
                 type="button"
-                className={`flex-1 rounded-none ${travelReason === 'leisure' 
+                className={`flex-1 rounded-none hover:bg-yellow-100 hover:text-gray-800 hover:border-yellow-300 ${travelReason === 'leisure' 
                   ? 'bg-yellow-100 text-gray-800 border border-yellow-300' 
                   : 'bg-white text-navy border border-gray-300'}`}
                 onClick={() => setTravelReason('leisure')}
@@ -277,7 +278,7 @@ const CreateProfile: React.FC = () => {
               </Button>
               <Button 
                 type="button"
-                className={`flex-1 rounded-none ${travelReason === 'business' 
+                className={`flex-1 rounded-none hover:bg-yellow-100 hover:text-gray-800 hover:border-yellow-300 ${travelReason === 'business' 
                   ? 'bg-yellow-100 text-gray-800 border border-yellow-300' 
                   : 'bg-white text-navy border border-gray-300'}`}
                 onClick={() => setTravelReason('business')}
