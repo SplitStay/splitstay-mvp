@@ -353,6 +353,7 @@ const CreateProfile: React.FC = () => {
                           onClick={() => {
                             if (!tempSelectedLanguages.includes(lang)) {
                               setTempSelectedLanguages([...tempSelectedLanguages, lang]);
+                              setLanguageSearch(""); // Clear search after selection
                             }
                           }}
                         >
@@ -503,6 +504,7 @@ const CreateProfile: React.FC = () => {
                           onClick={() => {
                             if (!tempSelectedTraits.includes(trait.id)) {
                               setTempSelectedTraits([...tempSelectedTraits, trait.id]);
+                              setTraitSearch(""); // Clear search after selection
                             }
                           }}
                         >
