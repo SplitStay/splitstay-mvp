@@ -381,7 +381,12 @@ const CreateProfile: React.FC = () => {
                     </DialogClose>
                     <DialogClose asChild>
                       <Button
-                        className="bg-navy hover:bg-navy/90 text-white flex-1 sm:flex-none"
+                        type="button"
+                        style={{
+                          backgroundColor: "#001F3F", 
+                          color: "white",
+                          flex: "1 1 auto"
+                        }}
                         onClick={() => {
                           // Apply the temporary selections to the actual selections
                           setSelectedLanguages(tempSelectedLanguages);
@@ -529,8 +534,12 @@ const CreateProfile: React.FC = () => {
                     </DialogClose>
                     <DialogClose asChild>
                       <Button
-                        variant="default"
-                        className="bg-navy hover:bg-navy/90 text-white flex-1 sm:flex-none"
+                        type="button"
+                        style={{
+                          backgroundColor: "#001F3F", 
+                          color: "white",
+                          flex: "1 1 auto"
+                        }}
                         onClick={() => {
                           // Apply the temporary selections to the actual selections
                           setSelectedTraits(tempSelectedTraits);
