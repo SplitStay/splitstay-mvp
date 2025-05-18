@@ -1,22 +1,18 @@
 import React from "react";
 import { useLocation } from "wouter";
-import { SplitStayLogo } from "@/components/icons";
 import { Button } from "@/components/ui/button";
-import { Bed, UserPlus, Eye, CheckCircle } from "lucide-react";
+import { Bed, UserPlus, Eye, CheckCircle, ChevronRight } from "lucide-react";
 
 const Home: React.FC = () => {
   const [_, navigate] = useLocation();
 
   return (
     <div className="p-6 flex flex-col items-center">
-      {/* Logo */}
       <div className="mb-4 mt-8">
-        <SplitStayLogo className="text-primary" />
+        {/* Empty space - Logo is in layout header */}
       </div>
       
-      <h1 className="text-4xl font-bold text-primary text-center mb-4">SplitStay</h1>
-      
-      <p className="text-center text-gray-700 mb-10">
+      <p className="text-center text-gray-700 mb-10 mt-4">
         Welcome to SplitStay — where<br />
         solo travelers connect, match,<br />
         and save.
@@ -36,7 +32,7 @@ const Home: React.FC = () => {
             <Bed className="mr-3 h-5 w-5" />
             <span>Create Profile</span>
           </div>
-          <ChevronRightIcon />
+          <ChevronRight />
         </Button>
         
         <Button
@@ -49,7 +45,7 @@ const Home: React.FC = () => {
             <UserPlus className="mr-3 h-5 w-5" />
             <span>Find Roommates</span>
           </div>
-          <ChevronRightIcon />
+          <ChevronRight />
         </Button>
         
         <Button
@@ -62,7 +58,7 @@ const Home: React.FC = () => {
             <Eye className="mr-3 h-5 w-5" />
             <span>Just Browsing</span>
           </div>
-          <ChevronRightIcon />
+          <ChevronRight />
         </Button>
       </div>
       
@@ -98,22 +94,5 @@ const Home: React.FC = () => {
     </div>
   );
 };
-
-// Helper icon component
-const ChevronRightIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="m9 18 6-6-6-6" />
-  </svg>
-);
 
 export default Home;
