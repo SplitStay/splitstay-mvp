@@ -529,6 +529,7 @@ const CreateProfile: React.FC = () => {
                     </DialogClose>
                     <DialogClose asChild>
                       <Button
+                        variant="default"
                         className="bg-navy hover:bg-navy/90 text-white flex-1 sm:flex-none"
                         onClick={() => {
                           // Apply the temporary selections to the actual selections
