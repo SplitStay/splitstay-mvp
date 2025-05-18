@@ -16,6 +16,7 @@ import LeaveReview from "@/pages/leave-review";
 import RequestBooking from "@/pages/request-booking";
 import RequestSent from "@/pages/request-sent";
 import Chat from "@/pages/chat";
+import Messages from "@/pages/messages";
 import BookingConfirmation from "@/pages/booking-confirmation";
 import CheckIn from "@/pages/check-in";
 import GuestInfo from "@/pages/guest-info";
@@ -34,6 +35,7 @@ function Router() {
       <Route path="/create-profile" component={CreateProfile} />
       <Route path="/find-roommate" component={FindRoommate} />
       <Route path="/browse-profiles" component={BrowseProfiles} />
+      <Route path="/messages" component={Messages} />
       <Route path="/leave-review/:id" component={LeaveReview} />
       <Route path="/request-booking/:id" component={RequestBooking} />
       <Route path="/request-sent/:id" component={RequestSent} />
