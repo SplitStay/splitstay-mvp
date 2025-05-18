@@ -56,13 +56,22 @@ const CreateProfile: React.FC = () => {
   // Predefined values
   const languages = ["English", "Spanish", "French", "German", "Chinese", "Japanese"];
   
-  // Complete list of languages for search
+  // Complete list of languages for search - comprehensive global list
   const allLanguages = [
-    "English", "Spanish", "French", "German", "Chinese", "Japanese", "Portuguese", 
-    "Russian", "Arabic", "Hindi", "Bengali", "Korean", "Italian", "Turkish", "Vietnamese", 
-    "Tamil", "Urdu", "Polish", "Dutch", "Greek", "Thai", "Indonesian", "Malay", "Swahili", 
-    "Hebrew", "Swedish", "Danish", "Norwegian", "Finnish", "Czech", "Hungarian", "Romanian",
-    "Tagalog", "Filipino", "Ukrainian", "Persian", "Punjabi", "Telugu", "Marathi", "Kannada"
+    "Afrikaans", "Albanian", "Amharic", "Arabic", "Armenian", "Assamese", "Azerbaijani", "Basque", 
+    "Belarusian", "Bengali", "Bosnian", "Bulgarian", "Burmese", "Catalan", "Cebuano", "Chichewa", 
+    "Chinese", "Corsican", "Croatian", "Czech", "Danish", "Dutch", "English", "Esperanto", "Estonian", 
+    "Farsi", "Filipino", "Finnish", "French", "Frisian", "Galician", "Georgian", "German", "Greek", 
+    "Gujarati", "Haitian Creole", "Hausa", "Hawaiian", "Hebrew", "Hindi", "Hmong", "Hungarian", 
+    "Icelandic", "Igbo", "Indonesian", "Irish", "Italian", "Japanese", "Javanese", "Kannada", 
+    "Kazakh", "Khmer", "Korean", "Kurdish", "Kyrgyz", "Lao", "Latin", "Latvian", "Lithuanian", 
+    "Luxembourgish", "Macedonian", "Malagasy", "Malay", "Malayalam", "Maltese", "Maori", "Marathi", 
+    "Mongolian", "Nepali", "Norwegian", "Odia", "Pashto", "Persian", "Polish", "Portuguese", 
+    "Punjabi", "Romanian", "Russian", "Samoan", "Scots Gaelic", "Serbian", "Sesotho", "Shona", 
+    "Sindhi", "Sinhala", "Slovak", "Slovenian", "Somali", "Spanish", "Sundanese", "Swahili", 
+    "Swedish", "Tajik", "Tamil", "Tatar", "Telugu", "Thai", "Turkish", "Turkmen", "Ukrainian", 
+    "Urdu", "Uyghur", "Uzbek", "Vietnamese", "Welsh", "Xhosa", "Yiddish", "Yoruba", "Zulu",
+    "Tagalog", "Mandarin", "Cantonese", "Wu", "Min", "Hakka", "Gan", "Sign Language"
   ];
   
   // State for language search and selection
@@ -269,7 +278,7 @@ const CreateProfile: React.FC = () => {
             <div className="flex w-full rounded-md overflow-hidden">
               <Button 
                 type="button"
-                className={`flex-1 rounded-none hover:bg-yellow-100 hover:text-gray-800 hover:border-yellow-300 ${travelReason === 'leisure' 
+                className={`flex-1 rounded-none hover:bg-accent hover:text-accent-foreground hover:border-accent ${travelReason === 'leisure' 
                   ? 'bg-yellow-100 text-gray-800 border border-yellow-300' 
                   : 'bg-white text-navy border border-gray-300'}`}
                 onClick={() => setTravelReason('leisure')}
@@ -278,7 +287,7 @@ const CreateProfile: React.FC = () => {
               </Button>
               <Button 
                 type="button"
-                className={`flex-1 rounded-none hover:bg-yellow-100 hover:text-gray-800 hover:border-yellow-300 ${travelReason === 'business' 
+                className={`flex-1 rounded-none hover:bg-accent hover:text-accent-foreground hover:border-accent ${travelReason === 'business' 
                   ? 'bg-yellow-100 text-gray-800 border border-yellow-300' 
                   : 'bg-white text-navy border border-gray-300'}`}
                 onClick={() => setTravelReason('business')}
