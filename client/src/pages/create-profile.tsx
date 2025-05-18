@@ -365,13 +365,13 @@ const CreateProfile: React.FC = () => {
                     </div>
                   )}
                   
-                  <DialogFooter>
+                  <DialogFooter className="flex justify-between sm:justify-end gap-2">
                     <DialogClose asChild>
-                      <Button variant="outline">Cancel</Button>
+                      <Button variant="outline" className="flex-1 sm:flex-none">Cancel</Button>
                     </DialogClose>
                     <DialogClose asChild>
                       <Button
-                        className="bg-navy hover:bg-navy/90 text-white"
+                        className="bg-navy hover:bg-navy/90 text-white flex-1 sm:flex-none"
                         onClick={() => {
                           // Apply the temporary selections to the actual selections
                           setSelectedLanguages(tempSelectedLanguages);
@@ -443,13 +443,7 @@ const CreateProfile: React.FC = () => {
           <div className="bg-white rounded-lg p-5">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-xl font-medium text-navy">Travel Traits</h3>
-              <Dialog onOpenChange={(open) => {
-                if (open) {
-                  // Initialize temporary selected traits with current selections
-                  setTempSelectedTraits([...selectedTraits]);
-                  setTraitSearch("");
-                }
-              }}>
+              <Dialog>
                 <DialogTrigger asChild>
                   <Button size="sm" variant="outline" className="h-8 px-2">
                     <Plus className="h-4 w-4 mr-1" />
@@ -519,29 +513,28 @@ const CreateProfile: React.FC = () => {
                     </div>
                   )}
                   
-                  <div className="flex justify-end">
-                    <Button
-                      className="bg-navy hover:bg-navy/90 text-white"
-                      onClick={() => {
-                        // Apply the temporary selections to the actual selections
-                        setSelectedTraits(tempSelectedTraits);
-                        
-                        // Show success notification
-                        toast({
-                          title: "Travel traits updated",
-                          description: `${tempSelectedTraits.length} traits selected`,
-                        });
-                        
-                        // Close dialog programmatically
-                        const closeButton = document.querySelector('[data-radix-collection-item]');
-                        if (closeButton instanceof HTMLElement) {
-                          closeButton.click();
-                        }
-                      }}
-                    >
-                      Confirm Selection
-                    </Button>
-                  </div>
+                  <DialogFooter className="flex justify-between sm:justify-end gap-2">
+                    <DialogClose asChild>
+                      <Button variant="outline" className="flex-1 sm:flex-none">Cancel</Button>
+                    </DialogClose>
+                    <DialogClose asChild>
+                      <Button
+                        className="bg-navy hover:bg-navy/90 text-white flex-1 sm:flex-none"
+                        onClick={() => {
+                          // Apply the temporary selections to the actual selections
+                          setSelectedTraits(tempSelectedTraits);
+                          
+                          // Show success notification
+                          toast({
+                            title: "Travel traits updated",
+                            description: `${tempSelectedTraits.length} traits selected`,
+                          });
+                        }}
+                      >
+                        Confirm Selection
+                      </Button>
+                    </DialogClose>
+                  </DialogFooter>
                 </DialogContent>
               </Dialog>
             </div>
