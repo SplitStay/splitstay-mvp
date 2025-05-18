@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --background: 0 0% 98%;
+  --background: 39 29% 95%;  /* #F5F1EB */
   --foreground: 240 10% 3.9%;
   --muted: 240 4.8% 95.9%;
   --muted-foreground: 240 3.8% 46.1%;
@@ -63,7 +63,7 @@
   max-width: 500px;
   margin: 0 auto;
   min-height: 100vh;
-  background-color: white;
+  background-color: #F5F1EB;
   position: relative;
 }
 
