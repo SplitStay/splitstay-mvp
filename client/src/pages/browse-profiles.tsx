@@ -27,14 +27,12 @@ const BrowseProfiles: React.FC = () => {
     ageRanges: {
       "18-25": false,
       "26-30": false,
-      "31-40": false,
-      "41+": false
+      "31-40": false
     },
     languages: {
       "English": false,
       "French": false,
-      "German": false,
-      "Spanish": false
+      "German": false
     },
     sleepingHabits: {
       "Early bird": false,
@@ -43,8 +41,7 @@ const BrowseProfiles: React.FC = () => {
     noiseLevel: {
       "Quiet": false,
       "Social": false
-    },
-    verifiedOnly: false
+    }
   });
 
   // In a real app, this would use the actual logged-in user ID
@@ -404,41 +401,24 @@ const BrowseProfiles: React.FC = () => {
               </div>
             </div>
             
-            {/* Verified Only */}
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="verified-only" 
-                checked={filters.verifiedOnly}
-                onCheckedChange={(checked) => {
-                  setFilters({
-                    ...filters,
-                    verifiedOnly: !!checked
-                  });
-                }}
-              />
-              <Label htmlFor="verified-only" className="flex items-center">
-                <Check className="h-4 w-4 mr-1 text-green-500" />
-                Verified users only
-              </Label>
-            </div>
+            {/* No verified filter needed since all users are verified */}
           </div>
           
           <DialogFooter>
             <Button
               variant="outline"
               onClick={() => {
+                // Reset to initial filter state
                 setFilters({
                   ageRanges: {
                     "18-25": false,
                     "26-30": false,
-                    "31-40": false,
-                    "41+": false
+                    "31-40": false
                   },
                   languages: {
                     "English": false,
                     "French": false,
-                    "German": false,
-                    "Spanish": false
+                    "German": false
                   },
                   sleepingHabits: {
                     "Early bird": false,
@@ -447,8 +427,7 @@ const BrowseProfiles: React.FC = () => {
                   noiseLevel: {
                     "Quiet": false,
                     "Social": false
-                  },
-                  verifiedOnly: false
+                  }
                 });
               }}
             >
