@@ -65,15 +65,7 @@ const Home: React.FC = () => {
       <div className="mt-10 w-full">
         <Button
           type="button"
-          style={{
-            backgroundColor: "#001F3F", 
-            color: "white",
-            width: "100%",
-            padding: "1.5rem 1rem",
-            borderRadius: "9999px",
-            fontSize: "1.125rem",
-            fontWeight: "600"
-          }}
+          className="navy-button"
           onClick={() => navigate("/login")} 
         >
           Log in
