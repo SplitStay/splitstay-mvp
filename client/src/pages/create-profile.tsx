@@ -165,8 +165,9 @@ const CreateProfile: React.FC = () => {
         <div className="bg-white rounded-lg p-5 flex flex-col gap-4">
           {/* Profile Picture */}
           <div className="flex flex-col items-center mb-2">
+            <p className="text-sm font-medium text-center mb-2">Add Profile Photo</p>
             <label htmlFor="profile-upload" className="cursor-pointer">
-              <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-3 relative overflow-hidden hover:opacity-90 transition-opacity">
+              <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-3 relative overflow-hidden hover:opacity-90 transition-opacity border-2 border-dashed border-navy">
                 {profileImage ? (
                   <img 
                     src={profileImage} 
@@ -174,7 +175,10 @@ const CreateProfile: React.FC = () => {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <Plus className="w-8 h-8 text-gray-500" />
+                  <div className="flex flex-col items-center justify-center">
+                    <Plus className="w-8 h-8 text-navy" />
+                    <span className="text-xs text-navy font-medium">Upload</span>
+                  </div>
                 )}
                 <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                   <span className="text-white text-xs font-medium">Change photo</span>
