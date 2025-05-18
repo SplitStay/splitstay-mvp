@@ -1,20 +1,44 @@
 import React, { useState } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, MapPin, Calendar, Moon, Sun, VolumeX, Users, Bed, DoorOpen } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Moon, Sun, VolumeX, Users, Bed, DoorOpen, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { format, addDays } from "date-fns";
 
 const FindRoommate: React.FC = () => {
   const [_, navigate] = useLocation();
   const [destination, setDestination] = useState("");
-  const [dates, setDates] = useState("");
+  const [locationSearch, setLocationSearch] = useState("");
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [isFlexible, setIsFlexible] = useState(false);
   const [preferences, setPreferences] = useState({
     sleepHabits: "early_bird",
     noiseLevel: "quiet",
     roomType: "twin",
   });
+  
+  // Global locations list for search
+  const globalLocations = [
+    "Amsterdam", "Athens", "Barcelona", "Berlin", "Brussels", 
+    "Budapest", "Copenhagen", "Dublin", "Florence", "Geneva", 
+    "Istanbul", "Lisbon", "London", "Madrid", "Milan", 
+    "Munich", "Oslo", "Paris", "Prague", "Rome", 
+    "Stockholm", "Venice", "Vienna", "Zurich",
+    "Bangkok", "Beijing", "Dubai", "Hong Kong", "Kyoto", 
+    "Kuala Lumpur", "Seoul", "Shanghai", "Singapore", "Tokyo",
+    "Cairo", "Cape Town", "Marrakech", "Nairobi",
+    "Auckland", "Melbourne", "Sydney",
+    "Cancun", "Havana", "Mexico City", "Rio de Janeiro", "San José",
+    "Boston", "Chicago", "Las Vegas", "Los Angeles", "Miami", 
+    "Montreal", "New York", "San Francisco", "Seattle", "Toronto", "Vancouver"
+  ];
 
   const handlePreferenceClick = (category: "sleepHabits" | "noiseLevel", value: string) => {
     setPreferences({
@@ -34,10 +58,18 @@ const FindRoommate: React.FC = () => {
     // Save the search criteria if needed
     localStorage.setItem('splitstay_search', JSON.stringify({
       destination,
-      dates,
+      startDate,
+      endDate,
+      isFlexible,
       preferences
     }));
     navigate("/browse-profiles");
+  };
+  
+  // Format the date range for display
+  const getDateRangeText = () => {
+    if (!startDate || !endDate) return "";
+    return `${format(startDate, "MMM d, yyyy")} - ${format(endDate, "MMM d, yyyy")}`;
   };
 
   return (
@@ -58,38 +90,103 @@ const FindRoommate: React.FC = () => {
         <div className="space-y-2">
           <label className="block text-gray-700 font-medium">Destination</label>
           <div className="relative">
-            <select
-              value={destination}
-              onChange={(e) => setDestination(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-primary appearance-none"
-            >
-              <option value="">Select a destination</option>
-              <option value="Brussels">Brussels</option>
-              <option value="Paris">Paris</option>
-              <option value="Amsterdam">Amsterdam</option>
-              <option value="Berlin">Berlin</option>
-              <option value="London">London</option>
-            </select>
-            <MapPin className="absolute right-4 top-3.5 text-gray-400 h-5 w-5 pointer-events-none" />
+            <Input
+              type="text"
+              value={locationSearch}
+              onChange={(e) => setLocationSearch(e.target.value)}
+              placeholder="Search any global destination"
+              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-primary pr-10"
+            />
+            <Search className="absolute right-4 top-3.5 text-gray-400 h-5 w-5 pointer-events-none" />
+            
+            {locationSearch.length > 0 && (
+              <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                {globalLocations
+                  .filter(location => location.toLowerCase().includes(locationSearch.toLowerCase()))
+                  .map(location => (
+                    <div
+                      key={location}
+                      className="p-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => {
+                        setDestination(location);
+                        setLocationSearch(location);
+                      }}
+                    >
+                      {location}
+                    </div>
+                  ))}
+              </div>
+            )}
           </div>
         </div>
         
         <div className="space-y-2">
           <label className="block text-gray-700 font-medium">Dates</label>
-          <div className="relative">
-            <select
-              value={dates}
-              onChange={(e) => setDates(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-primary appearance-none"
-            >
-              <option value="">Select travel dates</option>
-              <option value="May 12 - 15, 2025">May 12 - 15, 2025</option>
-              <option value="May 20 - 24, 2025">May 20 - 24, 2025</option>
-              <option value="June 5 - 10, 2025">June 5 - 10, 2025</option>
-              <option value="June 15 - 20, 2025">June 15 - 20, 2025</option>
-              <option value="July 1 - 7, 2025">July 1 - 7, 2025</option>
-            </select>
-            <Calendar className="absolute right-4 top-3.5 text-gray-400 h-5 w-5 pointer-events-none" />
+          <div className="grid grid-cols-2 gap-2 mb-1">
+            <div>
+              <label className="block text-sm text-gray-600 mb-1">From</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal border-2 border-gray-300",
+                      !startDate && "text-gray-500"
+                    )}
+                  >
+                    {startDate ? format(startDate, "MMM d, yyyy") : "Choose date"}
+                    <Calendar className="ml-auto h-4 w-4 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <CalendarComponent
+                    mode="single"
+                    selected={startDate}
+                    onSelect={setStartDate}
+                    initialFocus
+                    disabled={(date) => date < new Date()}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            
+            <div>
+              <label className="block text-sm text-gray-600 mb-1">Till</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal border-2 border-gray-300",
+                      !endDate && "text-gray-500"
+                    )}
+                  >
+                    {endDate ? format(endDate, "MMM d, yyyy") : "Choose date"}
+                    <Calendar className="ml-auto h-4 w-4 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <CalendarComponent
+                    mode="single"
+                    selected={endDate}
+                    onSelect={setEndDate}
+                    initialFocus
+                    disabled={(date) => !startDate || date < startDate}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="flexible-dates" 
+              checked={isFlexible}
+              onCheckedChange={(checked) => setIsFlexible(checked === true)}
+            />
+            <Label htmlFor="flexible-dates" className="text-sm text-gray-600">
+              Flexible dates (±3 days)
+            </Label>
           </div>
         </div>
         
@@ -150,7 +247,15 @@ const FindRoommate: React.FC = () => {
         <div className="pt-4">
           <Button
             type="submit"
-            className="w-full bg-primary text-white font-semibold py-3 px-4 rounded-lg"
+            style={{
+              backgroundColor: "#001F3F", 
+              color: "white",
+              width: "100%",
+              padding: "1rem 1.5rem",
+              borderRadius: "0.5rem",
+              fontSize: "1.125rem",
+              fontWeight: "600"
+            }}
           >
             Find Matches
           </Button>
