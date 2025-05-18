@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, ChevronRight, SlidersHorizontal } from "lucide-react";
+import { ArrowLeft, ChevronRight, SlidersHorizontal, X, Moon, Sun, VolumeX, Users, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SplitStayLogo } from "@/components/icons";
 import RoommateCard from "@/components/roommate-card";
@@ -9,6 +9,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { UserProfile } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 const BrowseProfiles: React.FC = () => {
   const [_, navigate] = useLocation();
@@ -16,6 +20,32 @@ const BrowseProfiles: React.FC = () => {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [dates, setDates] = useState("");
+  
+  // Filter dialog state
+  const [filterDialogOpen, setFilterDialogOpen] = useState(false);
+  const [filters, setFilters] = useState({
+    ageRanges: {
+      "18-25": false,
+      "26-30": false,
+      "31-40": false,
+      "41+": false
+    },
+    languages: {
+      "English": false,
+      "French": false,
+      "German": false,
+      "Spanish": false
+    },
+    sleepingHabits: {
+      "Early bird": false,
+      "Night owl": false
+    },
+    noiseLevel: {
+      "Quiet": false,
+      "Social": false
+    },
+    verifiedOnly: false
+  });
 
   // In a real app, this would use the actual logged-in user ID
   // For demo purposes we'll use a fixed ID
@@ -75,7 +105,7 @@ const BrowseProfiles: React.FC = () => {
   // Define some hardcoded profiles for demo purposes
   const defaultProfiles: UserProfile[] = [
     {
-      id: 1,
+      id: "1",
       firstName: "Hannah",
       lastName: "Kim",
       email: "hannah@example.com",
@@ -83,7 +113,7 @@ const BrowseProfiles: React.FC = () => {
       password: "password",
       profilePicture: "https://i.pravatar.cc/150?img=29",
       bio: "Spontaneous traveler who enjoys quiet hikes",
-      age: 28,
+      age: "28",
       gender: "female",
       languages: ["English", "French"],
       travelTraits: ["Nature lover", "Early riser", "Quiet"],
@@ -93,7 +123,7 @@ const BrowseProfiles: React.FC = () => {
       positiveReviews: true
     },
     {
-      id: 2,
+      id: "2",
       firstName: "Alina",
       lastName: "Chen",
       email: "alina@example.com",
@@ -101,7 +131,7 @@ const BrowseProfiles: React.FC = () => {
       password: "password",
       profilePicture: "https://i.pravatar.cc/150?img=31",
       bio: "Spontaneous traveler who enjoys quiet time",
-      age: 23,
+      age: "23",
       gender: "female",
       languages: ["English", "German"],
       travelTraits: ["Food lover", "Night owl", "Quiet"],
@@ -111,7 +141,7 @@ const BrowseProfiles: React.FC = () => {
       positiveReviews: true
     },
     {
-      id: 3,
+      id: "3",
       firstName: "Sophie",
       lastName: "Müller",
       email: "sophie@example.com",
@@ -119,7 +149,7 @@ const BrowseProfiles: React.FC = () => {
       password: "password",
       profilePicture: "https://i.pravatar.cc/150?img=5",
       bio: "Looking for a travel partner to split costs",
-      age: 27,
+      age: "27",
       gender: "female",
       languages: ["English", "French"],
       travelTraits: ["Shopper", "Foodie", "Social"],
@@ -175,7 +205,12 @@ const BrowseProfiles: React.FC = () => {
           <SplitStayLogo className="mx-auto" />
           <h1 className="text-2xl font-bold text-primary">SplitStay</h1>
         </div>
-        <Button variant="ghost" size="icon" className="text-gray-500">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="text-gray-500"
+          onClick={() => setFilterDialogOpen(true)}
+        >
           <SlidersHorizontal className="h-5 w-5" />
         </Button>
       </div>
