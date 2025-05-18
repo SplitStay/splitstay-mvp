@@ -10,7 +10,7 @@ const Home: React.FC = () => {
     <div className="p-6 flex flex-col items-center">
       {/* Removed extra spacing */}
       
-      <p className="text-center text-gray-700 mb-10 -mt-24">
+      <p className="text-center text-gray-700 mb-10 mt-2 md:-mt-24">
         Welcome to SplitStay — where<br />
         solo travelers connect, match,<br />
         and save.
