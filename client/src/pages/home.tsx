@@ -2,6 +2,8 @@ import React from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Bed, UserPlus, Eye, CheckCircle, ChevronRight } from "lucide-react";
+// Import the logo directly
+import logoImage from "../assets/LOGO_TP.png";
 
 const Home: React.FC = () => {
   const [_, navigate] = useLocation();
@@ -11,9 +13,9 @@ const Home: React.FC = () => {
       {/* Logo section with proper spacing */}
       <div className="flex flex-col items-center mb-12 pt-4">
         <img 
-          src="/LOGO_TP.png" 
+          src={logoImage} 
           alt="SplitStay Logo" 
-          className="h-24 mb-4"
+          className="h-24 w-auto mb-4"
         />
         <h1 className="text-3xl font-bold text-primary text-center mb-6">SplitStay</h1>
         <p className="text-center text-gray-700 mt-2">
