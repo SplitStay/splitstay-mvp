@@ -145,14 +145,18 @@ const CreateProfile: React.FC = () => {
             <div className="flex w-full rounded-md overflow-hidden">
               <Button 
                 type="button"
-                className={`flex-1 rounded-none ${travelReason === 'leisure' ? 'bg-navy text-white' : 'bg-white text-navy border border-gray-300'}`}
+                className={`flex-1 rounded-none ${travelReason === 'leisure' 
+                  ? 'bg-yellow-100 text-gray-800 border border-yellow-300' 
+                  : 'bg-white text-navy border border-gray-300'}`}
                 onClick={() => setTravelReason('leisure')}
               >
                 Leisure
               </Button>
               <Button 
                 type="button"
-                className={`flex-1 rounded-none ${travelReason === 'business' ? 'bg-navy text-white' : 'bg-white text-navy border border-gray-300'}`}
+                className={`flex-1 rounded-none ${travelReason === 'business' 
+                  ? 'bg-yellow-100 text-gray-800 border border-yellow-300' 
+                  : 'bg-white text-navy border border-gray-300'}`}
                 onClick={() => setTravelReason('business')}
               >
                 Business
