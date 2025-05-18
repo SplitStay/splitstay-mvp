@@ -24,37 +24,11 @@ const Home: React.FC = () => {
           variant="outline"
           size="lg"
           className="w-full justify-between border-2 border-primary text-primary py-6 rounded-full"
-          onClick={() => navigate("/create-profile")}
-        >
-          <div className="flex items-center">
-            <Bed className="mr-3 h-5 w-5" />
-            <span>Create Profile</span>
-          </div>
-          <ChevronRight />
-        </Button>
-        
-        <Button
-          variant="outline"
-          size="lg"
-          className="w-full justify-between border-2 border-primary text-primary py-6 rounded-full"
-          onClick={() => navigate("/browse-profiles")}
+          onClick={() => navigate("/signup")}
         >
           <div className="flex items-center">
             <UserPlus className="mr-3 h-5 w-5" />
-            <span>Find Roommates</span>
-          </div>
-          <ChevronRight />
-        </Button>
-        
-        <Button
-          variant="outline"
-          size="lg"
-          className="w-full justify-between border-2 border-primary text-primary py-6 rounded-full"
-          onClick={() => navigate("/browse-profiles")}
-        >
-          <div className="flex items-center">
-            <Eye className="mr-3 h-5 w-5" />
-            <span>Just Browsing</span>
+            <span>Create Profile</span>
           </div>
           <ChevronRight />
         </Button>
@@ -82,8 +56,8 @@ const Home: React.FC = () => {
       <div className="mt-10 w-full">
         <Button
           size="lg"
-          className="w-full bg-navy hover:bg-navy/90 text-white py-6 rounded-full"
-          onClick={() => navigate("/browse-profiles")} // For demo, navigate to profiles
+          className="w-full bg-navy hover:bg-navy/90 text-white py-6 rounded-full font-semibold text-lg"
+          onClick={() => navigate("/login")} 
         >
           Log in
         </Button>

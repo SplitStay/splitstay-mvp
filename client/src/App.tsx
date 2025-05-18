@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
+import Login from "@/pages/login";
+import SignUp from "@/pages/signup";
 import CreateProfile from "@/pages/create-profile";
 import FindRoommate from "@/pages/find-roommate";
 import BrowseProfiles from "@/pages/browse-profiles";
@@ -22,6 +24,8 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/login" component={Login} />
+      <Route path="/signup" component={SignUp} />
       <Route path="/create-profile" component={CreateProfile} />
       <Route path="/find-roommate" component={FindRoommate} />
       <Route path="/browse-profiles" component={BrowseProfiles} />
