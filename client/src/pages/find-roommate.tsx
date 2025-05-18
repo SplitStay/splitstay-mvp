@@ -98,6 +98,7 @@ const FindRoommate: React.FC = () => {
     { city: "Utrecht", country: "Netherlands" },
     { city: "Venice", country: "Italy" },
     { city: "Vienna", country: "Austria" },
+    { city: "Warsaw", country: "Poland" },
     { city: "Zurich", country: "Switzerland" },
     { city: "Bangkok", country: "Thailand" },
     { city: "Beijing", country: "China" },
@@ -336,7 +337,7 @@ const FindRoommate: React.FC = () => {
                     <div className="px-3 py-1 text-xs text-gray-500 font-medium">
                       Popular countries:
                     </div>
-                    {["Germany", "France", "Spain", "Italy", "United Kingdom"].map(country => (
+                    {["Poland", "Germany", "France", "Spain", "Italy", "United Kingdom", "Netherlands"].map(country => (
                       <div
                         key={country}
                         className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
