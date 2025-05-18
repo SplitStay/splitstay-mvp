@@ -11,6 +11,12 @@ import { cn } from "@/lib/utils";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { format, addDays } from "date-fns";
 
+// Define location interface
+interface LocationItem {
+  city: string;
+  country: string;
+}
+
 const FindRoommate: React.FC = () => {
   const [_, navigate] = useLocation();
   const [destination, setDestination] = useState("");
@@ -24,20 +30,66 @@ const FindRoommate: React.FC = () => {
     roomType: "twin",
   });
   
-  // Global locations list for search
-  const globalLocations = [
-    "Amsterdam", "Athens", "Barcelona", "Berlin", "Brussels", 
-    "Budapest", "Copenhagen", "Dublin", "Florence", "Geneva", 
-    "Istanbul", "Lisbon", "London", "Madrid", "Milan", 
-    "Munich", "Oslo", "Paris", "Prague", "Rome", 
-    "Stockholm", "Venice", "Vienna", "Zurich",
-    "Bangkok", "Beijing", "Dubai", "Hong Kong", "Kyoto", 
-    "Kuala Lumpur", "Seoul", "Shanghai", "Singapore", "Tokyo",
-    "Cairo", "Cape Town", "Marrakech", "Nairobi",
-    "Auckland", "Melbourne", "Sydney",
-    "Cancun", "Havana", "Mexico City", "Rio de Janeiro", "San José",
-    "Boston", "Chicago", "Las Vegas", "Los Angeles", "Miami", 
-    "Montreal", "New York", "San Francisco", "Seattle", "Toronto", "Vancouver"
+  // Global locations list for search with countries
+  const globalLocations: LocationItem[] = [
+    { city: "Amsterdam", country: "Netherlands" },
+    { city: "Athens", country: "Greece" },
+    { city: "Barcelona", country: "Spain" },
+    { city: "Berlin", country: "Germany" },
+    { city: "Brussels", country: "Belgium" },
+    { city: "Budapest", country: "Hungary" },
+    { city: "Copenhagen", country: "Denmark" },
+    { city: "Dublin", country: "Ireland" },
+    { city: "Florence", country: "Italy" },
+    { city: "Geneva", country: "Switzerland" },
+    { city: "Istanbul", country: "Turkey" },
+    { city: "Lisbon", country: "Portugal" },
+    { city: "London", country: "United Kingdom" },
+    { city: "Madrid", country: "Spain" },
+    { city: "Maaseik", country: "Belgium" },
+    { city: "Milan", country: "Italy" },
+    { city: "Munich", country: "Germany" },
+    { city: "Oslo", country: "Norway" },
+    { city: "Paris", country: "France" },
+    { city: "Prague", country: "Czech Republic" },
+    { city: "Rome", country: "Italy" },
+    { city: "Stockholm", country: "Sweden" },
+    { city: "Venice", country: "Italy" },
+    { city: "Vienna", country: "Austria" },
+    { city: "Zurich", country: "Switzerland" },
+    { city: "Bangkok", country: "Thailand" },
+    { city: "Beijing", country: "China" },
+    { city: "Dubai", country: "United Arab Emirates" },
+    { city: "Hong Kong", country: "China" },
+    { city: "Kyoto", country: "Japan" },
+    { city: "Kuala Lumpur", country: "Malaysia" },
+    { city: "Seoul", country: "South Korea" },
+    { city: "Shanghai", country: "China" },
+    { city: "Singapore", country: "Singapore" },
+    { city: "Tokyo", country: "Japan" },
+    { city: "Cairo", country: "Egypt" },
+    { city: "Cape Town", country: "South Africa" },
+    { city: "Marrakech", country: "Morocco" },
+    { city: "Nairobi", country: "Kenya" },
+    { city: "Auckland", country: "New Zealand" },
+    { city: "Melbourne", country: "Australia" },
+    { city: "Sydney", country: "Australia" },
+    { city: "Cancun", country: "Mexico" },
+    { city: "Havana", country: "Cuba" },
+    { city: "Mexico City", country: "Mexico" },
+    { city: "Rio de Janeiro", country: "Brazil" },
+    { city: "San José", country: "Costa Rica" },
+    { city: "Boston", country: "United States" },
+    { city: "Chicago", country: "United States" },
+    { city: "Las Vegas", country: "United States" },
+    { city: "Los Angeles", country: "United States" },
+    { city: "Miami", country: "United States" },
+    { city: "Montreal", country: "Canada" },
+    { city: "New York", country: "United States" },
+    { city: "San Francisco", country: "United States" },
+    { city: "Seattle", country: "United States" },
+    { city: "Toronto", country: "Canada" },
+    { city: "Vancouver", country: "Canada" }
   ];
 
   const handlePreferenceClick = (category: "sleepHabits" | "noiseLevel", value: string) => {
@@ -101,20 +153,53 @@ const FindRoommate: React.FC = () => {
             
             {locationSearch.length > 0 && (
               <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                {/* Show matching locations */}
                 {globalLocations
-                  .filter(location => location.toLowerCase().includes(locationSearch.toLowerCase()))
+                  .filter(location => 
+                    location.city.toLowerCase().includes(locationSearch.toLowerCase()) ||
+                    location.country.toLowerCase().includes(locationSearch.toLowerCase())
+                  )
+                  .slice(0, 10) // Limit to 10 results for better performance
                   .map(location => (
                     <div
-                      key={location}
+                      key={`${location.city}-${location.country}`}
                       className="p-2 hover:bg-gray-100 cursor-pointer"
                       onClick={() => {
-                        setDestination(location);
-                        setLocationSearch(location);
+                        const fullLocation = `${location.city}, ${location.country}`;
+                        setDestination(fullLocation);
+                        setLocationSearch(fullLocation);
                       }}
                     >
-                      {location}
+                      <span className="font-medium">{location.city}</span>
+                      <span className="text-gray-500">, {location.country}</span>
                     </div>
                   ))}
+                  
+                {/* Allow custom city entry */}
+                {(globalLocations.filter(location => 
+                  location.city.toLowerCase().includes(locationSearch.toLowerCase())
+                ).length === 0 || 
+                !globalLocations.some(location => 
+                  location.city.toLowerCase() === locationSearch.toLowerCase()
+                )) && (
+                  <div
+                    className="p-2 hover:bg-gray-100 cursor-pointer text-navy font-medium"
+                    onClick={() => {
+                      // If there's a comma, assume it's in "City, Country" format
+                      if (locationSearch.includes(',')) {
+                        setDestination(locationSearch);
+                        // No need to change the search text
+                      } else {
+                        // Prompt for country
+                        const customLocation = `${locationSearch} (custom location)`;
+                        setDestination(customLocation);
+                        setLocationSearch(customLocation);
+                      }
+                    }}
+                  >
+                    Use "{locationSearch}" as destination
+                  </div>
+                )}
               </div>
             )}
           </div>
