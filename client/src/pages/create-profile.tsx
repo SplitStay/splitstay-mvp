@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, Calendar, Plus } from "lucide-react";
+import { ArrowLeft, Calendar, Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,6 +10,7 @@ import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface TravelTrait {
   id: string;
@@ -166,7 +167,42 @@ const CreateProfile: React.FC = () => {
 
           {/* Languages */}
           <div>
-            <label className="block text-navy font-medium mb-1">Languages</label>
+            <div className="flex justify-between items-center mb-1">
+              <label className="block text-navy font-medium">Languages</label>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button size="sm" variant="outline" className="h-8 px-2">
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add Language</DialogTitle>
+                  </DialogHeader>
+                  <div className="relative mb-4">
+                    <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input className="pl-10" placeholder="Search languages" />
+                  </div>
+                  <div className="flex flex-wrap gap-2 max-h-60 overflow-y-auto">
+                    {["Arabic", "Bengali", "Dutch", "Finnish", "Greek", "Hindi", "Indonesian", "Korean", "Norwegian", "Portuguese", "Russian", "Swedish", "Thai", "Turkish", "Vietnamese"].map((lang) => (
+                      <Button 
+                        key={lang} 
+                        variant="outline" 
+                        className="py-1 px-3"
+                        onClick={() => {
+                          if (!selectedLanguages.includes(lang)) {
+                            setSelectedLanguages([...selectedLanguages, lang]);
+                          }
+                        }}
+                      >
+                        {lang}
+                      </Button>
+                    ))}
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
             <div className="flex flex-wrap gap-2">
               {languages.map((language) => (
                 <button
@@ -209,6 +245,48 @@ const CreateProfile: React.FC = () => {
 
           {/* Travel Traits */}
           <div className="bg-white rounded-lg p-5">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-xl font-medium text-navy">Travel Traits</h3>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button size="sm" variant="outline" className="h-8 px-2">
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add Travel Trait</DialogTitle>
+                  </DialogHeader>
+                  <div className="relative mb-4">
+                    <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input className="pl-10" placeholder="Search traits" />
+                  </div>
+                  <div className="flex flex-wrap gap-2 max-h-60 overflow-y-auto">
+                    {[
+                      "Coffee Lover", "Tea Enthusiast", "Foodie", "Minimalist", 
+                      "Shopping Addict", "Museum Goer", "History Buff", "Beach Lover", 
+                      "Mountain Climber", "Yoga Enthusiast", "Architecture Buff", 
+                      "Photography Fan", "Social Butterfly", "Tech Geek"
+                    ].map((trait) => (
+                      <Button 
+                        key={trait} 
+                        variant="outline" 
+                        className="py-1 px-3"
+                        onClick={() => {
+                          const traitId = trait.toLowerCase().replace(/\s+/g, '_');
+                          if (!selectedTraits.includes(traitId)) {
+                            setSelectedTraits([...selectedTraits, traitId]);
+                          }
+                        }}
+                      >
+                        {trait}
+                      </Button>
+                    ))}
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
             <div className="flex flex-wrap gap-2">
               {travelTraits.map((trait) => (
                 <button
