@@ -26,9 +26,22 @@ const CreateProfile: React.FC = () => {
   const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>(undefined);
   const [travelReason, setTravelReason] = useState<"leisure" | "business">("leisure");
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
   
   // Travel traits
   const [selectedTraits, setSelectedTraits] = useState<string[]>([]);
+  
+  // Handle profile image upload
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setProfileImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // Predefined values
   const languages = ["English", "Spanish", "French", "German", "Chinese", "Japanese"];
@@ -68,7 +81,8 @@ const CreateProfile: React.FC = () => {
       dateOfBirth: dateOfBirth || new Date("1995-01-01"),
       travelReason,
       languages: selectedLanguages.length > 0 ? selectedLanguages : ["English"],
-      traits: selectedTraits
+      traits: selectedTraits,
+      profileImage: profileImage
     }));
     
     // Navigate to the next step
@@ -88,9 +102,29 @@ const CreateProfile: React.FC = () => {
         <div className="bg-white rounded-lg p-5 flex flex-col gap-4">
           {/* Profile Picture */}
           <div className="flex flex-col items-center mb-2">
-            <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-3">
-              <Plus className="w-8 h-8 text-gray-500" />
-            </div>
+            <label htmlFor="profile-upload" className="cursor-pointer">
+              <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-3 relative overflow-hidden hover:opacity-90 transition-opacity">
+                {profileImage ? (
+                  <img 
+                    src={profileImage} 
+                    alt="Profile" 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <Plus className="w-8 h-8 text-gray-500" />
+                )}
+                <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                  <span className="text-white text-xs font-medium">Change photo</span>
+                </div>
+              </div>
+            </label>
+            <input 
+              type="file" 
+              id="profile-upload" 
+              className="hidden" 
+              accept="image/*"
+              onChange={handleImageUpload}
+            />
           </div>
 
           {/* Name */}
