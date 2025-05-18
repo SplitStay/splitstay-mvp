@@ -83,18 +83,26 @@ export const SplitStayLogo = ({ className = "" }: { className?: string }) => (
   <div className={`flex items-center justify-center ${className}`}>
     <div className="flex flex-col items-center">
       <svg 
-        width="128" 
-        height="96" 
-        viewBox="0 0 128 96" 
-        className={`text-blue-900 h-12 ${className}`}
+        viewBox="0 0 500 300" 
+        className={`text-blue-900 h-20 ${className}`}
         fill="currentColor"
       >
-        <path d="M53.9 48.1v-4.5h-5.6v4.5h-5.6v-4.5h-5.6v22.7h5.6v-12h5.6v12h5.6v-12h5.6v12h5.6v-22.7h-11.2v4.5z" />
-        <path d="M86.4 48.1v-4.5h-5.6v4.5h-5.6v-4.5h-5.6v22.7h5.6v-12h5.6v12h5.6v-12h5.6v12h5.6v-22.7h-11.2v4.5z" />
-        <path d="M64 21.3h-5.6v42h5.6v-42z" />
-        <path d="M64 21.3h5.6v5.6H64z" />
+        {/* Bed on the left */}
+        <path d="M150,120 h60 a20,20 0 0 1 20,20 v15 h-100 v-15 a20,20 0 0 1 20,-20 z" />
+        <rect x="130" y="155" width="100" height="20" />
+        <path d="M130,175 h100 v40 h-25 v-15 h-50 v15 h-25 z" />
+        
+        {/* Bed on the right */}
+        <path d="M290,120 h60 a20,20 0 0 1 20,20 v15 h-100 v-15 a20,20 0 0 1 20,-20 z" />
+        <rect x="270" y="155" width="100" height="20" />
+        <path d="M270,175 h100 v40 h-25 v-15 h-50 v15 h-25 z" />
+        
+        {/* Nightstand/lamp in center */}
+        <rect x="230" y="175" width="40" height="40" />
+        <path d="M230,175 v-25 h40 v25" />
+        <path d="M235,150 h30 l-15,-30 z" />
       </svg>
-      <div className="text-blue-900 font-bold text-2xl">SplitStay</div>
+      <div className="text-blue-900 font-bold text-4xl mt-2">SplitStay</div>
     </div>
   </div>
 );
