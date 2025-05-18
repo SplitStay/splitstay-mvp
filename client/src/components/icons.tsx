@@ -82,9 +82,9 @@ export const LampIcon = ({ className = "" }: { className?: string }) => (
 export const SplitStayLogo = ({ className = "" }: { className?: string }) => (
   <div className={`flex items-center justify-center ${className}`}>
     <img 
-      src="/assets/logo.jpg" 
+      src="/assets/logo-transparent.png" 
       alt="SplitStay Logo" 
-      className={`h-16 ${className}`}
+      className={`h-32 ${className}`}
     />
   </div>
 );

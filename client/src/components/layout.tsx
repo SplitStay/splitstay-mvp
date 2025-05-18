@@ -18,7 +18,7 @@ const Layout: React.FC<LayoutProps> = ({
         <div className="container mx-auto flex justify-center">
           <Link href="/">
             <div className="cursor-pointer">
-              <SplitStayLogo className="h-16" />
+              <SplitStayLogo />
             </div>
           </Link>
         </div>
