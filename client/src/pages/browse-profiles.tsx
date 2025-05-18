@@ -27,12 +27,13 @@ const BrowseProfiles: React.FC = () => {
     ageRanges: {
       "18-25": false,
       "26-30": false,
-      "31-40": false
+      "31-40+": false
     },
     languages: {
       "English": false,
       "French": false,
-      "German": false
+      "German": false,
+      "Spanish": false
     },
     sleepingHabits: {
       "Early bird": false,
@@ -274,17 +275,7 @@ const BrowseProfiles: React.FC = () => {
       <Dialog open={filterDialogOpen} onOpenChange={setFilterDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center justify-between">
-              <span>Filter Roommates</span>
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={() => setFilterDialogOpen(false)}
-                className="h-7 w-7"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </DialogTitle>
+            <DialogTitle>Filter Roommates</DialogTitle>
           </DialogHeader>
           
           <div className="space-y-6 py-4">
@@ -413,12 +404,13 @@ const BrowseProfiles: React.FC = () => {
                   ageRanges: {
                     "18-25": false,
                     "26-30": false,
-                    "31-40": false
+                    "31-40+": false
                   },
                   languages: {
                     "English": false,
                     "French": false,
-                    "German": false
+                    "German": false,
+                    "Spanish": false
                   },
                   sleepingHabits: {
                     "Early bird": false,
