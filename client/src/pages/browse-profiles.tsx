@@ -277,24 +277,30 @@ const BrowseProfiles: React.FC = () => {
       
       {/* Filter Dialog */}
       <Dialog open={filterDialogOpen} onOpenChange={setFilterDialogOpen}>
-        <DialogContent className="max-w-md py-5" aria-describedby="filter-dialog-description">
-          <DialogHeader className="pb-3">
-            <DialogTitle className="text-center py-2 mt-2">Filter Roommates</DialogTitle>
-            <p className="text-sm text-muted-foreground text-center" id="filter-dialog-description">
-              Customize your roommate search by selecting your preferences.
+        <DialogContent 
+          className="max-w-[90%] w-[320px] pt-3 pb-4 px-4" 
+          aria-describedby="filter-dialog-description"
+        >
+          <DialogHeader className="pb-2">
+            <div className="flex items-center justify-between mb-1">
+              <DialogTitle className="text-lg">Filter</DialogTitle>
+            </div>
+            <p className="text-xs text-muted-foreground" id="filter-dialog-description">
+              Customize your roommate search
             </p>
           </DialogHeader>
           
-          <div className="space-y-6 py-4">
+          <div className="space-y-4 py-2">
             {/* Age Range */}
             <div>
-              <h3 className="font-medium mb-3">Age Range</h3>
-              <div className="grid grid-cols-2 gap-3">
+              <h3 className="font-medium mb-2 text-sm">Age Range</h3>
+              <div className="grid grid-cols-2 gap-2">
                 {Object.entries(filters.ageRanges).map(([range, checked]) => (
                   <div key={range} className="flex items-center space-x-2">
                     <Checkbox 
                       id={`age-${range}`} 
                       checked={checked}
+                      className="h-3.5 w-3.5"
                       onCheckedChange={(checked) => {
                         setFilters({
                           ...filters,
@@ -305,7 +311,7 @@ const BrowseProfiles: React.FC = () => {
                         });
                       }}
                     />
-                    <Label htmlFor={`age-${range}`}>{range}</Label>
+                    <Label htmlFor={`age-${range}`} className="text-sm">{range}</Label>
                   </div>
                 ))}
               </div>
@@ -313,13 +319,14 @@ const BrowseProfiles: React.FC = () => {
             
             {/* Languages */}
             <div>
-              <h3 className="font-medium mb-3">Languages</h3>
-              <div className="grid grid-cols-2 gap-3">
+              <h3 className="font-medium mb-2 text-sm">Languages</h3>
+              <div className="grid grid-cols-2 gap-2">
                 {Object.entries(filters.languages).map(([language, checked]) => (
                   <div key={language} className="flex items-center space-x-2">
                     <Checkbox 
                       id={`lang-${language}`} 
                       checked={checked}
+                      className="h-3.5 w-3.5"
                       onCheckedChange={(checked) => {
                         setFilters({
                           ...filters,
@@ -330,21 +337,21 @@ const BrowseProfiles: React.FC = () => {
                         });
                       }}
                     />
-                    <Label htmlFor={`lang-${language}`}>{language}</Label>
+                    <Label htmlFor={`lang-${language}`} className="text-sm">{language}</Label>
                   </div>
                 ))}
               </div>
             </div>
             
-            {/* Preferences */}
+            {/* Sleep Habits */}
             <div>
-              <h3 className="font-medium mb-3">Sleep Habits</h3>
-              <div className="grid grid-cols-2 gap-3">
+              <h3 className="font-medium mb-2 text-sm">Sleep Habits</h3>
+              <div className="grid grid-cols-2 gap-2">
                 {Object.entries(filters.sleepingHabits).map(([habit, checked]) => (
                   <div 
                     key={habit}
                     className={cn(
-                      "flex items-center p-3 border-2 rounded-md cursor-pointer",
+                      "flex items-center p-2 border-2 rounded-md cursor-pointer text-sm",
                       checked ? "border-primary bg-blue-50" : "border-gray-200"
                     )}
                     onClick={() => {
@@ -358,9 +365,9 @@ const BrowseProfiles: React.FC = () => {
                     }}
                   >
                     {habit === "Early bird" ? (
-                      <Sun className="h-5 w-5 mr-2 text-orange-500" />
+                      <Sun className="h-4 w-4 mr-1 text-orange-500" />
                     ) : (
-                      <Moon className="h-5 w-5 mr-2 text-indigo-600" />
+                      <Moon className="h-4 w-4 mr-1 text-indigo-600" />
                     )}
                     <span>{habit}</span>
                   </div>
@@ -368,14 +375,15 @@ const BrowseProfiles: React.FC = () => {
               </div>
             </div>
             
+            {/* Noise Level */}
             <div>
-              <h3 className="font-medium mb-3">Noise Level</h3>
-              <div className="grid grid-cols-2 gap-3">
+              <h3 className="font-medium mb-2 text-sm">Noise Level</h3>
+              <div className="grid grid-cols-2 gap-2">
                 {Object.entries(filters.noiseLevel).map(([level, checked]) => (
                   <div 
                     key={level}
                     className={cn(
-                      "flex items-center p-3 border-2 rounded-md cursor-pointer",
+                      "flex items-center p-2 border-2 rounded-md cursor-pointer text-sm",
                       checked ? "border-primary bg-blue-50" : "border-gray-200"
                     )}
                     onClick={() => {
@@ -389,9 +397,9 @@ const BrowseProfiles: React.FC = () => {
                     }}
                   >
                     {level === "Quiet" ? (
-                      <VolumeX className="h-5 w-5 mr-2 text-gray-600" />
+                      <VolumeX className="h-4 w-4 mr-1 text-gray-600" />
                     ) : (
-                      <Users className="h-5 w-5 mr-2 text-blue-500" />
+                      <Users className="h-4 w-4 mr-1 text-blue-500" />
                     )}
                     <span>{level}</span>
                   </div>
@@ -402,9 +410,11 @@ const BrowseProfiles: React.FC = () => {
             {/* No verified filter needed since all users are verified */}
           </div>
           
-          <DialogFooter>
+          <DialogFooter className="flex justify-between mt-1 pt-0 gap-2">
             <Button
               variant="outline"
+              size="sm"
+              className="text-xs h-8 px-3"
               onClick={() => {
                 // Reset to initial filter state
                 setFilters({
@@ -434,10 +444,11 @@ const BrowseProfiles: React.FC = () => {
               Reset
             </Button>
             <Button 
-              className="navy-button"
+              size="sm"
+              className="text-xs h-8 px-3 navy-button"
               onClick={() => setFilterDialogOpen(false)}
             >
-              Apply Filters
+              Apply
             </Button>
           </DialogFooter>
         </DialogContent>
