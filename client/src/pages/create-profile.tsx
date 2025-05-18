@@ -148,7 +148,7 @@ const CreateProfile: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen p-5 bg-cream">
-      <h1 className="text-4xl font-bold text-navy text-center mb-8">Complete Your profile</h1>
+      <h1 className="text-4xl font-bold text-navy text-center mb-2">Complete Your Profile</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {/* Left Column - Personal Info */}
