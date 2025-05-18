@@ -198,7 +198,7 @@ const FindRoommate: React.FC = () => {
           variant="ghost"
           size="icon"
           className="mr-2 text-gray-500"
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/dashboard")}
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
