@@ -121,11 +121,14 @@ const Dashboard: React.FC = () => {
                     </div>
                     <div className="flex items-center">
                       <span className="text-xs mr-2">Roommate:</span>
-                      <img 
-                        src={trip.roommateImage} 
-                        alt={trip.roommate}
-                        className="h-8 w-8 rounded-full"
-                      />
+                      <div className="flex items-center">
+                        <img 
+                          src={trip.roommateImage} 
+                          alt={trip.roommate}
+                          className="h-8 w-8 rounded-full mr-2"
+                        />
+                        <span className="text-sm font-medium">{trip.roommate}</span>
+                      </div>
                     </div>
                   </div>
                   <div className="flex justify-between items-center mt-3">
@@ -180,11 +183,14 @@ const Dashboard: React.FC = () => {
                     </div>
                     <div className="flex items-center">
                       <span className="text-xs mr-2">Roommate:</span>
-                      <img 
-                        src={trip.roommateImage} 
-                        alt={trip.roommate}
-                        className="h-8 w-8 rounded-full"
-                      />
+                      <div className="flex items-center">
+                        <img 
+                          src={trip.roommateImage} 
+                          alt={trip.roommate}
+                          className="h-8 w-8 rounded-full mr-2"
+                        />
+                        <span className="text-sm font-medium">{trip.roommate}</span>
+                      </div>
                     </div>
                   </div>
                   <div className="flex justify-between items-center mt-3">
@@ -224,7 +230,7 @@ const Dashboard: React.FC = () => {
             variant="ghost" 
             size="sm" 
             className="flex flex-col items-center text-xs"
-            onClick={() => {}}
+            onClick={() => navigate("/profile")}
           >
             <User className="h-5 w-5 mb-1" />
             <span>Profile</span>
@@ -233,7 +239,7 @@ const Dashboard: React.FC = () => {
             variant="ghost" 
             size="sm" 
             className="flex flex-col items-center text-xs text-primary"
-            onClick={() => {}}
+            onClick={() => navigate("/dashboard")}
           >
             <Calendar className="h-5 w-5 mb-1" />
             <span>Trips</span>
