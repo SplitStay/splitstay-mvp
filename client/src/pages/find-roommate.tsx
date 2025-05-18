@@ -151,14 +151,27 @@ const FindRoommate: React.FC = () => {
   };
 
   const handleFindMatches = () => {
-    // Save the search criteria if needed
+    // Make sure we have a destination and dates before proceeding
+    if (!destination) {
+      alert("Please select a destination");
+      return;
+    }
+    
+    if (!startDate || !endDate) {
+      alert("Please select your travel dates");
+      return;
+    }
+    
+    // Save the search criteria as serializable values
     localStorage.setItem('splitstay_search', JSON.stringify({
       destination,
-      startDate,
-      endDate,
+      startDate: startDate ? startDate.toISOString() : null,
+      endDate: endDate ? endDate.toISOString() : null,
       isFlexible,
       preferences
     }));
+    
+    // Navigate to browse profiles
     navigate("/browse-profiles");
   };
 
@@ -537,15 +550,7 @@ const FindRoommate: React.FC = () => {
         <div className="pt-4">
           <Button
             type="button"
-            style={{
-              backgroundColor: "#001F3F", 
-              color: "white",
-              width: "100%",
-              padding: "1rem 1.5rem",
-              borderRadius: "0.5rem",
-              fontSize: "1.125rem",
-              fontWeight: "600"
-            }}
+            className="navy-button"
             onClick={handleFindMatches}
           >
             Find Matches

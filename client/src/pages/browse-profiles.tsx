@@ -24,26 +24,51 @@ const BrowseProfiles: React.FC = () => {
   // Load search criteria from localStorage when component mounts
   useEffect(() => {
     const savedSearch = localStorage.getItem('splitstay_search');
+    console.log("Saved search data:", savedSearch);
+    
     if (savedSearch) {
       try {
         const searchData = JSON.parse(savedSearch);
+        console.log("Parsed search data:", searchData);
+        
         if (searchData.destination) {
+          console.log("Setting destination:", searchData.destination);
           setDestination(searchData.destination);
         }
         
         if (searchData.startDate && searchData.endDate) {
-          const start = new Date(searchData.startDate);
-          const end = new Date(searchData.endDate);
+          // Handle both string dates and Date objects
+          const start = typeof searchData.startDate === 'string' 
+            ? new Date(searchData.startDate) 
+            : searchData.startDate;
+          
+          const end = typeof searchData.endDate === 'string'
+            ? new Date(searchData.endDate)
+            : searchData.endDate;
+            
+          console.log("Start date:", start);
+          console.log("End date:", end);
+          
           setStartDate(start);
           setEndDate(end);
           
           // Format dates for display
-          const formattedDates = `${format(start, 'MMM d')} – ${format(end, 'MMM d')}`;
-          setDates(formattedDates);
+          try {
+            const formattedDates = `${format(start, 'MMM d')} – ${format(end, 'MMM d')}`;
+            console.log("Formatted dates:", formattedDates);
+            setDates(formattedDates);
+          } catch (formatError) {
+            console.error("Error formatting dates:", formatError);
+            setDates("Select dates");
+          }
         }
       } catch (error) {
         console.error("Error parsing saved search data:", error);
       }
+    } else {
+      // Provide fallback values for when no search data exists
+      setDestination("Select destination");
+      setDates("Select dates");
     }
   }, []);
 
