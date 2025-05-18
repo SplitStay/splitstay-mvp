@@ -16,7 +16,7 @@ const Home: React.FC = () => {
         and save.
       </p>
       
-      <h2 className="text-2xl font-semibold text-primary text-center mb-6">What brings you here?</h2>
+      <h2 className="text-2xl font-semibold text-primary text-center mb-6">Ready to find your perfect roommate?</h2>
       
       {/* Action buttons */}
       <div className="w-full space-y-4">
@@ -55,8 +55,16 @@ const Home: React.FC = () => {
       {/* Login */}
       <div className="mt-10 w-full">
         <Button
-          size="lg"
-          className="w-full bg-navy hover:bg-navy/90 text-white py-6 rounded-full font-semibold text-lg"
+          type="button"
+          style={{
+            backgroundColor: "#001F3F", 
+            color: "white",
+            width: "100%",
+            padding: "1.5rem 1rem",
+            borderRadius: "9999px",
+            fontSize: "1.125rem",
+            fontWeight: "600"
+          }}
           onClick={() => navigate("/login")} 
         >
           Log in
