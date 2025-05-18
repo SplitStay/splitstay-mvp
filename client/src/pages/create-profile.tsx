@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, Calendar, Plus, Search } from "lucide-react";
+import { ArrowLeft, Calendar, Plus, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,7 +10,16 @@ import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription,
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger,
+  DialogFooter,
+  DialogClose
+} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 
 interface TravelTrait {
@@ -58,10 +67,12 @@ const CreateProfile: React.FC = () => {
   // State for language search and selection
   const [languageSearch, setLanguageSearch] = useState("");
   const [tempSelectedLanguages, setTempSelectedLanguages] = useState<string[]>([]);
+  const [languageDialogOpen, setLanguageDialogOpen] = useState(false);
   
   // State for trait search and selection
   const [traitSearch, setTraitSearch] = useState("");
   const [tempSelectedTraits, setTempSelectedTraits] = useState<string[]>([]);
+  const [traitDialogOpen, setTraitDialogOpen] = useState(false);
   
   const travelTraits: TravelTrait[] = [
     { id: "spontaneous", label: "Spontaneous" },
@@ -280,15 +291,13 @@ const CreateProfile: React.FC = () => {
           <div>
             <div className="flex justify-between items-center mb-1">
               <label className="block text-navy font-medium">Languages</label>
-              <Dialog onOpenChange={(open) => {
-                if (open) {
-                  // Initialize temporary selected languages with current selections
-                  setTempSelectedLanguages([...selectedLanguages]);
-                  setLanguageSearch("");
-                }
-              }}>
+              <Dialog>
                 <DialogTrigger asChild>
-                  <Button size="sm" variant="outline" className="h-8 px-2">
+                  <Button size="sm" variant="outline" className="h-8 px-2" onClick={() => {
+                    // Initialize temporary selected languages with current selections when opening the dialog
+                    setTempSelectedLanguages([...selectedLanguages]);
+                    setLanguageSearch("");
+                  }}>
                     <Plus className="h-4 w-4 mr-1" />
                     Add
                   </Button>
@@ -296,6 +305,9 @@ const CreateProfile: React.FC = () => {
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>Add Languages</DialogTitle>
+                    <DialogDescription>
+                      Search and select languages you speak. Click Confirm when done.
+                    </DialogDescription>
                   </DialogHeader>
                   <div className="relative mb-4">
                     <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -345,7 +357,7 @@ const CreateProfile: React.FC = () => {
                                 tempSelectedLanguages.filter(l => l !== lang)
                               )}
                             >
-                              ×
+                              <X className="h-3 w-3" />
                             </button>
                           </Badge>
                         ))}
@@ -353,22 +365,28 @@ const CreateProfile: React.FC = () => {
                     </div>
                   )}
                   
-                  <div className="flex justify-end">
-                    <Button
-                      className="bg-navy hover:bg-navy/90"
-                      onClick={() => {
-                        // Apply the temporary selections to the actual selections
-                        setSelectedLanguages(tempSelectedLanguages);
-                        // Close dialog programmatically
-                        const closeButton = document.querySelector('[data-radix-collection-item]');
-                        if (closeButton instanceof HTMLElement) {
-                          closeButton.click();
-                        }
-                      }}
-                    >
-                      Confirm
-                    </Button>
-                  </div>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="outline">Cancel</Button>
+                    </DialogClose>
+                    <DialogClose asChild>
+                      <Button
+                        className="bg-navy hover:bg-navy/90 text-white"
+                        onClick={() => {
+                          // Apply the temporary selections to the actual selections
+                          setSelectedLanguages(tempSelectedLanguages);
+                          
+                          // Show success notification
+                          toast({
+                            title: "Languages updated",
+                            description: `${tempSelectedLanguages.length} languages selected`,
+                          });
+                        }}
+                      >
+                        Confirm Selection
+                      </Button>
+                    </DialogClose>
+                  </DialogFooter>
                 </DialogContent>
               </Dialog>
             </div>
@@ -503,10 +521,17 @@ const CreateProfile: React.FC = () => {
                   
                   <div className="flex justify-end">
                     <Button
-                      className="bg-navy hover:bg-navy/90"
+                      className="bg-navy hover:bg-navy/90 text-white"
                       onClick={() => {
                         // Apply the temporary selections to the actual selections
                         setSelectedTraits(tempSelectedTraits);
+                        
+                        // Show success notification
+                        toast({
+                          title: "Travel traits updated",
+                          description: `${tempSelectedTraits.length} traits selected`,
+                        });
+                        
                         // Close dialog programmatically
                         const closeButton = document.querySelector('[data-radix-collection-item]');
                         if (closeButton instanceof HTMLElement) {
@@ -514,7 +539,7 @@ const CreateProfile: React.FC = () => {
                         }
                       }}
                     >
-                      Confirm
+                      Confirm Selection
                     </Button>
                   </div>
                 </DialogContent>
