@@ -52,6 +52,7 @@ const FindRoommate: React.FC = () => {
   const [_, navigate] = useLocation();
   const [destination, setDestination] = useState("");
   const [locationSearch, setLocationSearch] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [isFlexible, setIsFlexible] = useState(false);
@@ -60,6 +61,9 @@ const FindRoommate: React.FC = () => {
     noiseLevel: "quiet",
     roomType: "twin",
   });
+  
+  // Reference to the dropdown menu
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
   
   // Global locations list for search with countries
   const globalLocations: LocationItem[] = [
@@ -71,6 +75,7 @@ const FindRoommate: React.FC = () => {
     { city: "Budapest", country: "Hungary" },
     { city: "Copenhagen", country: "Denmark" },
     { city: "Dublin", country: "Ireland" },
+    { city: "Eindhoven", country: "Netherlands" },
     { city: "Florence", country: "Italy" },
     { city: "Geneva", country: "Switzerland" },
     { city: "Istanbul", country: "Turkey" },
@@ -84,7 +89,9 @@ const FindRoommate: React.FC = () => {
     { city: "Paris", country: "France" },
     { city: "Prague", country: "Czech Republic" },
     { city: "Rome", country: "Italy" },
+    { city: "Rotterdam", country: "Netherlands" },
     { city: "Stockholm", country: "Sweden" },
+    { city: "Utrecht", country: "Netherlands" },
     { city: "Venice", country: "Italy" },
     { city: "Vienna", country: "Austria" },
     { city: "Zurich", country: "Switzerland" },
@@ -177,15 +184,38 @@ const FindRoommate: React.FC = () => {
             <Input
               type="text"
               value={locationSearch}
-              onChange={(e) => setLocationSearch(e.target.value)}
-              onKeyDown={handleInputKeyDown}
+              onChange={(e) => {
+                setLocationSearch(e.target.value);
+                setShowDropdown(e.target.value.length > 1);
+              }}
+              onFocus={() => setShowDropdown(locationSearch.length > 1)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  
+                  // Auto-select current input text as destination
+                  if (locationSearch.length > 0) {
+                    if (!locationSearch.includes(',')) {
+                      const fullLocation = `${locationSearch}, Netherlands`;
+                      setDestination(fullLocation);
+                      setLocationSearch(fullLocation);
+                    } else {
+                      setDestination(locationSearch);
+                    }
+                    setShowDropdown(false);
+                  }
+                }
+              }}
               placeholder="Enter any destination worldwide"
               className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-primary pr-10"
             />
             <Search className="absolute right-4 top-3.5 text-gray-400 h-5 w-5 pointer-events-none" />
             
-            {locationSearch.length > 1 && (
-              <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+            {showDropdown && locationSearch.length > 1 && (
+              <div 
+                ref={dropdownRef}
+                className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
+              >
                 {/* Show header text explaining entry options */}
                 <div className="p-2 bg-gray-50 border-b text-sm text-gray-500">
                   Search for any city or enter a custom location
@@ -206,6 +236,7 @@ const FindRoommate: React.FC = () => {
                         const fullLocation = `${location.city}, ${location.country}`;
                         setDestination(fullLocation);
                         setLocationSearch(fullLocation);
+                        setShowDropdown(false);
                       }}
                     >
                       <span className="font-medium">{location.city}</span>
@@ -213,12 +244,20 @@ const FindRoommate: React.FC = () => {
                     </div>
                   ))}
                   
-                {/* Always show custom entry option */}
+                {/* Custom entry option */}
                 <div
                   className="p-3 bg-gray-50 hover:bg-gray-100 cursor-pointer text-navy font-medium border-t"
                   onClick={() => {
-                    setDestination(locationSearch);
-                    // Let user add country if needed
+                    // Add Netherlands as default country if not specified
+                    if (!locationSearch.includes(',')) {
+                      const fullLocation = `${locationSearch}, Netherlands`;
+                      setDestination(fullLocation);
+                      setLocationSearch(fullLocation);
+                    } else {
+                      // Keep the location as is if it already has a country
+                      setDestination(locationSearch);
+                    }
+                    setShowDropdown(false);
                   }}
                 >
                   <span className="flex items-center">
