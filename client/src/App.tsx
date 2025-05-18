@@ -8,9 +8,11 @@ import Home from "@/pages/home";
 import Login from "@/pages/login";
 import SignUp from "@/pages/signup";
 import Dashboard from "@/pages/dashboard";
+import Profile from "@/pages/profile";
 import CreateProfile from "@/pages/create-profile";
 import FindRoommate from "@/pages/find-roommate";
 import BrowseProfiles from "@/pages/browse-profiles-fixed";
+import LeaveReview from "@/pages/leave-review";
 import RequestBooking from "@/pages/request-booking";
 import RequestSent from "@/pages/request-sent";
 import Chat from "@/pages/chat";
@@ -28,9 +30,11 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/signup" component={SignUp} />
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/profile" component={Profile} />
       <Route path="/create-profile" component={CreateProfile} />
       <Route path="/find-roommate" component={FindRoommate} />
       <Route path="/browse-profiles" component={BrowseProfiles} />
+      <Route path="/leave-review/:id" component={LeaveReview} />
       <Route path="/request-booking/:id" component={RequestBooking} />
       <Route path="/request-sent/:id" component={RequestSent} />
       <Route path="/chat/:id" component={Chat} />
