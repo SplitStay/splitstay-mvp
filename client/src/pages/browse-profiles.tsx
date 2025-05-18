@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ChevronRight, SlidersHorizontal } from "lucide-react";
@@ -8,24 +8,66 @@ import RoommateCard from "@/components/roommate-card";
 import { Card, CardContent } from "@/components/ui/card";
 import { UserProfile } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
+import { format } from "date-fns";
 
 const BrowseProfiles: React.FC = () => {
   const [_, navigate] = useLocation();
-  const [destination] = useState("Brussels");
-  const [dates] = useState("May 12 – 15");
+  const [destination, setDestination] = useState("");
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [dates, setDates] = useState("");
 
   // In a real app, this would use the actual logged-in user ID
   // For demo purposes we'll use a fixed ID
   const userId = 5; // John Doe
+  
+  // Load search criteria from localStorage when component mounts
+  useEffect(() => {
+    const savedSearch = localStorage.getItem('splitstay_search');
+    if (savedSearch) {
+      try {
+        const searchData = JSON.parse(savedSearch);
+        if (searchData.destination) {
+          setDestination(searchData.destination);
+        }
+        
+        if (searchData.startDate && searchData.endDate) {
+          const start = new Date(searchData.startDate);
+          const end = new Date(searchData.endDate);
+          setStartDate(start);
+          setEndDate(end);
+          
+          // Format dates for display
+          const formattedDates = `${format(start, 'MMM d')} – ${format(end, 'MMM d')}`;
+          setDates(formattedDates);
+        }
+      } catch (error) {
+        console.error("Error parsing saved search data:", error);
+      }
+    }
+  }, []);
 
   // Fetch compatible profiles
   const { data: profiles, isLoading } = useQuery({
-    queryKey: ['/api/matching', { userId, location: destination }],
+    queryKey: ['/api/matching', { userId, location: destination, startDate, endDate }],
     queryFn: async () => {
-      const res = await fetch(`/api/matching?userId=${userId}&location=${destination}&startDate=2023-05-12&endDate=2023-05-15`);
+      // Only proceed with query if we have all the necessary data
+      if (!destination || !startDate || !endDate) {
+        return [];
+      }
+      
+      // Format dates as ISO strings for the API
+      const startDateStr = startDate.toISOString().split('T')[0];
+      const endDateStr = endDate.toISOString().split('T')[0];
+      
+      const res = await fetch(
+        `/api/matching?userId=${userId}&location=${encodeURIComponent(destination)}&startDate=${startDateStr}&endDate=${endDateStr}`
+      );
+      
       if (!res.ok) throw new Error('Failed to fetch profiles');
       return res.json() as Promise<UserProfile[]>;
-    }
+    },
+    enabled: !!(destination && startDate && endDate) // Only run query when we have search criteria
   });
 
   return (
