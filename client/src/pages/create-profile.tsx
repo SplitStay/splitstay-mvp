@@ -1,11 +1,17 @@
 import React, { useState } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, Search } from "lucide-react";
+import { ArrowLeft, Search, Camera, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { toast } from "@/hooks/use-toast";
+import { format } from "date-fns";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface TravelTrait {
   id: string;
@@ -16,6 +22,35 @@ const CreateProfile: React.FC = () => {
   const [_, navigate] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTraits, setSelectedTraits] = useState<string[]>([]);
+  
+  // New states for profile creation
+  const [name, setName] = useState("");
+  const [bio, setBio] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>(undefined);
+  const [travelReason, setTravelReason] = useState<"leisure" | "business">("leisure");
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+  const [isVerified, setIsVerified] = useState(true); // For demonstration purposes
+
+  const availableLanguages = [
+    "English",
+    "Spanish",
+    "French",
+    "German",
+    "Italian",
+    "Portuguese",
+    "Chinese",
+    "Japanese",
+    "Korean",
+    "Arabic"
+  ];
+
+  const toggleLanguage = (language: string) => {
+    if (selectedLanguages.includes(language)) {
+      setSelectedLanguages(selectedLanguages.filter(lang => lang !== language));
+    } else {
+      setSelectedLanguages([...selectedLanguages, language]);
+    }
+  };
 
   const availableTraits: TravelTrait[] = [
     { id: "early_bird", label: "Early Bird" },
