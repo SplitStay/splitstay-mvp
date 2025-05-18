@@ -30,11 +30,11 @@ const Home: React.FC = () => {
           variant="outline"
           size="lg"
           className="w-full justify-between border-2 border-primary text-primary py-6 rounded-full"
-          onClick={() => navigate("/find-roommate")}
+          onClick={() => navigate("/create-profile")}
         >
           <div className="flex items-center">
             <Bed className="mr-3 h-5 w-5" />
-            <span>Share a Hotel Room</span>
+            <span>Create Profile</span>
           </div>
           <ChevronRightIcon />
         </Button>
