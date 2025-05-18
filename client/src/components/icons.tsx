@@ -81,10 +81,20 @@ export const LampIcon = ({ className = "" }: { className?: string }) => (
 // Logo combination
 export const SplitStayLogo = ({ className = "" }: { className?: string }) => (
   <div className={`flex items-center justify-center ${className}`}>
-    <img 
-      src="/assets/logo.jpg" 
-      alt="SplitStay Logo" 
-      className="h-12"
-    />
+    <div className="flex flex-col items-center">
+      <svg 
+        width="128" 
+        height="96" 
+        viewBox="0 0 128 96" 
+        className={`text-blue-900 h-12 ${className}`}
+        fill="currentColor"
+      >
+        <path d="M53.9 48.1v-4.5h-5.6v4.5h-5.6v-4.5h-5.6v22.7h5.6v-12h5.6v12h5.6v-12h5.6v12h5.6v-22.7h-11.2v4.5z" />
+        <path d="M86.4 48.1v-4.5h-5.6v4.5h-5.6v-4.5h-5.6v22.7h5.6v-12h5.6v12h5.6v-12h5.6v12h5.6v-22.7h-11.2v4.5z" />
+        <path d="M64 21.3h-5.6v42h5.6v-42z" />
+        <path d="M64 21.3h5.6v5.6H64z" />
+      </svg>
+      <div className="text-blue-900 font-bold text-2xl">SplitStay</div>
+    </div>
   </div>
 );

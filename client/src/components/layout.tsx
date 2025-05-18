@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "wouter";
 import { cn } from "@/lib/utils";
-import logoImage from "../assets/logo.jpg";
+import { SplitStayLogo } from "@/components/icons";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -17,7 +17,9 @@ const Layout: React.FC<LayoutProps> = ({
       <header className="bg-white shadow-sm p-4">
         <div className="container mx-auto flex justify-center">
           <Link href="/">
-            <img src={logoImage} alt="SplitStay Logo" className="h-16 cursor-pointer" />
+            <div className="cursor-pointer">
+              <SplitStayLogo className="h-16" />
+            </div>
           </Link>
         </div>
       </header>
