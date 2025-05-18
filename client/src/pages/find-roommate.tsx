@@ -72,6 +72,7 @@ const FindRoommate: React.FC = () => {
     { city: "Barcelona", country: "Spain" },
     { city: "Berlin", country: "Germany" },
     { city: "Brussels", country: "Belgium" },
+    { city: "Bucharest", country: "Romania" },
     { city: "Budapest", country: "Hungary" },
     { city: "Copenhagen", country: "Denmark" },
     { city: "Dublin", country: "Ireland" },
@@ -335,9 +336,29 @@ const FindRoommate: React.FC = () => {
                 ) && locationSearch.length > 1 && (
                   <div className="border-t">
                     <div className="px-3 py-1 text-xs text-gray-500 font-medium">
-                      Popular countries:
+                      Suggested countries:
                     </div>
-                    {["Poland", "Germany", "France", "Spain", "Italy", "United Kingdom", "Netherlands"].map(country => (
+                    <div
+                      className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => {
+                        setLocationSearch(`${locationSearch}, `);
+                        // Keep dropdown open to let user type country
+                        setShowDropdown(true);
+                      }}
+                    >
+                      <span className="text-navy font-medium">Type a country for {locationSearch}</span>
+                      <span className="block text-xs text-gray-500">
+                        Enter the country where this city is located
+                      </span>
+                    </div>
+                    
+                    {/* Divider */}
+                    <div className="px-3 py-1 text-xs text-gray-500 font-medium border-t mt-1">
+                      Or select from common countries:
+                    </div>
+                    
+                    {/* Common European countries */}
+                    {["Romania", "Poland", "Germany", "France", "Spain", "Italy", "United Kingdom", "Netherlands"].map(country => (
                       <div
                         key={country}
                         className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
@@ -351,6 +372,11 @@ const FindRoommate: React.FC = () => {
                         <span className="text-navy">{locationSearch}, {country}</span>
                       </div>
                     ))}
+                    
+                    {/* Custom location note */}
+                    <div className="p-2 text-xs text-gray-500 border-t">
+                      Note: For a more accurate location search, please specify both city and country.
+                    </div>
                   </div>
                 )}
               </div>
