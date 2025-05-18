@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 
 interface TravelTrait {
   id: string;
@@ -46,6 +47,22 @@ const CreateProfile: React.FC = () => {
   // Predefined values
   const languages = ["English", "Spanish", "French", "German", "Chinese", "Japanese"];
   
+  // Complete list of languages for search
+  const allLanguages = [
+    "English", "Spanish", "French", "German", "Chinese", "Japanese", "Portuguese", 
+    "Russian", "Arabic", "Hindi", "Bengali", "Korean", "Italian", "Turkish", "Vietnamese", 
+    "Tamil", "Urdu", "Polish", "Dutch", "Greek", "Thai", "Indonesian", "Malay", "Swahili", 
+    "Hebrew", "Swedish", "Danish", "Norwegian", "Finnish", "Czech", "Hungarian", "Romanian"
+  ];
+  
+  // State for language search and selection
+  const [languageSearch, setLanguageSearch] = useState("");
+  const [tempSelectedLanguages, setTempSelectedLanguages] = useState<string[]>([]);
+  
+  // State for trait search and selection
+  const [traitSearch, setTraitSearch] = useState("");
+  const [tempSelectedTraits, setTempSelectedTraits] = useState<string[]>([]);
+  
   const travelTraits: TravelTrait[] = [
     { id: "spontaneous", label: "Spontaneous" },
     { id: "street_food", label: "Street Food" },
@@ -55,6 +72,31 @@ const CreateProfile: React.FC = () => {
     { id: "planner", label: "Planner" },
     { id: "adventurous", label: "Adventurous" },
     { id: "relaxed", label: "Relaxed" },
+  ];
+  
+  // Complete list of travel traits for search
+  const allTravelTraits: TravelTrait[] = [
+    ...travelTraits,
+    { id: "coffee_lover", label: "Coffee Lover" },
+    { id: "tea_enthusiast", label: "Tea Enthusiast" },
+    { id: "foodie", label: "Foodie" },
+    { id: "minimalist", label: "Minimalist" },
+    { id: "shopping_addict", label: "Shopping Addict" },
+    { id: "museum_goer", label: "Museum Goer" },
+    { id: "history_buff", label: "History Buff" },
+    { id: "beach_lover", label: "Beach Lover" },
+    { id: "mountain_climber", label: "Mountain Climber" },
+    { id: "yoga_enthusiast", label: "Yoga Enthusiast" },
+    { id: "architecture_buff", label: "Architecture Buff" },
+    { id: "photography_fan", label: "Photography Fan" },
+    { id: "social_butterfly", label: "Social Butterfly" },
+    { id: "tech_geek", label: "Tech Geek" },
+    { id: "family_oriented", label: "Family Oriented" },
+    { id: "adventure_seeker", label: "Adventure Seeker" },
+    { id: "environmentalist", label: "Environmentalist" },
+    { id: "sports_fan", label: "Sports Fan" },
+    { id: "music_lover", label: "Music Lover" },
+    { id: "art_enthusiast", label: "Art Enthusiast" },
   ];
 
   const toggleLanguage = (language: string) => {
@@ -238,7 +280,13 @@ const CreateProfile: React.FC = () => {
           <div>
             <div className="flex justify-between items-center mb-1">
               <label className="block text-navy font-medium">Languages</label>
-              <Dialog>
+              <Dialog onOpenChange={(open) => {
+                if (open) {
+                  // Initialize temporary selected languages with current selections
+                  setTempSelectedLanguages([...selectedLanguages]);
+                  setLanguageSearch("");
+                }
+              }}>
                 <DialogTrigger asChild>
                   <Button size="sm" variant="outline" className="h-8 px-2">
                     <Plus className="h-4 w-4 mr-1" />
@@ -247,46 +295,107 @@ const CreateProfile: React.FC = () => {
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Add Language</DialogTitle>
+                    <DialogTitle>Add Languages</DialogTitle>
                   </DialogHeader>
                   <div className="relative mb-4">
                     <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input className="pl-10" placeholder="Search languages" />
+                    <Input 
+                      className="pl-10" 
+                      placeholder="Search languages" 
+                      value={languageSearch}
+                      onChange={(e) => setLanguageSearch(e.target.value)}
+                    />
                   </div>
-                  <div className="flex flex-wrap gap-2 max-h-60 overflow-y-auto">
-                    {["Arabic", "Bengali", "Dutch", "Finnish", "Greek", "Hindi", "Indonesian", "Korean", "Norwegian", "Portuguese", "Russian", "Swedish", "Thai", "Turkish", "Vietnamese"].map((lang) => (
-                      <Button 
-                        key={lang} 
-                        variant="outline" 
-                        className="py-1 px-3"
-                        onClick={() => {
-                          if (!selectedLanguages.includes(lang)) {
-                            setSelectedLanguages([...selectedLanguages, lang]);
-                          }
-                        }}
-                      >
-                        {lang}
-                      </Button>
-                    ))}
+                  <div className="flex flex-wrap gap-2 max-h-60 overflow-y-auto mb-4">
+                    {allLanguages
+                      .filter(lang => 
+                        lang.toLowerCase().includes(languageSearch.toLowerCase()) &&
+                        !tempSelectedLanguages.includes(lang)
+                      )
+                      .map((lang) => (
+                        <Button 
+                          key={lang} 
+                          variant="outline" 
+                          className="py-1 px-3"
+                          onClick={() => {
+                            if (!tempSelectedLanguages.includes(lang)) {
+                              setTempSelectedLanguages([...tempSelectedLanguages, lang]);
+                            }
+                          }}
+                        >
+                          {lang}
+                        </Button>
+                      ))
+                    }
+                  </div>
+                  
+                  {tempSelectedLanguages.length > 0 && (
+                    <div className="border-t pt-3 mb-3">
+                      <p className="text-sm font-medium mb-2">Selected languages:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {tempSelectedLanguages.map(lang => (
+                          <Badge 
+                            key={lang}
+                            className="bg-yellow-100 text-gray-800 border border-yellow-300 px-2 py-1"
+                          >
+                            {lang}
+                            <button 
+                              className="ml-1 text-gray-500 hover:text-gray-800"
+                              onClick={() => setTempSelectedLanguages(
+                                tempSelectedLanguages.filter(l => l !== lang)
+                              )}
+                            >
+                              ×
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="flex justify-end">
+                    <Button
+                      className="bg-navy hover:bg-navy/90"
+                      onClick={() => {
+                        // Apply the temporary selections to the actual selections
+                        setSelectedLanguages(tempSelectedLanguages);
+                        // Close dialog programmatically
+                        const closeButton = document.querySelector('[data-radix-collection-item]');
+                        if (closeButton instanceof HTMLElement) {
+                          closeButton.click();
+                        }
+                      }}
+                    >
+                      Confirm
+                    </Button>
                   </div>
                 </DialogContent>
               </Dialog>
             </div>
             <div className="flex flex-wrap gap-2">
-              {languages.map((language) => (
-                <button
-                  key={language}
-                  type="button"
-                  className={`py-2 px-4 rounded-full text-sm transition-colors ${
-                    selectedLanguages.includes(language)
-                      ? "bg-yellow-100 text-gray-800 border border-yellow-300"
-                      : "bg-white border border-gray-300 text-gray-700 hover:border-yellow-300"
-                  }`}
-                  onClick={() => toggleLanguage(language)}
-                >
-                  {language}
-                </button>
-              ))}
+              {selectedLanguages.length > 0 ? (
+                selectedLanguages.map((language) => (
+                  <button
+                    key={language}
+                    type="button"
+                    className="py-2 px-4 rounded-full text-sm transition-colors bg-yellow-100 text-gray-800 border border-yellow-300"
+                    onClick={() => toggleLanguage(language)}
+                  >
+                    {language}
+                  </button>
+                ))
+              ) : (
+                languages.map((language) => (
+                  <button
+                    key={language}
+                    type="button"
+                    className="py-2 px-4 rounded-full text-sm transition-colors bg-white border border-gray-300 text-gray-700 hover:border-yellow-300"
+                    onClick={() => toggleLanguage(language)}
+                  >
+                    {language}
+                  </button>
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -316,7 +425,13 @@ const CreateProfile: React.FC = () => {
           <div className="bg-white rounded-lg p-5">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-xl font-medium text-navy">Travel Traits</h3>
-              <Dialog>
+              <Dialog onOpenChange={(open) => {
+                if (open) {
+                  // Initialize temporary selected traits with current selections
+                  setTempSelectedTraits([...selectedTraits]);
+                  setTraitSearch("");
+                }
+              }}>
                 <DialogTrigger asChild>
                   <Button size="sm" variant="outline" className="h-8 px-2">
                     <Plus className="h-4 w-4 mr-1" />
@@ -325,52 +440,115 @@ const CreateProfile: React.FC = () => {
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Add Travel Trait</DialogTitle>
+                    <DialogTitle>Add Travel Traits</DialogTitle>
                   </DialogHeader>
                   <div className="relative mb-4">
                     <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input className="pl-10" placeholder="Search traits" />
+                    <Input 
+                      className="pl-10" 
+                      placeholder="Search traits" 
+                      value={traitSearch}
+                      onChange={(e) => setTraitSearch(e.target.value)}
+                    />
                   </div>
-                  <div className="flex flex-wrap gap-2 max-h-60 overflow-y-auto">
-                    {[
-                      "Coffee Lover", "Tea Enthusiast", "Foodie", "Minimalist", 
-                      "Shopping Addict", "Museum Goer", "History Buff", "Beach Lover", 
-                      "Mountain Climber", "Yoga Enthusiast", "Architecture Buff", 
-                      "Photography Fan", "Social Butterfly", "Tech Geek"
-                    ].map((trait) => (
-                      <Button 
-                        key={trait} 
-                        variant="outline" 
-                        className="py-1 px-3"
-                        onClick={() => {
-                          const traitId = trait.toLowerCase().replace(/\s+/g, '_');
-                          if (!selectedTraits.includes(traitId)) {
-                            setSelectedTraits([...selectedTraits, traitId]);
-                          }
-                        }}
-                      >
-                        {trait}
-                      </Button>
-                    ))}
+                  <div className="flex flex-wrap gap-2 max-h-60 overflow-y-auto mb-4">
+                    {allTravelTraits
+                      .filter(trait => 
+                        trait.label.toLowerCase().includes(traitSearch.toLowerCase()) &&
+                        !tempSelectedTraits.includes(trait.id)
+                      )
+                      .map((trait) => (
+                        <Button 
+                          key={trait.id} 
+                          variant="outline" 
+                          className="py-1 px-3"
+                          onClick={() => {
+                            if (!tempSelectedTraits.includes(trait.id)) {
+                              setTempSelectedTraits([...tempSelectedTraits, trait.id]);
+                            }
+                          }}
+                        >
+                          {trait.label}
+                        </Button>
+                      ))
+                    }
+                  </div>
+                  
+                  {tempSelectedTraits.length > 0 && (
+                    <div className="border-t pt-3 mb-3">
+                      <p className="text-sm font-medium mb-2">Selected traits:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {tempSelectedTraits.map(traitId => {
+                          const trait = allTravelTraits.find(t => t.id === traitId);
+                          return trait ? (
+                            <Badge 
+                              key={trait.id}
+                              className="bg-yellow-100 text-gray-800 border border-yellow-300 px-2 py-1"
+                            >
+                              {trait.label}
+                              <button 
+                                className="ml-1 text-gray-500 hover:text-gray-800"
+                                onClick={() => setTempSelectedTraits(
+                                  tempSelectedTraits.filter(id => id !== trait.id)
+                                )}
+                              >
+                                ×
+                              </button>
+                            </Badge>
+                          ) : null;
+                        })}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="flex justify-end">
+                    <Button
+                      className="bg-navy hover:bg-navy/90"
+                      onClick={() => {
+                        // Apply the temporary selections to the actual selections
+                        setSelectedTraits(tempSelectedTraits);
+                        // Close dialog programmatically
+                        const closeButton = document.querySelector('[data-radix-collection-item]');
+                        if (closeButton instanceof HTMLElement) {
+                          closeButton.click();
+                        }
+                      }}
+                    >
+                      Confirm
+                    </Button>
                   </div>
                 </DialogContent>
               </Dialog>
             </div>
             <div className="flex flex-wrap gap-2">
-              {travelTraits.map((trait) => (
-                <button
-                  key={trait.id}
-                  type="button"
-                  className={`py-2 px-4 rounded-full text-sm transition-colors ${
-                    selectedTraits.includes(trait.id)
-                      ? "bg-yellow-100 text-gray-800 border border-yellow-300"
-                      : "bg-white border border-gray-300 text-gray-700 hover:border-yellow-300"
-                  }`}
-                  onClick={() => toggleTrait(trait.id)}
-                >
-                  {trait.label}
-                </button>
-              ))}
+              {selectedTraits.length > 0 ? (
+                // Display selected traits
+                selectedTraits.map(traitId => {
+                  const trait = allTravelTraits.find(t => t.id === traitId);
+                  return trait ? (
+                    <button
+                      key={trait.id}
+                      type="button"
+                      className="py-2 px-4 rounded-full text-sm transition-colors bg-yellow-100 text-gray-800 border border-yellow-300"
+                      onClick={() => toggleTrait(trait.id)}
+                    >
+                      {trait.label}
+                    </button>
+                  ) : null;
+                })
+              ) : (
+                // If no traits are selected, show default traits
+                travelTraits.map((trait) => (
+                  <button
+                    key={trait.id}
+                    type="button"
+                    className="py-2 px-4 rounded-full text-sm transition-colors bg-white border border-gray-300 text-gray-700 hover:border-yellow-300"
+                    onClick={() => toggleTrait(trait.id)}
+                  >
+                    {trait.label}
+                  </button>
+                ))
+              )}
             </div>
           </div>
         </div>
