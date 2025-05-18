@@ -14,7 +14,7 @@ const Layout: React.FC<LayoutProps> = ({
 }) => {
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#F5F1EB" }}>
-      <header className="p-4 pb-0 pt-0" style={{ backgroundColor: "#F5F1EB" }}>
+      <header className="p-0 pb-0" style={{ backgroundColor: "#F5F1EB" }}>
         <div className="container mx-auto flex justify-center">
           <Link href="/">
             <div className="cursor-pointer">
@@ -23,7 +23,7 @@ const Layout: React.FC<LayoutProps> = ({
           </Link>
         </div>
       </header>
-      <div className={cn("app-container", className)} style={{ paddingTop: "0", marginTop: "-90px" }}>
+      <div className={cn("app-container", className)} style={{ paddingTop: "0" }}>
         {children}
       </div>
     </div>
