@@ -192,7 +192,7 @@ const Dashboard: React.FC = () => {
                       variant="outline" 
                       size="sm" 
                       className="text-xs"
-                      onClick={() => navigate(`/post-stay/2`)}
+                      onClick={() => navigate(`/leave-review/2`)}
                     >
                       Leave Review
                     </Button>
