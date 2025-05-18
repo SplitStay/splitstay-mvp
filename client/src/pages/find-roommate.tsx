@@ -58,26 +58,38 @@ const FindRoommate: React.FC = () => {
         <div className="space-y-2">
           <label className="block text-gray-700 font-medium">Destination</label>
           <div className="relative">
-            <Input
+            <select
               value={destination}
               onChange={(e) => setDestination(e.target.value)}
-              placeholder="Where are you going?"
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-primary"
-            />
-            <MapPin className="absolute right-4 top-3.5 text-gray-400 h-5 w-5" />
+              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-primary appearance-none"
+            >
+              <option value="">Select a destination</option>
+              <option value="Brussels">Brussels</option>
+              <option value="Paris">Paris</option>
+              <option value="Amsterdam">Amsterdam</option>
+              <option value="Berlin">Berlin</option>
+              <option value="London">London</option>
+            </select>
+            <MapPin className="absolute right-4 top-3.5 text-gray-400 h-5 w-5 pointer-events-none" />
           </div>
         </div>
         
         <div className="space-y-2">
           <label className="block text-gray-700 font-medium">Dates</label>
           <div className="relative">
-            <Input
+            <select
               value={dates}
               onChange={(e) => setDates(e.target.value)}
-              placeholder="Choose dates"
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-primary"
-            />
-            <Calendar className="absolute right-4 top-3.5 text-gray-400 h-5 w-5" />
+              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-primary appearance-none"
+            >
+              <option value="">Select travel dates</option>
+              <option value="May 12 - 15, 2025">May 12 - 15, 2025</option>
+              <option value="May 20 - 24, 2025">May 20 - 24, 2025</option>
+              <option value="June 5 - 10, 2025">June 5 - 10, 2025</option>
+              <option value="June 15 - 20, 2025">June 15 - 20, 2025</option>
+              <option value="July 1 - 7, 2025">July 1 - 7, 2025</option>
+            </select>
+            <Calendar className="absolute right-4 top-3.5 text-gray-400 h-5 w-5 pointer-events-none" />
           </div>
         </div>
         
