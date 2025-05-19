@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SplitStay Application Flow Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #001F3F;
+            text-align: center;
+        }
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        .description {
+            margin-top: 30px;
+        }
+        h2 {
+            color: #001F3F;
+            border-bottom: 2px solid #001F3F;
+            padding-bottom: 5px;
+        }
+        h3 {
+            color: #001F3F;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .journey {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .journey h4 {
+            margin-top: 0;
+            color: #001F3F;
+        }
+        .download-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .download-btn {
+            background-color: #001F3F;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .download-btn:hover {
+            background-color: #003366;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SplitStay Application Flow</h1>
+        
+        <div class="mermaid">
+            graph TD
+                Home[Home Screen] --> Login[Login]
+                Home --> SignUp[Sign Up]
+                SignUp --> CreateProfile[Create Profile]
+                Login --> Dashboard[Dashboard]
+                CreateProfile --> FindRoommate[Find Roommate]
+                
+                Dashboard --> Profile[User Profile]
+                Dashboard --> FindRoommate
+                Dashboard --> Messages[Messages/Chat]
+                Dashboard --> UpcomingTrips[Upcoming Trips]
+                Dashboard --> PastTrips[Past Trips]
+                
+                Profile --> EditProfile[Edit Profile]
+                EditProfile --> Profile
+                
+                FindRoommate --> BrowseProfiles[Browse Profiles]
+                BrowseProfiles --> RequestBooking[Request to Book]
+                RequestBooking --> RequestSent[Request Sent]
+                RequestSent --> Messages
+                
+                UpcomingTrips --> BookingConfirmation[Booking Confirmation]
+                BookingConfirmation --> CheckIn[Check-In Experience]
+                CheckIn --> GuestInfo[Guest Info]
+                CheckIn --> Chat[Chat with Hotel]
+                
+                PastTrips --> LeaveReview[Leave Review]
+                LeaveReview --> RateRoommate[Rate Roommate]
+                
+                GuestInfo --> PostStay[Post Stay Feedback]
+                PostStay --> RateRoommate
+                
+                Messages --> Chat
+                
+                subgraph Legend
+                    UserActions[User Account Flow]
+                    BookingActions[Booking Flow]
+                    StayActions[Stay Experience Flow]
+                    FeedbackActions[Feedback Flow]
+                end
+                
+                classDef userFlow fill:#ffcccb,stroke:#ff0000
+                classDef bookingFlow fill:#d1e7dd,stroke:#0d6832
+                classDef stayFlow fill:#cfe2ff,stroke:#084298
+                classDef feedbackFlow fill:#fff3cd,stroke:#856404
+                
+                class Home,Login,SignUp,CreateProfile,Profile,EditProfile userFlow
+                class FindRoommate,BrowseProfiles,RequestBooking,RequestSent bookingFlow
+                class BookingConfirmation,CheckIn,GuestInfo,Chat stayFlow
+                class Messages,LeaveReview,RateRoommate,PostStay feedbackFlow
+        </div>
+        
+        <div class="description">
+            <h2>Screen Descriptions</h2>
+            
+            <div class="section">
+                <h3>User Account Flow</h3>
+                <ul>
+                    <li><strong>Home Screen</strong>: Landing page with app introduction and sign-up/login options</li>
+                    <li><strong>Login</strong>: Authentication screen for existing users</li>
+                    <li><strong>Sign Up</strong>: Registration screen for new users</li>
+                    <li><strong>Create Profile</strong>: Form to create user profile with personal details, preferences</li>
+                    <li><strong>User Profile</strong>: View user information, stats, and reviews</li>
+                    <li><strong>Edit Profile</strong>: Modify existing profile information</li>
+                </ul>
+            </div>
+            
+            <div class="section">
+                <h3>Booking Flow</h3>
+                <ul>
+                    <li><strong>Find Roommate</strong>: Search for compatible roommates by location, dates, preferences</li>
+                    <li><strong>Browse Profiles</strong>: View potential roommates based on search criteria</li>
+                    <li><strong>Request to Book</strong>: Send booking request to potential roommate</li>
+                    <li><strong>Request Sent</strong>: Confirmation that request was sent successfully</li>
+                </ul>
+            </div>
+            
+            <div class="section">
+                <h3>Stay Experience Flow</h3>
+                <ul>
+                    <li><strong>Booking Confirmation</strong>: Details about the confirmed booking</li>
+                    <li><strong>Check-In Experience</strong>: Information for arrival including roommate status</li>
+                    <li><strong>Guest Info</strong>: Details about the hotel and stay after check-in</li>
+                    <li><strong>Chat with Hotel</strong>: Direct messaging with hotel staff</li>
+                </ul>
+            </div>
+            
+            <div class="section">
+                <h3>Feedback Flow</h3>
+                <ul>
+                    <li><strong>Messages/Chat</strong>: Communication with roommates</li>
+                    <li><strong>Leave Review</strong>: Write reviews for hotels and experience</li>
+                    <li><strong>Rate Roommate</strong>: Provide feedback on roommate experience</li>
+                    <li><strong>Post Stay Feedback</strong>: Overall feedback after completing a stay</li>
+                </ul>
+            </div>
+            
+            <h2>Key User Journeys</h2>
+            
+            <div class="journey">
+                <h4>1. New User Path</h4>
+                <p>Home → Sign Up → Create Profile → Find Roommate → Browse Profiles → Request Booking</p>
+            </div>
+            
+            <div class="journey">
+                <h4>2. Returning User Booking Path</h4>
+                <p>Home → Login → Dashboard → Find Roommate → Browse Profiles → Request Booking</p>
+            </div>
+            
+            <div class="journey">
+                <h4>3. Stay Experience Path</h4>
+                <p>Dashboard → Upcoming Trips → Booking Confirmation → Check-In → Guest Info → Post Stay → Rate Roommate</p>
+            </div>
+            
+            <div class="journey">
+                <h4>4. Communication Path</h4>
+                <p>Dashboard → Messages → Chat with Roommate/Hotel</p>
+            </div>
+            
+            <div class="journey">
+                <h4>5. Profile Management Path</h4>
+                <p>Dashboard → Profile → Edit Profile</p>
+            </div>
+        </div>
+        
+        <div class="download-section">
+            <p>To save this flow chart, right-click on the diagram and select "Save image as..." or take a screenshot.</p>
+            <button class="download-btn" onclick="saveDiagram()">Save Diagram as PNG</button>
+        </div>
+    </div>
+
+    <script>
+        // Initialize mermaid diagram
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            fontFamily: 'Arial',
+            fontSize: 14
+        });
+        
+        // Function to save diagram as PNG
+        function saveDiagram() {
+            const svgElement = document.querySelector('.mermaid svg');
+            if (!svgElement) {
+                alert("Diagram not loaded yet. Please try again.");
+                return;
+            }
+            
+            const svgData = new XMLSerializer().serializeToString(svgElement);
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            
+            const img = new Image();
+            img.onload = function() {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                
+                const pngData = canvas.toDataURL("image/png");
+                const downloadLink = document.createElement("a");
+                downloadLink.href = pngData;
+                downloadLink.download = "SplitStay-FlowChart.png";
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+            };
+            
+            img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
+        }
+    </script>
+</body>
+</html>
