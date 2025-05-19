@@ -28,18 +28,32 @@ interface TravelTrait {
 }
 
 const CreateProfile: React.FC = () => {
-  const [_, navigate] = useLocation();
+  const [location, navigate] = useLocation();
+  const isEditMode = location === "/profile/edit";
+  
+  // Pre-fill data for edit mode
+  const defaultUserData = isEditMode ? {
+    fullName: "Alina Chen",
+    bio: "Spontaneous traveler who enjoys quiet time. Love exploring new cities and making memories!",
+    dateOfBirth: new Date(2002, 0, 15), // Jan 15, 2002 for age 23
+    travelReason: "leisure" as const,
+    languages: ["English", "German"],
+    profileImage: "https://i.pravatar.cc/150?img=31",
+    traits: ["Early bird", "Quiet", "Clean", "Budget-conscious"],
+    interests: ["Photography", "Hiking", "Food", "Museums"]
+  } : null;
   
   // Personal info states
-  const [name, setName] = useState("");
-  const [bio, setBio] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>(undefined);
-  const [travelReason, setTravelReason] = useState<"leisure" | "business">("leisure");
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [name, setName] = useState(defaultUserData?.fullName || "");
+  const [bio, setBio] = useState(defaultUserData?.bio || "");
+  const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>(defaultUserData?.dateOfBirth);
+  const [travelReason, setTravelReason] = useState<"leisure" | "business">(defaultUserData?.travelReason || "leisure");
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(defaultUserData?.languages || []);
+  const [profileImage, setProfileImage] = useState<string | null>(defaultUserData?.profileImage || null);
   
   // Travel traits
-  const [selectedTraits, setSelectedTraits] = useState<string[]>([]);
+  const [selectedTraits, setSelectedTraits] = useState<string[]>(defaultUserData?.traits || []);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>(defaultUserData?.interests || []);
   
   // Handle profile image upload
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {

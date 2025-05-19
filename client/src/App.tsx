@@ -32,6 +32,7 @@ function Router() {
       <Route path="/signup" component={SignUp} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/profile" component={Profile} />
+      <Route path="/profile/edit" component={CreateProfile} />
       <Route path="/create-profile" component={CreateProfile} />
       <Route path="/find-roommate" component={FindRoommate} />
       <Route path="/browse-profiles" component={BrowseProfiles} />
