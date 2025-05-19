@@ -293,38 +293,40 @@ const Messages: React.FC = () => {
             </div>
           )}
           
-          <div className="flex items-center">
-            <div className="relative">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-gray-500"
-                onClick={handleAttachmentClick}
-              >
-                <Paperclip className="h-5 w-5" />
-              </Button>
-              
-              {showAttachmentOptions && (
-                <div className="absolute bottom-full left-0 mb-2 bg-white shadow-lg rounded-md border border-gray-200 py-1 w-48">
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    className="hidden"
-                    onChange={handleFileSelect}
-                    accept="image/*,.pdf,.doc,.docx,.txt"
-                  />
-                  <button 
-                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    Photo or File
-                  </button>
-                </div>
-              )}
+          <div className="flex items-center relative">
+            <div className="absolute left-0 bottom-0 top-0 flex items-center pl-2">
+              <div className="relative">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-gray-500"
+                  onClick={handleAttachmentClick}
+                >
+                  <Paperclip className="h-5 w-5" />
+                </Button>
+                
+                {showAttachmentOptions && (
+                  <div className="absolute bottom-full left-0 mb-2 bg-white shadow-lg rounded-md border border-gray-200 py-1 w-48 z-10">
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      className="hidden"
+                      onChange={handleFileSelect}
+                      accept="image/*,.pdf,.doc,.docx,.txt"
+                    />
+                    <button 
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      Photo or File
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
             
             <Input
-              className="flex-1 mx-2"
+              className="flex-1 pl-12 pr-12"
               placeholder="Type a message..."
               value={messageText}
               onChange={(e) => setMessageText(e.target.value)}
@@ -336,14 +338,16 @@ const Messages: React.FC = () => {
               }}
             />
             
-            <Button
-              className={`rounded-full ${(messageText.trim() || selectedFile) ? 'navy-button' : 'bg-gray-200 text-gray-500'}`}
-              size="icon"
-              onClick={handleSendMessage}
-              disabled={!messageText.trim() && !selectedFile}
-            >
-              <Send className="h-5 w-5" />
-            </Button>
+            <div className="absolute right-0 bottom-0 top-0 flex items-center pr-2">
+              <Button
+                className={`rounded-full ${(messageText.trim() || selectedFile) ? 'navy-button' : 'bg-gray-200 text-gray-500'}`}
+                size="icon"
+                onClick={handleSendMessage}
+                disabled={!messageText.trim() && !selectedFile}
+              >
+                <Send className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
