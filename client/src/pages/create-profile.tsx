@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { toast } from "@/hooks/use-toast";
+import { trackProfileCreation } from "@/lib/analytics";
 import { format } from "date-fns";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -169,6 +170,9 @@ const CreateProfile: React.FC = () => {
       profileImage: profileImage,
       interests: selectedInterests
     }));
+    
+    // Track profile creation/update event in Google Analytics
+    trackProfileCreation();
     
     // Show success toast
     toast({
