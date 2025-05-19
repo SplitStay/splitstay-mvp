@@ -16,7 +16,7 @@ import LeaveReview from "@/pages/leave-review";
 import RequestBooking from "@/pages/request-booking";
 import RequestSent from "@/pages/request-sent";
 import Chat from "@/pages/chat";
-import Messages from "@/pages/messages";
+import Messages from "@/pages/messages-fixed";
 import BookingConfirmation from "@/pages/booking-confirmation";
 import CheckIn from "@/pages/check-in";
 import GuestInfo from "@/pages/guest-info";
