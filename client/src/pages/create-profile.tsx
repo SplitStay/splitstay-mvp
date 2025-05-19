@@ -179,7 +179,19 @@ const CreateProfile: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen p-5 bg-cream">
-      <h1 className="text-4xl font-bold text-navy text-center mt-0 mb-4">Complete Your Profile</h1>
+      <div className="flex items-center justify-between mb-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-gray-500"
+          onClick={() => navigate(isEditMode ? "/profile" : "/")}
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <h1 className="text-2xl font-bold text-primary flex-1 text-center">
+          {isEditMode ? "Edit Your Profile" : "Complete Your Profile"}
+        </h1>
+      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {/* Left Column - Personal Info */}
@@ -624,9 +636,9 @@ const CreateProfile: React.FC = () => {
         <Button 
           variant="outline"
           className="py-4 text-lg border-navy text-navy"
-          onClick={handleSkip}
+          onClick={() => navigate(isEditMode ? "/profile" : "/")}
         >
-          Skip for Now
+          {isEditMode ? "Cancel" : "Skip for Now"}
         </Button>
         <Button 
           type="button"
@@ -639,7 +651,7 @@ const CreateProfile: React.FC = () => {
           }}
           onClick={handleCreateProfile}
         >
-          Continue
+          {isEditMode ? "Save Changes" : "Continue"}
         </Button>
       </div>
     </div>
