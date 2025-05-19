@@ -13,6 +13,7 @@ import {
   MessageSquare,
   Settings
 } from "lucide-react";
+import { trackMessageSent } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -118,6 +119,12 @@ const Messages: React.FC = () => {
       time: time,
       attachment: selectedFile ? URL.createObjectURL(selectedFile) : undefined
     };
+    
+    // Track message sent in Google Analytics
+    const activeConvo = conversations.find(c => c.id === activeConversation);
+    if (activeConvo) {
+      trackMessageSent(activeConvo.user.fullName);
+    }
     
     // Add message to the list
     setMessages([...messages, newMessage]);

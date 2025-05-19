@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Slider } from "@/components/ui/slider";
 import { format } from "date-fns";
+import { trackRoommateSearch } from "@/lib/analytics";
 
 // Define location interface
 interface LocationItem {
@@ -163,6 +164,9 @@ const FindRoommate: React.FC = () => {
       alert("Please select your travel dates");
       return;
     }
+    
+    // Track roommate search in Google Analytics
+    trackRoommateSearch(destination);
     
     // Save the search criteria as serializable values
     localStorage.setItem('splitstay_search', JSON.stringify({
