@@ -166,11 +166,20 @@ const CreateProfile: React.FC = () => {
       travelReason,
       languages: selectedLanguages.length > 0 ? selectedLanguages : ["English"],
       traits: selectedTraits,
-      profileImage: profileImage
+      profileImage: profileImage,
+      interests: selectedInterests
     }));
     
-    // Navigate to the next step
-    navigate("/find-roommate");
+    // Show success toast
+    toast({
+      title: isEditMode ? "Profile updated" : "Profile created",
+      description: isEditMode 
+        ? "Your profile has been updated successfully!" 
+        : "Your profile has been created successfully!",
+    });
+    
+    // Navigate based on mode
+    navigate(isEditMode ? "/profile" : "/find-roommate");
   };
 
   const handleSkip = () => {
