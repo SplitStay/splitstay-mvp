@@ -60,30 +60,20 @@ const ResearchConsent: React.FC<ResearchConsentProps> = ({
             <Checkbox 
               id="recordSession" 
               checked={recordSession}
-              onCheckedChange={(checked) => setRecordSession(checked as boolean)}
+              onCheckedChange={(checked) => {
+                setRecordSession(checked as boolean);
+                // If they agree to session recording, automatically set to true so dialog can close
+                if (checked) {
+                  setTimeout(() => handleAccept(), 500);
+                }
+              }}
             />
             <div className="grid gap-1.5 leading-none">
               <Label htmlFor="recordSession" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Record my session (clicks, navigation paths)
+                Help improve SplitStay
               </Label>
               <p className="text-xs text-gray-500">
-                We'll record how you use the app, but no personal data.
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex items-start space-x-2">
-            <Checkbox 
-              id="recordAudio" 
-              checked={recordAudio}
-              onCheckedChange={(checked) => setRecordAudio(checked as boolean)}
-            />
-            <div className="grid gap-1.5 leading-none">
-              <Label htmlFor="recordAudio" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Record audio feedback
-              </Label>
-              <p className="text-xs text-gray-500">
-                You can share thoughts out loud as you use the app.
+                We'll collect basic usage data to enhance the experience.
               </p>
             </div>
           </div>
