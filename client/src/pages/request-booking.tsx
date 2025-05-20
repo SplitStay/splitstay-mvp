@@ -19,31 +19,31 @@ const RequestBooking: React.FC<RequestBookingProps> = ({ params }) => {
   const userId = parseInt(params.id, 10);
   
   // First try to get the profile from the browse profiles data
-  const getProfileFromLocalStorage = (): UserProfile | null => {
+  const getProfileFromSessionStorage = (): UserProfile | null => {
     try {
-      const savedSearchData = localStorage.getItem("splitstay_search");
+      const savedSearchData = sessionStorage.getItem("splitstay_search");
       if (savedSearchData) {
         // Get the browse profiles data that was loaded
-        const browsedProfiles = JSON.parse(localStorage.getItem("splitstay_browsed_profiles") || "[]");
+        const browsedProfiles = JSON.parse(sessionStorage.getItem("splitstay_browsed_profiles") || "[]");
         // Find the profile matching the user ID (comparing as strings to handle potential type differences)
         return browsedProfiles.find((p: UserProfile) => String(p.id) === params.id) || null;
       }
     } catch (error) {
-      console.error("Error retrieving profile from localStorage:", error);
+      console.error("Error retrieving profile from sessionStorage:", error);
     }
     return null;
   };
 
-  const localProfile = getProfileFromLocalStorage();
+  const localProfile = getProfileFromSessionStorage();
 
   const { data: profile, isLoading } = useQuery({
     queryKey: [`/api/users/${userId}`],
     queryFn: async () => {
-      // If we have the profile in localStorage, use that one immediately
+      // If we have the profile in sessionStorage, use that one immediately
       if (localProfile) {
-        console.log("Using profile from localStorage:", localProfile);
+        console.log("Using profile from sessionStorage:", localProfile);
         
-        // Ensure the profile has fullName when using localStorage data
+        // Ensure the profile has fullName when using sessionStorage data
         const profileWithFullName = {
           ...localProfile,
           fullName: localProfile.fullName || `${localProfile.firstName || ''} ${localProfile.lastName || ''}`.trim()
