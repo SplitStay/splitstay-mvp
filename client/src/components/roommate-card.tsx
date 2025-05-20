@@ -151,6 +151,11 @@ const RoommateCard: React.FC<RoommateCardProps> = ({
                       </Badge>
                     )}
                   </div>
+                  
+                  <div className="flex items-center mt-1">
+                    <Bed className="h-3 w-3 mr-1 text-gray-600" />
+                    <span className="text-xs text-gray-700">{profile.preferredAccommodation.roomType}</span>
+                  </div>
                 </div>
               </div>
             </div>
