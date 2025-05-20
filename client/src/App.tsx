@@ -24,6 +24,7 @@ import GuestInfo from "@/pages/guest-info";
 import PostStay from "@/pages/post-stay";
 import RateRoommate from "@/pages/rate-roommate";
 import Layout from "@/components/layout";
+import ResearchProvider from "@/components/research-provider";
 
 function Router() {
   // Initialize analytics tracking
@@ -59,10 +60,12 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Layout>
-          <Router />
-        </Layout>
-        <Toaster />
+        <ResearchProvider>
+          <Layout>
+            <Router />
+          </Layout>
+          <Toaster />
+        </ResearchProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );
