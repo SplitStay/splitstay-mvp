@@ -109,21 +109,19 @@ const FeedbackButton: React.FC = () => {
     <>
       <div className="fixed bottom-24 right-4 flex flex-col space-y-3 items-end">
         {/* Recording status indicator */}
-        {recordingStatus !== 'idle' && (
+        {recordStatus !== 'idle' && (
           <div className={`text-white text-xs rounded-full px-2 py-1 mb-1 flex items-center ${
-            recordingStatus === 'recording' ? 'bg-red-500 animate-pulse' : 
-            recordingStatus === 'saving' ? 'bg-yellow-500' :
-            recordingStatus === 'saved' ? 'bg-green-500' : 'bg-red-500'
+            recordStatus === 'recording' ? 'bg-red-500 animate-pulse' : 
+            recordStatus === 'saved' ? 'bg-green-500' : 'bg-red-500'
           }`}>
-            {recordingStatus === 'recording' && (
+            {recordStatus === 'recording' && (
               <>
                 <span className="inline-block w-2 h-2 bg-white rounded-full mr-1 animate-pulse"></span>
-                Recording: {formatTime(recordingSeconds)}
+                Recording audio...
               </>
             )}
-            {recordingStatus === 'saving' && 'Saving recording...'}
-            {recordingStatus === 'saved' && 'Recording saved!'}
-            {recordingStatus === 'error' && 'Recording failed'}
+            {recordStatus === 'saved' && 'Recording saved!'}
+            {recordStatus === 'error' && 'Recording failed'}
           </div>
         )}
         
@@ -141,7 +139,7 @@ const FeedbackButton: React.FC = () => {
                 : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100'
             }`}
             onClick={toggleAudioFeedback}
-            disabled={recordingStatus === 'saving'}
+            disabled={recordStatus === 'error'}
           >
             {isRecording ? (
               <MicOff className="h-6 w-6" />
