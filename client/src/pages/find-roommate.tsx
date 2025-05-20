@@ -687,6 +687,16 @@ const FindRoommate: React.FC = () => {
         </div>
         
         <div className="pt-6 pb-2">
+          {destination && startDate && endDate ? (
+            <div className="mb-2 text-center">
+              <div className="text-sm text-gray-600">
+                <span className="font-medium">{destination}</span>
+                <span className="mx-2">•</span>
+                <span>{format(startDate, 'MMM d')} - {format(endDate, 'MMM d')}</span>
+              </div>
+            </div>
+          ) : null}
+          
           <Button
             type="button"
             className="navy-button w-full text-lg py-6 relative"
@@ -696,11 +706,11 @@ const FindRoommate: React.FC = () => {
               <span>Find Matches</span>
               <ChevronRight className="ml-2 h-5 w-5" />
             </div>
-            <div className="absolute bottom-1 w-full text-xs opacity-80">
-              {destination && startDate && endDate ? 
-                `${destination} · ${format(startDate, 'MMM d')} - ${format(endDate, 'MMM d')}` : 
-                'Complete all fields to continue'}
-            </div>
+            {!destination || !startDate || !endDate ? (
+              <div className="absolute bottom-1 w-full text-xs opacity-80">
+                Complete all fields to continue
+              </div>
+            ) : null}
           </Button>
         </div>
       </div>
