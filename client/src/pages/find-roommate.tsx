@@ -156,12 +156,62 @@ const FindRoommate: React.FC = () => {
   const handleFindMatches = () => {
     // Make sure we have a destination and dates before proceeding
     if (!destination) {
-      alert("Please select a destination");
+      // Create a friendly error message element instead of using alert
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'fixed inset-0 flex items-center justify-center bg-black/50 z-50';
+      
+      const errorContent = document.createElement('div');
+      errorContent.className = 'bg-white rounded-lg p-6 max-w-sm mx-auto shadow-lg';
+      
+      const title = document.createElement('h3');
+      title.className = 'text-lg font-medium text-primary mb-2';
+      title.textContent = 'Missing Destination';
+      
+      const message = document.createElement('p');
+      message.className = 'text-gray-600 mb-4';
+      message.textContent = 'Please enter where you\'d like to travel. This helps us find roommates planning to visit the same location.';
+      
+      const button = document.createElement('button');
+      button.className = 'w-full bg-primary text-white py-2 rounded-lg font-medium';
+      button.textContent = 'OK';
+      button.onclick = () => document.body.removeChild(errorDiv);
+      
+      errorContent.appendChild(title);
+      errorContent.appendChild(message);
+      errorContent.appendChild(button);
+      errorDiv.appendChild(errorContent);
+      
+      document.body.appendChild(errorDiv);
       return;
     }
     
     if (!startDate || !endDate) {
-      alert("Please select your travel dates");
+      // Create a friendly error message for dates
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'fixed inset-0 flex items-center justify-center bg-black/50 z-50';
+      
+      const errorContent = document.createElement('div');
+      errorContent.className = 'bg-white rounded-lg p-6 max-w-sm mx-auto shadow-lg';
+      
+      const title = document.createElement('h3');
+      title.className = 'text-lg font-medium text-primary mb-2';
+      title.textContent = 'Travel Dates Needed';
+      
+      const message = document.createElement('p');
+      message.className = 'text-gray-600 mb-4';
+      message.textContent = 'Please select your travel dates so we can match you with roommates traveling at the same time.';
+      
+      const button = document.createElement('button');
+      button.className = 'w-full bg-primary text-white py-2 rounded-lg font-medium';
+      button.textContent = 'OK';
+      button.onclick = () => document.body.removeChild(errorDiv);
+      
+      errorContent.appendChild(title);
+      errorContent.appendChild(message);
+      errorContent.appendChild(button);
+      errorDiv.appendChild(errorContent);
+      
+      document.body.appendChild(errorDiv);
       return;
     }
     
