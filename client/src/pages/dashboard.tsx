@@ -71,14 +71,29 @@ const Dashboard: React.FC = () => {
               <h2 className="font-semibold text-lg">{user.fullName}</h2>
               <p className="text-sm text-gray-500">Verified Member</p>
             </div>
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="text-xs"
-              onClick={() => navigate("/profile")}
-            >
-              View Profile
-            </Button>
+            <div className="flex flex-col gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="text-xs"
+                onClick={() => navigate("/profile")}
+              >
+                View Profile
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="text-xs flex items-center text-red-500 hover:text-red-700"
+                onClick={() => {
+                  // Clear all session data on logout
+                  sessionStorage.clear();
+                  navigate("/");
+                }}
+              >
+                <LogOut className="h-3 w-3 mr-1" />
+                Log Out
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
