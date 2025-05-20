@@ -11,17 +11,17 @@ const Home: React.FC = () => {
   return (
     <div className="p-6 flex flex-col items-center">
       {/* Logo section with proper spacing */}
-      <div className="flex flex-col items-center mb-12 pt-4">
+      <div className="flex flex-col items-center mb-10 pt-4">
         <img 
           src={logoImage} 
           alt="SplitStay Logo" 
-          className="h-24 w-auto mb-4"
+          className="h-28 w-auto mb-4"
         />
-        <h1 className="text-3xl font-bold text-primary text-center mb-6">SplitStay</h1>
-        <p className="text-center text-gray-700 mt-2">
-          Welcome to SplitStay — where<br />
-          solo travelers connect, match,<br />
-          and save.
+        <h1 className="text-3xl font-bold text-primary text-center mb-4">SplitStay</h1>
+        <p className="text-center text-gray-700 mt-2 font-medium text-lg">
+          Find compatible roommates.<br />
+          Split hotel costs.<br />
+          Make new friends.
         </p>
       </div>
       
@@ -39,35 +39,63 @@ const Home: React.FC = () => {
           </div>
           <ChevronRight />
         </Button>
+        
+        <Button
+          variant="outline"
+          className="w-full flex justify-between border-2"
+          onClick={() => navigate("/dashboard")}
+        >
+          <div className="flex items-center">
+            <Eye className="mr-3 h-5 w-5" />
+            <span>Explore Demo</span>
+          </div>
+          <ChevronRight />
+        </Button>
       </div>
       
       {/* Features */}
-      <div className="mt-10 w-full text-gray-700">
-        <ul className="space-y-2">
-          <li className="flex items-start">
-            <CheckCircle className="text-secondary mt-1 mr-2 h-5 w-5" />
-            <span>All users verified before booking</span>
+      <div className="mt-10 w-full">
+        <h3 className="text-lg font-medium text-primary mb-4">Why travelers choose SplitStay:</h3>
+        <ul className="space-y-4">
+          <li className="flex items-start bg-gray-50 p-3 rounded-lg">
+            <CheckCircle className="text-green-500 mt-1 mr-3 h-5 w-5 flex-shrink-0" />
+            <div>
+              <span className="font-medium">Verified Safety</span>
+              <p className="text-sm text-gray-600 mt-1">All users are ID verified with a secure review system</p>
+            </div>
           </li>
-          <li className="flex items-start">
-            <CheckCircle className="text-secondary mt-1 mr-2 h-5 w-5" />
-            <span>Book with safety and comfort</span>
+          <li className="flex items-start bg-gray-50 p-3 rounded-lg">
+            <CheckCircle className="text-green-500 mt-1 mr-3 h-5 w-5 flex-shrink-0" />
+            <div>
+              <span className="font-medium">Smart Matching</span>
+              <p className="text-sm text-gray-600 mt-1">Find roommates based on travel style and preferences</p>
+            </div>
           </li>
-          <li className="flex items-start">
-            <CheckCircle className="text-secondary mt-1 mr-2 h-5 w-5" />
-            <span>No hidden fees. Ever</span>
+          <li className="flex items-start bg-gray-50 p-3 rounded-lg">
+            <CheckCircle className="text-green-500 mt-1 mr-3 h-5 w-5 flex-shrink-0" />
+            <div>
+              <span className="font-medium">Save 50% on Accommodation</span>
+              <p className="text-sm text-gray-600 mt-1">Split costs with a compatible roommate, no hidden fees</p>
+            </div>
           </li>
         </ul>
       </div>
       
       {/* Login */}
       <div className="mt-10 w-full">
-        <Button
-          type="button"
-          className="navy-button"
-          onClick={() => navigate("/login")} 
-        >
-          Log in
-        </Button>
+        <div className="flex flex-col space-y-3">
+          <Button
+            type="button"
+            variant="outline"
+            className="border-2"
+            onClick={() => navigate("/login")} 
+          >
+            Already have an account? Log in
+          </Button>
+          <p className="text-xs text-center text-gray-500 mt-1">
+            For demo purposes, all features are available without creating an account
+          </p>
+        </div>
       </div>
     </div>
   );
