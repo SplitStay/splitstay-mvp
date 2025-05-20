@@ -46,8 +46,34 @@ const BrowseProfiles: React.FC = () => {
     }
   });
   
+  // Let's use custom profile type without schema restrictions for the demo
+  interface DemoProfile {
+    id: number;
+    fullName: string;
+    email: string;
+    username: string;
+    password: string;
+    profilePicture: string;
+    bio: string;
+    age: string;
+    gender: string;
+    languages: string[];
+    travelTraits: string[];
+    isVerified: boolean;
+    matchPercentage: number;
+    matchLabel: string;
+    positiveReviews: boolean;
+    preferredAccommodation: {
+      name: string;
+      platform: string;
+      url: string;
+      isFlexible: boolean;
+      roomType: string;
+    };
+  }
+
   // Demo profiles
-  const defaultProfiles = [
+  const defaultProfiles: DemoProfile[] = [
     {
       id: 1,
       fullName: "Hannah Kim",
@@ -61,8 +87,6 @@ const BrowseProfiles: React.FC = () => {
       languages: ["English", "Korean"],
       travelTraits: ["Nature lover", "Early riser", "Quiet"],
       isVerified: true,
-      preferences: {},
-      createdAt: new Date(),
       matchPercentage: 91,
       matchLabel: "Recommended Roommate",
       positiveReviews: true,
@@ -87,8 +111,6 @@ const BrowseProfiles: React.FC = () => {
       languages: ["English", "Mandarin"],
       travelTraits: ["Food lover", "Night owl", "Quiet"],
       isVerified: true,
-      preferences: {},
-      createdAt: new Date(),
       matchPercentage: 84,
       matchLabel: "Ideal Match",
       positiveReviews: true,
@@ -113,8 +135,6 @@ const BrowseProfiles: React.FC = () => {
       languages: ["English", "German"],
       travelTraits: ["Organized", "Early riser", "Social"],
       isVerified: true,
-      preferences: {},
-      createdAt: new Date(),
       matchPercentage: 75,
       matchLabel: "Good Match",
       positiveReviews: true,
@@ -129,7 +149,7 @@ const BrowseProfiles: React.FC = () => {
   ];
   
   // State for filtered profiles
-  const [filteredProfiles, setFilteredProfiles] = useState<UserProfile[]>([]);
+  const [filteredProfiles, setFilteredProfiles] = useState<DemoProfile[]>([]);
   
   // Fetch profiles
   const { data: profiles, isLoading } = useQuery({
