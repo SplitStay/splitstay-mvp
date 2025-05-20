@@ -157,7 +157,7 @@ const BrowseProfiles: React.FC = () => {
   
   // Load saved search data on mount
   useEffect(() => {
-    const savedSearchData = localStorage.getItem("splitstay_search");
+    const savedSearchData = sessionStorage.getItem("splitstay_search");
     
     if (savedSearchData) {
       console.log("Saved search data:", savedSearchData);
@@ -283,8 +283,8 @@ const BrowseProfiles: React.FC = () => {
   // Initialize filtered profiles when profiles load and store them in localStorage
   useEffect(() => {
     if (profiles) {
-      // Store the profiles in localStorage for use on the request booking page
-      localStorage.setItem('splitstay_browsed_profiles', JSON.stringify(profiles));
+      // Store the profiles in sessionStorage for use on the request booking page
+      sessionStorage.setItem('splitstay_browsed_profiles', JSON.stringify(profiles));
       
       setFilteredProfiles(profiles);
     }

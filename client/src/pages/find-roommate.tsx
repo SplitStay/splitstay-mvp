@@ -168,8 +168,9 @@ const FindRoommate: React.FC = () => {
     // Track roommate search in Google Analytics
     trackRoommateSearch(destination);
     
-    // Save the search criteria as serializable values
-    localStorage.setItem('splitstay_search', JSON.stringify({
+    // Save the search criteria as serializable values in session storage instead of local storage
+    // This ensures data is cleared when the browser is closed or on logout
+    sessionStorage.setItem('splitstay_search', JSON.stringify({
       destination,
       startDate: startDate ? startDate.toISOString() : null,
       endDate: endDate ? endDate.toISOString() : null,
@@ -183,7 +184,7 @@ const FindRoommate: React.FC = () => {
 
   // Load saved search data when the component mounts
   React.useEffect(() => {
-    const savedSearchData = localStorage.getItem("splitstay_search");
+    const savedSearchData = sessionStorage.getItem("splitstay_search");
     
     if (savedSearchData) {
       try {
