@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import UserAvatar from "@/components/user-avatar";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Star, Users, ChevronDown, ChevronUp } from "lucide-react";
+import { CheckCircle, Star, Users, ChevronDown, ChevronUp, ExternalLink, Home, Lock, Check } from "lucide-react";
 import { Link } from "wouter";
 import { cn } from "@/lib/utils";
 import { UserProfile } from "@shared/schema";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { FaAirbnb } from "react-icons/fa";
+import { SiBookingdotcom as SiBooking } from "react-icons/si";
 
 interface RoommateCardProps {
   profile: UserProfile;
@@ -95,6 +97,61 @@ const RoommateCard: React.FC<RoommateCardProps> = ({
           {profile.bio && (
             <div className="mt-2 text-gray-700 text-sm">
               "{profile.bio}"
+            </div>
+          )}
+          
+          {/* Preferred Accommodation Section */}
+          {profile.preferredAccommodation && (
+            <div className="mt-3 border-t pt-2 border-gray-100 text-xs">
+              <div className="flex items-start">
+                <div className="flex items-center">
+                  <Home className="h-3 w-3 mr-1 text-gray-600" />
+                  <span className="font-medium text-gray-700">Preferred Accommodation:</span>
+                </div>
+                
+                <div className="ml-2 flex-1">
+                  <div className="flex justify-between">
+                    <span>{profile.preferredAccommodation.name}</span>
+                    <a 
+                      href={profile.preferredAccommodation.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        window.open(profile.preferredAccommodation.url, '_blank');
+                      }}
+                      className="inline-flex items-center text-primary hover:underline"
+                    >
+                      {profile.preferredAccommodation.platform === 'booking' && (
+                        <SiBooking className="h-3 w-3 mr-1" />
+                      )}
+                      {profile.preferredAccommodation.platform === 'airbnb' && (
+                        <FaAirbnb className="h-3 w-3 mr-1" />
+                      )}
+                      {profile.preferredAccommodation.platform === 'agoda' && (
+                        <Star className="h-3 w-3 mr-1 fill-red-500 text-red-500" />
+                      )}
+                      <span>View</span>
+                      <ExternalLink className="h-2.5 w-2.5 ml-0.5" />
+                    </a>
+                  </div>
+                  
+                  <div className="flex items-center mt-1">
+                    {profile.preferredAccommodation.isFlexible ? (
+                      <Badge variant="outline" className="h-5 border-green-200 bg-green-50 text-green-600 text-[10px] px-1 py-0 rounded-sm">
+                        <Check className="h-2.5 w-2.5 mr-0.5" />
+                        Open to other options
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="h-5 border-amber-200 bg-amber-50 text-amber-600 text-[10px] px-1 py-0 rounded-sm">
+                        <Lock className="h-2.5 w-2.5 mr-0.5" />
+                        Preferred location only
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           )}
           

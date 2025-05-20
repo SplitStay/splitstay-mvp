@@ -64,7 +64,13 @@ const BrowseProfiles: React.FC = () => {
       isVerified: true,
       matchPercentage: 91,
       matchLabel: "Recommended Roommate",
-      positiveReviews: true
+      positiveReviews: true,
+      preferredAccommodation: {
+        name: "Park Plaza Westminster",
+        platform: "booking",
+        url: "https://www.booking.com/hotel/gb/park-plaza-westminster-bridge-london.html",
+        isFlexible: true
+      }
     },
     {
       id: "2",
@@ -82,7 +88,13 @@ const BrowseProfiles: React.FC = () => {
       isVerified: true,
       matchPercentage: 84,
       matchLabel: "Ideal Match",
-      positiveReviews: true
+      positiveReviews: true,
+      preferredAccommodation: {
+        name: "CitizenM Tower of London",
+        platform: "airbnb",
+        url: "https://www.airbnb.com/rooms/london",
+        isFlexible: true
+      }
     },
     {
       id: "3",
@@ -100,7 +112,13 @@ const BrowseProfiles: React.FC = () => {
       isVerified: true,
       matchPercentage: 75,
       matchLabel: "Good Match",
-      positiveReviews: true
+      positiveReviews: true,
+      preferredAccommodation: {
+        name: "St. Pancras Renaissance",
+        platform: "agoda",
+        url: "https://www.agoda.com/st-pancras-renaissance-hotel-london/hotel/london-gb.html",
+        isFlexible: false
+      }
     }
   ];
   
