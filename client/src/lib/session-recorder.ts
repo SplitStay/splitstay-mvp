@@ -180,17 +180,33 @@ class SessionRecorder {
 
   private async startAudioRecording(): Promise<void> {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // Request access with a more specific constraint that works better across browsers
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        }
+      });
+      
       this.audioChunks = [];
       
-      this.mediaRecorder = new MediaRecorder(stream);
+      // Create the media recorder with specific MIME type that's widely supported
+      this.mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'audio/webm;codecs=opus'
+      });
+      
+      // Add event listener for data available
       this.mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           this.audioChunks.push(event.data);
+          console.log(`Audio chunk received: ${event.data.size} bytes`);
         }
       };
       
-      this.mediaRecorder.start();
+      // Start recording with 1 second timeslices to ensure we get data even for short recordings
+      this.mediaRecorder.start(1000);
+      console.log('Audio recording started successfully');
     } catch (error) {
       console.error('Failed to start audio recording:', error);
       throw error;
@@ -204,49 +220,87 @@ class SessionRecorder {
         return;
       }
       
-      this.mediaRecorder.onstop = () => {
-        if (this.currentSession) {
-          const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
-          this.currentSession.audioBlob = audioBlob;
+      // Handle stopping the recording
+      this.mediaRecorder.onstop = async () => {
+        try {
+          console.log(`Audio recording stopped, processing ${this.audioChunks.length} chunks`);
           
-          // Upload the audio to the server
-          const reader = new FileReader();
-          reader.readAsDataURL(audioBlob);
-          reader.onloadend = async () => {
-            const base64data = reader.result;
-            try {
-              // Send the audio data to the server
-              const response = await fetch('/api/research/audio', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  sessionId: this.currentSession!.sessionId,
-                  fileName: `${this.currentSession!.sessionId}.webm`,
-                  mimeType: 'audio/webm',
-                  fileSize: audioBlob.size,
-                  audioData: base64data
-                })
-              });
-              
-              if (response.ok) {
-                console.log('Audio data saved to server successfully');
-              } else {
-                console.error('Failed to save audio data to server:', await response.text());
+          if (this.currentSession && this.audioChunks.length > 0) {
+            // Create an audio blob with the correct MIME type
+            const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm;codecs=opus' });
+            this.currentSession.audioBlob = audioBlob;
+            
+            console.log(`Created audio blob, size: ${audioBlob.size} bytes`);
+            
+            // Create a unique filename with timestamp
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const fileName = `recording-${this.currentSession.sessionId}-${timestamp}.webm`;
+            
+            // Read the blob as data URL (base64)
+            const reader = new FileReader();
+            reader.readAsDataURL(audioBlob);
+            
+            reader.onloadend = async () => {
+              try {
+                const base64data = reader.result;
+                console.log('Audio data converted to base64, sending to server...');
+                
+                // Send the audio data to the server
+                const response = await fetch('/api/research/audio', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    sessionId: this.currentSession!.sessionId,
+                    fileName: fileName,
+                    mimeType: 'audio/webm;codecs=opus',
+                    fileSize: audioBlob.size,
+                    audioData: base64data
+                  })
+                });
+                
+                if (response.ok) {
+                  console.log('Audio data saved to server successfully!');
+                } else {
+                  const errorText = await response.text();
+                  console.error('Failed to save audio data to server:', errorText);
+                  // We still resolve because the recording was stopped successfully
+                  // even if the server save failed
+                }
+                resolve();
+              } catch (error) {
+                console.error('Error sending audio data to server:', error);
+                // We still resolve because the recording was stopped successfully
+                resolve();
               }
-            } catch (error) {
-              console.error('Error sending audio data to server:', error);
-            }
-          };
+            };
+            
+            reader.onerror = (error) => {
+              console.error('Error reading audio data:', error);
+              resolve(); // Still resolve to allow UI to update
+            };
+          } else {
+            console.warn('No audio chunks recorded or session is null');
+            resolve();
+          }
+        } catch (error) {
+          console.error('Error processing recorded audio:', error);
+          resolve(); // Still resolve to allow UI to update
         }
-        resolve();
       };
       
+      // Request one final chunk of data before stopping
+      this.mediaRecorder.requestData();
+      
+      // Stop the recording
       this.mediaRecorder.stop();
       
       // Stop tracks to release the microphone
-      this.mediaRecorder.stream.getTracks().forEach(track => track.stop());
+      this.mediaRecorder.stream.getTracks().forEach(track => {
+        track.stop();
+        console.log('Audio track stopped and released');
+      });
     });
   }
 
