@@ -36,14 +36,15 @@ interface ResearchSession {
 }
 
 const ResearchAdmin: React.FC = () => {
-  const { data: sessions, isLoading, error, refetch } = useQuery<ResearchSession[]>({
+  // Get research data from API
+  const { data: apiSessions, isLoading, error, refetch } = useQuery<ResearchSession[]>({
     queryKey: ['/api/research/data'],
     refetchOnWindowFocus: false,
-    retry: false,
-    onError: (error) => {
-      console.error('Error loading research data:', error);
-    }
+    retry: 1
   });
+  
+  // Process the data to handle errors
+  const sessions = !error && apiSessions && apiSessions.length > 0 ? apiSessions : [];
 
   const formatDate = (dateString: string) => {
     try {
@@ -117,8 +118,22 @@ const ResearchAdmin: React.FC = () => {
         
         {sessions && sessions.length === 0 && (
           <Card>
-            <CardContent className="pt-6">
-              <p className="text-center text-gray-500">No research data collected yet</p>
+            <CardContent className="pt-6 pb-6">
+              <div className="text-center py-8">
+                <h3 className="text-xl font-medium mb-4">No research data collected yet</h3>
+                <p className="text-gray-500 mb-6">
+                  User research data will appear here once participants start using your app, 
+                  providing feedback, and recording sessions.
+                </p>
+                <div className="flex flex-col gap-2 items-center">
+                  <p className="text-sm text-gray-600">To collect research data:</p>
+                  <ol className="list-decimal text-left max-w-md mx-auto text-sm text-gray-600">
+                    <li className="ml-5 mb-2">Ask users to click the feedback button in the bottom right corner</li>
+                    <li className="ml-5 mb-2">Encourage participants to record voice feedback</li>
+                    <li className="ml-5 mb-2">Request users to complete the feedback form after using the app</li>
+                  </ol>
+                </div>
+              </div>
             </CardContent>
           </Card>
         )}
