@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, Moon, Sun, VolumeX, Users, Bed, DoorOpen, Search, Calendar } from "lucide-react";
+import { ArrowLeft, Moon, Sun, VolumeX, Users, Bed, DoorOpen, Search, Calendar, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
