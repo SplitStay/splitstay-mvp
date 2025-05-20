@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, Calendar, Plus, Search, X } from "lucide-react";
+import { 
+  ArrowLeft, Calendar, Plus, Search, X, 
+  UserCircle, ShieldCheck, CheckCircle, CreditCard
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
