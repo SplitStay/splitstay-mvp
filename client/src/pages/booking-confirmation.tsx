@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Calendar, Phone } from "lucide-react";
+import { ArrowLeft, Calendar, Phone, Calculator } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import UserAvatar from "@/components/user-avatar";
@@ -9,6 +9,15 @@ import { HotelIcon } from "@/components/icons";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BookingDetails } from "@shared/schema";
 import { daysUntilCheckIn } from "@/lib/utils";
+import PaymentSplitCalculator from "@/components/payment-split-calculator";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface BookingConfirmationProps {
   params: {
@@ -18,6 +27,7 @@ interface BookingConfirmationProps {
 
 const BookingConfirmation: React.FC<BookingConfirmationProps> = ({ params }) => {
   const [_, navigate] = useLocation();
+  const [showSplitCalculator, setShowSplitCalculator] = useState(false);
   const bookingId = parseInt(params.id, 10);
   
   const { data: bookingDetails, isLoading } = useQuery({
@@ -92,6 +102,40 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({ params }) => 
             </div>
           </div>
         </div>
+        {!isLoading && bookingDetails && (
+          <div className="p-4 border-t border-gray-200 flex justify-between items-center">
+            <div>
+              <div className="flex items-center mb-1">
+                <span className="font-medium flex items-center">
+                  <Calculator className="mr-2 h-5 w-5 text-primary" />
+                  Total Cost
+                </span>
+              </div>
+              <div className="text-2xl font-bold text-primary">
+                ${(bookingDetails.totalCost / 100).toFixed(2)}
+              </div>
+            </div>
+            <Dialog open={showSplitCalculator} onOpenChange={setShowSplitCalculator}>
+              <DialogTrigger asChild>
+                <Button className="bg-primary hover:bg-primary/90">
+                  Split Payment
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-[90%] sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Payment Split Calculator</DialogTitle>
+                  <DialogDescription>
+                    Calculate how to divide the cost between roommates
+                  </DialogDescription>
+                </DialogHeader>
+                <PaymentSplitCalculator 
+                  bookingDetails={bookingDetails} 
+                  onClose={() => setShowSplitCalculator(false)}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
+        )}
       </Card>
       
       {/* Roommates */}
