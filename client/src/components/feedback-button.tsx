@@ -51,36 +51,47 @@ const FeedbackButton: React.FC = () => {
 
   return (
     <>
-      <div className="fixed bottom-24 right-4 flex flex-col space-y-2 items-end">
-        <div className="bg-primary text-white text-sm rounded-lg px-3 py-1.5 mb-1 shadow-lg animate-bounce">
-          Give Feedback
-          <div className="absolute w-3 h-3 bg-primary rotate-45 -bottom-1 right-6"></div>
-        </div>
-        
+      <div className="fixed bottom-24 right-4 flex flex-col space-y-3 items-end">
         {isRecording && (
           <div className="bg-red-500 text-white text-xs rounded-full px-2 py-1 mb-1 animate-pulse flex items-center">
             <span className="inline-block w-2 h-2 bg-white rounded-full mr-1"></span>
             Recording
           </div>
         )}
-        <Button
-          size="icon"
-          className="rounded-full bg-white border border-gray-200 text-gray-700 shadow-lg hover:bg-gray-100 h-12 w-12"
-          onClick={toggleAudioFeedback}
-        >
-          {isRecording ? (
-            <MicOff className="h-6 w-6 text-red-500" />
-          ) : (
-            <Mic className="h-6 w-6" />
-          )}
-        </Button>
-        <Button
-          size="icon"
-          className="rounded-full bg-primary text-white shadow-lg h-14 w-14 border-2 border-white hover:scale-110 transition-transform"
-          onClick={handleOpenFeedback}
-        >
-          <MessageSquare className="h-7 w-7" />
-        </Button>
+        
+        {/* Voice feedback button with label */}
+        <div className="flex items-center space-x-2">
+          <div className="bg-white text-gray-800 text-sm rounded-lg px-3 py-1.5 shadow-md">
+            Record Voice
+            <div className="absolute w-3 h-3 bg-white rotate-45 top-1/2 -right-1 transform -translate-y-1/2"></div>
+          </div>
+          <Button
+            size="icon"
+            className="rounded-full bg-white border border-gray-200 text-gray-700 shadow-lg hover:bg-gray-100 h-12 w-12"
+            onClick={toggleAudioFeedback}
+          >
+            {isRecording ? (
+              <MicOff className="h-6 w-6 text-red-500" />
+            ) : (
+              <Mic className="h-6 w-6" />
+            )}
+          </Button>
+        </div>
+        
+        {/* Text feedback button with label */}
+        <div className="flex items-center space-x-2">
+          <div className="bg-primary text-white text-sm rounded-lg px-3 py-1.5 shadow-md animate-pulse">
+            Give Feedback
+            <div className="absolute w-3 h-3 bg-primary rotate-45 top-1/2 -right-1 transform -translate-y-1/2"></div>
+          </div>
+          <Button
+            size="icon"
+            className="rounded-full bg-primary text-white shadow-lg h-14 w-14 border-2 border-white hover:scale-110 transition-transform"
+            onClick={handleOpenFeedback}
+          >
+            <MessageSquare className="h-7 w-7" />
+          </Button>
+        </div>
       </div>
 
       <FeedbackForm
