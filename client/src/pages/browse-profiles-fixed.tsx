@@ -95,7 +95,7 @@ const BrowseProfiles: React.FC = () => {
         platform: "airbnb",
         url: "https://www.airbnb.com/rooms/london",
         isFlexible: true,
-        roomType: "Double bed"
+        roomType: "Private room"
       }
     },
     {
@@ -120,7 +120,7 @@ const BrowseProfiles: React.FC = () => {
         platform: "agoda",
         url: "https://www.agoda.com/st-pancras-renaissance-hotel-london/hotel/london-gb.html",
         isFlexible: false,
-        roomType: "Queen beds"
+        roomType: "Separate beds"
       }
     }
   ];
