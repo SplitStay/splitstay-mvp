@@ -87,7 +87,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({
     <Dialog open={open} onOpenChange={(isOpen) => {
       if (!isOpen) onClose();
     }}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         {!submitted ? (
           <>
             <DialogHeader>
@@ -98,7 +98,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({
                 Help us improve SplitStay with your honest feedback.
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4 py-4">
+            <div className="space-y-3 py-2">
               <div className="space-y-2">
                 <Label htmlFor="rating">How would you rate your experience?</Label>
                 <StarRating rating={rating} setRating={setRating} />
@@ -111,7 +111,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({
                   placeholder="Tell us what you liked or what could be improved..."
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}
-                  className="min-h-[120px]"
+                  className="min-h-[90px]"
                 />
               </div>
               
