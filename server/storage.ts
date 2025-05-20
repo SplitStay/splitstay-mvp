@@ -54,6 +54,16 @@ export interface IStorage {
   createReview(review: InsertReview): Promise<Review>;
   getReviewsByReviewee(revieweeId: number): Promise<Review[]>;
   
+  // Research operations
+  saveResearchSession(session: InsertResearchSession): Promise<ResearchSession>;
+  getResearchSession(id: string): Promise<ResearchSession | undefined>;
+  getAllResearchSessions(): Promise<ResearchSession[]>;
+  saveResearchFeedback(feedback: InsertResearchFeedback): Promise<ResearchFeedback>;
+  getAllResearchFeedback(): Promise<ResearchFeedback[]>;
+  saveAudioRecording(recording: InsertAudioRecording): Promise<AudioRecording>;
+  getAudioRecordingsBySession(sessionId: string): Promise<AudioRecording[]>;
+  getAllAudioRecordings(): Promise<AudioRecording[]>;
+  
   // Special operations
   findCompatibleUsers(userId: number, location: string, dateStart: Date, dateEnd: Date): Promise<UserProfile[]>;
 }
