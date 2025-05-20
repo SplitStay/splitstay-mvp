@@ -175,16 +175,17 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({
                 </p>
               </div>
             </div>
-            <DialogFooter className="flex sm:justify-between">
+            <DialogFooter className="flex flex-col space-y-2 sm:flex-row sm:justify-between sm:space-y-0 sm:space-x-2">
               <Button
                 variant="outline"
                 onClick={onClose}
+                className="w-full sm:w-auto"
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleSubmit}
-                className="bg-primary text-white"
+                className="bg-primary text-white w-full sm:w-auto"
               >
                 Submit Feedback
               </Button>
@@ -221,7 +222,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({
               )}
             </div>
             <DialogFooter>
-              <Button onClick={onClose} className="w-full">
+              <Button onClick={onClose} className="w-full bg-primary text-white">
                 Close
               </Button>
             </DialogFooter>
