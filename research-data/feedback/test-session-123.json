@@ -1,0 +1,9 @@
+{
+  "sessionId": "test-session-123",
+  "rating": 4,
+  "feedbackText": "I really like the app concept. It would save me a lot of money when traveling. The matching feature is intuitive and the profiles have good details.",
+  "wouldUse": true,
+  "knowsOthersWhoWouldUse": true,
+  "contactEmail": "test@example.com",
+  "createdAt": "2025-05-20T12:15:00.000Z"
+}

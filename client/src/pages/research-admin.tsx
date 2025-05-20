@@ -39,6 +39,10 @@ const ResearchAdmin: React.FC = () => {
   const { data: sessions, isLoading, error, refetch } = useQuery<ResearchSession[]>({
     queryKey: ['/api/research/data'],
     refetchOnWindowFocus: false,
+    retry: false,
+    onError: (error) => {
+      console.error('Error loading research data:', error);
+    }
   });
 
   const formatDate = (dateString: string) => {
