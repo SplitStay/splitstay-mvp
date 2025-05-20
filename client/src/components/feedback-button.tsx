@@ -55,6 +55,18 @@ const FeedbackButton: React.FC = () => {
       if (consent) {
         const { recordAudio } = JSON.parse(consent);
         if (recordAudio) {
+          // Check if browser supports getUserMedia API
+          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            setRecordStatus("error");
+            toast({
+              title: "Audio recording not supported",
+              description: "Your browser doesn't support audio recording. Please try a desktop browser like Chrome or Firefox.",
+              variant: "destructive"
+            });
+            setTimeout(() => setRecordStatus("idle"), 3000);
+            return;
+          }
+          
           // User already consented to audio, start recording
           sessionRecorder.startRecording({ recordAudio: true, recordSession: false })
             .then(() => {
@@ -71,10 +83,23 @@ const FeedbackButton: React.FC = () => {
               console.error("Error starting recording:", error);
               setRecordStatus("error");
               
-              // Show error toast
+              // Check for common errors and provide better messages
+              let errorMessage = "Please make sure microphone access is allowed in your browser.";
+              
+              if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
+                errorMessage = "Microphone access was denied. Please allow microphone access to record.";
+              } else if (error.name === "NotFoundError" || error.name === "DevicesNotFoundError") {
+                errorMessage = "No microphone detected. Please connect a microphone and try again.";
+              } else if (error.name === "NotReadableError" || error.name === "TrackStartError") {
+                errorMessage = "Your microphone is being used by another application. Please close other apps and try again.";
+              } else if (error.name === "SecurityError") {
+                errorMessage = "The use of microphone is not secure in this context. Try using HTTPS.";
+              }
+              
+              // Show error toast with better guidance
               toast({
                 title: "Could not start recording",
-                description: "Please make sure microphone access is allowed in your browser.",
+                description: errorMessage,
                 variant: "destructive"
               });
               
