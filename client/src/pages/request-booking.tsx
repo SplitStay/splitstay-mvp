@@ -42,18 +42,34 @@ const RequestBooking: React.FC<RequestBookingProps> = ({ params }) => {
       // If we have the profile in localStorage, use that one immediately
       if (localProfile) {
         console.log("Using profile from localStorage:", localProfile);
-        return localProfile;
+        
+        // Ensure the profile has fullName when using localStorage data
+        const profileWithFullName = {
+          ...localProfile,
+          fullName: localProfile.fullName || `${localProfile.firstName || ''} ${localProfile.lastName || ''}`.trim()
+        };
+        
+        return profileWithFullName;
       }
       
       // Otherwise fetch from API
       console.log("Fetching profile from API");
       const res = await fetch(`/api/users/${userId}`);
       if (!res.ok) throw new Error('Failed to fetch user profile');
-      return res.json() as Promise<UserProfile>;
+      const apiProfile = await res.json() as UserProfile;
+      
+      // Also ensure API profile has fullName
+      return {
+        ...apiProfile,
+        fullName: apiProfile.fullName || `${apiProfile.firstName || ''} ${apiProfile.lastName || ''}`.trim()
+      };
     },
     // Skip refetching if we already have the data
     refetchOnWindowFocus: !localProfile,
-    initialData: localProfile || undefined
+    initialData: localProfile ? {
+      ...localProfile,
+      fullName: localProfile.fullName || `${localProfile.firstName || ''} ${localProfile.lastName || ''}`.trim()
+    } : undefined
   });
 
   const handleSendRequest = () => {

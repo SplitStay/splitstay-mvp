@@ -367,13 +367,21 @@ const BrowseProfiles: React.FC = () => {
       ) : (
         <div className="space-y-4">
           {/* Display filtered profiles when filters are active, otherwise show all profiles */}
-          {(activeFilters ? filteredProfiles : profiles)?.map((profile) => (
-            <RoommateCard
-              key={profile.id}
-              profile={profile}
-              actionUrl={`/request-booking/${profile.id}`}
-            />
-          ))}
+          {(activeFilters ? filteredProfiles : profiles)?.map((profile) => {
+            // Make sure profile has fullName property (combine firstName and lastName if needed)
+            const profileWithFullName = {
+              ...profile,
+              fullName: profile.fullName || `${profile.firstName || ''} ${profile.lastName || ''}`.trim()
+            };
+            
+            return (
+              <RoommateCard
+                key={profile.id}
+                profile={profileWithFullName}
+                actionUrl={`/request-booking/${profile.id}`}
+              />
+            );
+          })}
           
           {/* Show "no results" message if filters return no profiles */}
           {activeFilters && filteredProfiles.length === 0 && (
