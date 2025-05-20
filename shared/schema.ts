@@ -198,6 +198,13 @@ export type AudioRecording = typeof audioRecordings.$inferSelect;
 export type InsertAudioRecording = z.infer<typeof insertAudioRecordingSchema>;
 
 // Extended types for frontend use
+export type PreferredAccommodation = {
+  name: string;
+  platform: 'booking' | 'airbnb' | 'agoda' | string;
+  url: string;
+  isFlexible: boolean;
+};
+
 export type UserProfile = User & {
   matchPercentage?: number;
   matchLabel?: string;
@@ -206,6 +213,7 @@ export type UserProfile = User & {
   languages?: string[];
   travelTraits?: string[];
   positiveReviews?: boolean;
+  preferredAccommodation?: PreferredAccommodation;
 };
 
 export type BookingDetails = Booking & {

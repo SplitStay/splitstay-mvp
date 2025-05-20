@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 import { UserProfile } from "@shared/schema";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { FaAirbnb } from "react-icons/fa";
-import { SiBookingdotcom as SiBooking } from "react-icons/si";
 
 interface RoommateCardProps {
   profile: UserProfile;
@@ -124,7 +123,7 @@ const RoommateCard: React.FC<RoommateCardProps> = ({
                       className="inline-flex items-center text-primary hover:underline"
                     >
                       {profile.preferredAccommodation.platform === 'booking' && (
-                        <SiBooking className="h-3 w-3 mr-1" />
+                        <Star className="h-3 w-3 mr-1 fill-blue-500 text-blue-500" />
                       )}
                       {profile.preferredAccommodation.platform === 'airbnb' && (
                         <FaAirbnb className="h-3 w-3 mr-1" />
