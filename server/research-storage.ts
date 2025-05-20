@@ -70,11 +70,23 @@ export class ResearchStorage {
   
   // Save feedback
   async saveFeedback(feedback: ResearchFeedback): Promise<ResearchFeedback> {
+    console.log(`Saving feedback to file system for session: ${feedback.sessionId}`);
     const filePath = path.join(FEEDBACK_DIR, `${feedback.sessionId}.json`);
     const data = JSON.stringify(feedback, null, 2);
     
-    await fs.promises.writeFile(filePath, data, 'utf-8');
-    return feedback;
+    try {
+      await fs.promises.writeFile(filePath, data, 'utf-8');
+      console.log(`Feedback successfully saved to: ${filePath}`);
+      
+      // Verify the file was actually created
+      const fileExists = fs.existsSync(filePath);
+      console.log(`File exists check: ${fileExists}`);
+      
+      return feedback;
+    } catch (error) {
+      console.error(`Error saving feedback to ${filePath}:`, error);
+      throw error;
+    }
   }
   
   // Get feedback for a session
