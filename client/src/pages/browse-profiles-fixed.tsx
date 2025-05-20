@@ -47,7 +47,7 @@ const BrowseProfiles: React.FC = () => {
   });
   
   // Demo profiles
-  const defaultProfiles: UserProfile[] = [
+  const defaultProfiles = [
     {
       id: 1,
       fullName: "Hannah Kim",
@@ -61,6 +61,8 @@ const BrowseProfiles: React.FC = () => {
       languages: ["English", "Korean"],
       travelTraits: ["Nature lover", "Early riser", "Quiet"],
       isVerified: true,
+      preferences: {},
+      createdAt: new Date(),
       matchPercentage: 91,
       matchLabel: "Recommended Roommate",
       positiveReviews: true,
@@ -85,6 +87,8 @@ const BrowseProfiles: React.FC = () => {
       languages: ["English", "Mandarin"],
       travelTraits: ["Food lover", "Night owl", "Quiet"],
       isVerified: true,
+      preferences: {},
+      createdAt: new Date(),
       matchPercentage: 84,
       matchLabel: "Ideal Match",
       positiveReviews: true,
@@ -109,6 +113,8 @@ const BrowseProfiles: React.FC = () => {
       languages: ["English", "German"],
       travelTraits: ["Organized", "Early riser", "Social"],
       isVerified: true,
+      preferences: {},
+      createdAt: new Date(),
       matchPercentage: 75,
       matchLabel: "Good Match",
       positiveReviews: true,
@@ -385,10 +391,10 @@ const BrowseProfiles: React.FC = () => {
         <div className="space-y-4">
           {/* Display filtered profiles when filters are active, otherwise show all profiles */}
           {(activeFilters ? filteredProfiles : profiles)?.map((profile) => {
-            // Make sure profile has fullName property (combine firstName and lastName if needed)
+            // Make sure profile has all required properties
             const profileWithFullName = {
               ...profile,
-              fullName: profile.fullName || `${profile.firstName || ''} ${profile.lastName || ''}`.trim()
+              fullName: profile.fullName || ""
             };
             
             return (
