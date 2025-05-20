@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import UserAvatar from "@/components/user-avatar";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Star, Users, ChevronDown, ChevronUp, ExternalLink, Home, Lock, Check } from "lucide-react";
+import { CheckCircle, Star, Users, ChevronDown, ChevronUp, ExternalLink, Home, Lock, Check, Bed } from "lucide-react";
 import { Link } from "wouter";
 import { cn } from "@/lib/utils";
 import { UserProfile } from "@shared/schema";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { FaAirbnb } from "react-icons/fa";
+import { FaAirbnb, FaHotel } from "react-icons/fa";
+import { BiHotel } from "react-icons/bi";
+import { MdHotel } from "react-icons/md";
 
 interface RoommateCardProps {
   profile: UserProfile;
@@ -123,13 +125,13 @@ const RoommateCard: React.FC<RoommateCardProps> = ({
                       className="inline-flex items-center text-primary hover:underline"
                     >
                       {profile.preferredAccommodation.platform === 'booking' && (
-                        <Star className="h-3 w-3 mr-1 fill-blue-500 text-blue-500" />
+                        <FaHotel className="h-3 w-3 mr-1 text-blue-600" />
                       )}
                       {profile.preferredAccommodation.platform === 'airbnb' && (
-                        <FaAirbnb className="h-3 w-3 mr-1" />
+                        <FaAirbnb className="h-3 w-3 mr-1 text-red-500" />
                       )}
                       {profile.preferredAccommodation.platform === 'agoda' && (
-                        <Star className="h-3 w-3 mr-1 fill-red-500 text-red-500" />
+                        <MdHotel className="h-3 w-3 mr-1 text-purple-600" />
                       )}
                       <span>View</span>
                       <ExternalLink className="h-2.5 w-2.5 ml-0.5" />

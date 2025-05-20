@@ -69,7 +69,8 @@ const BrowseProfiles: React.FC = () => {
         name: "Park Plaza Westminster",
         platform: "booking",
         url: "https://www.booking.com/hotel/gb/park-plaza-westminster-bridge-london.html",
-        isFlexible: true
+        isFlexible: true,
+        roomType: "Twin beds"
       }
     },
     {
@@ -93,7 +94,8 @@ const BrowseProfiles: React.FC = () => {
         name: "CitizenM Tower of London",
         platform: "airbnb",
         url: "https://www.airbnb.com/rooms/london",
-        isFlexible: true
+        isFlexible: true,
+        roomType: "Double bed"
       }
     },
     {
@@ -117,7 +119,8 @@ const BrowseProfiles: React.FC = () => {
         name: "St. Pancras Renaissance",
         platform: "agoda",
         url: "https://www.agoda.com/st-pancras-renaissance-hotel-london/hotel/london-gb.html",
-        isFlexible: false
+        isFlexible: false,
+        roomType: "Queen beds"
       }
     }
   ];

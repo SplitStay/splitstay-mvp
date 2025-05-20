@@ -203,6 +203,7 @@ export type PreferredAccommodation = {
   platform: 'booking' | 'airbnb' | 'agoda' | string;
   url: string;
   isFlexible: boolean;
+  roomType: string;
 };
 
 export type UserProfile = User & {
