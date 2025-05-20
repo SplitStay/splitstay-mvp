@@ -61,7 +61,7 @@ const FeedbackButton: React.FC = () => {
         
         {/* Voice feedback button with label */}
         <div className="flex items-center space-x-2">
-          <div className="bg-white text-gray-800 text-sm rounded-lg px-3 py-1.5 shadow-md">
+          <div className="bg-white text-gray-800 text-sm rounded-lg px-3 py-1.5 shadow-md relative">
             Record Voice
             <div className="absolute w-3 h-3 bg-white rotate-45 top-1/2 -right-1 transform -translate-y-1/2"></div>
           </div>
@@ -80,7 +80,7 @@ const FeedbackButton: React.FC = () => {
         
         {/* Text feedback button with label */}
         <div className="flex items-center space-x-2">
-          <div className="bg-primary text-white text-sm rounded-lg px-3 py-1.5 shadow-md animate-pulse">
+          <div className="bg-primary text-white text-sm rounded-lg px-3 py-1.5 shadow-md animate-pulse relative">
             Give Feedback
             <div className="absolute w-3 h-3 bg-primary rotate-45 top-1/2 -right-1 transform -translate-y-1/2"></div>
           </div>
