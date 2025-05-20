@@ -106,7 +106,7 @@ const CreateProfile: React.FC = () => {
     { id: "spontaneous", label: "Spontaneous" },
     
     // Activity level
-    { id: "adventurous", label: "Adventurous" },
+    { id: "adventure_seeker", label: "Adventure Seeker" },
     { id: "relaxed", label: "Relaxed" },
     
     // Sleep schedule
@@ -125,9 +125,8 @@ const CreateProfile: React.FC = () => {
     { id: "spontaneous", label: "Spontaneous" },
     
     // Activity level
-    { id: "adventurous", label: "Adventurous" },
-    { id: "relaxed", label: "Relaxed" },
     { id: "adventure_seeker", label: "Adventure Seeker" },
+    { id: "relaxed", label: "Relaxed" },
     
     // Sleep schedule
     { id: "early_bird", label: "Early Bird" },
