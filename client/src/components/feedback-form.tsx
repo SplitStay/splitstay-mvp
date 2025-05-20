@@ -138,24 +138,28 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="knowSomeone">Do you know people who would use this?</Label>
-                <div className="flex space-x-4 mt-1">
-                  <Button
-                    type="button"
-                    variant={knowSomeoneWhoWouldUse === true ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setKnowSomeoneWhoWouldUse(true)}
-                  >
-                    Yes
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={knowSomeoneWhoWouldUse === false ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setKnowSomeoneWhoWouldUse(false)}
-                  >
-                    No
-                  </Button>
+                <Label htmlFor="recommendScore">How likely are you to recommend SplitStay to a friend?</Label>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(score => (
+                    <Button
+                      key={`score-${score}`}
+                      type="button"
+                      variant={knowSomeoneWhoWouldUse === (score >= 7) ? "default" : "outline"}
+                      size="sm"
+                      className="min-w-[36px]"
+                      onClick={() => {
+                        // Map scores 7-10 to true (likely to recommend)
+                        // Map scores 0-6 to false (unlikely to recommend)
+                        setKnowSomeoneWhoWouldUse(score >= 7);
+                      }}
+                    >
+                      {score}
+                    </Button>
+                  ))}
+                </div>
+                <div className="flex justify-between text-xs text-gray-500 px-1 pt-1">
+                  <span>Not likely</span>
+                  <span>Very likely</span>
                 </div>
               </div>
               
