@@ -26,16 +26,12 @@ router.post('/api/research/session', async (req, res) => {
 router.post('/api/research/feedback', async (req, res) => {
   try {
     const feedbackData = req.body as ResearchFeedback;
+    console.log('Received feedback data:', feedbackData);
     
-    // Validate session ID
+    // Generate a session ID if not provided
     if (!feedbackData.sessionId) {
-      return res.status(400).json({ error: 'Missing session ID' });
-    }
-    
-    // Check if the session exists
-    const session = await researchStorage.getSession(feedbackData.sessionId);
-    if (!session) {
-      return res.status(404).json({ error: 'Session not found' });
+      feedbackData.sessionId = `direct-feedback-${Date.now()}`;
+      console.log('Generated new session ID:', feedbackData.sessionId);
     }
     
     // Add timestamp if not provided
@@ -44,6 +40,7 @@ router.post('/api/research/feedback', async (req, res) => {
     }
     
     const savedFeedback = await researchStorage.saveFeedback(feedbackData);
+    console.log('Feedback saved successfully:', savedFeedback);
     res.status(201).json(savedFeedback);
   } catch (error) {
     console.error('Error saving feedback:', error);
@@ -55,25 +52,44 @@ router.post('/api/research/feedback', async (req, res) => {
 router.post('/api/research/audio', async (req, res) => {
   try {
     const recordingData = req.body as AudioRecording;
+    console.log('Received audio recording data:', { 
+      sessionId: recordingData.sessionId,
+      fileName: recordingData.fileName,
+      mimeType: recordingData.mimeType,
+      fileSize: recordingData.fileSize,
+      hasAudioData: !!recordingData.audioData
+    });
     
     // Validate required fields
-    if (!recordingData.sessionId || !recordingData.fileName || !recordingData.audioData) {
+    if (!recordingData.fileName || !recordingData.audioData) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
     
-    // Check if the session exists
-    const session = await researchStorage.getSession(recordingData.sessionId);
-    if (!session) {
-      return res.status(404).json({ error: 'Session not found' });
+    // Generate a session ID if not provided
+    if (!recordingData.sessionId) {
+      recordingData.sessionId = `audio-recording-${Date.now()}`;
+      console.log('Generated new session ID for audio:', recordingData.sessionId);
     }
     
-    // Update the session to indicate it has audio
-    if (!session.hasAudioRecording) {
+    // Create a simple session if one doesn't exist
+    const session = await researchStorage.getSession(recordingData.sessionId);
+    if (!session) {
+      const newSession = {
+        id: recordingData.sessionId,
+        startTime: new Date(),
+        recordedActions: [],
+        hasAudioRecording: true
+      };
+      await researchStorage.saveSession(newSession);
+      console.log('Created new session for audio recording:', newSession.id);
+    } else if (!session.hasAudioRecording) {
+      // Update existing session to indicate it has audio
       session.hasAudioRecording = true;
       await researchStorage.saveSession(session);
     }
     
     const savedRecording = await researchStorage.saveAudio(recordingData);
+    console.log('Audio recording saved successfully for session:', recordingData.sessionId);
     
     // Don't return the audio data in the response
     const response = { ...savedRecording };
