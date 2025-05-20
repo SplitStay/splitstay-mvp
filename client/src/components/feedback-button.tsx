@@ -18,7 +18,7 @@ const FeedbackButton: React.FC = () => {
       });
     } else {
       // If not recording, check if user already consented to audio
-      const consent = localStorage.getItem('splitstay_research_consent');
+      const consent = sessionStorage.getItem('splitstay_research_consent');
       if (consent) {
         const { recordAudio } = JSON.parse(consent);
         if (recordAudio) {

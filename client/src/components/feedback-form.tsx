@@ -72,7 +72,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({
       shareIntent: !!onShare && knowSomeoneWhoWouldUse === true
     };
     
-    localStorage.setItem('splitstay_feedback', JSON.stringify({
+    sessionStorage.setItem('splitstay_feedback', JSON.stringify({
       feedback,
       rating,
       email,

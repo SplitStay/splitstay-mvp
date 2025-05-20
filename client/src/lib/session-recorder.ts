@@ -87,7 +87,7 @@ class SessionRecorder {
       const sessionData = { ...this.currentSession };
       
       // Store session data locally
-      localStorage.setItem(`splitstay_session_${this.currentSession.sessionId}`, 
+      sessionStorage.setItem(`splitstay_session_${this.currentSession.sessionId}`, 
         JSON.stringify(sessionData));
       
       // Send session data to server
@@ -140,7 +140,7 @@ class SessionRecorder {
     
     // Update the stored session data locally
     if (this.currentSession.sessionId) {
-      localStorage.setItem(`splitstay_session_${this.currentSession.sessionId}`, 
+      sessionStorage.setItem(`splitstay_session_${this.currentSession.sessionId}`, 
         JSON.stringify(this.currentSession));
     }
     
@@ -209,10 +209,36 @@ class SessionRecorder {
           const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
           this.currentSession.audioBlob = audioBlob;
           
-          // In a real app, you'd upload this to a server
-          // For now, we'll create a URL that can be played back
-          const audioUrl = URL.createObjectURL(audioBlob);
-          localStorage.setItem(`splitstay_audio_${this.currentSession.sessionId}`, audioUrl);
+          // Upload the audio to the server
+          const reader = new FileReader();
+          reader.readAsDataURL(audioBlob);
+          reader.onloadend = async () => {
+            const base64data = reader.result;
+            try {
+              // Send the audio data to the server
+              const response = await fetch('/api/research/audio', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  sessionId: this.currentSession!.sessionId,
+                  fileName: `${this.currentSession!.sessionId}.webm`,
+                  mimeType: 'audio/webm',
+                  fileSize: audioBlob.size,
+                  audioData: base64data
+                })
+              });
+              
+              if (response.ok) {
+                console.log('Audio data saved to server successfully');
+              } else {
+                console.error('Failed to save audio data to server:', await response.text());
+              }
+            } catch (error) {
+              console.error('Error sending audio data to server:', error);
+            }
+          };
         }
         resolve();
       };
