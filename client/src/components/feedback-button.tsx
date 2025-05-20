@@ -51,7 +51,12 @@ const FeedbackButton: React.FC = () => {
 
   return (
     <>
-      <div className="fixed bottom-24 right-4 flex flex-col space-y-2">
+      <div className="fixed bottom-24 right-4 flex flex-col space-y-2 items-end">
+        <div className="bg-primary text-white text-sm rounded-lg px-3 py-1.5 mb-1 shadow-lg animate-bounce">
+          Give Feedback
+          <div className="absolute w-3 h-3 bg-primary rotate-45 -bottom-1 right-6"></div>
+        </div>
+        
         {isRecording && (
           <div className="bg-red-500 text-white text-xs rounded-full px-2 py-1 mb-1 animate-pulse flex items-center">
             <span className="inline-block w-2 h-2 bg-white rounded-full mr-1"></span>
@@ -60,21 +65,21 @@ const FeedbackButton: React.FC = () => {
         )}
         <Button
           size="icon"
-          className="rounded-full bg-white border border-gray-200 text-gray-700 shadow-lg hover:bg-gray-100"
+          className="rounded-full bg-white border border-gray-200 text-gray-700 shadow-lg hover:bg-gray-100 h-12 w-12"
           onClick={toggleAudioFeedback}
         >
           {isRecording ? (
-            <MicOff className="h-5 w-5 text-red-500" />
+            <MicOff className="h-6 w-6 text-red-500" />
           ) : (
-            <Mic className="h-5 w-5" />
+            <Mic className="h-6 w-6" />
           )}
         </Button>
         <Button
           size="icon"
-          className="rounded-full bg-primary text-white shadow-lg"
+          className="rounded-full bg-primary text-white shadow-lg h-14 w-14 border-2 border-white hover:scale-110 transition-transform"
           onClick={handleOpenFeedback}
         >
-          <MessageSquare className="h-5 w-5" />
+          <MessageSquare className="h-7 w-7" />
         </Button>
       </div>
 
