@@ -285,7 +285,8 @@ const CreateProfile: React.FC = () => {
               <h3 className="font-semibold text-navy">ID Verification</h3>
             </div>
             <p className="text-sm text-gray-700 mb-3">
-              We verify all travelers to create trust and safety in our community.
+              To host or be hosted, SplitStay requires a one-time ID verification.
+              Your info is encrypted and never shared.
             </p>
             <div className="flex flex-col space-y-3">
               <div className="flex items-center text-sm">
@@ -348,7 +349,7 @@ const CreateProfile: React.FC = () => {
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
-                <span className="ml-2 text-xs text-gray-500">Enhance trust with verified ID</span>
+                <span className="ml-2 text-xs text-gray-500">Required for safety</span>
               </div>
             </div>
           </div>
@@ -598,27 +599,8 @@ const CreateProfile: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Column - ID Verification & Traits */}
+        {/* Right Column - Traits */}
         <div className="flex flex-col gap-5">
-          {/* ID Verification Box */}
-          <div className="bg-white rounded-lg p-5">
-            <h2 className="text-2xl font-bold text-navy mb-3">ID Verification</h2>
-            
-            <div className="flex items-center mb-4">
-              <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center mr-2">
-                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <span className="font-semibold">ID Verified</span>
-            </div>
-            
-            <p className="text-gray-700">
-              To host or be hosted, SplitStay requires a one-time ID verification.
-              Your info is encrypted and never shared.
-            </p>
-          </div>
-
           {/* Travel Traits */}
           <div className="bg-white rounded-lg p-5">
             <div className="flex justify-between items-center mb-3">
