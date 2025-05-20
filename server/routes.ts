@@ -9,6 +9,7 @@ import {
   insertMessageSchema,
   insertReviewSchema 
 } from "@shared/schema";
+import researchRoutes from "./research-routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
@@ -16,6 +17,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // API routes
   const apiRouter = express.Router();
   app.use("/api", apiRouter);
+  
+  // Register research routes
+  app.use(researchRoutes);
   
   // Users
   apiRouter.get("/users", async (req, res) => {

@@ -23,6 +23,7 @@ import CheckIn from "@/pages/check-in";
 import GuestInfo from "@/pages/guest-info";
 import PostStay from "@/pages/post-stay";
 import RateRoommate from "@/pages/rate-roommate";
+import ResearchAdmin from "@/pages/research-admin";
 import Layout from "@/components/layout";
 import ResearchProvider from "@/components/research-provider";
 
@@ -51,6 +52,7 @@ function Router() {
       <Route path="/guest-info/:id" component={GuestInfo} />
       <Route path="/post-stay/:id" component={PostStay} />
       <Route path="/rate-roommate/:id" component={RateRoommate} />
+      <Route path="/research-admin" component={ResearchAdmin} />
       <Route component={NotFound} />
     </Switch>
   );

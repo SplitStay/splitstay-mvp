@@ -86,9 +86,28 @@ class SessionRecorder {
       
       const sessionData = { ...this.currentSession };
       
-      // Store session data (in a real app this would send to a server)
+      // Store session data locally
       localStorage.setItem(`splitstay_session_${this.currentSession.sessionId}`, 
         JSON.stringify(sessionData));
+      
+      // Send session data to server
+      try {
+        const response = await fetch('/api/research/session', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(sessionData)
+        });
+        
+        if (response.ok) {
+          console.log('Session data saved to server successfully');
+        } else {
+          console.error('Failed to save session data to server:', await response.text());
+        }
+      } catch (serverError) {
+        console.error('Error sending session data to server:', serverError);
+      }
       
       console.log('Session recording completed', this.currentSession.sessionId);
       return sessionData;
@@ -98,7 +117,13 @@ class SessionRecorder {
     }
   }
 
-  public addFeedback(feedback: { text?: string; rating?: number; email?: string }): void {
+  public async addFeedback(feedback: { 
+    text?: string; 
+    rating?: number; 
+    email?: string;
+    wouldUse?: boolean;
+    knowsOthersWhoWouldUse?: boolean;
+  }): Promise<void> {
     if (!this.currentSession) return;
     
     if (feedback.text) {
@@ -113,10 +138,39 @@ class SessionRecorder {
       this.currentSession.userEmail = feedback.email;
     }
     
-    // Update the stored session data
+    // Update the stored session data locally
     if (this.currentSession.sessionId) {
       localStorage.setItem(`splitstay_session_${this.currentSession.sessionId}`, 
         JSON.stringify(this.currentSession));
+    }
+    
+    // Send feedback data to server
+    try {
+      const feedbackData = {
+        sessionId: this.currentSession.sessionId,
+        feedbackText: feedback.text,
+        rating: feedback.rating,
+        contactEmail: feedback.email,
+        wouldUse: feedback.wouldUse,
+        knowsOthersWhoWouldUse: feedback.knowsOthersWhoWouldUse,
+        createdAt: new Date()
+      };
+      
+      const response = await fetch('/api/research/feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(feedbackData)
+      });
+      
+      if (response.ok) {
+        console.log('Feedback data saved to server successfully');
+      } else {
+        console.error('Failed to save feedback data to server:', await response.text());
+      }
+    } catch (serverError) {
+      console.error('Error sending feedback data to server:', serverError);
     }
   }
 

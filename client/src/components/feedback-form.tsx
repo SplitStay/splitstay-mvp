@@ -55,15 +55,17 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({
   const [knowSomeoneWhoWouldUse, setKnowSomeoneWhoWouldUse] = useState<boolean | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = () => {
-    // Save feedback to session recorder
-    sessionRecorder.addFeedback({
+  const handleSubmit = async () => {
+    // Save feedback to session recorder and send to server
+    await sessionRecorder.addFeedback({
       text: feedback,
       rating,
-      email: email || undefined
+      email: email || undefined,
+      wouldUse,
+      knowsOthersWhoWouldUse: knowSomeoneWhoWouldUse
     });
     
-    // Store additional feedback data
+    // Store additional feedback data locally
     const additionalFeedback = {
       wouldUse,
       knowSomeoneWhoWouldUse,
