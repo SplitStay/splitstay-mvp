@@ -473,60 +473,73 @@ const FindRoommate: React.FC = () => {
         
         <div className="space-y-2">
           <label className="block text-gray-700 font-medium">Dates</label>
-          <div className="grid grid-cols-2 gap-2 mb-1">
-            <div>
-              <label className="block text-sm text-gray-600 mb-1">From</label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal border-2 border-gray-300",
-                      !startDate && "text-gray-500"
-                    )}
-                  >
-                    {startDate ? format(startDate, "MMM d, yyyy") : "Choose date"}
-                    <Calendar className="ml-auto h-4 w-4 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <CalendarComponent
-                    mode="single"
-                    selected={startDate}
-                    onSelect={setStartDate}
-                    initialFocus
-                    disabled={(date) => date < new Date()}
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-            
-            <div>
-              <label className="block text-sm text-gray-600 mb-1">Till</label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal border-2 border-gray-300",
-                      !endDate && "text-gray-500"
-                    )}
-                  >
-                    {endDate ? format(endDate, "MMM d, yyyy") : "Choose date"}
-                    <Calendar className="ml-auto h-4 w-4 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <CalendarComponent
-                    mode="single"
-                    selected={endDate}
-                    onSelect={setEndDate}
-                    initialFocus
-                    disabled={(date) => !startDate || date < startDate}
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
+          <div className="mb-1">
+            <Popover>
+              <PopoverTrigger asChild>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">From</label>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal border-2 border-gray-300",
+                        !startDate && "text-gray-500"
+                      )}
+                    >
+                      {startDate ? format(startDate, "MMM d, yyyy") : "Choose date"}
+                      <Calendar className="ml-auto h-4 w-4 opacity-50" />
+                    </Button>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Till</label>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal border-2 border-gray-300",
+                        !endDate && "text-gray-500"
+                      )}
+                    >
+                      {endDate ? format(endDate, "MMM d, yyyy") : "Choose date"}
+                      <Calendar className="ml-auto h-4 w-4 opacity-50" />
+                    </Button>
+                  </div>
+                </div>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="center">
+                <CalendarComponent
+                  mode="range"
+                  selected={{
+                    from: startDate,
+                    to: endDate,
+                  }}
+                  onSelect={(range) => {
+                    if (range?.from) {
+                      setStartDate(range.from);
+                    } else {
+                      setStartDate(undefined);
+                    }
+                    
+                    if (range?.to) {
+                      setEndDate(range.to);
+                      
+                      // Auto-close the calendar when both dates are selected
+                      setTimeout(() => {
+                        const openButton = document.querySelector('[data-state="open"]');
+                        if (openButton && range.from) {
+                          (openButton as HTMLElement).click();
+                        }
+                      }, 400);
+                    } else {
+                      setEndDate(undefined);
+                    }
+                  }}
+                  numberOfMonths={2}
+                  initialFocus
+                  disabled={(date) => date < new Date()}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
           
           <div className="flex items-center space-x-2">
