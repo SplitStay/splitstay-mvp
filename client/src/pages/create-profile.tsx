@@ -262,64 +262,65 @@ const CreateProfile: React.FC = () => {
             />
           </div>
 
-          {/* Date of Birth */}
+          {/* Date of Birth - Improved with separate select fields */}
           <div>
             <label className="block text-navy font-medium mb-1">Date of Birth</label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-between text-left font-normal border-gray-300 relative"
-                >
-                  {dateOfBirth ? format(dateOfBirth, "PPP") : "Select date"}
-                  <Calendar className="ml-auto h-4 w-4 opacity-50 absolute right-3" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <div className="p-3 border-b border-gray-200">
-                  <div className="flex justify-between items-center">
-                    <select 
-                      value={dateOfBirth ? dateOfBirth.getMonth() : new Date().getMonth()} 
-                      onChange={(e) => {
-                        const newMonth = parseInt(e.target.value);
-                        const newDate = dateOfBirth ? new Date(dateOfBirth) : new Date();
-                        newDate.setMonth(newMonth);
-                        setDateOfBirth(newDate);
-                      }}
-                      className="px-2 py-1 rounded border border-gray-300"
-                    >
-                      {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map((month, index) => (
-                        <option key={month} value={index}>{month}</option>
-                      ))}
-                    </select>
-                    <select 
-                      value={dateOfBirth ? dateOfBirth.getFullYear() : new Date().getFullYear()} 
-                      onChange={(e) => {
-                        const newYear = parseInt(e.target.value);
-                        const newDate = dateOfBirth ? new Date(dateOfBirth) : new Date();
-                        newDate.setFullYear(newYear);
-                        setDateOfBirth(newDate);
-                      }}
-                      className="px-2 py-1 rounded border border-gray-300"
-                    >
-                      {Array.from({ length: 80 }, (_, i) => new Date().getFullYear() - i).map(year => (
-                        <option key={year} value={year}>{year}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-                <CalendarComponent
-                  mode="single"
-                  selected={dateOfBirth}
-                  onSelect={setDateOfBirth}
-                  disabled={(date) => date > new Date() || date < new Date("1920-01-01")}
-                  initialFocus
-                  captionLayout="buttons"
-                  fromYear={1940}
-                  toYear={new Date().getFullYear()}
-                />
-              </PopoverContent>
-            </Popover>
+            <div className="flex gap-2">
+              {/* Day Select */}
+              <select
+                value={dateOfBirth ? dateOfBirth.getDate() : ""}
+                onChange={(e) => {
+                  const day = parseInt(e.target.value);
+                  const newDate = dateOfBirth ? new Date(dateOfBirth) : new Date();
+                  newDate.setDate(day);
+                  setDateOfBirth(newDate);
+                }}
+                className="px-3 py-2 rounded-md border border-gray-300 flex-1"
+                aria-label="Day"
+              >
+                <option value="" disabled>Day</option>
+                {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+                  <option key={`day-${day}`} value={day}>{day}</option>
+                ))}
+              </select>
+              
+              {/* Month Select */}
+              <select
+                value={dateOfBirth ? dateOfBirth.getMonth() : ""}
+                onChange={(e) => {
+                  const month = parseInt(e.target.value);
+                  const newDate = dateOfBirth ? new Date(dateOfBirth) : new Date();
+                  newDate.setMonth(month);
+                  setDateOfBirth(newDate);
+                }}
+                className="px-3 py-2 rounded-md border border-gray-300 flex-1"
+                aria-label="Month"
+              >
+                <option value="" disabled>Month</option>
+                {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map((month, index) => (
+                  <option key={`month-${month}`} value={index}>{month}</option>
+                ))}
+              </select>
+              
+              {/* Year Select */}
+              <select
+                value={dateOfBirth ? dateOfBirth.getFullYear() : ""}
+                onChange={(e) => {
+                  const year = parseInt(e.target.value);
+                  const newDate = dateOfBirth ? new Date(dateOfBirth) : new Date();
+                  newDate.setFullYear(year);
+                  setDateOfBirth(newDate);
+                }}
+                className="px-3 py-2 rounded-md border border-gray-300 flex-1"
+                aria-label="Year"
+              >
+                <option value="" disabled>Year</option>
+                {Array.from({ length: 80 }, (_, i) => new Date().getFullYear() - i).map(year => (
+                  <option key={`year-${year}`} value={year}>{year}</option>
+                ))}
+              </select>
+            </div>
+            <p className="text-xs text-gray-500 mt-1">Must be at least 18 years old</p>
           </div>
 
           {/* Travel Reason */}
