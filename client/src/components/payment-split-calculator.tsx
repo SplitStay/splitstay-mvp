@@ -52,6 +52,10 @@ export const PaymentSplitCalculator: React.FC<PaymentSplitCalculatorProps> = ({
   // Additional guest fees
   const [additionalGuestFees, setAdditionalGuestFees] = useState(0);
   
+  // Service fee settings
+  const [includeServiceFee, setIncludeServiceFee] = useState(true);
+  const [serviceFeePercent, setServiceFeePercent] = useState(10); // Default 10%
+  
   // Calculate the final amounts for each person based on the selected method
   const calculateFinalAmounts = () => {
     let amounts: number[] = [];
@@ -87,6 +91,14 @@ export const PaymentSplitCalculator: React.FC<PaymentSplitCalculatorProps> = ({
     if (additionalGuestFees > 0) {
       // Only add to first person for simplicity, could be made configurable
       amounts[0] += additionalGuestFees;
+    }
+    
+    // Add service fee if enabled
+    if (includeServiceFee) {
+      amounts = amounts.map(amount => {
+        const serviceFee = (amount * serviceFeePercent) / 100;
+        return amount + serviceFee;
+      });
     }
     
     return amounts;
@@ -316,6 +328,42 @@ export const PaymentSplitCalculator: React.FC<PaymentSplitCalculatorProps> = ({
               />
             </div>
           </div>
+          
+          <div className="flex items-center justify-between border-t pt-4 mt-4">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="service-fee"
+                checked={includeServiceFee}
+                onCheckedChange={setIncludeServiceFee}
+              />
+              <Label htmlFor="service-fee" className="font-medium">
+                SplitStay Service Fee
+              </Label>
+            </div>
+            
+            {includeServiceFee && (
+              <div className="flex items-center space-x-2">
+                <input
+                  id="service-fee-percent"
+                  type="number"
+                  className="w-16 p-2 border rounded-md"
+                  value={serviceFeePercent}
+                  onChange={(e) => setServiceFeePercent(Number(e.target.value))}
+                  min={0}
+                  max={100}
+                />
+                <Label htmlFor="service-fee-percent" className="text-sm">%</Label>
+              </div>
+            )}
+          </div>
+          
+          {includeServiceFee && (
+            <div className="pl-10">
+              <p className="text-sm text-gray-500">
+                This fee helps us maintain the platform, verify users, and provide secure payment processing.
+              </p>
+            </div>
+          )}
         </div>
         
         <Separator className="my-4" />
@@ -324,26 +372,60 @@ export const PaymentSplitCalculator: React.FC<PaymentSplitCalculatorProps> = ({
         <div>
           <h3 className="font-medium text-lg mb-3">Final Split</h3>
           
-          {bookingDetails.participants.map((participant, index) => (
-            <div key={participant.id} className="flex justify-between items-center py-2 border-b">
-              <div>
-                <p className="font-medium">{participant.user.fullName}</p>
-                {splitMethod === "custom" && (
-                  <p className="text-sm text-gray-500">{customSplits[index].toFixed(1)}%</p>
-                )}
-                {splitMethod === "nights" && (
-                  <p className="text-sm text-gray-500">{nightsPerPerson[index]} nights</p>
-                )}
-                {hasPremiumOptions && personWithPremium === index && (
-                  <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">Premium</span>
-                )}
+          {bookingDetails.participants.map((participant, index) => {
+            // Calculate base amount (without service fee) for display purposes
+            let baseAmount = 0;
+            switch (splitMethod) {
+              case "equal":
+                baseAmount = equalSplitAmount;
+                break;
+              case "custom":
+                baseAmount = (totalCostDollars * customSplits[index]) / 100;
+                break;
+              case "nights":
+                const totalNights = nightsPerPerson.reduce((sum, nights) => sum + nights, 0);
+                baseAmount = (totalCostDollars * nightsPerPerson[index]) / totalNights;
+                break;
+            }
+            
+            // Calculate service fee
+            const serviceFee = includeServiceFee ? (baseAmount * serviceFeePercent) / 100 : 0;
+            
+            return (
+              <div key={participant.id} className="flex justify-between items-center py-2 border-b">
+                <div>
+                  <p className="font-medium">{participant.user.fullName}</p>
+                  {splitMethod === "custom" && (
+                    <p className="text-sm text-gray-500">{customSplits[index].toFixed(1)}%</p>
+                  )}
+                  {splitMethod === "nights" && (
+                    <p className="text-sm text-gray-500">{nightsPerPerson[index]} nights</p>
+                  )}
+                  {hasPremiumOptions && personWithPremium === index && (
+                    <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">Premium</span>
+                  )}
+                </div>
+                <div className="text-right">
+                  <p className="text-xl font-bold text-primary">${finalAmounts[index].toFixed(2)}</p>
+                  {includeServiceFee && (
+                    <p className="text-xs text-gray-500">
+                      includes ${serviceFee.toFixed(2)} service fee
+                    </p>
+                  )}
+                </div>
               </div>
-              <p className="text-xl font-bold text-primary">${finalAmounts[index].toFixed(2)}</p>
-            </div>
-          ))}
+            );
+          })}
           
           <div className="flex justify-between items-center py-3 mt-2">
-            <p className="font-medium">Total</p>
+            <div>
+              <p className="font-medium">Total</p>
+              {includeServiceFee && (
+                <p className="text-xs text-gray-500">
+                  Includes {serviceFeePercent}% service fee
+                </p>
+              )}
+            </div>
             <p className="text-xl font-bold">
               ${finalAmounts.reduce((sum, amount) => sum + amount, 0).toFixed(2)}
             </p>
