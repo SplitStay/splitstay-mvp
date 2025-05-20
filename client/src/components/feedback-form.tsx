@@ -139,27 +139,25 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({
               
               <div className="space-y-2">
                 <Label htmlFor="recommendScore">How likely are you to recommend SplitStay to a friend?</Label>
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(score => (
+                <div className="flex justify-between mt-1">
+                  {[
+                    { label: "Not likely", value: false },
+                    { label: "Maybe", value: false },
+                    { label: "Likely", value: true },
+                    { label: "Very likely", value: true }
+                  ].map((option, index) => (
                     <Button
-                      key={`score-${score}`}
+                      key={`recommend-${index}`}
                       type="button"
-                      variant={knowSomeoneWhoWouldUse === (score >= 7) ? "default" : "outline"}
+                      variant={(knowSomeoneWhoWouldUse === option.value) ? "default" : "outline"}
                       size="sm"
-                      className="min-w-[36px]"
                       onClick={() => {
-                        // Map scores 7-10 to true (likely to recommend)
-                        // Map scores 0-6 to false (unlikely to recommend)
-                        setKnowSomeoneWhoWouldUse(score >= 7);
+                        setKnowSomeoneWhoWouldUse(option.value);
                       }}
                     >
-                      {score}
+                      {option.label}
                     </Button>
                   ))}
-                </div>
-                <div className="flex justify-between text-xs text-gray-500 px-1 pt-1">
-                  <span>Not likely</span>
-                  <span>Very likely</span>
                 </div>
               </div>
               
