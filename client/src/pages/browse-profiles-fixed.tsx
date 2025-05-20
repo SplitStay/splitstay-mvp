@@ -73,7 +73,7 @@ const BrowseProfiles: React.FC = () => {
       email: "alina@example.com",
       username: "alina",
       password: "password",
-      profilePicture: "https://i.pravatar.cc/150?img=25",
+      profilePicture: "https://i.pravatar.cc/150?img=47",
       bio: "Digital nomad who loves exploring new cuisines",
       age: "23",
       gender: "female",
