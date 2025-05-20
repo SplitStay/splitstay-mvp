@@ -280,11 +280,15 @@ const Dashboard: React.FC = () => {
           <Button 
             variant="ghost" 
             size="sm" 
-            className="flex flex-col items-center text-xs"
-            onClick={() => {}}
+            className="flex flex-col items-center text-xs text-red-500"
+            onClick={() => {
+              // Clear all session data on logout
+              sessionStorage.clear();
+              navigate("/");
+            }}
           >
-            <Settings className="h-5 w-5 mb-1" />
-            <span>Settings</span>
+            <LogOut className="h-5 w-5 mb-1" />
+            <span>Logout</span>
           </Button>
         </div>
       </div>
