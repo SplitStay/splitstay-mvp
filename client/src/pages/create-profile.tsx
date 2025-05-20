@@ -297,14 +297,57 @@ const CreateProfile: React.FC = () => {
                 <span>Phone verified</span>
               </div>
               <div className="flex items-center text-sm">
-                <Button 
-                  variant="outline" 
-                  className="text-xs py-1 h-auto border-primary text-primary hover:bg-primary hover:text-white"
-                  size="sm"
-                >
-                  <CreditCard className="h-3 w-3 mr-1" />
-                  Verify ID Document
-                </Button>
+                <Dialog>
+                  <DialogTrigger>
+                    <Button 
+                      variant="outline" 
+                      className="text-xs py-1 h-auto border-primary text-primary hover:bg-primary hover:text-white"
+                      size="sm"
+                    >
+                      <CreditCard className="h-3 w-3 mr-1" />
+                      Verify ID Document
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Verify Your Identity</DialogTitle>
+                      <DialogDescription>
+                        This helps build trust in the SplitStay community. Your ID is never shared with other users.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-2">
+                      <div className="flex items-center justify-center p-4 border-2 border-dashed rounded-lg border-gray-300">
+                        <div className="text-center">
+                          <CreditCard className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                          <p className="text-sm font-medium">Upload a government ID</p>
+                          <p className="text-xs text-gray-500 mt-1">Passport, driver's license, or national ID card</p>
+                          <Button size="sm" className="mt-3 bg-primary text-white">Select File</Button>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Verification Steps:</label>
+                        <div className="flex items-center text-sm mb-1">
+                          <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
+                          <span>Upload your ID document</span>
+                        </div>
+                        <div className="flex items-center text-sm mb-1">
+                          <div className="h-4 w-4 rounded-full border border-gray-300 mr-2" />
+                          <span className="text-gray-600">Take a selfie to confirm it's you</span>
+                        </div>
+                        <div className="flex items-center text-sm">
+                          <div className="h-4 w-4 rounded-full border border-gray-300 mr-2" />
+                          <span className="text-gray-600">Wait for verification (typically 24 hours)</span>
+                        </div>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" className="w-full sm:w-auto">Cancel</Button>
+                      <Button className="w-full sm:w-auto bg-primary text-white">
+                        Continue Verification
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
                 <span className="ml-2 text-xs text-gray-500">Enhance trust with verified ID</span>
               </div>
             </div>
