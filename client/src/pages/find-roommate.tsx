@@ -181,6 +181,47 @@ const FindRoommate: React.FC = () => {
     navigate("/browse-profiles");
   };
 
+  // Load saved search data when the component mounts
+  React.useEffect(() => {
+    const savedSearchData = localStorage.getItem("splitstay_search");
+    
+    if (savedSearchData) {
+      try {
+        const parsedData = JSON.parse(savedSearchData);
+        
+        // Restore destination
+        if (parsedData.destination) {
+          setDestination(parsedData.destination);
+          setLocationSearch(parsedData.destination);
+        }
+        
+        // Restore dates
+        if (parsedData.startDate) {
+          setStartDate(new Date(parsedData.startDate));
+        }
+        
+        if (parsedData.endDate) {
+          setEndDate(new Date(parsedData.endDate));
+        }
+        
+        // Restore flexible dates option
+        if (parsedData.isFlexible !== undefined) {
+          setIsFlexible(parsedData.isFlexible);
+        }
+        
+        // Restore preferences
+        if (parsedData.preferences) {
+          setPreferences({
+            ...preferences,
+            ...parsedData.preferences
+          });
+        }
+      } catch (error) {
+        console.error("Error loading saved search data:", error);
+      }
+    }
+  }, []);
+  
   // Handle document click to close dropdown when clicking outside
   React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
