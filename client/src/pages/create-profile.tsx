@@ -99,47 +99,83 @@ const CreateProfile: React.FC = () => {
   const [tempSelectedTraits, setTempSelectedTraits] = useState<string[]>([]);
   const [traitDialogOpen, setTraitDialogOpen] = useState(false);
   
+  // Main travel traits (organized in logical pairs)
   const travelTraits: TravelTrait[] = [
-    { id: "spontaneous", label: "Spontaneous" },
-    { id: "street_food", label: "Street Food" },
-    { id: "quiet_time", label: "Quiet Time" },
-    { id: "early_bird", label: "Early Bird" },
-    { id: "night_owl", label: "Night Owl" },
+    // Planning style
     { id: "planner", label: "Planner" },
+    { id: "spontaneous", label: "Spontaneous" },
+    
+    // Activity level
     { id: "adventurous", label: "Adventurous" },
     { id: "relaxed", label: "Relaxed" },
+    
+    // Sleep schedule
+    { id: "early_bird", label: "Early Bird" },
+    { id: "night_owl", label: "Night Owl" },
+    
+    // Social style
+    { id: "quiet_time", label: "Quiet Time" },
+    { id: "street_food", label: "Street Food" },
   ];
   
-  // Complete list of travel traits for search
+  // Complete list of travel traits for search (organized by related pairs)
   const allTravelTraits: TravelTrait[] = [
-    ...travelTraits,
-    { id: "fine_dining", label: "Fine Dining" },
+    // Planning style
+    { id: "planner", label: "Planner" },
+    { id: "spontaneous", label: "Spontaneous" },
+    
+    // Activity level
+    { id: "adventurous", label: "Adventurous" },
+    { id: "relaxed", label: "Relaxed" },
+    { id: "adventure_seeker", label: "Adventure Seeker" },
+    
+    // Sleep schedule
+    { id: "early_bird", label: "Early Bird" },
+    { id: "night_owl", label: "Night Owl" },
+    
+    // Social style
+    { id: "quiet_time", label: "Quiet Time" },
     { id: "chatterbox", label: "Chatterbox" },
     { id: "party_animal", label: "Party Animal" },
-    { id: "nature_lover", label: "Nature Lover" },
-    { id: "city_lover", label: "City Lover" },
-    { id: "bookworm", label: "Bookworm" },
-    { id: "binge_watcher", label: "Binge Watcher" },
+    { id: "social_butterfly", label: "Social Butterfly" },
+    
+    // Food preferences
+    { id: "street_food", label: "Street Food" },
+    { id: "fine_dining", label: "Fine Dining" },
+    { id: "foodie", label: "Foodie" },
+    
+    // Drink preferences
     { id: "coffee_lover", label: "Coffee Lover" },
     { id: "tea_enthusiast", label: "Tea Enthusiast" },
-    { id: "foodie", label: "Foodie" },
-    { id: "minimalist", label: "Minimalist" },
-    { id: "shopping_addict", label: "Shopping Addict" },
-    { id: "museum_goer", label: "Museum Goer" },
-    { id: "history_buff", label: "History Buff" },
+    
+    // Location preferences
+    { id: "nature_lover", label: "Nature Lover" },
+    { id: "city_lover", label: "City Lover" },
     { id: "beach_lover", label: "Beach Lover" },
     { id: "mountain_climber", label: "Mountain Climber" },
-    { id: "yoga_enthusiast", label: "Yoga Enthusiast" },
+    
+    // Indoor activities
+    { id: "bookworm", label: "Bookworm" },
+    { id: "binge_watcher", label: "Binge Watcher" },
+    
+    // Shopping style
+    { id: "minimalist", label: "Minimalist" },
+    { id: "shopping_addict", label: "Shopping Addict" },
+    
+    // Cultural interests
+    { id: "museum_goer", label: "Museum Goer" },
+    { id: "history_buff", label: "History Buff" },
     { id: "architecture_buff", label: "Architecture Buff" },
+    { id: "art_enthusiast", label: "Art Enthusiast" },
+    
+    // Other interests
     { id: "photography_fan", label: "Photography Fan" },
-    { id: "social_butterfly", label: "Social Butterfly" },
     { id: "tech_geek", label: "Tech Geek" },
     { id: "family_oriented", label: "Family Oriented" },
-    { id: "adventure_seeker", label: "Adventure Seeker" },
     { id: "environmentalist", label: "Environmentalist" },
     { id: "sports_fan", label: "Sports Fan" },
     { id: "music_lover", label: "Music Lover" },
-    { id: "art_enthusiast", label: "Art Enthusiast" },
+    { id: "yoga_enthusiast", label: "Yoga Enthusiast" },
   ];
 
   const toggleLanguage = (language: string) => {
