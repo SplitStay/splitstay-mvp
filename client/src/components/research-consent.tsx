@@ -28,8 +28,8 @@ const ResearchConsent: React.FC<ResearchConsentProps> = ({
     if (recordAudio || recordSession) {
       onAccept(recordAudio, recordSession);
       setOpen(false);
-      // Save consent to localStorage for this session
-      localStorage.setItem('splitstay_research_consent', JSON.stringify({
+      // Save consent to sessionStorage for this session
+      sessionStorage.setItem('splitstay_research_consent', JSON.stringify({
         recordAudio,
         recordSession,
         timestamp: new Date().toISOString()

@@ -13,7 +13,7 @@ const ResearchProvider: React.FC<ResearchProviderProps> = ({ children }) => {
 
   useEffect(() => {
     // Check if the user has already provided consent
-    const storedConsent = localStorage.getItem('splitstay_research_consent');
+    const storedConsent = sessionStorage.getItem('splitstay_research_consent');
     
     if (storedConsent) {
       // User already gave consent, initialize recorder with saved preferences
