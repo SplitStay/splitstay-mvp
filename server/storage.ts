@@ -1,5 +1,6 @@
 import {
   users, hotels, bookings, bookingParticipants, messages, reviews,
+  researchSessions, researchFeedback, audioRecordings,
   type User,
   type InsertUser,
   type Hotel,
@@ -12,6 +13,12 @@ import {
   type InsertMessage,
   type Review,
   type InsertReview,
+  type ResearchSession,
+  type InsertResearchSession,
+  type ResearchFeedback,
+  type InsertResearchFeedback,
+  type AudioRecording,
+  type InsertAudioRecording,
   type UserProfile,
   type BookingDetails
 } from "@shared/schema";
