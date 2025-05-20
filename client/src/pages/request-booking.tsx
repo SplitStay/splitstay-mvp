@@ -18,13 +18,42 @@ const RequestBooking: React.FC<RequestBookingProps> = ({ params }) => {
   const [_, navigate] = useLocation();
   const userId = parseInt(params.id, 10);
   
+  // First try to get the profile from the browse profiles data
+  const getProfileFromLocalStorage = (): UserProfile | null => {
+    try {
+      const savedSearchData = localStorage.getItem("splitstay_search");
+      if (savedSearchData) {
+        // Get the browse profiles data that was loaded
+        const browsedProfiles = JSON.parse(localStorage.getItem("splitstay_browsed_profiles") || "[]");
+        // Find the profile matching the user ID (comparing as strings to handle potential type differences)
+        return browsedProfiles.find((p: UserProfile) => String(p.id) === params.id) || null;
+      }
+    } catch (error) {
+      console.error("Error retrieving profile from localStorage:", error);
+    }
+    return null;
+  };
+
+  const localProfile = getProfileFromLocalStorage();
+
   const { data: profile, isLoading } = useQuery({
     queryKey: [`/api/users/${userId}`],
     queryFn: async () => {
+      // If we have the profile in localStorage, use that one immediately
+      if (localProfile) {
+        console.log("Using profile from localStorage:", localProfile);
+        return localProfile;
+      }
+      
+      // Otherwise fetch from API
+      console.log("Fetching profile from API");
       const res = await fetch(`/api/users/${userId}`);
       if (!res.ok) throw new Error('Failed to fetch user profile');
       return res.json() as Promise<UserProfile>;
-    }
+    },
+    // Skip refetching if we already have the data
+    refetchOnWindowFocus: !localProfile,
+    initialData: localProfile || undefined
   });
 
   const handleSendRequest = () => {

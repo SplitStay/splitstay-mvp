@@ -259,9 +259,12 @@ const BrowseProfiles: React.FC = () => {
     setFilteredProfiles(filtered);
   }, [filters, profiles]);
   
-  // Initialize filtered profiles when profiles load
+  // Initialize filtered profiles when profiles load and store them in localStorage
   useEffect(() => {
     if (profiles) {
+      // Store the profiles in localStorage for use on the request booking page
+      localStorage.setItem('splitstay_browsed_profiles', JSON.stringify(profiles));
+      
       setFilteredProfiles(profiles);
     }
   }, [profiles]);

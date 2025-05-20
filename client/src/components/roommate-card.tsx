@@ -21,9 +21,8 @@ const RoommateCard: React.FC<RoommateCardProps> = ({
 }) => {
   const [reviewsOpen, setReviewsOpen] = useState(false);
   
-  // Use a separate variable to track if the card should be clickable
-  // When reviews are open, we don't want the card to navigate
-  const isCardClickable = actionUrl && !reviewsOpen;
+  // Always make the card clickable when an action URL is provided
+  const isCardClickable = !!actionUrl;
   
   const CardComponent = isCardClickable ? Link : 'div';
   const cardProps = isCardClickable ? { href: actionUrl } : {};
