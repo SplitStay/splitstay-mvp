@@ -49,9 +49,8 @@ const BrowseProfiles: React.FC = () => {
   // Demo profiles
   const defaultProfiles: UserProfile[] = [
     {
-      id: "1",
-      firstName: "Hannah",
-      lastName: "Kim",
+      id: 1,
+      fullName: "Hannah Kim",
       email: "hannah@example.com",
       username: "hannah",
       password: "password",
@@ -74,9 +73,8 @@ const BrowseProfiles: React.FC = () => {
       }
     },
     {
-      id: "2",
-      firstName: "Alina",
-      lastName: "Chen",
+      id: 2,
+      fullName: "Alina Chen",
       email: "alina@example.com",
       username: "alina",
       password: "password",
@@ -99,9 +97,8 @@ const BrowseProfiles: React.FC = () => {
       }
     },
     {
-      id: "3",
-      firstName: "Sophie",
-      lastName: "Müller",
+      id: 3,
+      fullName: "Sophie Müller",
       email: "sophie@example.com",
       username: "sophie",
       password: "password",
@@ -302,8 +299,7 @@ const BrowseProfiles: React.FC = () => {
       languages: {
         "English": false,
         "French": false,
-        "German": false,
-        "Spanish": false
+        "German": false
       },
       sleepingHabits: {
         "Early bird": false,

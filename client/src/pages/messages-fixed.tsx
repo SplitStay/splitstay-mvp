@@ -149,49 +149,67 @@ const Messages: React.FC = () => {
   const renderConversationList = () => (
     <div className="h-full flex flex-col">
       <div className="flex items-center justify-between p-4 border-b">
-        <h1 className="text-xl font-bold">Messages</h1>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => {}}
-        >
-          <Search className="h-5 w-5" />
-        </Button>
+        <h1 className="text-xl font-bold text-primary">Messages</h1>
+        <div className="flex items-center">
+          <div className="relative mr-2">
+            <Input 
+              className="h-9 w-40 pl-8 rounded-full bg-gray-100 border-0 text-sm" 
+              placeholder="Search..." 
+            />
+            <Search className="h-4 w-4 text-gray-500 absolute left-2.5 top-1/2 transform -translate-y-1/2" />
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-gray-500 rounded-full h-9 w-9"
+            onClick={() => {}}
+          >
+            <MoreVertical className="h-5 w-5" />
+          </Button>
+        </div>
       </div>
       
       <div className="flex-1 overflow-y-auto">
-        {conversations.map((conversation) => (
-          <div 
-            key={conversation.id}
-            className={`p-4 flex items-center cursor-pointer hover:bg-gray-50 ${
-              activeConversation === conversation.id ? "bg-gray-100" : ""
-            }`}
-            onClick={() => setActiveConversation(conversation.id)}
-          >
-            <UserAvatar 
-              user={conversation.user}
-              showVerified={conversation.user.isVerified}
-              size="md"
-            />
-            <div className="ml-3 flex-1 min-w-0">
-              <div className="flex justify-between items-center">
-                <p className="font-medium truncate">{conversation.user.fullName}</p>
-                <span className="text-xs text-gray-500">{conversation.time}</span>
-              </div>
-              <p className="text-sm text-gray-600 truncate">{conversation.lastMessage}</p>
-            </div>
-            {conversation.unreadCount && (
-              <div className="ml-2 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                {conversation.unreadCount}
-              </div>
-            )}
+        {conversations.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-40 text-center p-4">
+            <MessageSquare className="h-10 w-10 text-gray-300 mb-2" />
+            <p className="text-gray-500">No messages yet</p>
+            <p className="text-sm text-gray-400 mt-1">When you match with roommates, your conversations will appear here</p>
           </div>
-        ))}
+        ) : (
+          conversations.map((conversation) => (
+            <div 
+              key={conversation.id}
+              className={`p-4 flex items-center cursor-pointer hover:bg-gray-50 transition-colors ${
+                activeConversation === conversation.id ? "bg-gray-100" : ""
+              }`}
+              onClick={() => setActiveConversation(conversation.id)}
+            >
+              <UserAvatar 
+                user={conversation.user}
+                showVerified={conversation.user.isVerified}
+                size="md"
+              />
+              <div className="ml-3 flex-1 min-w-0">
+                <div className="flex justify-between items-center">
+                  <p className="font-medium truncate">{conversation.user.fullName}</p>
+                  <span className="text-xs text-gray-500">{conversation.time}</span>
+                </div>
+                <p className="text-sm text-gray-600 truncate">{conversation.lastMessage}</p>
+              </div>
+              {conversation.unreadCount && (
+                <div className="ml-2 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {conversation.unreadCount}
+                </div>
+              )}
+            </div>
+          ))
+        )}
       </div>
       
       <div className="p-4 border-t">
         <Button 
-          className="w-full navy-button"
+          className="w-full navy-button py-5"
           onClick={() => navigate("/find-roommate")}
         >
           Find New Roommates
@@ -222,7 +240,19 @@ const Messages: React.FC = () => {
           />
           <div className="ml-3 flex-1">
             <p className="font-medium">{conversation.user.fullName}</p>
+            <div className="flex items-center text-xs text-green-600">
+              <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-1.5"></span>
+              <span>Online</span>
+            </div>
           </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="mr-2 text-xs h-8"
+            onClick={() => navigate(`/request-booking/${conversation.id}`)}
+          >
+            Book room
+          </Button>
           <Button
             variant="ghost"
             size="icon"
@@ -300,13 +330,13 @@ const Messages: React.FC = () => {
             </div>
           )}
           
-          <div className="flex items-center relative">
-            <div className="absolute left-0 bottom-0 top-0 flex items-center pl-2">
+          <div className="flex items-center relative border rounded-full bg-gray-50 pr-1 py-1 pl-2">
+            <div className="flex items-center">
               <div className="relative">
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-gray-500"
+                  className="text-gray-500 h-8 w-8 rounded-full hover:bg-gray-200"
                   onClick={handleAttachmentClick}
                 >
                   <Paperclip className="h-5 w-5" />
@@ -333,7 +363,7 @@ const Messages: React.FC = () => {
             </div>
             
             <Input
-              className="flex-1 pl-12 pr-12"
+              className="flex-1 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-2"
               placeholder="Type a message..."
               value={messageText}
               onChange={(e) => setMessageText(e.target.value)}
@@ -345,16 +375,14 @@ const Messages: React.FC = () => {
               }}
             />
             
-            <div className="absolute right-0 bottom-0 top-0 flex items-center pr-2">
-              <Button
-                className={`rounded-full ${(messageText.trim() || selectedFile) ? 'navy-button' : 'bg-gray-200 text-gray-500'}`}
-                size="icon"
-                onClick={handleSendMessage}
-                disabled={!messageText.trim() && !selectedFile}
-              >
-                <Send className="h-5 w-5" />
-              </Button>
-            </div>
+            <Button
+              className={`rounded-full h-8 w-8 ${(messageText.trim() || selectedFile) ? 'navy-button' : 'bg-gray-200 text-gray-500'}`}
+              size="icon"
+              onClick={handleSendMessage}
+              disabled={!messageText.trim() && !selectedFile}
+            >
+              <Send className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </div>

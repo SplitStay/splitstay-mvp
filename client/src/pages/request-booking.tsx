@@ -203,13 +203,41 @@ const RequestBooking: React.FC<RequestBookingProps> = ({ params }) => {
         </CardContent>
       </Card>
       
+      {/* Price Breakdown */}
+      <Card className="border-2 border-gray-200 rounded-lg mb-6">
+        <CardContent className="p-4">
+          <h3 className="font-semibold mb-3">Price Breakdown</h3>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span>Room rate (3 nights)</span>
+              <span>€300</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Split cost (50%)</span>
+              <span className="text-green-600">-€150</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Service fee</span>
+              <span>€15</span>
+            </div>
+            <div className="flex justify-between font-medium text-base border-t pt-2 mt-2">
+              <span>Total</span>
+              <span>€165</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      
       {/* Buttons */}
       <div className="space-y-3">
         <Button 
-          className="w-full bg-primary text-white font-semibold py-6"
+          className="w-full navy-button font-semibold py-6 relative"
           onClick={handleSendRequest}
         >
-          Send Request to Share Room
+          <div className="flex flex-col">
+            <span>Send Request to Share Room</span>
+            <span className="text-xs font-normal opacity-80 mt-1">No payment until {profile?.fullName?.split(' ')[0] || 'roommate'} accepts</span>
+          </div>
         </Button>
         
         <Button 
