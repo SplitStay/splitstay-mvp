@@ -300,7 +300,7 @@ const BrowseProfiles: React.FC = () => {
           variant="ghost"
           size="icon"
           className="text-gray-500"
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/find-roommate")}
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
