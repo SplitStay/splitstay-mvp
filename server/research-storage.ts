@@ -127,21 +127,55 @@ export class ResearchStorage {
   
   // Save audio recording
   async saveAudio(recording: AudioRecording): Promise<AudioRecording> {
+    console.log(`Saving audio recording for session: ${recording.sessionId}`);
+    
+    // Ensure directory exists
+    if (!fs.existsSync(AUDIO_DIR)) {
+      console.log(`Creating audio directory: ${AUDIO_DIR}`);
+      fs.mkdirSync(AUDIO_DIR, { recursive: true });
+    }
+    
     // Save metadata
     const metadataFilePath = path.join(AUDIO_DIR, `${recording.sessionId}-metadata.json`);
     const metadata = { ...recording };
     delete (metadata as any).audioData; // Remove audio data from metadata
-    await fs.promises.writeFile(metadataFilePath, JSON.stringify(metadata, null, 2), 'utf-8');
     
-    // Save audio data
-    if (recording.audioData) {
-      const audioFilePath = path.join(AUDIO_DIR, recording.fileName);
-      // Convert base64 data to buffer and save
-      const audioBuffer = Buffer.from(recording.audioData.split(',')[1], 'base64');
-      await fs.promises.writeFile(audioFilePath, audioBuffer);
+    try {
+      await fs.promises.writeFile(metadataFilePath, JSON.stringify(metadata, null, 2), 'utf-8');
+      console.log(`Metadata saved to: ${metadataFilePath}`);
+      
+      // Save audio data
+      if (recording.audioData) {
+        const audioFilePath = path.join(AUDIO_DIR, recording.fileName);
+        console.log(`Saving audio file to: ${audioFilePath}`);
+        
+        // Convert base64 data to buffer and save
+        try {
+          let audioBuffer;
+          const base64Data = recording.audioData.toString();
+          
+          // Check if data has a data URL prefix
+          if (base64Data.includes('base64,')) {
+            audioBuffer = Buffer.from(base64Data.split('base64,')[1], 'base64');
+          } else {
+            audioBuffer = Buffer.from(base64Data, 'base64');
+          }
+          
+          await fs.promises.writeFile(audioFilePath, audioBuffer);
+          console.log(`Audio file saved successfully, size: ${audioBuffer.length} bytes`);
+        } catch (error) {
+          console.error(`Error processing audio data:`, error);
+          throw new Error(`Failed to process audio data: ${error.message}`);
+        }
+      } else {
+        console.warn('No audio data provided in recording');
+      }
+      
+      return recording;
+    } catch (error) {
+      console.error(`Error saving audio recording:`, error);
+      throw error;
     }
-    
-    return recording;
   }
   
   // Get audio recording metadata
