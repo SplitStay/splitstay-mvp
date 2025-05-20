@@ -562,21 +562,32 @@ const BrowseProfiles: React.FC = () => {
             </div>
           </div>
           
-          <DialogFooter className="flex justify-between mt-1 pt-0 gap-2">
+          <DialogFooter className="flex justify-between mt-4 pt-2 gap-2 border-t">
             <Button
               variant="outline"
               size="sm"
-              className="text-xs h-8 px-3"
+              className="text-xs h-9 px-4 border-gray-300"
               onClick={resetFilters}
             >
-              Reset
+              Reset All
             </Button>
             <Button 
               size="sm"
-              className="text-xs h-8 px-3 navy-button"
-              onClick={() => setFilterDialogOpen(false)}
+              className="text-xs h-9 px-6 navy-button font-medium"
+              onClick={() => {
+                // Track filter usage for analytics
+                console.log("Filters applied:", filters);
+                setFilterDialogOpen(false);
+              }}
             >
-              Apply
+              Apply Filters
+              {activeFilters && 
+                <span className="ml-1 bg-white text-primary rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold">
+                  {Object.values(filters).reduce((count, category) => 
+                    count + Object.values(category).filter(Boolean).length, 0)
+                  }
+                </span>
+              }
             </Button>
           </DialogFooter>
         </DialogContent>

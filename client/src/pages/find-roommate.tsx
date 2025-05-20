@@ -623,13 +623,21 @@ const FindRoommate: React.FC = () => {
           </div>
         </div>
         
-        <div className="pt-4">
+        <div className="pt-6 pb-2">
           <Button
             type="button"
-            className="navy-button"
+            className="navy-button w-full text-lg py-6 relative"
             onClick={handleFindMatches}
           >
-            Find Matches
+            <div className="flex items-center justify-center">
+              <span>Find Matches</span>
+              <ChevronRight className="ml-2 h-5 w-5" />
+            </div>
+            <div className="absolute bottom-1 w-full text-xs opacity-80">
+              {destination && startDate && endDate ? 
+                `${destination} · ${format(startDate, 'MMM d')} - ${format(endDate, 'MMM d')}` : 
+                'Complete all fields to continue'}
+            </div>
           </Button>
         </div>
       </div>
