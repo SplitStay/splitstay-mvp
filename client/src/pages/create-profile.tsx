@@ -70,13 +70,13 @@ const CreateProfile: React.FC = () => {
       reader.readAsDataURL(file);
     } else {
       // For the MVP demo, automatically set Emily's profile image
-      setProfileImage("https://i.pravatar.cc/300?img=47");
+      setProfileImage("/images/emily-profile.png");
     }
   };
   
   // Set demo image for Emily's profile
   const setDemoProfileImage = () => {
-    setProfileImage("https://i.pravatar.cc/300?img=47");
+    setProfileImage("/images/emily-profile.png");
   };
 
   // Predefined values
