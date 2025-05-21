@@ -68,7 +68,15 @@ const CreateProfile: React.FC = () => {
         setProfileImage(e.target?.result as string);
       };
       reader.readAsDataURL(file);
+    } else {
+      // For the MVP demo, automatically set Emily's profile image
+      setProfileImage("https://i.pravatar.cc/300?img=47");
     }
+  };
+  
+  // Set demo image for Emily's profile
+  const setDemoProfileImage = () => {
+    setProfileImage("https://i.pravatar.cc/300?img=47");
   };
 
   // Predefined values
@@ -251,7 +259,10 @@ const CreateProfile: React.FC = () => {
           <div className="flex flex-col items-center mb-2">
             <p className="text-sm font-medium text-center mb-2">Add Profile Photo</p>
             <label htmlFor="profile-upload" className="cursor-pointer">
-              <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-3 relative overflow-hidden hover:opacity-90 transition-opacity border-2 border-dashed border-navy">
+              <div 
+                className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-3 relative overflow-hidden hover:opacity-90 transition-opacity border-2 border-dashed border-navy"
+                onClick={setDemoProfileImage} // Added for demo to auto-set Emily's photo on click
+              >
                 {profileImage ? (
                   <img 
                     src={profileImage} 
