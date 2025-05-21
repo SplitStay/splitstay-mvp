@@ -34,8 +34,21 @@ interface TravelTrait {
 const CreateProfile: React.FC = () => {
   const [location, navigate] = useLocation();
   const isEditMode = location === "/profile/edit";
+  const isDemoMode = !isEditMode; // Consider any new profile creation as demo mode
   
-  // Pre-fill data for edit mode
+  // Emily's demo data for the MVP video
+  const emilyData = {
+    fullName: "Emily Zhang",
+    bio: "Spontaneous traveler who loves exploring new cities. Always looking for authentic experiences and meeting new people!",
+    dateOfBirth: new Date(1998, 5, 12), // June 12, 1998 
+    travelReason: "leisure" as const,
+    languages: ["English", "Mandarin"],
+    profileImage: "https://i.ibb.co/k4NdnYf/Emily-Profile-Photo.png",
+    traits: ["Early bird", "Adventurous", "Clean", "Foodie"],
+    interests: ["Photography", "Hiking", "Local cuisine", "Architecture"]
+  };
+  
+  // Pre-fill data based on mode
   const defaultUserData = isEditMode ? {
     fullName: "Alina Chen",
     bio: "Spontaneous traveler who enjoys quiet time. Love exploring new cities and making memories!",
@@ -45,9 +58,9 @@ const CreateProfile: React.FC = () => {
     profileImage: "https://i.pravatar.cc/150?img=31",
     traits: ["Early bird", "Quiet", "Clean", "Budget-conscious"],
     interests: ["Photography", "Hiking", "Food", "Museums"]
-  } : null;
+  } : isDemoMode ? emilyData : null;
   
-  // Personal info states
+  // Personal info states - use Emily's data for demo mode
   const [name, setName] = useState(defaultUserData?.fullName || "");
   const [bio, setBio] = useState(defaultUserData?.bio || "");
   const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>(defaultUserData?.dateOfBirth);
