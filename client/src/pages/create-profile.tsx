@@ -36,6 +36,10 @@ const CreateProfile: React.FC = () => {
   const isEditMode = location === "/profile/edit";
   const isDemoMode = !isEditMode; // Consider any new profile creation as demo mode
   
+  // Import Emily's profile image directly
+  // For the demo, we'll use a placeholder that will be replaced
+  // with the right image when you click the profile section
+  
   // Emily's demo data for the MVP video
   const emilyData = {
     fullName: "Emily Zhang",
@@ -43,7 +47,7 @@ const CreateProfile: React.FC = () => {
     dateOfBirth: new Date(1998, 5, 12), // June 12, 1998 
     travelReason: "leisure" as const,
     languages: ["English", "Mandarin"],
-    profileImage: "https://i.ibb.co/k4NdnYf/Emily-Profile-Photo.png",
+    profileImage: "/images/emily-profile.png", // Emily's profile photo
     traits: ["Early bird", "Adventurous", "Clean", "Foodie"],
     interests: ["Photography", "Hiking", "Local cuisine", "Architecture"]
   };
@@ -83,15 +87,15 @@ const CreateProfile: React.FC = () => {
       reader.readAsDataURL(file);
     } else {
       // For the MVP demo, automatically set Emily's profile image
-      const emilyImageUrl = "https://i.ibb.co/k4NdnYf/Emily-Profile-Photo.png";
+      const emilyImageUrl = "/images/emily-profile.png";
       setProfileImage(emilyImageUrl);
     }
   };
   
   // Set demo image for Emily's profile
   const setDemoProfileImage = () => {
-    // Using the attached image of Emily from the assets folder
-    const emilyImageUrl = "https://i.ibb.co/k4NdnYf/Emily-Profile-Photo.png";
+    // Using Emily's image from public folder
+    const emilyImageUrl = "/images/emily-profile.png";
     setProfileImage(emilyImageUrl);
   };
 
