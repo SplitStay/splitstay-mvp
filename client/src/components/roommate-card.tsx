@@ -24,11 +24,12 @@ const RoommateCard: React.FC<RoommateCardProps> = ({
 }) => {
   const [reviewsOpen, setReviewsOpen] = useState(false);
   
-  // Always make the card clickable when an action URL is provided
+  // Track if card should be clickable based on action URL
   const isCardClickable = !!actionUrl;
   
-  const CardComponent = isCardClickable ? Link : 'div';
-  const cardProps = isCardClickable ? { href: actionUrl } : {};
+  // Use div instead of Link to avoid nested anchor tags issue
+  const CardComponent = 'div';
+  const cardProps = {};
   
   // Handle review click to prevent navigation
   const handleReviewClick = (e: React.MouseEvent) => {
@@ -55,9 +56,23 @@ const RoommateCard: React.FC<RoommateCardProps> = ({
     }
   ];
 
+  // Handle click on the entire card
+  const handleCardClick = () => {
+    if (isCardClickable && actionUrl) {
+      window.location.href = actionUrl;
+    }
+  };
+
   return (
     <CardComponent {...cardProps}>
-      <Card className={cn("border-2 border-gray-200 cursor-pointer hover:border-gray-300", className)}>
+      <Card 
+        className={cn(
+          "border-2 border-gray-200 hover:border-gray-300", 
+          isCardClickable ? "cursor-pointer" : "",
+          className
+        )}
+        onClick={isCardClickable ? handleCardClick : undefined}
+      >
         <CardContent className="p-4">
           <div className="flex items-center space-x-3">
             <UserAvatar
