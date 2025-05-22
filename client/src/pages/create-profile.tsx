@@ -47,7 +47,7 @@ const CreateProfile: React.FC = () => {
     dateOfBirth: new Date(1998, 5, 12), // June 12, 1998 
     travelReason: "leisure" as const,
     languages: ["English", "Mandarin"],
-    profileImage: "/emily-new-profile.png", // Emily's profile photo
+    profileImage: "/images/emily-profile.png", // Emily's profile photo
     traits: ["Early bird", "Adventurous", "Clean", "Foodie"],
     interests: ["Photography", "Hiking", "Local cuisine", "Architecture"]
   };
@@ -283,7 +283,13 @@ const CreateProfile: React.FC = () => {
                 className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-3 relative overflow-hidden hover:opacity-90 transition-opacity border-2 border-dashed border-navy"
                 onClick={setDemoProfileImage} // Added for demo to auto-set Emily's photo on click
               >
-                {profileImage ? (
+                {name === "Emily Zhang" ? (
+                  <img 
+                    src="/emily-latest-profile.png" 
+                    alt="Emily Profile" 
+                    className="w-full h-full object-cover"
+                  />
+                ) : profileImage ? (
                   <img 
                     src={profileImage} 
                     alt="Profile" 
