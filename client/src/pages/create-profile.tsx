@@ -664,6 +664,31 @@ const CreateProfile: React.FC = () => {
                 </DialogContent>
               </Dialog>
             </div>
+            {/* Common quick-select trait options */}
+            <div className="flex flex-wrap gap-2 mb-4">
+              {["Early Bird", "Night Owl", "Adventurous", "Relaxed", "Foodie", "Budget-conscious"].map((label) => {
+                const trait = allTravelTraits.find(t => t.label === label);
+                const traitId = trait ? trait.id : label.toLowerCase().replace(/\s+/g, '_');
+                const isSelected = selectedTraits.includes(traitId);
+                
+                return (
+                  <button
+                    key={traitId}
+                    type="button"
+                    className={`py-2 px-4 rounded-full text-sm transition-colors ${
+                      isSelected 
+                        ? 'bg-blue-100 text-blue-900 border border-blue-300' 
+                        : 'bg-white border border-gray-300 text-gray-700 hover:border-blue-300'
+                    }`}
+                    onClick={() => toggleTrait(traitId)}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+            
+            {/* Selected traits */}
             <div className="flex flex-wrap gap-2">
               {selectedTraits.length > 0 ? (
                 // Display selected traits
