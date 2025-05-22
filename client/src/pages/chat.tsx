@@ -38,7 +38,7 @@ const Chat: React.FC<ChatProps> = ({ params }) => {
   const otherUser = {
     id: 1,
     fullName: "Amara",
-    profilePicture: "/"+window.location.pathname.split('/')[1]+"/attached_assets/Amara Profle Photo 4.png",
+    profilePicture: "https://i.pravatar.cc/150?img=5",
     isVerified: true,
     gender: "female",
     age: 28,
@@ -75,7 +75,7 @@ const Chat: React.FC<ChatProps> = ({ params }) => {
       id: 1,
       bookingId: 1,
       senderId: 1, // Amara
-      content: "Hi Sophie! Looking forward to our trip! 😊 Would you like to coordinate arrival times?",
+      content: "Hi Emily! Looking forward to our trip! 😊 Would you like to coordinate arrival times?",
       createdAt: new Date(Date.now() - 3600000) // 1 hour ago
     }
   ];
