@@ -110,12 +110,12 @@ const BrowseProfiles: React.FC = () => {
   const defaultProfiles: UserProfile[] = [
     {
       id: "1",
-      firstName: "Amara",
+      firstName: "Maya",
       lastName: "",
-      email: "amara@example.com",
-      username: "amara",
+      email: "maya@example.com",
+      username: "maya",
       password: "password",
-      profilePicture: "/amara-profile-pic.png",
+      profilePicture: "/images/maya-profile.png",
       bio: "Adventure seeker passionate about different cultures",
       age: "25",
       gender: "female",

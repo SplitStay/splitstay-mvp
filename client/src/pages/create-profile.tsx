@@ -1,76 +1,84 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useLocation } from "wouter";
+import { 
+  ArrowLeft, Calendar, Plus, Search, X, 
+  UserCircle, ShieldCheck, CheckCircle, CreditCard
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { 
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
-} from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Command, CommandInput, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
-import { ArrowLeft, Plus, Search, Star, Check, Calendar, Info, X } from "lucide-react";
-// import { DatePicker } from "@/components/date-picker";
-import { useQuery } from "@tanstack/react-query";
-import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
-// import { getAge } from "@/lib/date-utils";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { toast } from "@/hooks/use-toast";
 import { trackProfileCreation } from "@/lib/analytics";
+import { format } from "date-fns";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription,
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger,
+  DialogFooter,
+  DialogClose
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 
-const MAX_LANGUAGES = 5;
-const MAX_TRAITS = 8;
-
-// Define trait type
-type TravelTrait = {
+interface TravelTrait {
   id: string;
   label: string;
-};
-
-// Define interest type
-type Interest = {
-  id: string;
-  label: string;
-};
+}
 
 const CreateProfile: React.FC = () => {
-  const toast = useToast();
+  const [location, navigate] = useLocation();
+  const isEditMode = location === "/profile/edit";
+  const isDemoMode = !isEditMode; // Consider any new profile creation as demo mode
   
-  // Get location and check if we're in edit mode
-  const [location, navigate] = useLocation();  
-  const isEditMode = location.includes("/edit-profile");
+  // Import Emily's profile image directly
+  // For the demo, we'll use a placeholder that will be replaced
+  // with the right image when you click the profile section
   
-  // Get existing profile data if in edit mode
-  const existingProfile = isEditMode 
-    ? JSON.parse(localStorage.getItem('splitstay_profile') || '{}')
-    : null;
+  // Emily's demo data for the MVP video
+  const emilyData = {
+    fullName: "Emily Zhang",
+    bio: "Spontaneous traveler who loves exploring new cities. Always looking for authentic experiences and meeting new people!",
+    dateOfBirth: new Date(1998, 5, 12), // June 12, 1998 
+    travelReason: "leisure" as const,
+    languages: ["English", "Mandarin"],
+    profileImage: "/images/emily-profile.png", // Emily's profile photo
+    traits: ["Early bird", "Adventurous", "Clean", "Foodie"],
+    interests: ["Photography", "Hiking", "Local cuisine", "Architecture"]
+  };
+  
+  // Pre-fill data based on mode
+  const defaultUserData = isEditMode ? {
+    fullName: "Alina Chen",
+    bio: "Spontaneous traveler who enjoys quiet time. Love exploring new cities and making memories!",
+    dateOfBirth: new Date(2002, 0, 15), // Jan 15, 2002 for age 23
+    travelReason: "leisure" as const,
+    languages: ["English", "German"],
+    profileImage: "https://i.pravatar.cc/150?img=31",
+    traits: ["Early bird", "Quiet", "Clean", "Budget-conscious"],
+    interests: ["Photography", "Hiking", "Food", "Museums"]
+  } : isDemoMode ? emilyData : null;
   
   // Personal info states - use Emily's data for demo mode
-  const [name, setName] = useState(existingProfile?.name || "");
-  const [bio, setBio] = useState(existingProfile?.bio || "");
-  const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>(
-    existingProfile?.dateOfBirth ? new Date(existingProfile.dateOfBirth) : undefined
-  );
-  const [travelReason, setTravelReason] = useState<"leisure" | "business" | "bleisure">(
-    existingProfile?.travelReason || "leisure"
-  );
-  const [profileImage, setProfileImage] = useState<string | undefined>(
-    existingProfile?.profileImage
-  );
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(
-    existingProfile?.languages || []
-  );
-  const [selectedTraits, setSelectedTraits] = useState<string[]>(
-    existingProfile?.traits || []
-  );
-  const [selectedInterests, setSelectedInterests] = useState<string[]>(
-    existingProfile?.interests || []
-  );
+  const [name, setName] = useState(defaultUserData?.fullName || "");
+  const [bio, setBio] = useState(defaultUserData?.bio || "");
+  const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>(defaultUserData?.dateOfBirth);
+  const [travelReason, setTravelReason] = useState<"leisure" | "business">(defaultUserData?.travelReason || "leisure");
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(defaultUserData?.languages || []);
+  const [profileImage, setProfileImage] = useState<string | null>(defaultUserData?.profileImage || null);
   
-  // Handle image upload
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  // Travel traits
+  const [selectedTraits, setSelectedTraits] = useState<string[]>(defaultUserData?.traits || []);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>(defaultUserData?.interests || []);
+  
+  // Handle profile image upload
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -79,18 +87,16 @@ const CreateProfile: React.FC = () => {
       reader.readAsDataURL(file);
     } else {
       // For the MVP demo, automatically set Emily's profile image
-      const emilyImageUrl = "/emily.png";
+      const emilyImageUrl = "/images/emily-profile.png";
       setProfileImage(emilyImageUrl);
     }
   };
   
   // Set demo image for Emily's profile
   const setDemoProfileImage = () => {
-    // Using hardcoded data URI to guarantee the image loads
-    const emilyImageUrl = "https://res.cloudinary.com/demo/image/fetch/https://xsgames.co/randomusers/assets/avatars/female/43.jpg";
+    // Using Emily's image from public folder
+    const emilyImageUrl = "/images/emily-profile.png";
     setProfileImage(emilyImageUrl);
-    // Also set the name to Emily for demo purposes
-    setName("Emily Zhang");
   };
 
   // Predefined values
@@ -141,22 +147,36 @@ const CreateProfile: React.FC = () => {
     // Social style
     { id: "quiet_time", label: "Quiet Time" },
     { id: "street_food", label: "Street Food" },
+  ];
+  
+  // Complete list of travel traits for search (organized by related pairs)
+  const allTravelTraits: TravelTrait[] = [
+    // Planning style
+    { id: "planner", label: "Planner" },
+    { id: "spontaneous", label: "Spontaneous" },
     
-    // Exploration style
-    { id: "tourist", label: "Tourist" },
-    { id: "local_experience", label: "Local Experience" },
+    // Activity level
+    { id: "adventure_seeker", label: "Adventure Seeker" },
+    { id: "relaxed", label: "Relaxed" },
     
-    // Spending habits
-    { id: "budget_conscious", label: "Budget Conscious" },
-    { id: "luxury_traveler", label: "Luxury Traveler" },
+    // Sleep schedule
+    { id: "early_bird", label: "Early Bird" },
+    { id: "night_owl", label: "Night Owl" },
     
-    // Culinary preferences
+    // Social style
+    { id: "quiet_time", label: "Quiet Time" },
+    { id: "chatterbox", label: "Chatterbox" },
+    { id: "party_animal", label: "Party Animal" },
+    { id: "social_butterfly", label: "Social Butterfly" },
+    
+    // Food preferences
+    { id: "street_food", label: "Street Food" },
+    { id: "fine_dining", label: "Fine Dining" },
     { id: "foodie", label: "Foodie" },
-    { id: "picky_eater", label: "Picky Eater" },
     
-    // Planning intensity
-    { id: "scheduler", label: "Scheduler" },
-    { id: "go_with_flow", label: "Go with the Flow" },
+    // Drink preferences
+    { id: "coffee_lover", label: "Coffee Lover" },
+    { id: "tea_enthusiast", label: "Tea Enthusiast" },
     
     // Location preferences
     { id: "nature_lover", label: "Nature Lover" },
@@ -258,26 +278,28 @@ const CreateProfile: React.FC = () => {
           {/* Profile Picture */}
           <div className="flex flex-col items-center mb-2">
             <p className="text-sm font-medium text-center mb-2">Add Profile Photo</p>
-            <div 
-              className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-3 relative overflow-hidden hover:opacity-90 transition-opacity border-2 border-dashed border-navy cursor-pointer"
-              onClick={setDemoProfileImage} 
-            >
-              {profileImage ? (
-                <img 
-                  src={profileImage} 
-                  alt="Profile" 
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="flex flex-col items-center justify-center">
-                  <Plus className="w-8 h-8 text-navy" />
-                  <span className="text-xs text-navy font-medium">Upload</span>
+            <label htmlFor="profile-upload" className="cursor-pointer">
+              <div 
+                className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-3 relative overflow-hidden hover:opacity-90 transition-opacity border-2 border-dashed border-navy"
+                onClick={setDemoProfileImage} // Added for demo to auto-set Emily's photo on click
+              >
+                {profileImage ? (
+                  <img 
+                    src={profileImage} 
+                    alt="Profile" 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center">
+                    <Plus className="w-8 h-8 text-navy" />
+                    <span className="text-xs text-navy font-medium">Upload</span>
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                  <span className="text-white text-xs font-medium">Change photo</span>
                 </div>
-              )}
-              <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                <span className="text-white text-xs font-medium">Change photo</span>
               </div>
-            </div>
+            </label>
             <input 
               type="file" 
               id="profile-upload" 
@@ -296,367 +318,486 @@ const CreateProfile: React.FC = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Jane"
-              className="border-gray-300"
+              className="w-full border-gray-300"
             />
           </div>
-          
+
           {/* Bio */}
           <div>
-            <label className="block text-navy font-medium mb-1">Tell us about yourself</label>
+            <label className="block text-navy font-medium mb-1">What makes you feel alive?</label>
             <Textarea 
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              placeholder="I love hiking, exploring, and catching sunrises"
-              className="border-gray-300 resize-none min-h-[100px]"
+              placeholder="Love hiking, exploring, and catching sunrises"
+              className="w-full border-gray-300 min-h-[100px]"
             />
           </div>
-          
-          {/* Date of Birth */}
+
+          {/* Date of Birth - Improved with separate select fields */}
           <div>
-            <label className="block text-navy font-medium mb-1">Date of birth</label>
-            <Input 
-              type="text"
-              placeholder="1998-06-12"
-              value={dateOfBirth ? dateOfBirth.toISOString().split('T')[0] : ''}
-              onChange={(e) => {
-                try {
-                  const date = new Date(e.target.value);
-                  setDateOfBirth(date);
-                } catch (error) {
-                  console.error("Invalid date format");
-                }
-              }}
-              className="border-gray-300"
-            />
-            {dateOfBirth && (
-              <div className="text-sm text-gray-500 mt-1">
-                Birth date: {dateOfBirth.toLocaleDateString()}
-              </div>
-            )}
+            <label className="block text-navy font-medium mb-1">Date of Birth</label>
+            <div className="flex gap-2">
+              {/* Day Select */}
+              <select
+                value={dateOfBirth ? dateOfBirth.getDate() : ""}
+                onChange={(e) => {
+                  const day = parseInt(e.target.value);
+                  const newDate = dateOfBirth ? new Date(dateOfBirth) : new Date();
+                  newDate.setDate(day);
+                  setDateOfBirth(newDate);
+                }}
+                className="px-3 py-2 rounded-md border border-gray-300 flex-1"
+                aria-label="Day"
+              >
+                <option value="" disabled>Day</option>
+                {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+                  <option key={`day-${day}`} value={day}>{day}</option>
+                ))}
+              </select>
+              
+              {/* Month Select */}
+              <select
+                value={dateOfBirth ? dateOfBirth.getMonth() : ""}
+                onChange={(e) => {
+                  const month = parseInt(e.target.value);
+                  const newDate = dateOfBirth ? new Date(dateOfBirth) : new Date();
+                  newDate.setMonth(month);
+                  setDateOfBirth(newDate);
+                }}
+                className="px-3 py-2 rounded-md border border-gray-300 flex-1"
+                aria-label="Month"
+              >
+                <option value="" disabled>Month</option>
+                {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map((month, index) => (
+                  <option key={`month-${month}`} value={index}>{month}</option>
+                ))}
+              </select>
+              
+              {/* Year Select */}
+              <select
+                value={dateOfBirth ? dateOfBirth.getFullYear() : ""}
+                onChange={(e) => {
+                  const year = parseInt(e.target.value);
+                  const newDate = dateOfBirth ? new Date(dateOfBirth) : new Date();
+                  newDate.setFullYear(year);
+                  setDateOfBirth(newDate);
+                }}
+                className="px-3 py-2 rounded-md border border-gray-300 flex-1"
+                aria-label="Year"
+              >
+                <option value="" disabled>Year</option>
+                {Array.from({ length: 80 }, (_, i) => new Date().getFullYear() - i).map(year => (
+                  <option key={`year-${year}`} value={year}>{year}</option>
+                ))}
+              </select>
+            </div>
+            <p className="text-xs text-gray-500 mt-1">Must be at least 18 years old</p>
           </div>
-          
+
           {/* Travel Reason */}
           <div>
-            <label className="block text-navy font-medium mb-1">I usually travel for</label>
-            <RadioGroup 
-              value={travelReason} 
-              onValueChange={(value) => setTravelReason(value as "leisure" | "business" | "bleisure")}
-              className="flex gap-4 mt-2"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="leisure" id="leisure" />
-                <Label htmlFor="leisure">Leisure</Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="business" id="business" />
-                <Label htmlFor="business">Business</Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="bleisure" id="bleisure" />
-                <Label htmlFor="bleisure">Bleisure</Label>
-              </div>
-            </RadioGroup>
-          </div>
-        </div>
-        
-        {/* Right Column - Languages & Traits */}
-        <div>
-          {/* Languages */}
-          <div className="bg-white rounded-lg p-5 mb-5">
-            <div className="flex justify-between items-center mb-3">
-              <label className="block text-navy font-medium">Languages you speak</label>
+            <label className="block text-navy font-medium mb-1">Reason for Travel</label>
+            <div className="flex w-full rounded-md overflow-hidden">
               <Button 
-                variant="outline" 
-                size="sm" 
-                className="text-xs"
-                onClick={() => {
-                  setTempSelectedLanguages([...selectedLanguages]);
-                  setLanguageDialogOpen(true);
-                }}
+                type="button"
+                className={`flex-1 rounded-none hover:bg-accent hover:text-accent-foreground hover:border-accent ${travelReason === 'leisure' 
+                  ? 'bg-yellow-100 text-gray-800 border border-yellow-300' 
+                  : 'bg-white text-navy border border-gray-300'}`}
+                onClick={() => setTravelReason('leisure')}
               >
-                Add More
+                Leisure
+              </Button>
+              <Button 
+                type="button"
+                className={`flex-1 rounded-none hover:bg-accent hover:text-accent-foreground hover:border-accent ${travelReason === 'business' 
+                  ? 'bg-yellow-100 text-gray-800 border border-yellow-300' 
+                  : 'bg-white text-navy border border-gray-300'}`}
+                onClick={() => setTravelReason('business')}
+              >
+                Business
               </Button>
             </div>
-            
-            {selectedLanguages.length === 0 ? (
-              <div className="text-sm text-gray-500 italic">
-                Select languages you speak
-              </div>
-            ) : (
-              <div className="flex flex-wrap gap-2">
-                {selectedLanguages.map(language => (
-                  <Badge 
+          </div>
+
+          {/* Languages */}
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <label className="block text-navy font-medium">Languages</label>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button size="sm" variant="outline" className="h-8 px-2" onClick={() => {
+                    // Initialize temporary selected languages with current selections when opening the dialog
+                    setTempSelectedLanguages([...selectedLanguages]);
+                    setLanguageSearch("");
+                  }}>
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add Languages</DialogTitle>
+                    <DialogDescription>
+                      Search and select languages you speak. Click Confirm when done.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="relative mb-4">
+                    <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input 
+                      className="pl-10" 
+                      placeholder="Search languages" 
+                      value={languageSearch}
+                      onChange={(e) => setLanguageSearch(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex flex-wrap gap-2 max-h-60 overflow-y-auto mb-4">
+                    {allLanguages
+                      .filter(lang => 
+                        lang.toLowerCase().includes(languageSearch.toLowerCase()) &&
+                        !tempSelectedLanguages.includes(lang)
+                      )
+                      .map((lang) => (
+                        <Button 
+                          key={lang} 
+                          variant="outline" 
+                          className="py-1 px-3"
+                          onClick={() => {
+                            if (!tempSelectedLanguages.includes(lang)) {
+                              setTempSelectedLanguages([...tempSelectedLanguages, lang]);
+                              setLanguageSearch(""); // Clear search after selection
+                            }
+                          }}
+                        >
+                          {lang}
+                        </Button>
+                      ))
+                    }
+                  </div>
+                  
+                  {tempSelectedLanguages.length > 0 && (
+                    <div className="border-t pt-3 mb-3">
+                      <p className="text-sm font-medium mb-2">Selected languages:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {tempSelectedLanguages.map(lang => (
+                          <Badge 
+                            key={lang}
+                            className="bg-yellow-100 text-gray-800 border border-yellow-300 px-2 py-1"
+                          >
+                            {lang}
+                            <button 
+                              className="ml-1 text-gray-500 hover:text-gray-800"
+                              onClick={() => setTempSelectedLanguages(
+                                tempSelectedLanguages.filter(l => l !== lang)
+                              )}
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <DialogFooter className="flex justify-between sm:justify-end gap-2">
+                    <DialogClose asChild>
+                      <Button variant="outline" className="flex-1 sm:flex-none">Cancel</Button>
+                    </DialogClose>
+                    <DialogClose asChild>
+                      <Button
+                        type="button"
+                        style={{
+                          backgroundColor: "#001F3F", 
+                          color: "white",
+                          flex: "1 1 auto"
+                        }}
+                        onClick={() => {
+                          // Apply the temporary selections to the actual selections
+                          setSelectedLanguages(tempSelectedLanguages);
+                          
+                          // Show success notification
+                          toast({
+                            title: "Languages updated",
+                            description: `${tempSelectedLanguages.length} languages selected`,
+                          });
+                        }}
+                      >
+                        Confirm Selection
+                      </Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {selectedLanguages.length > 0 ? (
+                selectedLanguages.map((language) => (
+                  <button
                     key={language}
-                    className="bg-secondary-light text-primary hover:bg-secondary/80 cursor-pointer flex items-center gap-1 px-3 py-1.5"
+                    type="button"
+                    className="py-2 px-4 rounded-full text-sm transition-colors bg-yellow-100 text-gray-800 border border-yellow-300"
                     onClick={() => toggleLanguage(language)}
                   >
                     {language}
-                    <X size={14} className="ml-1" />
-                  </Badge>
-                ))}
-              </div>
-            )}
+                  </button>
+                ))
+              ) : (
+                languages.map((language) => (
+                  <button
+                    key={language}
+                    type="button"
+                    className="py-2 px-4 rounded-full text-sm transition-colors bg-white border border-gray-300 text-gray-700 hover:border-yellow-300"
+                    onClick={() => toggleLanguage(language)}
+                  >
+                    {language}
+                  </button>
+                ))
+              )}
+            </div>
           </div>
-          
+        </div>
+
+        {/* Right Column - Traits */}
+        <div className="flex flex-col gap-5">
           {/* Travel Traits */}
           <div className="bg-white rounded-lg p-5">
             <div className="flex justify-between items-center mb-3">
-              <label className="block text-navy font-medium">Your travel traits</label>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="text-xs"
-                onClick={() => {
-                  setTempSelectedTraits([...selectedTraits]);
-                  setTraitDialogOpen(true);
-                }}
-              >
-                Add More
-              </Button>
+              <h3 className="text-xl font-medium text-navy">Travel Traits</h3>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button size="sm" variant="outline" className="h-8 px-2">
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add Travel Traits</DialogTitle>
+                  </DialogHeader>
+                  <div className="relative mb-4">
+                    <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input 
+                      className="pl-10" 
+                      placeholder="Search traits" 
+                      value={traitSearch}
+                      onChange={(e) => setTraitSearch(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex flex-wrap gap-2 max-h-60 overflow-y-auto mb-4">
+                    {allTravelTraits
+                      .filter(trait => 
+                        trait.label.toLowerCase().includes(traitSearch.toLowerCase()) &&
+                        !tempSelectedTraits.includes(trait.id)
+                      )
+                      .map((trait) => (
+                        <Button 
+                          key={trait.id} 
+                          variant="outline" 
+                          className="py-1 px-3"
+                          onClick={() => {
+                            if (!tempSelectedTraits.includes(trait.id)) {
+                              setTempSelectedTraits([...tempSelectedTraits, trait.id]);
+                              setTraitSearch(""); // Clear search after selection
+                            }
+                          }}
+                        >
+                          {trait.label}
+                        </Button>
+                      ))
+                    }
+                  </div>
+                  
+                  {tempSelectedTraits.length > 0 && (
+                    <div className="border-t pt-3 mb-3">
+                      <p className="text-sm font-medium mb-2">Selected traits:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {tempSelectedTraits.map(traitId => {
+                          const trait = allTravelTraits.find(t => t.id === traitId);
+                          return trait ? (
+                            <Badge 
+                              key={trait.id}
+                              className="bg-yellow-100 text-gray-800 border border-yellow-300 px-2 py-1"
+                            >
+                              {trait.label}
+                              <button 
+                                className="ml-1 text-gray-500 hover:text-gray-800"
+                                onClick={() => setTempSelectedTraits(
+                                  tempSelectedTraits.filter(id => id !== trait.id)
+                                )}
+                              >
+                                ×
+                              </button>
+                            </Badge>
+                          ) : null;
+                        })}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <DialogFooter className="flex justify-between sm:justify-end gap-2">
+                    <DialogClose asChild>
+                      <Button variant="outline" className="flex-1 sm:flex-none">Cancel</Button>
+                    </DialogClose>
+                    <DialogClose asChild>
+                      <Button
+                        type="button"
+                        style={{
+                          backgroundColor: "#001F3F", 
+                          color: "white",
+                          flex: "1 1 auto"
+                        }}
+                        onClick={() => {
+                          // Apply the temporary selections to the actual selections
+                          setSelectedTraits(tempSelectedTraits);
+                          
+                          // Show success notification
+                          toast({
+                            title: "Travel traits updated",
+                            description: `${tempSelectedTraits.length} traits selected`,
+                          });
+                        }}
+                      >
+                        Confirm Selection
+                      </Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
-            
-            {selectedTraits.length === 0 ? (
-              <div className="text-sm text-gray-500 italic mb-3">
-                Select traits that describe your travel style
-              </div>
-            ) : (
-              <div className="flex flex-wrap gap-2 mb-3">
-                {selectedTraits.map(traitId => {
-                  const trait = travelTraits.find(t => t.id === traitId);
+            <div className="flex flex-wrap gap-2">
+              {selectedTraits.length > 0 ? (
+                // Display selected traits
+                selectedTraits.map(traitId => {
+                  const trait = allTravelTraits.find(t => t.id === traitId);
                   return trait ? (
-                    <Badge 
+                    <button
                       key={trait.id}
-                      className="bg-secondary-light text-primary hover:bg-secondary/80 cursor-pointer flex items-center gap-1 px-3 py-1.5"
+                      type="button"
+                      className="py-2 px-4 rounded-full text-sm transition-colors bg-yellow-100 text-gray-800 border border-yellow-300"
                       onClick={() => toggleTrait(trait.id)}
                     >
                       {trait.label}
-                      <X size={14} className="ml-1" />
-                    </Badge>
+                    </button>
                   ) : null;
-                })}
-              </div>
-            )}
-            
-            {/* Most Common Traits Quick Selection */}
-            <div>
-              <p className="text-sm text-gray-500 mb-2">Quick add popular traits:</p>
-              <div className="flex flex-wrap gap-2">
-                {travelTraits.slice(0, 8).map(trait => (
-                  <Badge 
+                })
+              ) : (
+                // If no traits are selected, show default traits
+                travelTraits.map((trait) => (
+                  <button
                     key={trait.id}
-                    variant={selectedTraits.includes(trait.id) ? "default" : "outline"}
-                    className={cn(
-                      "cursor-pointer px-3 py-1.5",
-                      selectedTraits.includes(trait.id) 
-                        ? "bg-primary hover:bg-primary/80" 
-                        : "hover:bg-gray-100"
-                    )}
+                    type="button"
+                    className="py-2 px-4 rounded-full text-sm transition-colors bg-white border border-gray-300 text-gray-700 hover:border-yellow-300"
                     onClick={() => toggleTrait(trait.id)}
                   >
                     {trait.label}
-                  </Badge>
-                ))}
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+          
+          {/* ID Verification Section - Moved below travel traits */}
+          <div className="bg-white rounded-lg p-5 mt-5">
+            <div className="flex items-center mb-2">
+              <ShieldCheck className="h-5 w-5 text-green-600 mr-2" />
+              <h3 className="text-lg font-semibold text-navy">ID Verification</h3>
+            </div>
+            <p className="text-sm text-gray-700 mb-3">
+              To host or be hosted, SplitStay requires a one-time ID verification.
+              Your info is encrypted and never shared.
+            </p>
+            <div className="flex flex-col space-y-3">
+              <div className="flex items-center text-sm">
+                <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
+                <span>Email verified</span>
+              </div>
+              <div className="flex items-center text-sm">
+                <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
+                <span>Phone verified</span>
+              </div>
+              <div className="flex items-center text-sm">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <span className="inline-block">
+                      <Button 
+                        variant="outline" 
+                        className="text-sm py-1 h-auto border-primary text-primary hover:bg-primary hover:text-white"
+                        size="sm"
+                      >
+                        <CreditCard className="h-3 w-3 mr-1" />
+                        Verify ID Document
+                      </Button>
+                    </span>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Verify Your Identity</DialogTitle>
+                      <DialogDescription>
+                        This helps build trust in the SplitStay community. Your ID is never shared with other users.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-2">
+                      <div className="flex items-center justify-center p-4 border-2 border-dashed rounded-lg border-gray-300">
+                        <div className="text-center">
+                          <CreditCard className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                          <p className="text-sm font-medium">Upload a government ID</p>
+                          <p className="text-xs text-gray-500 mt-1">Passport, driver's license, or national ID card</p>
+                          <Button size="sm" className="mt-3 bg-primary text-white">Select File</Button>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Verification Steps:</label>
+                        <div className="flex items-center text-sm mb-1">
+                          <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
+                          <span>Upload your ID document</span>
+                        </div>
+                        <div className="flex items-center text-sm mb-1">
+                          <div className="h-4 w-4 rounded-full border border-gray-300 mr-2" />
+                          <span className="text-gray-600">Take a selfie to confirm it's you</span>
+                        </div>
+                        <div className="flex items-center text-sm">
+                          <div className="h-4 w-4 rounded-full border border-gray-300 mr-2" />
+                          <span className="text-gray-600">Wait for verification (typically 24 hours)</span>
+                        </div>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" className="w-full sm:w-auto">Cancel</Button>
+                      <Button className="w-full sm:w-auto bg-primary text-white">
+                        Continue Verification
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+                <span className="ml-2 text-xs text-gray-500">Required for safety</span>
               </div>
             </div>
           </div>
         </div>
       </div>
       
-      {/* Action Buttons */}
-      <div className="mt-8 flex gap-3 justify-center">
-        {!isEditMode && (
-          <Button
-            variant="outline"
-            onClick={handleSkip}
-            className="min-w-[120px]"
-          >
-            Skip for now
-          </Button>
-        )}
-        <Button
-          onClick={handleCreateProfile}
-          className="bg-primary hover:bg-primary/90 text-white min-w-[120px]"
+      {/* Bottom Buttons */}
+      <div className="grid grid-cols-2 gap-4 mt-8">
+        <Button 
+          variant="outline"
+          className="py-4 text-lg border-navy text-navy"
+          onClick={() => navigate(isEditMode ? "/profile" : "/")}
         >
-          {isEditMode ? "Save changes" : "Create profile"}
+          {isEditMode ? "Cancel" : "Skip for Now"}
+        </Button>
+        <Button 
+          type="button"
+          style={{
+            backgroundColor: "#001F3F", 
+            color: "white",
+            padding: "1rem 1.5rem",
+            fontSize: "1.125rem",
+            fontWeight: "500"
+          }}
+          onClick={handleCreateProfile}
+        >
+          {isEditMode ? "Save Changes" : "Continue"}
         </Button>
       </div>
-      
-      {/* Language Selection Dialog */}
-      <Dialog open={languageDialogOpen} onOpenChange={setLanguageDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Select Languages</DialogTitle>
-          </DialogHeader>
-          <Command className="rounded-lg border shadow-md">
-            <CommandInput 
-              placeholder="Search languages..." 
-              value={languageSearch}
-              onValueChange={setLanguageSearch}
-            />
-            <CommandEmpty>No language found.</CommandEmpty>
-            <div className="max-h-[300px] overflow-y-auto">
-              <CommandGroup>
-                {allLanguages
-                  .filter(language => 
-                    language.toLowerCase().includes(languageSearch.toLowerCase())
-                  )
-                  .map(language => (
-                    <CommandItem
-                      key={language}
-                      onSelect={() => {
-                        if (tempSelectedLanguages.includes(language)) {
-                          setTempSelectedLanguages(
-                            tempSelectedLanguages.filter(l => l !== language)
-                          );
-                        } else {
-                          if (tempSelectedLanguages.length < MAX_LANGUAGES) {
-                            setTempSelectedLanguages([...tempSelectedLanguages, language]);
-                          } else {
-                            toast({
-                              title: "Maximum languages reached",
-                              description: `You can select up to ${MAX_LANGUAGES} languages.`,
-                              variant: "destructive"
-                            });
-                          }
-                        }
-                      }}
-                      className="flex items-center gap-2 px-4 py-2 cursor-pointer"
-                    >
-                      <div className={cn(
-                        "flex h-5 w-5 items-center justify-center rounded-full border",
-                        tempSelectedLanguages.includes(language)
-                          ? "border-primary bg-primary text-white"
-                          : "border-gray-300"
-                      )}>
-                        {tempSelectedLanguages.includes(language) && (
-                          <Check className="h-3 w-3 text-current" />
-                        )}
-                      </div>
-                      <span>{language}</span>
-                    </CommandItem>
-                  ))}
-              </CommandGroup>
-            </div>
-          </Command>
-          <div className="flex flex-wrap gap-2 mt-2">
-            {tempSelectedLanguages.map(language => (
-              <Badge 
-                key={language}
-                className="px-3 py-1.5 bg-secondary-light text-primary"
-              >
-                {language}
-              </Badge>
-            ))}
-          </div>
-          <DialogFooter className="mt-4">
-            <Button
-              variant="outline"
-              onClick={() => setLanguageDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() => {
-                setSelectedLanguages(tempSelectedLanguages);
-                setLanguageDialogOpen(false);
-              }}
-            >
-              Save
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      {/* Trait Selection Dialog */}
-      <Dialog open={traitDialogOpen} onOpenChange={setTraitDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Select Travel Traits</DialogTitle>
-          </DialogHeader>
-          <Command className="rounded-lg border shadow-md">
-            <CommandInput 
-              placeholder="Search traits..." 
-              value={traitSearch}
-              onValueChange={setTraitSearch}
-            />
-            <CommandEmpty>No trait found.</CommandEmpty>
-            <div className="max-h-[300px] overflow-y-auto">
-              <CommandGroup>
-                {travelTraits
-                  .filter(trait => 
-                    trait.label.toLowerCase().includes(traitSearch.toLowerCase())
-                  )
-                  .map(trait => (
-                    <CommandItem
-                      key={trait.id}
-                      onSelect={() => {
-                        if (tempSelectedTraits.includes(trait.id)) {
-                          setTempSelectedTraits(
-                            tempSelectedTraits.filter(id => id !== trait.id)
-                          );
-                        } else {
-                          if (tempSelectedTraits.length < MAX_TRAITS) {
-                            setTempSelectedTraits([...tempSelectedTraits, trait.id]);
-                          } else {
-                            toast({
-                              title: "Maximum traits reached",
-                              description: `You can select up to ${MAX_TRAITS} traits.`,
-                              variant: "destructive"
-                            });
-                          }
-                        }
-                      }}
-                      className="flex items-center gap-2 px-4 py-2 cursor-pointer"
-                    >
-                      <div className={cn(
-                        "flex h-5 w-5 items-center justify-center rounded-full border",
-                        tempSelectedTraits.includes(trait.id)
-                          ? "border-primary bg-primary text-white"
-                          : "border-gray-300"
-                      )}>
-                        {tempSelectedTraits.includes(trait.id) && (
-                          <Check className="h-3 w-3 text-current" />
-                        )}
-                      </div>
-                      <span>{trait.label}</span>
-                    </CommandItem>
-                  ))}
-              </CommandGroup>
-            </div>
-          </Command>
-          <div className="flex flex-wrap gap-2 mt-2">
-            {tempSelectedTraits.map(traitId => {
-              const trait = travelTraits.find(t => t.id === traitId);
-              return trait ? (
-                <Badge 
-                  key={trait.id}
-                  className="px-3 py-1.5 bg-secondary-light text-primary"
-                >
-                  {trait.label}
-                </Badge>
-              ) : null;
-            })}
-          </div>
-          <DialogFooter className="mt-4">
-            <Button
-              variant="outline"
-              onClick={() => setTraitDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() => {
-                setSelectedTraits(tempSelectedTraits);
-                setTraitDialogOpen(false);
-              }}
-            >
-              Save
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
