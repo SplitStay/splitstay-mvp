@@ -43,7 +43,7 @@ const CreateProfile: React.FC = () => {
   // Emily's demo data for the MVP video
   const emilyData = {
     fullName: "Emily Zhang",
-    bio: "Spontaneous traveler who loves exploring new cities. Always looking for authentic experiences and meeting new people!",
+    bio: "Discovering hidden local spots in new cities and capturing sunrise moments with my camera. Nothing beats the feeling of getting lost in a new place and stumbling upon something amazing!",
     dateOfBirth: new Date(1998, 5, 12), // June 12, 1998 
     travelReason: "leisure" as const,
     languages: ["English", "Mandarin"],
