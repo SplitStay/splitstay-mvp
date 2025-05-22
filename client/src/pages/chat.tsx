@@ -43,15 +43,27 @@ const Chat: React.FC<ChatProps> = ({ params }) => {
     }
   });
   
-  // Fetch messages
-  const { data: messages, isLoading: isLoadingMessages } = useQuery({
+  // Use custom message data instead of fetching from API
+  const { isLoading: isLoadingMessages } = useQuery({
     queryKey: [`/api/messages/booking/${bookingId}`],
     queryFn: async () => {
       const res = await fetch(`/api/messages/booking/${bookingId}`);
       if (!res.ok) throw new Error('Failed to fetch messages');
       return res.json() as Promise<Message[]>;
-    }
+    },
+    enabled: false // Disable this query as we're using custom messages
   });
+  
+  // Custom messages for the promovideo storyboard
+  const messages = [
+    {
+      id: 1,
+      bookingId: 1,
+      senderId: 1, // Amara
+      content: "Hi Sophie! Looking forward to our trip! 😊 Would you like to coordinate arrival times?",
+      createdAt: new Date(Date.now() - 3600000) // 1 hour ago
+    }
+  ];
   
   // Send message mutation
   const sendMessageMutation = useMutation({
