@@ -681,7 +681,7 @@ const CreateProfile: React.FC = () => {
             </div>
             {/* Common quick-select trait options */}
             <div className="flex flex-wrap gap-2 mb-4">
-              {["Early Bird", "Night Owl", "Adventurous", "Relaxed", "Foodie", "Budget-conscious"].map((label) => {
+              {["Early Bird", "Night Owl", "Adventurous", "Relaxed", "Foodie", "Budget-conscious", "Clean", "Social", "Quiet", "Nature Lover"].map((label) => {
                 const trait = allTravelTraits.find(t => t.label === label);
                 const traitId = trait ? trait.id : label.toLowerCase().replace(/\s+/g, '_');
                 const isSelected = selectedTraits.includes(traitId);
