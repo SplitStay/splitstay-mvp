@@ -277,33 +277,6 @@ const Chat: React.FC<ChatProps> = ({ params }) => {
             <Send className="h-5 w-5" />
           </Button>
         </div>
-        <div className="flex justify-between mt-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-primary font-medium text-sm"
-            onClick={handleDownloadConfirmation}
-          >
-            <svg className="mr-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            Download Confirmation
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-primary font-medium text-sm"
-            onClick={handleViewBookingDetails}
-          >
-            <svg className="mr-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-              <circle cx="12" cy="12" r="3" />
-            </svg>
-            View Booking Details
-          </Button>
-        </div>
       </div>
     </div>
   );
