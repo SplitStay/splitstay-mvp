@@ -75,15 +75,26 @@ const RoommateCard: React.FC<RoommateCardProps> = ({
       >
         <CardContent className="p-4">
           <div className="flex items-center space-x-3">
-            <UserAvatar
-              user={{
-                fullName: profile.fullName,
-                profilePicture: profile.profilePicture,
-                isVerified: profile.isVerified,
-              }}
-              size="lg"
-              showVerified={false}
-            />
+            {/* Special handling for Maya's profile */}
+            {profile.fullName === "Maya" ? (
+              <div className="h-16 w-16 rounded-full overflow-hidden">
+                <img 
+                  src="https://i.pravatar.cc/300?img=37" 
+                  alt="Maya" 
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            ) : (
+              <UserAvatar
+                user={{
+                  fullName: profile.fullName,
+                  profilePicture: profile.profilePicture,
+                  isVerified: profile.isVerified,
+                }}
+                size="lg"
+                showVerified={false}
+              />
+            )}
             
             <div className="flex-1">
               <div className="flex justify-between">
