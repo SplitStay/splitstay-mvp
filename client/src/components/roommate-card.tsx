@@ -75,12 +75,12 @@ const RoommateCard: React.FC<RoommateCardProps> = ({
       >
         <CardContent className="p-4">
           <div className="flex items-center space-x-3">
-            {/* Special handling for Maya's profile */}
-            {profile.fullName === "Maya" ? (
+            {/* Special handling for Amara's profile */}
+            {profile.fullName === "Amara" ? (
               <div className="h-16 w-16 rounded-full overflow-hidden">
                 <img 
-                  src="https://i.pravatar.cc/300?img=37" 
-                  alt="Maya" 
+                  src="/amara-profile.png" 
+                  alt="Amara" 
                   className="h-full w-full object-cover"
                 />
               </div>

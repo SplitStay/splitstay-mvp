@@ -110,7 +110,7 @@ const BrowseProfiles: React.FC = () => {
   const defaultProfiles: UserProfile[] = [
     {
       id: "1",
-      firstName: "Maya",
+      firstName: "Amara",
       lastName: "",
       email: "maya@example.com",
       username: "maya",
