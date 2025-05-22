@@ -74,7 +74,7 @@ const RateRoommate: React.FC<RateRoommateProps> = ({ params }) => {
         title: "Review submitted",
         description: "Thank you for your feedback!",
       });
-      navigate(`/post-stay/${bookingId}`);
+      navigate(`/souvenir-review`);
     },
     onError: (error) => {
       toast({
