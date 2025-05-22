@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import amaraProfilePic from "../assets/amara-profile.png";
 
 const BrowseProfiles: React.FC = () => {
   const [_, navigate] = useLocation();
@@ -76,11 +77,11 @@ const BrowseProfiles: React.FC = () => {
   const defaultProfiles: DemoProfile[] = [
     {
       id: 1,
-      fullName: "Maya",
-      email: "maya@example.com",
-      username: "maya",
+      fullName: "Amara",
+      email: "amara@example.com",
+      username: "amara",
       password: "password",
-      profilePicture: "/images/maya-profile.png",
+      profilePicture: amaraProfilePic,
       bio: "Adventure seeker passionate about different cultures",
       age: "25",
       gender: "female",
