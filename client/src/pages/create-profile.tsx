@@ -47,7 +47,7 @@ const CreateProfile: React.FC = () => {
     dateOfBirth: new Date(1998, 5, 12), // June 12, 1998 
     travelReason: "leisure" as const,
     languages: ["English", "Mandarin"],
-    profileImage: "/images/emily-profile-new.png", // Emily's profile photo
+    profileImage: "/images/emily-profile.png", // Emily's profile photo
     traits: ["Early bird", "Adventurous", "Clean", "Foodie"],
     interests: ["Photography", "Hiking", "Local cuisine", "Architecture"]
   };
