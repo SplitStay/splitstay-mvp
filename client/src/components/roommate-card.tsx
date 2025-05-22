@@ -75,30 +75,21 @@ const RoommateCard: React.FC<RoommateCardProps> = ({
       >
         <CardContent className="p-4">
           <div className="flex items-center space-x-3">
-            {/* Special handling for Amara's profile */}
-            {profile.firstName === "Amara" ? (
-              <div className="h-16 w-16 rounded-full overflow-hidden">
-                <img 
-                  src="/amara-profile.png" 
-                  alt="Amara" 
-                  className="h-full w-full object-cover"
-                />
-              </div>
-            ) : (
-              <UserAvatar
-                user={{
-                  fullName: profile.fullName,
-                  profilePicture: profile.profilePicture,
-                  isVerified: profile.isVerified,
-                }}
-                size="lg"
-                showVerified={false}
-              />
-            )}
+            <UserAvatar
+              user={{
+                fullName: profile.fullName || profile.firstName,
+                profilePicture: profile.id === "1" ? 
+                  "https://xsgames.co/randomusers/assets/avatars/female/43.jpg" : 
+                  profile.profilePicture,
+                isVerified: profile.isVerified,
+              }}
+              size="lg"
+              showVerified={false}
+            />
             
             <div className="flex-1">
               <div className="flex justify-between">
-                <h3 className="text-lg font-semibold">{profile.firstName}</h3>
+                <h3 className="text-lg font-semibold">{profile.id === "1" ? "Amara" : profile.fullName}</h3>
                 {profile.matchPercentage && (
                   <span className="font-semibold text-secondary">{profile.matchPercentage}%</span>
                 )}
