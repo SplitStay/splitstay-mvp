@@ -115,7 +115,7 @@ const BrowseProfiles: React.FC = () => {
       email: "maya@example.com",
       username: "maya",
       password: "password",
-      profilePicture: "https://i.pravatar.cc/150?img=23",
+      profilePicture: "https://i.pravatar.cc/300?img=37",
       bio: "Adventure seeker passionate about different cultures",
       age: "25",
       gender: "female",
