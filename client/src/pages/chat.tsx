@@ -23,15 +23,30 @@ const Chat: React.FC<ChatProps> = ({ params }) => {
   const bookingId = 1; // In a real app, this would be from the URL or context
   const userId = parseInt(params.id, 10);
   
-  // Fetch other user
-  const { data: otherUser, isLoading: isLoadingUser } = useQuery({
+  // Use hardcoded Amara profile instead of fetching from API
+  const { isLoading: isLoadingUser } = useQuery({
     queryKey: [`/api/users/${userId}`],
     queryFn: async () => {
       const res = await fetch(`/api/users/${userId}`);
       if (!res.ok) throw new Error('Failed to fetch user profile');
       return res.json() as Promise<User>;
-    }
+    },
+    enabled: false // Disable this query as we're using a hardcoded profile
   });
+  
+  // Hardcoded Amara profile for the promovideo
+  const otherUser = {
+    id: 1,
+    fullName: "Amara",
+    profilePicture: "/assets/Amara Profile Photo 4.png",
+    isVerified: true,
+    gender: "female",
+    age: 28,
+    languages: ["English", "French"],
+    bio: "Travel enthusiast passionate about discovering new cultures.",
+    occupation: "Marketing Specialist",
+    travelStyle: "Budget-friendly exploration"
+  };
   
   // Fetch booking details
   const { data: bookingDetails, isLoading: isLoadingBooking } = useQuery({
