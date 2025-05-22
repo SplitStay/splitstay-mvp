@@ -108,12 +108,12 @@ const StayDetails: React.FC<StayDetailsProps> = ({
             </div>
             
             {showButtons && (
-              <div className="flex justify-between mt-3 pt-2 border-t border-gray-100">
+              <div className="flex flex-col space-y-2 mt-3 pt-2 border-t border-gray-100">
                 {onDownloadConfirmation && (
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-primary text-sm"
+                    className="text-primary text-sm w-full justify-start"
                     onClick={onDownloadConfirmation}
                   >
                     <Calendar className="mr-1 h-4 w-4" />
@@ -125,7 +125,7 @@ const StayDetails: React.FC<StayDetailsProps> = ({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-primary text-sm"
+                    className="text-primary text-sm w-full justify-start"
                     onClick={onViewBooking}
                   >
                     <Calendar className="mr-1 h-4 w-4" />
