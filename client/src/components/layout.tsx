@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "wouter";
 import { cn } from "@/lib/utils";
 import { SplitStayLogo } from "@/components/icons";
+import "../styles/mobile-container.css";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -13,10 +14,11 @@ const Layout: React.FC<LayoutProps> = ({
   className = "",
 }) => {
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#F5F1EB" }}>
-      {/* Empty header - logo is now in each page as needed */}
-      <div className={cn("app-container", className)} style={{ paddingTop: "0" }}>
-        {children}
+    <div className="mobile-wrapper">
+      <div className="mobile-scroll">
+        <div className={cn("app-container", className)} style={{ paddingTop: "0" }}>
+          {children}
+        </div>
       </div>
     </div>
   );
