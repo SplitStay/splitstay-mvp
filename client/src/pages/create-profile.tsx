@@ -330,7 +330,7 @@ const CreateProfile: React.FC = () => {
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               placeholder="Love hiking, exploring, and catching sunrises"
-              className="w-full border-gray-300 min-h-[160px]"
+              className="w-full border-gray-300 min-h-[200px]"
             />
           </div>
 
