@@ -14,6 +14,7 @@ import { trackProfileCreation } from "@/lib/analytics";
 import { format } from "date-fns";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import emilyProfilePic from "../assets/emily-profile-2025.png";
 import { 
   Dialog, 
   DialogContent, 
@@ -47,7 +48,7 @@ const CreateProfile: React.FC = () => {
     dateOfBirth: new Date(1998, 5, 12), // June 12, 1998 
     travelReason: "leisure" as const,
     languages: ["English", "Mandarin"],
-    profileImage: "/images/emily-fresh-2025.png", // Emily's profile photo
+    profileImage: emilyProfilePic, // Emily's profile photo
     traits: ["Early bird", "Adventurous", "Clean", "Foodie"],
     interests: ["Photography", "Hiking", "Local cuisine", "Architecture"]
   };

@@ -18,6 +18,7 @@ import UserAvatar from "@/components/user-avatar";
 import ReferralSystem from "@/components/referral-system";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
+import emilyProfilePic from "../assets/emily-profile-2025.png";
 
 const Dashboard: React.FC = () => {
   const [_, navigate] = useLocation();
@@ -47,7 +48,7 @@ const Dashboard: React.FC = () => {
   // Mock user data - in a real app this would come from the API
   const user = {
     fullName: "Emily",
-    profilePicture: "/images/emily-fresh-2025.png",
+    profilePicture: emilyProfilePic,
     isVerified: true
   };
   
