@@ -42,16 +42,16 @@ const RoommateCard: React.FC<RoommateCardProps> = ({
   const sampleReviews = [
     {
       id: 1,
-      author: "Emily",
+      author: "Sophia",
       text: "Great roommate! Very respectful of shared spaces and quiet hours.",
       rating: 5,
       date: "April 2025"
     },
     {
       id: 2,
-      author: "Michael",
-      text: "We had a pleasant stay sharing a room in Paris. Very organized and friendly.",
-      rating: 4,
+      author: "Isabella",
+      text: "We had a wonderful stay sharing a room in Paris. Very organized and friendly.",
+      rating: 5,
       date: "March 2025"
     }
   ];
