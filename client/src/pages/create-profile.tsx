@@ -273,8 +273,8 @@ const CreateProfile: React.FC = () => {
         </h1>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {/* Left Column - Personal Info */}
+      <div className="grid grid-cols-1 gap-5">
+        {/* Personal Info */}
         <div className="bg-white rounded-lg p-5 flex flex-col gap-4">
           {/* Profile Picture */}
           <div className="flex flex-col items-center mb-2">
@@ -555,12 +555,9 @@ const CreateProfile: React.FC = () => {
               )}
             </div>
           </div>
-        </div>
-
-        {/* Right Column - Traits */}
-        <div className="flex flex-col gap-5">
-          {/* Travel Traits */}
-          <div className="bg-white rounded-lg p-5">
+          
+          {/* Travel Traits - Now placed below Languages */}
+          <div className="bg-white rounded-lg p-5 mt-5">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-xl font-medium text-navy">Travel Traits</h3>
               <Dialog>
@@ -696,7 +693,7 @@ const CreateProfile: React.FC = () => {
             </div>
           </div>
           
-          {/* ID Verification Section - Moved below travel traits */}
+          {/* ID Verification Section - Below travel traits */}
           <div className="bg-white rounded-lg p-5 mt-5">
             <div className="flex items-center mb-2">
               <ShieldCheck className="h-5 w-5 text-green-600 mr-2" />
