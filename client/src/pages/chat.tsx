@@ -34,11 +34,23 @@ const Chat: React.FC<ChatProps> = ({ params }) => {
     enabled: false // Disable this query as we're using a hardcoded profile
   });
   
+  // Force refresh to load new images
+  React.useEffect(() => {
+    // Clear browser cache for images
+    const timestamp = new Date().getTime();
+    const images = document.querySelectorAll('img');
+    images.forEach(img => {
+      if (img.src.includes('amara')) {
+        img.src = img.src.split('?')[0] + '?t=' + timestamp;
+      }
+    });
+  }, []);
+  
   // Hardcoded Amara profile for the promovideo
   const otherUser = {
     id: 1,
     fullName: "Amara",
-    profilePicture: "/amaraphoto.png",
+    profilePicture: null, // We'll use initials instead of a photo
     isVerified: true,
     gender: "female",
     age: 28,
