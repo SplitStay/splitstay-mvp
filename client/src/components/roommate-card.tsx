@@ -79,7 +79,7 @@ const RoommateCard: React.FC<RoommateCardProps> = ({
             {profile.fullName === "Amara" ? (
               <div className="h-16 w-16 rounded-full overflow-hidden">
                 <img 
-                  src="/amara-profile.png" 
+                  src="https://xsgames.co/randomusers/assets/avatars/female/67.jpg" 
                   alt="Amara" 
                   className="h-full w-full object-cover"
                 />
