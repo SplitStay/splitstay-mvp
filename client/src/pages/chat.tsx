@@ -125,7 +125,8 @@ const Chat: React.FC<ChatProps> = ({ params }) => {
   
   return (
     <div className="flex flex-col h-screen">
-      <div className="p-4 border-b border-gray-200 flex items-center">
+      {/* Fixed header - will always stay visible */}
+      <div className="p-4 border-b border-gray-200 flex items-center bg-white sticky top-0 z-10 shadow-sm">
         <Button
           variant="ghost"
           size="icon"
