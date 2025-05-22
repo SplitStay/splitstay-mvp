@@ -167,6 +167,34 @@ const Chat: React.FC<ChatProps> = ({ params }) => {
                 {otherUser?.fullName} confirmed the stay
               </div>
             </div>
+            
+            {/* Check-in message for promovideo */}
+            <div className="flex justify-center mb-4 mt-4">
+              <div className="bg-gray-200 px-3 py-1 rounded-full text-sm text-gray-700">
+                Today
+              </div>
+            </div>
+            
+            <div className="flex mb-4">
+              <div className="mr-2 flex-shrink-0">
+                <UserAvatar
+                  user={{
+                    fullName: otherUser?.fullName || "",
+                    profilePicture: otherUser?.profilePicture
+                  }}
+                  size="sm"
+                />
+              </div>
+              <div className="bg-white rounded-lg rounded-tl-none p-3 shadow-sm max-w-xs">
+                <p>Just checked in! Got our room keys. The hotel is beautiful! 😊</p>
+              </div>
+            </div>
+            
+            <div className="flex mb-4 justify-end">
+              <div className="bg-primary text-white rounded-lg rounded-tr-none p-3 shadow-sm max-w-xs">
+                <p>Perfect! I'm almost there with my suitcase. See you in 5 minutes!</p>
+              </div>
+            </div>
           </>
         ) : (
           <div className="text-center py-8 text-gray-500">

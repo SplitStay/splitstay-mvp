@@ -93,7 +93,7 @@ const RequestBooking: React.FC<RequestBookingProps> = ({ params }) => {
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <h1 className="text-2xl font-bold text-primary">Request to Book</h1>
+        <h1 className="text-2xl font-bold text-primary">Request to Book with Amara</h1>
       </div>
       
       {/* Profile */}

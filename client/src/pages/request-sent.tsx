@@ -115,13 +115,23 @@ const RequestSent: React.FC<RequestSentProps> = ({ params }) => {
           {/* Status */}
           <div className="mt-3">
             <div className="relative pt-1">
-              <Progress value={33} className="h-2" />
+              <Progress value={100} className="h-2" />
               <div className="flex text-xs justify-between mt-1">
                 <div className="font-semibold text-primary">Sent</div>
-                <div className="text-gray-500">Viewed</div>
-                <div className="text-gray-500">Accepted</div>
+                <div className="font-semibold text-primary">Viewed</div>
+                <div className="font-semibold text-primary">Accepted</div>
               </div>
             </div>
+          </div>
+          
+          {/* Accept Request Button - For Amara's view */}
+          <div className="mt-4 flex justify-center">
+            <Button 
+              className="w-3/4 bg-primary text-white font-semibold py-4"
+              onClick={handleMessageNow}
+            >
+              Accept Request
+            </Button>
           </div>
         </CardContent>
       </Card>
