@@ -314,14 +314,23 @@ const CreateProfile: React.FC = () => {
           {/* Date of Birth */}
           <div>
             <label className="block text-navy font-medium mb-1">Date of birth</label>
-            <DatePicker 
-              date={dateOfBirth} 
-              setDate={setDateOfBirth}
-              className="w-full border-gray-300"
+            <Input 
+              type="text"
+              placeholder="1998-06-12"
+              value={dateOfBirth ? dateOfBirth.toISOString().split('T')[0] : ''}
+              onChange={(e) => {
+                try {
+                  const date = new Date(e.target.value);
+                  setDateOfBirth(date);
+                } catch (error) {
+                  console.error("Invalid date format");
+                }
+              }}
+              className="border-gray-300"
             />
             {dateOfBirth && (
               <div className="text-sm text-gray-500 mt-1">
-                You are {getAge(dateOfBirth)} years old
+                Birth date: {dateOfBirth.toLocaleDateString()}
               </div>
             )}
           </div>
