@@ -79,7 +79,7 @@ const RoommateCard: React.FC<RoommateCardProps> = ({
               user={{
                 fullName: profile.fullName || profile.firstName,
                 profilePicture: profile.id === "1" ? 
-                  "https://xsgames.co/randomusers/assets/avatars/female/43.jpg" : 
+                  "/amara-square.png" : 
                   profile.profilePicture,
                 isVerified: profile.isVerified,
               }}
