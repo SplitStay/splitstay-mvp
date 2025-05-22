@@ -13,24 +13,25 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { SplitStayLogo } from "@/components/icons";
+import emilyProfilePic from "../assets/emily-profile-2025.png";
 
 const Profile: React.FC = () => {
   const [_, navigate] = useLocation();
   
   // Mock user data - in a real app this would come from the API/database
   const [user] = useState({
-    fullName: "Alina Chen",
-    profilePicture: "https://i.pravatar.cc/150?img=31",
-    username: "alina_travels",
-    age: "23",
+    fullName: "Emily Zhang",
+    profilePicture: emilyProfilePic,
+    username: "emily_travels",
+    age: "26",
     gender: "Female",
-    location: "London, UK",
-    bio: "Spontaneous traveler who enjoys quiet time. Love exploring new cities and making memories!",
-    languages: ["English", "German"],
-    interests: ["Photography", "Hiking", "Food", "Museums"],
-    travelTraits: ["Early bird", "Quiet", "Clean", "Budget-conscious"],
-    reviewsCount: 3,
-    avgRating: 4.8,
+    location: "Singapore",
+    bio: "Discovering hidden local spots in new cities and capturing sunrise moments with my camera. Nothing beats the feeling of getting lost in a new place and stumbling upon something amazing!",
+    languages: ["English", "Mandarin"],
+    interests: ["Photography", "Hiking", "Local cuisine", "Architecture"],
+    travelTraits: ["Early bird", "Adventurous", "Clean", "Foodie"],
+    reviewsCount: 5,
+    avgRating: 4.9,
     joinDate: "January 2025",
     isVerified: true,
     verifications: ["ID", "Email", "Phone", "Profile"]
