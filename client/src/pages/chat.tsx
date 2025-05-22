@@ -38,7 +38,7 @@ const Chat: React.FC<ChatProps> = ({ params }) => {
   const otherUser = {
     id: 1,
     fullName: "Amara",
-    profilePicture: "https://i.pravatar.cc/150?img=5",
+    profilePicture: "/amaraphoto.png",
     isVerified: true,
     gender: "female",
     age: 28,
