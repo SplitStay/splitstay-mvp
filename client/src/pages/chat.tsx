@@ -260,8 +260,8 @@ const Chat: React.FC<ChatProps> = ({ params }) => {
         )}
       </div>
       
-      {/* Message input */}
-      <div className="p-3 border-t border-gray-200 bg-white">
+      {/* Fixed message input at bottom */}
+      <div className="p-3 border-t border-gray-200 bg-white sticky bottom-0 z-10 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
         <div className="flex">
           <Input
             value={message}
