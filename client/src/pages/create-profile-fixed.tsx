@@ -11,12 +11,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Command, CommandInput, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
 import { ArrowLeft, Plus, Search, Star, Check, Calendar, Info, X } from "lucide-react";
-// import { DatePicker } from "@/components/date-picker";
+import { DatePicker } from "@/components/date-picker";
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-// import { getAge } from "@/lib/date-utils";
+import { getAge } from "@/lib/date-utils";
 import { trackProfileCreation } from "@/lib/analytics";
 
 const MAX_LANGUAGES = 5;
@@ -86,8 +86,8 @@ const CreateProfile: React.FC = () => {
   
   // Set demo image for Emily's profile
   const setDemoProfileImage = () => {
-    // Using Emily's new profile image from direct URL
-    const emilyImageUrl = "https://xsgames.co/randomusers/assets/avatars/female/2.jpg";
+    // Using Emily's image from public folder
+    const emilyImageUrl = "/emily.png";
     setProfileImage(emilyImageUrl);
     // Also set the name to Emily for demo purposes
     setName("Emily Zhang");
