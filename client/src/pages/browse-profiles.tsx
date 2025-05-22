@@ -110,8 +110,33 @@ const BrowseProfiles: React.FC = () => {
   const defaultProfiles: UserProfile[] = [
     {
       id: "1",
+      firstName: "Maya",
+      lastName: "",
+      email: "maya@example.com",
+      username: "maya",
+      password: "password",
+      profilePicture: "/images/maya-profile.png",
+      bio: "Adventure seeker passionate about different cultures",
+      age: "25",
+      gender: "female",
+      languages: ["English", "French", "Spanish"],
+      travelTraits: ["Organized", "Early riser", "Social"],
+      isVerified: true,
+      matchPercentage: 98,
+      matchLabel: "Perfect Match",
+      positiveReviews: true,
+      preferredAccommodation: {
+        name: "MEININGER Hotel",
+        platform: "booking",
+        url: "https://www.booking.com/hotel/be/meininger-brussels.html",
+        isFlexible: true,
+        roomType: "Twin beds"
+      }
+    },
+    {
+      id: "2",
       firstName: "Hannah",
-      lastName: "Kim",
+      lastName: "",
       email: "hannah@example.com",
       username: "hannah",
       password: "password",
@@ -119,48 +144,69 @@ const BrowseProfiles: React.FC = () => {
       bio: "Spontaneous traveler who enjoys quiet hikes",
       age: "28",
       gender: "female",
-      languages: ["English", "French"],
+      languages: ["English", "Korean"],
       travelTraits: ["Nature lover", "Early riser", "Quiet"],
       isVerified: true,
       matchPercentage: 91,
       matchLabel: "Recommended Roommate",
-      positiveReviews: true
+      positiveReviews: true,
+      preferredAccommodation: {
+        name: "Park Plaza Westminster",
+        platform: "booking",
+        url: "https://www.booking.com/hotel/gb/park-plaza-westminster-bridge-london.html",
+        isFlexible: true,
+        roomType: "Twin beds"
+      }
     },
     {
-      id: "2",
+      id: "3",
       firstName: "Alina",
-      lastName: "Chen",
+      lastName: "",
       email: "alina@example.com",
       username: "alina",
       password: "password",
       profilePicture: "https://i.pravatar.cc/150?img=31",
-      bio: "Spontaneous traveler who enjoys quiet time",
+      bio: "Digital nomad who loves exploring new cuisines",
       age: "23",
       gender: "female",
-      languages: ["English", "German"],
+      languages: ["English", "Mandarin"],
       travelTraits: ["Food lover", "Night owl", "Quiet"],
       isVerified: true,
       matchPercentage: 84,
       matchLabel: "Ideal Match",
-      positiveReviews: true
+      positiveReviews: true,
+      preferredAccommodation: {
+        name: "CitizenM Tower of London",
+        platform: "airbnb",
+        url: "https://www.airbnb.com/rooms/london",
+        isFlexible: true,
+        roomType: "Private room"
+      }
     },
     {
-      id: "3",
+      id: "4",
       firstName: "Sophie",
-      lastName: "Müller",
+      lastName: "",
       email: "sophie@example.com",
       username: "sophie",
       password: "password",
       profilePicture: "https://i.pravatar.cc/150?img=5",
-      bio: "Looking for a travel partner to split costs",
+      bio: "I enjoy museums and cultural experiences",
       age: "27",
       gender: "female",
-      languages: ["English", "French"],
-      travelTraits: ["Shopper", "Foodie", "Social"],
+      languages: ["English", "German"],
+      travelTraits: ["Organized", "Early riser", "Social"],
       isVerified: true,
       matchPercentage: 75,
       matchLabel: "Good Match",
-      positiveReviews: true
+      positiveReviews: true,
+      preferredAccommodation: {
+        name: "St. Pancras Renaissance",
+        platform: "agoda",
+        url: "https://www.agoda.com/st-pancras-renaissance-hotel-london/hotel/london-gb.html",
+        isFlexible: false,
+        roomType: "Separate beds"
+      }
     }
   ];
 

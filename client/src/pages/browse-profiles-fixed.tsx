@@ -91,9 +91,9 @@ const BrowseProfiles: React.FC = () => {
       matchLabel: "Perfect Match",
       positiveReviews: true,
       preferredAccommodation: {
-        name: "Hilton Brussels Grand Place",
+        name: "MEININGER Hotel",
         platform: "booking",
-        url: "https://www.booking.com/hotel/be/hilton-brussels.html",
+        url: "https://www.booking.com/hotel/be/meininger-brussels.html",
         isFlexible: true,
         roomType: "Twin beds"
       }
