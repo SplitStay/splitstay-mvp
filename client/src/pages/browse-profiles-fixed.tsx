@@ -76,7 +76,31 @@ const BrowseProfiles: React.FC = () => {
   const defaultProfiles: DemoProfile[] = [
     {
       id: 1,
-      fullName: "Hannah Kim",
+      fullName: "Maya",
+      email: "maya@example.com",
+      username: "maya",
+      password: "password",
+      profilePicture: "/images/maya-profile.png",
+      bio: "Adventure seeker passionate about different cultures",
+      age: "25",
+      gender: "female",
+      languages: ["English", "French", "Spanish"],
+      travelTraits: ["Organized", "Early riser", "Social"],
+      isVerified: true,
+      matchPercentage: 98,
+      matchLabel: "Perfect Match",
+      positiveReviews: true,
+      preferredAccommodation: {
+        name: "Hilton Brussels Grand Place",
+        platform: "booking",
+        url: "https://www.booking.com/hotel/be/hilton-brussels.html",
+        isFlexible: true,
+        roomType: "Twin beds"
+      }
+    },
+    {
+      id: 2,
+      fullName: "Hannah",
       email: "hannah@example.com",
       username: "hannah",
       password: "password",
@@ -99,8 +123,8 @@ const BrowseProfiles: React.FC = () => {
       }
     },
     {
-      id: 2,
-      fullName: "Alina Chen",
+      id: 3,
+      fullName: "Alina",
       email: "alina@example.com",
       username: "alina",
       password: "password",
@@ -123,8 +147,8 @@ const BrowseProfiles: React.FC = () => {
       }
     },
     {
-      id: 3,
-      fullName: "Sophie Müller",
+      id: 4,
+      fullName: "Sophie",
       email: "sophie@example.com",
       username: "sophie",
       password: "password",
