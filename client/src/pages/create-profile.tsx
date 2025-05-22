@@ -86,8 +86,8 @@ const CreateProfile: React.FC = () => {
   
   // Set demo image for Emily's profile
   const setDemoProfileImage = () => {
-    // Using Emily's new profile image from direct URL
-    const emilyImageUrl = "https://xsgames.co/randomusers/assets/avatars/female/2.jpg";
+    // Using Emily's exact profile image
+    const emilyImageUrl = "/emily-exact.png";
     setProfileImage(emilyImageUrl);
     // Also set the name to Emily for demo purposes
     setName("Emily Zhang");
