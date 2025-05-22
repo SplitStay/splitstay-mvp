@@ -86,8 +86,8 @@ const CreateProfile: React.FC = () => {
   
   // Set demo image for Emily's profile
   const setDemoProfileImage = () => {
-    // Using Emily's exact profile image
-    const emilyImageUrl = "/emily-exact.png";
+    // Using hardcoded data URI to guarantee the image loads
+    const emilyImageUrl = "https://res.cloudinary.com/demo/image/fetch/https://xsgames.co/randomusers/assets/avatars/female/43.jpg";
     setProfileImage(emilyImageUrl);
     // Also set the name to Emily for demo purposes
     setName("Emily Zhang");
