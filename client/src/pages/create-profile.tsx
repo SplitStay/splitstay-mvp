@@ -95,8 +95,10 @@ const CreateProfile: React.FC = () => {
   // Set demo image for Emily's profile
   const setDemoProfileImage = () => {
     // Using Emily's image from public folder
-    const emilyImageUrl = "/images/emily-profile.png";
+    const emilyImageUrl = "/emily.png";
     setProfileImage(emilyImageUrl);
+    // Also set the name to Emily for demo purposes
+    setName("Emily Zhang");
   };
 
   // Predefined values
@@ -283,13 +285,7 @@ const CreateProfile: React.FC = () => {
                 className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-3 relative overflow-hidden hover:opacity-90 transition-opacity border-2 border-dashed border-navy"
                 onClick={setDemoProfileImage} // Added for demo to auto-set Emily's photo on click
               >
-                {name === "Emily Zhang" ? (
-                  <img 
-                    src="/emily-latest-profile.png" 
-                    alt="Emily Profile" 
-                    className="w-full h-full object-cover"
-                  />
-                ) : profileImage ? (
+                {profileImage ? (
                   <img 
                     src={profileImage} 
                     alt="Profile" 
