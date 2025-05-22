@@ -17,9 +17,7 @@ const Layout: React.FC<LayoutProps> = ({
     <div className="min-h-screen bg-[#F5F1EB] flex justify-center items-center">
       <div className="mobile-container">
         <div className="mobile-content">
-          <div className={cn("app-container", className)} style={{ paddingTop: "0" }}>
-            {children}
-          </div>
+          {children}
         </div>
       </div>
     </div>

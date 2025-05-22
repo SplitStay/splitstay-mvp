@@ -1,5 +1,5 @@
 /* Mobile Container Styles */
-body {
+html, body {
   margin: 0;
   padding: 0;
   background-color: #f0f0f0;
@@ -37,8 +37,22 @@ body {
   overflow-x: hidden;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  position: relative;
 }
 
 .mobile-content::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
+}
+
+/* Make sure all content takes full width */
+.app-container {
+  width: 100%;
+  min-height: 100%;
+}
+
+/* Fix for specific pages like create-profile */
+[class*="p-6"], [class*="px-6"], [class*="py-6"] {
+  height: auto;
+  min-height: 100%;
 }
