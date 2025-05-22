@@ -50,7 +50,7 @@ const Chat: React.FC<ChatProps> = ({ params }) => {
   const otherUser = {
     id: 1,
     fullName: "Amara",
-    profilePicture: null, // We'll use initials instead of a photo
+    profilePicture: "/images/amara.png", // Use Amara's actual photo
     isVerified: true,
     gender: "female",
     age: 28,
