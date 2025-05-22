@@ -47,7 +47,7 @@ const Dashboard: React.FC = () => {
   // Mock user data - in a real app this would come from the API
   const user = {
     fullName: "Emily",
-    profilePicture: "/images/emily-profile-latest.png",
+    profilePicture: "/images/emily-profile.png",
     isVerified: true
   };
   
