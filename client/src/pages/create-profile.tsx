@@ -340,8 +340,13 @@ const CreateProfile: React.FC = () => {
             <div className="flex gap-2">
               {/* Day Select */}
               <select
-                value={dateOfBirth ? dateOfBirth.getDate() : ""}
+                value={dateOfBirth ? dateOfBirth.getDate().toString() : "placeholder"}
                 onChange={(e) => {
+                  if (e.target.value === "placeholder") {
+                    // Reset date of birth to undefined for recording purposes
+                    setDateOfBirth(undefined);
+                    return;
+                  }
                   const day = parseInt(e.target.value);
                   const newDate = dateOfBirth ? new Date(dateOfBirth) : new Date();
                   newDate.setDate(day);
@@ -350,7 +355,7 @@ const CreateProfile: React.FC = () => {
                 className="px-3 py-2 rounded-md border border-gray-300 flex-1"
                 aria-label="Day"
               >
-                <option value="" disabled>Day</option>
+                <option value="placeholder">Day</option>
                 {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
                   <option key={`day-${day}`} value={day}>{day}</option>
                 ))}
@@ -358,8 +363,13 @@ const CreateProfile: React.FC = () => {
               
               {/* Month Select */}
               <select
-                value={dateOfBirth ? dateOfBirth.getMonth() : ""}
+                value={dateOfBirth ? dateOfBirth.getMonth().toString() : "placeholder"}
                 onChange={(e) => {
+                  if (e.target.value === "placeholder") {
+                    // Reset date of birth to undefined for recording purposes
+                    setDateOfBirth(undefined);
+                    return;
+                  }
                   const month = parseInt(e.target.value);
                   const newDate = dateOfBirth ? new Date(dateOfBirth) : new Date();
                   newDate.setMonth(month);
@@ -368,7 +378,7 @@ const CreateProfile: React.FC = () => {
                 className="px-3 py-2 rounded-md border border-gray-300 flex-1"
                 aria-label="Month"
               >
-                <option value="" disabled>Month</option>
+                <option value="placeholder">Month</option>
                 {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map((month, index) => (
                   <option key={`month-${month}`} value={index}>{month}</option>
                 ))}
@@ -376,8 +386,13 @@ const CreateProfile: React.FC = () => {
               
               {/* Year Select */}
               <select
-                value={dateOfBirth ? dateOfBirth.getFullYear() : ""}
+                value={dateOfBirth ? dateOfBirth.getFullYear().toString() : "placeholder"}
                 onChange={(e) => {
+                  if (e.target.value === "placeholder") {
+                    // Reset date of birth to undefined for recording purposes
+                    setDateOfBirth(undefined);
+                    return;
+                  }
                   const year = parseInt(e.target.value);
                   const newDate = dateOfBirth ? new Date(dateOfBirth) : new Date();
                   newDate.setFullYear(year);
@@ -386,7 +401,7 @@ const CreateProfile: React.FC = () => {
                 className="px-3 py-2 rounded-md border border-gray-300 flex-1"
                 aria-label="Year"
               >
-                <option value="" disabled>Year</option>
+                <option value="placeholder">Year</option>
                 {Array.from({ length: 80 }, (_, i) => new Date().getFullYear() - i).map(year => (
                   <option key={`year-${year}`} value={year}>{year}</option>
                 ))}
