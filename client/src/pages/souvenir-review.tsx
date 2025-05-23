@@ -7,24 +7,86 @@ import { MobileContainer } from "@/components/mobile-container";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ChevronLeft, Camera } from "lucide-react";
+import { ChevronLeft, Camera, AlertCircle, Star } from "lucide-react";
+import { uploadSouvenirPhoto, getMockSouvenirs } from "@/lib/supabase";
 
 export default function SouvenirReviewPage() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [review, setReview] = useState("");
   const [rating, setRating] = useState(5);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [existingReviews, setExistingReviews] = useState<Array<{photoUrl: string, rating: number, reviewText: string, userName: string}>>([]);
+  const [showExistingPhotos, setShowExistingPhotos] = useState(false);
   
   // In a real app, we would get the booking details from the URL or state
   const bookingId = 1;
+  const userId = 1;
   const roommateName = "Amara";
+  
+  // Check if user has already uploaded a photo for this trip
+  const [hasExistingPhoto, setHasExistingPhoto] = useState(false);
+  
+  useEffect(() => {
+    // Simulate fetching existing souvenirs for this trip
+    const fetchExistingPhotos = async () => {
+      try {
+        // In a real app, this would call an API
+        // For demo, we'll use our mock function
+        const photos = getMockSouvenirs(bookingId);
+        if (photos.length > 0) {
+          // Check if current user has already uploaded a photo
+          setHasExistingPhoto(true);
+          
+          // Set up mock data for roommate's review
+          setExistingReviews([
+            {
+              photoUrl: photos[0],
+              rating: 5,
+              reviewText: "Had such a great time sharing this room with Emily! The hotel was beautiful and we saved so much money.",
+              userName: roommateName
+            }
+          ]);
+        }
+      } catch (error) {
+        console.error("Error fetching souvenirs:", error);
+      }
+    };
+    
+    fetchExistingPhotos();
+  }, [bookingId]);
   
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Check if file is an image
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file type",
+          description: "Please upload an image file (JPEG, PNG, etc.)",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Please upload an image smaller than 5MB",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Store the file for later upload
+      setImageFile(file);
+      
+      // Preview the image
       const reader = new FileReader();
       reader.onloadend = () => {
         setSelectedImage(reader.result as string);
@@ -33,11 +95,18 @@ export default function SouvenirReviewPage() {
     }
   };
   
-  const handleSubmit = () => {
-    // In a real app, we would call an API to save the review
-    // For this demo, we'll just show a success message
+  const handleSubmit = async () => {
+    // Check if we already have an existing photo for this trip
+    if (hasExistingPhoto) {
+      toast({
+        title: "You've already shared a memory for this trip",
+        description: "Only one photo per trip is allowed. You can view your existing memory in your dashboard.",
+        variant: "destructive",
+      });
+      return;
+    }
     
-    if (!selectedImage) {
+    if (!selectedImage || !imageFile) {
       toast({
         title: "Please select an image",
         variant: "destructive",
@@ -45,13 +114,33 @@ export default function SouvenirReviewPage() {
       return;
     }
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      setIsUploading(true);
+      
+      // In a real app, this would upload to Supabase or another cloud storage
+      // For this demo, we'll simulate a successful upload
+      // const photoUrl = await uploadSouvenirPhoto(imageFile, userId, bookingId);
+      
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Save the review data to our database
+      // In a real app, this would be an API call
+      // For demo purposes, we'll just simulate success
       setShowSuccess(true);
       
       // Invalidate queries to refresh the dashboard
       queryClient.invalidateQueries({ queryKey: ['/api/bookings'] });
-    }, 500);
+    } catch (error) {
+      console.error("Error uploading souvenir:", error);
+      toast({
+        title: "Failed to save your memory",
+        description: "Please try again later",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
   };
   
   if (showSuccess) {
@@ -125,70 +214,141 @@ export default function SouvenirReviewPage() {
         </div>
         
         <div className="flex-1 overflow-auto p-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-center">Share Your Travel Memory</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="text-center">
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Upload a photo from your stay and share your experience with {roommateName}
-                  </p>
-                  
-                  <div className="mb-4">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      id="souvenir-photo"
-                      className="hidden"
-                      onChange={handleImageChange}
-                    />
-                    <label
-                      htmlFor="souvenir-photo"
-                      className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-md cursor-pointer bg-background hover:bg-muted/50"
-                    >
-                      {selectedImage ? (
-                        <img
-                          src={selectedImage}
-                          alt="Selected"
-                          className="w-full h-full object-cover rounded-md"
-                        />
-                      ) : (
-                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                          <Camera className="w-8 h-8 mb-2 text-muted-foreground" />
-                          <p className="text-sm text-muted-foreground">
-                            Click to upload a souvenir photo
-                          </p>
-                        </div>
-                      )}
-                    </label>
+          {hasExistingPhoto ? (
+            <Card className="mb-4">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-center bg-yellow-50 p-3 rounded-md mb-4 text-sm">
+                  <AlertCircle className="h-4 w-4 text-yellow-600 mr-2" />
+                  <p>You've already shared a memory for this trip. You can view it in your dashboard.</p>
+                </div>
+                <Button 
+                  onClick={() => navigate("/dashboard")} 
+                  className="w-full"
+                >
+                  Go to Dashboard
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-center">Share Your Travel Memory</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="text-center">
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Upload a photo from your stay and share your experience with {roommateName}
+                    </p>
+                    
+                    <div className="mb-4">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        id="souvenir-photo"
+                        className="hidden"
+                        onChange={handleImageChange}
+                        disabled={isUploading}
+                      />
+                      <label
+                        htmlFor="souvenir-photo"
+                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-md cursor-pointer bg-background hover:bg-muted/50"
+                      >
+                        {selectedImage ? (
+                          <img
+                            src={selectedImage}
+                            alt="Selected"
+                            className="w-full h-full object-cover rounded-md"
+                          />
+                        ) : (
+                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                            <Camera className="w-8 h-8 mb-2 text-muted-foreground" />
+                            <p className="text-sm text-muted-foreground">
+                              Click to upload a souvenir photo
+                            </p>
+                          </div>
+                        )}
+                      </label>
+                    </div>
                   </div>
+                  
+                  <Separator />
+                  
+                  <div className="space-y-2">
+                    <h3 className="font-medium">Rate your roommate</h3>
+                    <Rating value={rating} onChange={setRating} size="lg" />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <h3 className="font-medium">Leave a review</h3>
+                    <textarea
+                      value={review}
+                      onChange={(e) => setReview(e.target.value)}
+                      placeholder="Share your experience..."
+                      className="w-full p-2 min-h-[100px] border rounded-md"
+                      disabled={isUploading}
+                    />
+                  </div>
+                  
+                  <Button 
+                    onClick={handleSubmit} 
+                    className="w-full" 
+                    disabled={isUploading}
+                  >
+                    {isUploading ? "Uploading..." : "Submit Review"}
+                  </Button>
+                  
+                  <p className="text-xs text-center text-gray-500">
+                    You can only upload one photo per trip.<br />
+                    Both you and {roommateName} will be able to see each other's reviews.
+                  </p>
                 </div>
-                
-                <Separator />
-                
-                <div className="space-y-2">
-                  <h3 className="font-medium">Rate your roommate</h3>
-                  <Rating value={rating} onChange={setRating} size="lg" />
-                </div>
-                
-                <div className="space-y-2">
-                  <h3 className="font-medium">Leave a review</h3>
-                  <textarea
-                    value={review}
-                    onChange={(e) => setReview(e.target.value)}
-                    placeholder="Share your experience..."
-                    className="w-full p-2 min-h-[100px] border rounded-md"
-                  />
-                </div>
-                
-                <Button onClick={handleSubmit} className="w-full">
-                  Submit Review
+              </CardContent>
+            </Card>
+          )}
+          
+          {/* Roommate's reviews section */}
+          {existingReviews.length > 0 && (
+            <div className="mt-6">
+              <div className="flex justify-between items-center mb-3">
+                <h2 className="text-lg font-semibold">Roommate's Memory</h2>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-xs" 
+                  onClick={() => setShowExistingPhotos(!showExistingPhotos)}
+                >
+                  {showExistingPhotos ? "Hide" : "Show"}
                 </Button>
               </div>
-            </CardContent>
-          </Card>
+              
+              {showExistingPhotos && existingReviews.map((review, index) => (
+                <Card key={index} className="mb-4">
+                  <div className="w-full aspect-video">
+                    <img
+                      src={review.photoUrl}
+                      alt={`Memory from ${review.userName}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <CardContent className="p-3">
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="font-medium">{review.userName}'s Review</h3>
+                      <div className="flex">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star 
+                            key={star} 
+                            className={`h-4 w-4 ${star <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-sm text-gray-600">{review.reviewText}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </MobileContainer>
