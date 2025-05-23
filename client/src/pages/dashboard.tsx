@@ -154,7 +154,8 @@ const Dashboard: React.FC = () => {
         ) : (
           <div className="grid grid-cols-2 gap-3">
             <Button 
-              className="navy-button h-auto py-4 flex-col" 
+              variant="outline"
+              className="h-auto py-4 flex-col text-primary" 
               onClick={() => {
                 try {
                   navigate("/find-roommate");
