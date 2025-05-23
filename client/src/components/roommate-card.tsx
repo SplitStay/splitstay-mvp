@@ -140,7 +140,10 @@ const RoommateCard: React.FC<RoommateCardProps> = ({
                       className="inline-flex items-center text-primary hover:underline"
                     >
                       {profile.preferredAccommodation.platform === 'booking' && (
-                        <FaHotel className="h-3 w-3 mr-1 text-blue-600" />
+                        <div className="h-4 w-4 mr-1 rounded-md bg-[#003580] flex items-center justify-center relative">
+                          <span className="text-white font-bold text-[8px]">B</span>
+                          <span className="absolute bottom-0.5 right-0.5 w-1.5 h-1.5 rounded-full bg-[#00B9F7]"></span>
+                        </div>
                       )}
                       {profile.preferredAccommodation.platform === 'airbnb' && (
                         <FaAirbnb className="h-3 w-3 mr-1 text-red-500" />
