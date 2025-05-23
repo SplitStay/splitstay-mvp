@@ -116,9 +116,9 @@ const BrowseProfiles: React.FC = () => {
       matchLabel: "Recommended Roommate",
       positiveReviews: true,
       preferredAccommodation: {
-        name: "Park Plaza Westminster",
+        name: "Hotel Hubert Brussels",
         platform: "booking",
-        url: "https://www.booking.com/hotel/gb/park-plaza-westminster-bridge-london.html",
+        url: "https://www.booking.com/hotel/be/hubert-brussels.html",
         isFlexible: true,
         roomType: "Twin beds"
       }
@@ -140,9 +140,9 @@ const BrowseProfiles: React.FC = () => {
       matchLabel: "Ideal Match",
       positiveReviews: true,
       preferredAccommodation: {
-        name: "CitizenM Tower of London",
+        name: "Ibis Brussels Centre",
         platform: "airbnb",
-        url: "https://www.airbnb.com/rooms/london",
+        url: "https://www.airbnb.com/rooms/brussels",
         isFlexible: true,
         roomType: "Private room"
       }
@@ -164,9 +164,9 @@ const BrowseProfiles: React.FC = () => {
       matchLabel: "Good Match",
       positiveReviews: true,
       preferredAccommodation: {
-        name: "St. Pancras Renaissance",
+        name: "Novotel Brussels Grand Place",
         platform: "agoda",
-        url: "https://www.agoda.com/st-pancras-renaissance-hotel-london/hotel/london-gb.html",
+        url: "https://www.agoda.com/novotel-brussels-grand-place/hotel/brussels-be.html",
         isFlexible: false,
         roomType: "Separate beds"
       }
