@@ -10,22 +10,51 @@ import { toast } from "@/hooks/use-toast";
 const SignUp: React.FC = () => {
   const [_, navigate] = useLocation();
   const [email, setEmail] = useState("emily.zhang@gmail.com");
-  const [password, setPassword] = useState("Wanderlust2025!");
-  const [confirmPassword, setConfirmPassword] = useState("Wanderlust2025!");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  // State for toggling password visibility
-  const [showPassword, setShowPassword] = useState(true);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(true);
   
-  // Auto-hide passwords after a short delay (for demo purposes)
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowPassword(false);
-      setShowConfirmPassword(false);
-    }, 2000); // Show password for 2 seconds
+  // For displaying the masked passwords with last character visible
+  const [maskedPassword, setMaskedPassword] = useState("");
+  const [maskedConfirmPassword, setMaskedConfirmPassword] = useState("");
+  
+  // Handle password input with briefly visible last character
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setPassword(newValue);
     
-    return () => clearTimeout(timer);
-  }, []);
+    // Create masked version with last character visible
+    if (newValue.length > 0) {
+      const lastChar = newValue.slice(-1);
+      const dots = "•".repeat(newValue.length - 1);
+      setMaskedPassword(dots + lastChar);
+      
+      // Hide the last character after a brief delay
+      setTimeout(() => {
+        setMaskedPassword("•".repeat(newValue.length));
+      }, 500);
+    } else {
+      setMaskedPassword("");
+    }
+  };
+  
+  // Same for confirm password
+  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setConfirmPassword(newValue);
+    
+    if (newValue.length > 0) {
+      const lastChar = newValue.slice(-1);
+      const dots = "•".repeat(newValue.length - 1);
+      setMaskedConfirmPassword(dots + lastChar);
+      
+      setTimeout(() => {
+        setMaskedConfirmPassword("•".repeat(newValue.length));
+      }, 500);
+    } else {
+      setMaskedConfirmPassword("");
+    }
+  };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,32 +159,50 @@ const SignUp: React.FC = () => {
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
               Password
             </label>
-            <Input
-              id="password"
-              type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Create a secure password"
-              className="w-full"
-              disabled={isLoading}
-              required
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type="text"
+                value={maskedPassword}
+                onChange={handlePasswordChange}
+                placeholder="Create a secure password"
+                className="w-full"
+                disabled={isLoading}
+                required
+              />
+              <input 
+                type="password" 
+                className="opacity-0 h-0 w-0 absolute" 
+                tabIndex={-1}
+                value={password}
+                readOnly
+              />
+            </div>
           </div>
           
           <div>
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
               Confirm Password
             </label>
-            <Input
-              id="confirmPassword"
-              type={showConfirmPassword ? "text" : "password"}
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm your password"
-              className="w-full"
-              disabled={isLoading}
-              required
-            />
+            <div className="relative">
+              <Input
+                id="confirmPassword"
+                type="text"
+                value={maskedConfirmPassword}
+                onChange={handleConfirmPasswordChange}
+                placeholder="Confirm your password"
+                className="w-full"
+                disabled={isLoading}
+                required
+              />
+              <input 
+                type="password" 
+                className="opacity-0 h-0 w-0 absolute" 
+                tabIndex={-1}
+                value={confirmPassword}
+                readOnly
+              />
+            </div>
           </div>
           
           <Button 
