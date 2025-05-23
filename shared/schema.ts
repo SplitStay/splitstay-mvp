@@ -2,6 +2,7 @@ import { pgTable, text, serial, integer, boolean, timestamp, jsonb } from "drizz
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations } from "drizzle-orm";
+import { type UserAction } from "./research-schema";
 
 // Users
 export const users = pgTable("users", {
@@ -138,6 +139,29 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
   }),
 }));
 
+// Souvenirs
+export const souvenirs = pgTable("souvenirs", {
+  id: serial("id").primaryKey(),
+  tripId: integer("trip_id").notNull(),
+  userId: integer("user_id").notNull(),
+  photoUrl: text("photo_url").notNull(),
+  reviewText: text("review_text"),
+  rating: integer("rating").notNull(),
+  timestamp: timestamp("timestamp").defaultNow(),
+});
+
+// Souvenirs relations
+export const souvenirsRelations = relations(souvenirs, ({ one }) => ({
+  booking: one(bookings, {
+    fields: [souvenirs.tripId],
+    references: [bookings.id],
+  }),
+  user: one(users, {
+    fields: [souvenirs.userId],
+    references: [users.id],
+  }),
+}));
+
 // Schemas for inserts
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -167,6 +191,11 @@ export const insertReviewSchema = createInsertSchema(reviews).omit({
   createdAt: true,
 });
 
+export const insertSouvenirSchema = createInsertSchema(souvenirs).omit({
+  id: true,
+  timestamp: true,
+});
+
 
 
 // Types
@@ -188,14 +217,8 @@ export type InsertMessage = z.infer<typeof insertMessageSchema>;
 export type Review = typeof reviews.$inferSelect;
 export type InsertReview = z.infer<typeof insertReviewSchema>;
 
-export type ResearchSession = typeof researchSessions.$inferSelect;
-export type InsertResearchSession = z.infer<typeof insertResearchSessionSchema>;
-
-export type ResearchFeedback = typeof researchFeedback.$inferSelect;
-export type InsertResearchFeedback = z.infer<typeof insertResearchFeedbackSchema>;
-
-export type AudioRecording = typeof audioRecordings.$inferSelect;
-export type InsertAudioRecording = z.infer<typeof insertAudioRecordingSchema>;
+export type Souvenir = typeof souvenirs.$inferSelect;
+export type InsertSouvenir = z.infer<typeof insertSouvenirSchema>;
 
 // Extended types for frontend use
 export type PreferredAccommodation = {
@@ -224,19 +247,4 @@ export type BookingDetails = Booking & {
 
 
 
-export type UserAction = {
-  type: 'click' | 'navigation' | 'input' | 'focus' | 'blur' | 'scroll';
-  target: string;
-  timestamp: number;
-  path: string;
-  metadata?: any;
-};
 
-export type ResearchSession = typeof researchSessions.$inferSelect;
-export type InsertResearchSession = typeof researchSessions.$inferInsert;
-
-export type ResearchFeedback = typeof researchFeedback.$inferSelect;
-export type InsertResearchFeedback = typeof researchFeedback.$inferInsert;
-
-export type AudioRecording = typeof audioRecordings.$inferSelect;
-export type InsertAudioRecording = typeof audioRecordings.$inferInsert;
