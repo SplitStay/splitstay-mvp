@@ -39,18 +39,6 @@ const Home: React.FC = () => {
           </div>
           <ChevronRight />
         </Button>
-        
-        <Button
-          variant="outline"
-          className="w-full flex justify-between border-2"
-          onClick={() => navigate("/dashboard")}
-        >
-          <div className="flex items-center">
-            <Eye className="mr-3 h-5 w-5" />
-            <span>Explore Demo</span>
-          </div>
-          <ChevronRight />
-        </Button>
       </div>
       
       {/* Features */}
@@ -92,9 +80,6 @@ const Home: React.FC = () => {
           >
             Already have an account? Log in
           </Button>
-          <p className="text-xs text-center text-gray-500 mt-1">
-            For demo purposes, all features are available without creating an account
-          </p>
         </div>
       </div>
     </div>
