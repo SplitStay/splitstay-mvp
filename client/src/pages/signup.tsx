@@ -18,68 +18,43 @@ const SignUp: React.FC = () => {
   const [maskedPassword, setMaskedPassword] = useState("");
   const [maskedConfirmPassword, setMaskedConfirmPassword] = useState("");
   
+  // A simpler approach that shows password for demo purposes
+  // Initialize with travel-themed password
+  React.useEffect(() => {
+    setPassword("Wanderlust2025!");
+    setMaskedPassword("Wanderlust2025!");
+    
+    setTimeout(() => {
+      setMaskedPassword("•".repeat("Wanderlust2025!".length));
+    }, 3000);
+  }, []);
+  
   // Handle password input with characters that smoothly transition to dots
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setPassword(newValue);
     
-    // Show the actual text
+    // For demo purposes, just show the password in clear text
     setMaskedPassword(newValue);
-    
-    // After a delay, gradually mask characters from left to right
-    const totalDelay = 1500; // 1.5 seconds total visibility
-    const characterDelay = 150; // Time between masking each character
-    
-    if (newValue.length > 0) {
-      // Schedule the masking of each character
-      for (let i = 0; i < newValue.length; i++) {
-        setTimeout(() => {
-          // Mask characters progressively
-          const visiblePart = newValue.slice(i + 1);
-          const maskedPart = "•".repeat(i + 1);
-          setMaskedPassword(maskedPart + visiblePart);
-          
-          // When all characters are masked, update state for final value
-          if (i === newValue.length - 1) {
-            setMaskedPassword("•".repeat(newValue.length));
-          }
-        }, totalDelay + (i * characterDelay));
-      }
-    } else {
-      setMaskedPassword("");
-    }
   };
   
-  // Same for confirm password
+  // Same simplified approach for confirm password 
+  React.useEffect(() => {
+    setConfirmPassword("Wanderlust2025!");
+    setMaskedConfirmPassword("Wanderlust2025!");
+    
+    setTimeout(() => {
+      setMaskedConfirmPassword("•".repeat("Wanderlust2025!".length));
+    }, 3000);
+  }, []);
+  
+  // Handle confirm password input
   const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setConfirmPassword(newValue);
     
-    // Show the actual text
+    // For demo purposes, just show the password in clear text
     setMaskedConfirmPassword(newValue);
-    
-    // After a delay, gradually mask characters from left to right
-    const totalDelay = 1500; // 1.5 seconds total visibility
-    const characterDelay = 150; // Time between masking each character
-    
-    if (newValue.length > 0) {
-      // Schedule the masking of each character
-      for (let i = 0; i < newValue.length; i++) {
-        setTimeout(() => {
-          // Mask characters progressively
-          const visiblePart = newValue.slice(i + 1);
-          const maskedPart = "•".repeat(i + 1);
-          setMaskedConfirmPassword(maskedPart + visiblePart);
-          
-          // When all characters are masked, update state for final value
-          if (i === newValue.length - 1) {
-            setMaskedConfirmPassword("•".repeat(newValue.length));
-          }
-        }, totalDelay + (i * characterDelay));
-      }
-    } else {
-      setMaskedConfirmPassword("");
-    }
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
