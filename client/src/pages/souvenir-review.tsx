@@ -1,164 +1,196 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, Star, Heart, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import UserAvatar from "@/components/user-avatar";
 import { useToast } from "@/hooks/use-toast";
+import { Rating } from "@/components/ui/rating";
+import { MobileContainer } from "@/components/mobile-container";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ChevronLeft, Camera } from "lucide-react";
 
-const SouvenirReview: React.FC = () => {
-  const [_, navigate] = useLocation();
+export default function SouvenirReviewPage() {
+  const [, navigate] = useLocation();
   const { toast } = useToast();
-  const [sharedPhoto, setSharedPhoto] = useState(false);
+  const queryClient = useQueryClient();
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [review, setReview] = useState("");
+  const [rating, setRating] = useState(5);
+  const [showSuccess, setShowSuccess] = useState(false);
   
-  const handleShareMemory = () => {
-    setSharedPhoto(true);
-    toast({
-      title: "Photo shared",
-      description: "Your memory has been shared with Amara!",
-    });
+  // In a real app, we would get the booking details from the URL or state
+  const bookingId = 1;
+  const roommateName = "Amara";
+  
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSelectedImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
   
-  return (
-    <div className="p-6">
-      <div className="flex items-center mb-6">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="mr-2 text-gray-500"
-          onClick={() => navigate("/shared-experience")}
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <h1 className="text-2xl font-bold text-primary">Trip Memories</h1>
-      </div>
-
-      {/* Reviews summary */}
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-3">Your Reviews</h2>
-        
-        <Card className="border-2 border-gray-200 rounded-lg mb-4">
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-3 mb-3">
-              <UserAvatar
-                user={{
-                  fullName: "Amara",
-                  profilePicture: "/assets/Amara Profile Photo 4.png"
-                }}
-                size="md"
-              />
-              <div>
-                <h3 className="font-semibold">Amara</h3>
-                <div className="flex text-yellow-500">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} className="h-4 w-4 fill-current" />
-                  ))}
-                </div>
-              </div>
-            </div>
-            <p className="text-gray-700 italic">
-              "Emily was the perfect roommate! She's respectful, friendly, and made our shared stay so enjoyable. We had great conversations over tea while it rained outside. I would definitely share a room with her again!"
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card className="border-2 border-gray-200 rounded-lg">
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-3 mb-3">
-              <UserAvatar
-                user={{
-                  fullName: "Emily",
-                  profilePicture: "/assets/Emily Profile Photo 3.png"
-                }}
-                size="md"
-              />
-              <div>
-                <h3 className="font-semibold">You</h3>
-                <div className="flex text-yellow-500">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} className="h-4 w-4 fill-current" />
-                  ))}
-                </div>
-              </div>
-            </div>
-            <p className="text-gray-700 italic">
-              "Amara was an amazing roommate! She's considerate, organized, and made our stay so comfortable. We had wonderful conversations and even shared book recommendations. Would definitely room with her again!"
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Trip Souvenir */}
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-3">Trip Souvenir</h2>
-        <Card className="border-2 border-gray-200 rounded-lg overflow-hidden">
-          <div className="relative w-full h-64 bg-gray-200">
-            <div className="absolute inset-0 flex items-center justify-center text-lg text-gray-500">
-              Photo of Emily and Amara smiling in front of the Atomium in Brussels
-            </div>
+  const handleSubmit = () => {
+    // In a real app, we would call an API to save the review
+    // For this demo, we'll just show a success message
+    
+    if (!selectedImage) {
+      toast({
+        title: "Please select an image",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Simulate API call
+    setTimeout(() => {
+      setShowSuccess(true);
+      
+      // Invalidate queries to refresh the dashboard
+      queryClient.invalidateQueries({ queryKey: ['/api/bookings'] });
+    }, 500);
+  };
+  
+  if (showSuccess) {
+    return (
+      <MobileContainer>
+        <div className="flex flex-col h-full">
+          <div className="px-4 py-3 flex items-center bg-white">
+            <Button variant="ghost" size="icon" onClick={() => navigate("/dashboard")}>
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-lg font-medium ml-2">Review Submitted</h1>
           </div>
-          <CardContent className="p-4">
-            <h3 className="font-semibold">Brussels, Belgium</h3>
-            <p className="text-gray-600">May 24, 2025 • with Amara</p>
-            <div className="flex justify-between mt-3">
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-gray-700 border-gray-300 flex items-center gap-1"
-                onClick={() => toast({
-                  title: "Added to favorites",
-                  description: "This memory has been saved to your favorites!"
-                })}
+          
+          <div className="flex-1 p-4 flex flex-col items-center justify-center">
+            <div className="w-24 h-24 rounded-full bg-green-100 flex items-center justify-center mb-6">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-green-600"
               >
-                <Heart className="h-4 w-4" /> Favorite
-              </Button>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                className={`${
-                  sharedPhoto 
-                    ? "text-primary border-primary" 
-                    : "text-gray-700 border-gray-300"
-                } flex items-center gap-1`}
-                onClick={handleShareMemory}
-              >
-                <Share2 className="h-4 w-4" /> {sharedPhoto ? "Shared" : "Share"}
-              </Button>
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
             </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Quote */}
-      <Card className="border-2 border-gray-200 rounded-lg mb-6 bg-primary text-white">
-        <CardContent className="p-4 text-center">
-          <p className="italic text-lg mb-2">
-            "What started as a way to save on a hotel room turned into a friendship for life."
-          </p>
-          <div className="text-sm opacity-80">— Your SplitStay Journey</div>
-        </CardContent>
-      </Card>
-
-      {/* Actions */}
-      <div className="space-y-3">
-        <Button 
-          className="w-full bg-primary text-white font-semibold py-6"
-          onClick={() => navigate("/find-roommate")}
-        >
-          Plan Another Trip
-        </Button>
+            
+            <h2 className="text-xl font-semibold mb-2">Thank You!</h2>
+            <p className="text-center text-muted-foreground mb-6">
+              Your review and travel memory have been submitted successfully.
+            </p>
+            
+            <div className="w-full max-w-md aspect-video rounded-md overflow-hidden mb-4">
+              <img
+                src={selectedImage || ""}
+                alt="Selected souvenir"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            
+            <div className="w-full max-w-md p-4 bg-background border rounded-md mb-6">
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-medium">Your rating:</span>
+                <Rating value={rating} onChange={() => {}} readOnly />
+              </div>
+              <p className="text-sm text-muted-foreground">{review}</p>
+            </div>
+            
+            <Button onClick={() => navigate("/dashboard")} className="w-full max-w-md">
+              Return to Dashboard
+            </Button>
+          </div>
+        </div>
+      </MobileContainer>
+    );
+  }
+  
+  return (
+    <MobileContainer>
+      <div className="flex flex-col h-full">
+        <div className="px-4 py-3 flex items-center bg-white">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/dashboard")}>
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-lg font-medium ml-2">Rate Your Experience</h1>
+        </div>
         
-        <Button 
-          variant="outline" 
-          className="w-full border-2 border-gray-300 text-gray-700 font-semibold py-6"
-          onClick={() => navigate("/dashboard")}
-        >
-          Go to Dashboard
-        </Button>
+        <div className="flex-1 overflow-auto p-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-center">Share Your Travel Memory</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="text-center">
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Upload a photo from your stay and share your experience with {roommateName}
+                  </p>
+                  
+                  <div className="mb-4">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      id="souvenir-photo"
+                      className="hidden"
+                      onChange={handleImageChange}
+                    />
+                    <label
+                      htmlFor="souvenir-photo"
+                      className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-md cursor-pointer bg-background hover:bg-muted/50"
+                    >
+                      {selectedImage ? (
+                        <img
+                          src={selectedImage}
+                          alt="Selected"
+                          className="w-full h-full object-cover rounded-md"
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                          <Camera className="w-8 h-8 mb-2 text-muted-foreground" />
+                          <p className="text-sm text-muted-foreground">
+                            Click to upload a souvenir photo
+                          </p>
+                        </div>
+                      )}
+                    </label>
+                  </div>
+                </div>
+                
+                <Separator />
+                
+                <div className="space-y-2">
+                  <h3 className="font-medium">Rate your roommate</h3>
+                  <Rating value={rating} onChange={setRating} size="lg" />
+                </div>
+                
+                <div className="space-y-2">
+                  <h3 className="font-medium">Leave a review</h3>
+                  <textarea
+                    value={review}
+                    onChange={(e) => setReview(e.target.value)}
+                    placeholder="Share your experience..."
+                    className="w-full p-2 min-h-[100px] border rounded-md"
+                  />
+                </div>
+                
+                <Button onClick={handleSubmit} className="w-full">
+                  Submit Review
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
+    </MobileContainer>
   );
-};
-
-export default SouvenirReview;
+}
