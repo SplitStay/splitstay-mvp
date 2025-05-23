@@ -14,14 +14,14 @@ export default function SouvenirReviewPage() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>("/assets/selfie.png"); // Pre-select the selfie
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [review, setReview] = useState("");
+  const [review, setReview] = useState("Had an amazing time in Brussels with Amara! The Grand Place was so beautiful at sunset. We saved over €120 by sharing the room!");
   const [rating, setRating] = useState(5);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [existingReviews, setExistingReviews] = useState<Array<{photoUrl: string, rating: number, reviewText: string, userName: string}>>([]);
-  const [showExistingPhotos, setShowExistingPhotos] = useState(false);
+  const [showExistingPhotos, setShowExistingPhotos] = useState(true);
   
   // In a real app, we would get the booking details from the URL or state
   const bookingId = 1;
@@ -29,7 +29,7 @@ export default function SouvenirReviewPage() {
   const roommateName = "Amara";
   
   // Check if user has already uploaded a photo for this trip
-  const [hasExistingPhoto, setHasExistingPhoto] = useState(true); // Set to true for demo purposes
+  const [hasExistingPhoto, setHasExistingPhoto] = useState(false); // Set to false to allow uploading
   
   useEffect(() => {
     // Simulate fetching existing souvenirs for this trip
