@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Mail } from "lucide-react";
 import { FaGoogle, FaFacebook } from "react-icons/fa";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
 
 const SignUp: React.FC = () => {
   const [_, navigate] = useLocation();
-  const [email, setEmail] = useState("emily.zhang@gmail.com");
-  const [password, setPassword] = useState("Wanderlust2025!");
-  const [confirmPassword, setConfirmPassword] = useState("Wanderlust2025!");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -119,7 +119,7 @@ const SignUp: React.FC = () => {
             </label>
             <Input
               id="password"
-              type="text" // Using text type to show password for demo
+              type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Create a secure password"
@@ -127,7 +127,6 @@ const SignUp: React.FC = () => {
               disabled={isLoading}
               required
             />
-            <p className="text-xs text-gray-500 mt-1">For demo: {password}</p>
           </div>
           
           <div>
@@ -136,7 +135,7 @@ const SignUp: React.FC = () => {
             </label>
             <Input
               id="confirmPassword"
-              type="text" // Using text type to show password for demo
+              type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Confirm your password"
