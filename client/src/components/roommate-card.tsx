@@ -140,9 +140,14 @@ const RoommateCard: React.FC<RoommateCardProps> = ({
                       className="inline-flex items-center text-primary hover:underline"
                     >
                       {profile.preferredAccommodation.platform === 'booking' && (
-                        <div className="h-4 w-4 mr-1 rounded-md bg-[#003580] flex items-center justify-center relative">
-                          <span className="text-white font-bold text-[8px]">B</span>
-                          <span className="absolute bottom-0.5 right-0.5 w-1.5 h-1.5 rounded-full bg-[#00B9F7]"></span>
+                        <div className="h-4 w-4 mr-1 flex items-center justify-center">
+                          <svg viewBox="0 0 100 100" width="100%" height="100%">
+                            <path
+                              d="M37 14C18.3 14 3 29.3 3 48s15.3 34 34 34c18.7 0 34-15.3 34-34S55.7 14 37 14z"
+                              fill="#003580"
+                            />
+                            <circle cx="85" cy="48" r="12" fill="#00B9F7" />
+                          </svg>
                         </div>
                       )}
                       {profile.preferredAccommodation.platform === 'airbnb' && (
