@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Mail } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { FaGoogle, FaFacebook } from "react-icons/fa";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
@@ -10,66 +10,10 @@ import { toast } from "@/hooks/use-toast";
 const SignUp: React.FC = () => {
   const [_, navigate] = useLocation();
   const [email, setEmail] = useState("emily.zhang@gmail.com");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [password, setPassword] = useState("Wanderlust2025!");
+  const [confirmPassword, setConfirmPassword] = useState("Wanderlust2025!");
   const [isLoading, setIsLoading] = useState(false);
   
-  // For displaying the masked passwords with smooth transition
-  const [maskedPassword, setMaskedPassword] = useState("");
-  const [maskedConfirmPassword, setMaskedConfirmPassword] = useState("");
-  
-  // A cleaner approach that alternates between clear text and dots every few seconds
-  const [showClearPasswords, setShowClearPasswords] = useState(true);
-  
-  // Initialize with travel-themed password and toggle visibility
-  React.useEffect(() => {
-    // Set initial values
-    setPassword("Wanderlust2025!");
-    setConfirmPassword("Wanderlust2025!");
-    
-    // Toggle between clear text and dots every 5 seconds
-    const interval = setInterval(() => {
-      setShowClearPasswords(prev => !prev);
-    }, 5000);
-    
-    return () => clearInterval(interval);
-  }, []);
-  
-  // Update masked password display based on the toggle state
-  React.useEffect(() => {
-    if (showClearPasswords) {
-      setMaskedPassword(password);
-      setMaskedConfirmPassword(confirmPassword);
-    } else {
-      setMaskedPassword("•".repeat(password.length));
-      setMaskedConfirmPassword("•".repeat(confirmPassword.length));
-    }
-  }, [showClearPasswords, password, confirmPassword]);
-  
-  // Handle password input
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    setPassword(newValue);
-    
-    if (showClearPasswords) {
-      setMaskedPassword(newValue);
-    } else {
-      setMaskedPassword("•".repeat(newValue.length));
-    }
-  };
-  
-  // Handle confirm password input
-  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    setConfirmPassword(newValue);
-    
-    if (showClearPasswords) {
-      setMaskedConfirmPassword(newValue);
-    } else {
-      setMaskedConfirmPassword("•".repeat(newValue.length));
-    }
-  };
-
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -173,50 +117,33 @@ const SignUp: React.FC = () => {
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
               Password
             </label>
-            <div className="relative">
-              <Input
-                id="password"
-                type="text"
-                value={maskedPassword}
-                onChange={handlePasswordChange}
-                placeholder="Create a secure password"
-                className="w-full"
-                disabled={isLoading}
-                required
-              />
-              <input 
-                type="password" 
-                className="opacity-0 h-0 w-0 absolute" 
-                tabIndex={-1}
-                value={password}
-                readOnly
-              />
-            </div>
+            <Input
+              id="password"
+              type="text" // Using text type to show password for demo
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Create a secure password"
+              className="w-full"
+              disabled={isLoading}
+              required
+            />
+            <p className="text-xs text-gray-500 mt-1">For demo: {password}</p>
           </div>
           
           <div>
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
               Confirm Password
             </label>
-            <div className="relative">
-              <Input
-                id="confirmPassword"
-                type="text"
-                value={maskedConfirmPassword}
-                onChange={handleConfirmPasswordChange}
-                placeholder="Confirm your password"
-                className="w-full"
-                disabled={isLoading}
-                required
-              />
-              <input 
-                type="password" 
-                className="opacity-0 h-0 w-0 absolute" 
-                tabIndex={-1}
-                value={confirmPassword}
-                readOnly
-              />
-            </div>
+            <Input
+              id="confirmPassword"
+              type="text" // Using text type to show password for demo
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirm your password"
+              className="w-full"
+              disabled={isLoading}
+              required
+            />
           </div>
           
           <Button 
