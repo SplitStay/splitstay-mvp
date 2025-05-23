@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { SplitStayLogo } from "@/components/icons";
 import "../styles/mobile-container.css";
@@ -13,6 +13,16 @@ const Layout: React.FC<LayoutProps> = ({
   children,
   className = "",
 }) => {
+  const [location] = useLocation();
+
+  useEffect(() => {
+    // Scroll to top whenever location changes
+    const scrollArea = document.querySelector('.mobile-scroll');
+    if (scrollArea) {
+      scrollArea.scrollTop = 0;
+    }
+  }, [location]);
+
   useEffect(() => {
     // Set current time for the mobile status bar
     const updateTime = () => {
