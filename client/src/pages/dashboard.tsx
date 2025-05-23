@@ -273,11 +273,11 @@ const Dashboard: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="flex justify-between items-center mt-3">
+                  <div className="flex justify-between items-center mt-3 gap-3">
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="text-xs"
+                      className="text-xs flex-1 h-10"
                       onClick={() => {
                         try {
                           navigate(`/booking-confirmation/1`);
@@ -289,8 +289,9 @@ const Dashboard: React.FC = () => {
                       View Details
                     </Button>
                     <Button 
+                      variant="default"
                       size="sm" 
-                      className="text-xs navy-button"
+                      className="text-xs flex-1 h-10 bg-primary text-white hover:bg-primary/90"
                       onClick={() => {
                         try {
                           navigate(`/chat/1`);
