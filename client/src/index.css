@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 :root {
   --background: 39 29% 95%;  /* #F5F1EB */
   --foreground: 240 10% 3.9%;
