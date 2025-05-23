@@ -9,10 +9,23 @@ import { toast } from "@/hooks/use-toast";
 
 const SignUp: React.FC = () => {
   const [_, navigate] = useLocation();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [email, setEmail] = useState("emily.zhang@gmail.com");
+  const [password, setPassword] = useState("Wanderlust2025!");
+  const [confirmPassword, setConfirmPassword] = useState("Wanderlust2025!");
   const [isLoading, setIsLoading] = useState(false);
+  // State for toggling password visibility
+  const [showPassword, setShowPassword] = useState(true);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(true);
+  
+  // Auto-hide passwords after a short delay (for demo purposes)
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowPassword(false);
+      setShowConfirmPassword(false);
+    }, 2000); // Show password for 2 seconds
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,7 +132,7 @@ const SignUp: React.FC = () => {
             </label>
             <Input
               id="password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Create a secure password"
@@ -135,7 +148,7 @@ const SignUp: React.FC = () => {
             </label>
             <Input
               id="confirmPassword"
-              type="password"
+              type={showConfirmPassword ? "text" : "password"}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Confirm your password"
