@@ -15,8 +15,8 @@ export function Toaster() {
     <ToastProvider>
       {toasts.map(function ({ id, title, description, action, ...props }) {
         return (
-          <Toast key={id} {...props} className="w-auto inline-flex max-w-xs transition-all duration-75" 
-            style={{animation: "fadeOut 0.15s forwards", animationDelay: "0.05s"}}>
+          <Toast key={id} {...props} className="w-auto inline-flex max-w-xs" 
+            style={{opacity: 1}}>
             <div className="grid gap-1">
               {title && <ToastTitle>{title}</ToastTitle>}
               {description && (
