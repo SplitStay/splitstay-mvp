@@ -416,21 +416,25 @@ const BrowseProfiles: React.FC = () => {
       
       {/* Profile Cards */}
       {isLoading ? (
-        <div className="space-y-4">
-          {[1, 2, 3].map((i) => (
-            <Card key={i} className="border-2 border-gray-200">
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-3">
-                  <Skeleton className="h-16 w-16 rounded-full" />
-                  <div className="flex-1 space-y-2">
-                    <Skeleton className="h-5 w-24" />
-                    <Skeleton className="h-4 w-40" />
-                    <Skeleton className="h-6 w-32" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+        <div className="text-center py-10 space-y-6">
+          <div className="flex justify-center items-center">
+            <div className="relative">
+              <div className="w-16 h-16 rounded-full bg-primary/20 animate-pulse absolute top-0 left-0 transform scale-150 opacity-30"></div>
+              <div className="w-16 h-16 rounded-full bg-primary/30 animate-pulse absolute top-0 left-0 transform scale-125 opacity-50" style={{ animationDelay: '0.3s' }}></div>
+              <div className="w-16 h-16 rounded-full bg-primary flex justify-center items-center relative z-10">
+                <Users className="h-8 w-8 text-white" />
+              </div>
+            </div>
+          </div>
+          <h3 className="text-xl font-semibold text-primary mt-4">Finding your perfect match</h3>
+          <p className="text-gray-600 px-6">
+            Our algorithm is analyzing travel preferences to find your ideal roommate for your stay in {destination || 'Brussels'}
+          </p>
+          <div className="flex justify-center space-x-2 mt-4">
+            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
+            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+          </div>
         </div>
       ) : (
         <div className="space-y-4">
