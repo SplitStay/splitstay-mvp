@@ -18,43 +18,56 @@ const SignUp: React.FC = () => {
   const [maskedPassword, setMaskedPassword] = useState("");
   const [maskedConfirmPassword, setMaskedConfirmPassword] = useState("");
   
-  // A simpler approach that shows password for demo purposes
-  // Initialize with travel-themed password
+  // A cleaner approach that alternates between clear text and dots every few seconds
+  const [showClearPasswords, setShowClearPasswords] = useState(true);
+  
+  // Initialize with travel-themed password and toggle visibility
   React.useEffect(() => {
+    // Set initial values
     setPassword("Wanderlust2025!");
-    setMaskedPassword("Wanderlust2025!");
+    setConfirmPassword("Wanderlust2025!");
     
-    setTimeout(() => {
-      setMaskedPassword("•".repeat("Wanderlust2025!".length));
-    }, 3000);
+    // Toggle between clear text and dots every 5 seconds
+    const interval = setInterval(() => {
+      setShowClearPasswords(prev => !prev);
+    }, 5000);
+    
+    return () => clearInterval(interval);
   }, []);
   
-  // Handle password input with characters that smoothly transition to dots
+  // Update masked password display based on the toggle state
+  React.useEffect(() => {
+    if (showClearPasswords) {
+      setMaskedPassword(password);
+      setMaskedConfirmPassword(confirmPassword);
+    } else {
+      setMaskedPassword("•".repeat(password.length));
+      setMaskedConfirmPassword("•".repeat(confirmPassword.length));
+    }
+  }, [showClearPasswords, password, confirmPassword]);
+  
+  // Handle password input
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setPassword(newValue);
     
-    // For demo purposes, just show the password in clear text
-    setMaskedPassword(newValue);
+    if (showClearPasswords) {
+      setMaskedPassword(newValue);
+    } else {
+      setMaskedPassword("•".repeat(newValue.length));
+    }
   };
-  
-  // Same simplified approach for confirm password 
-  React.useEffect(() => {
-    setConfirmPassword("Wanderlust2025!");
-    setMaskedConfirmPassword("Wanderlust2025!");
-    
-    setTimeout(() => {
-      setMaskedConfirmPassword("•".repeat("Wanderlust2025!".length));
-    }, 3000);
-  }, []);
   
   // Handle confirm password input
   const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setConfirmPassword(newValue);
     
-    // For demo purposes, just show the password in clear text
-    setMaskedConfirmPassword(newValue);
+    if (showClearPasswords) {
+      setMaskedConfirmPassword(newValue);
+    } else {
+      setMaskedConfirmPassword("•".repeat(newValue.length));
+    }
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
