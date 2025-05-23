@@ -6,7 +6,7 @@ import type {
 } from "@/components/ui/toast"
 
 const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 750 // 0.75 seconds for a very quick disappearance
+const TOAST_REMOVE_DELAY = 300 // 0.3 seconds for an extremely quick disappearance
 
 type ToasterToast = ToastProps & {
   id: string
