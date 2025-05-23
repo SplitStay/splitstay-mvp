@@ -545,29 +545,24 @@ const CreateProfile: React.FC = () => {
               </Dialog>
             </div>
             <div className="flex flex-wrap gap-2">
-              {selectedLanguages.length > 0 ? (
-                selectedLanguages.map((language) => (
+              {/* Show all language options, with selected ones highlighted */}
+              {languages.map((language) => {
+                const isSelected = selectedLanguages.includes(language);
+                return (
                   <button
                     key={language}
                     type="button"
-                    className="py-2 px-4 rounded-full text-sm transition-colors bg-yellow-100 text-gray-800 border border-yellow-300"
+                    className={`py-2 px-4 rounded-full text-sm transition-colors ${
+                      isSelected 
+                        ? 'bg-yellow-100 text-gray-800 border border-yellow-300' 
+                        : 'bg-white border border-gray-300 text-gray-700 hover:border-yellow-300'
+                    }`}
                     onClick={() => toggleLanguage(language)}
                   >
                     {language}
                   </button>
-                ))
-              ) : (
-                languages.map((language) => (
-                  <button
-                    key={language}
-                    type="button"
-                    className="py-2 px-4 rounded-full text-sm transition-colors bg-white border border-gray-300 text-gray-700 hover:border-yellow-300"
-                    onClick={() => toggleLanguage(language)}
-                  >
-                    {language}
-                  </button>
-                ))
-              )}
+                );
+              })}
             </div>
           </div>
         </div>
