@@ -14,25 +14,37 @@ const SignUp: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   
-  // For displaying the masked passwords with last character visible
+  // For displaying the masked passwords with smooth transition
   const [maskedPassword, setMaskedPassword] = useState("");
   const [maskedConfirmPassword, setMaskedConfirmPassword] = useState("");
   
-  // Handle password input with briefly visible last character
+  // Handle password input with characters that smoothly transition to dots
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setPassword(newValue);
     
-    // Create masked version with last character visible
+    // Show the actual text
+    setMaskedPassword(newValue);
+    
+    // After a delay, gradually mask characters from left to right
+    const totalDelay = 1500; // 1.5 seconds total visibility
+    const characterDelay = 150; // Time between masking each character
+    
     if (newValue.length > 0) {
-      const lastChar = newValue.slice(-1);
-      const dots = "•".repeat(newValue.length - 1);
-      setMaskedPassword(dots + lastChar);
-      
-      // Hide the last character after a brief delay
-      setTimeout(() => {
-        setMaskedPassword("•".repeat(newValue.length));
-      }, 500);
+      // Schedule the masking of each character
+      for (let i = 0; i < newValue.length; i++) {
+        setTimeout(() => {
+          // Mask characters progressively
+          const visiblePart = newValue.slice(i + 1);
+          const maskedPart = "•".repeat(i + 1);
+          setMaskedPassword(maskedPart + visiblePart);
+          
+          // When all characters are masked, update state for final value
+          if (i === newValue.length - 1) {
+            setMaskedPassword("•".repeat(newValue.length));
+          }
+        }, totalDelay + (i * characterDelay));
+      }
     } else {
       setMaskedPassword("");
     }
@@ -43,14 +55,28 @@ const SignUp: React.FC = () => {
     const newValue = e.target.value;
     setConfirmPassword(newValue);
     
+    // Show the actual text
+    setMaskedConfirmPassword(newValue);
+    
+    // After a delay, gradually mask characters from left to right
+    const totalDelay = 1500; // 1.5 seconds total visibility
+    const characterDelay = 150; // Time between masking each character
+    
     if (newValue.length > 0) {
-      const lastChar = newValue.slice(-1);
-      const dots = "•".repeat(newValue.length - 1);
-      setMaskedConfirmPassword(dots + lastChar);
-      
-      setTimeout(() => {
-        setMaskedConfirmPassword("•".repeat(newValue.length));
-      }, 500);
+      // Schedule the masking of each character
+      for (let i = 0; i < newValue.length; i++) {
+        setTimeout(() => {
+          // Mask characters progressively
+          const visiblePart = newValue.slice(i + 1);
+          const maskedPart = "•".repeat(i + 1);
+          setMaskedConfirmPassword(maskedPart + visiblePart);
+          
+          // When all characters are masked, update state for final value
+          if (i === newValue.length - 1) {
+            setMaskedConfirmPassword("•".repeat(newValue.length));
+          }
+        }, totalDelay + (i * characterDelay));
+      }
     } else {
       setMaskedConfirmPassword("");
     }
