@@ -119,66 +119,64 @@ const RoommateCard: React.FC<RoommateCardProps> = ({
           {/* Preferred Accommodation Section */}
           {profile.preferredAccommodation && (
             <div className="mt-3 border-t pt-2 border-gray-100 text-xs">
-              <div className="flex items-start">
+              <div className="space-y-2">
                 <div className="flex items-center">
                   <Home className="h-3 w-3 mr-1 text-gray-600" />
                   <span className="font-medium text-gray-700">Preferred Accommodation:</span>
                 </div>
                 
-                <div className="ml-2 flex-1">
-                  <div className="flex justify-between">
-                    <span>{profile.preferredAccommodation.name}</span>
-                    <a 
-                      href={profile.preferredAccommodation.url} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        window.open(profile.preferredAccommodation.url, '_blank');
-                      }}
-                      className="inline-flex items-center text-primary hover:underline"
-                    >
-                      {profile.preferredAccommodation.platform === 'booking' && (
-                        <div className="h-4 w-4 mr-1 flex items-center justify-center">
-                          <svg viewBox="0 0 100 100" width="100%" height="100%">
-                            <path
-                              d="M37 14C18.3 14 3 29.3 3 48s15.3 34 34 34c18.7 0 34-15.3 34-34S55.7 14 37 14z"
-                              fill="#003580"
-                            />
-                            <circle cx="85" cy="48" r="12" fill="#00B9F7" />
-                          </svg>
-                        </div>
-                      )}
-                      {profile.preferredAccommodation.platform === 'airbnb' && (
-                        <FaAirbnb className="h-3 w-3 mr-1 text-red-500" />
-                      )}
-                      {profile.preferredAccommodation.platform === 'agoda' && (
-                        <MdHotel className="h-3 w-3 mr-1 text-purple-600" />
-                      )}
-                      <span>View</span>
-                      <ExternalLink className="h-2.5 w-2.5 ml-0.5" />
-                    </a>
-                  </div>
-                  
-                  <div className="flex items-center mt-1">
-                    {profile.preferredAccommodation.isFlexible ? (
-                      <Badge variant="outline" className="h-5 border-green-200 bg-green-50 text-green-600 text-[10px] px-1 py-0 rounded-sm">
-                        <Check className="h-2.5 w-2.5 mr-0.5" />
-                        Open to other options
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline" className="h-5 border-amber-200 bg-amber-50 text-amber-600 text-[10px] px-1 py-0 rounded-sm">
-                        <Lock className="h-2.5 w-2.5 mr-0.5" />
-                        Preferred location only
-                      </Badge>
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold text-sm">{profile.preferredAccommodation.name}</span>
+                  <a 
+                    href={profile.preferredAccommodation.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      window.open(profile.preferredAccommodation.url, '_blank');
+                    }}
+                    className="inline-flex items-center text-primary hover:underline"
+                  >
+                    {profile.preferredAccommodation.platform === 'booking' && (
+                      <div className="h-5 w-5 mr-1 flex items-center justify-center">
+                        <svg viewBox="0 0 100 100" width="100%" height="100%">
+                          <path
+                            d="M37 14C18.3 14 3 29.3 3 48s15.3 34 34 34c18.7 0 34-15.3 34-34S55.7 14 37 14z"
+                            fill="#003580"
+                          />
+                          <circle cx="85" cy="48" r="12" fill="#00B9F7" />
+                        </svg>
+                      </div>
                     )}
-                  </div>
-                  
-                  <div className="flex items-center mt-1">
-                    <Bed className="h-3 w-3 mr-1 text-gray-600" />
-                    <span className="text-xs text-gray-700">{profile.preferredAccommodation.roomType}</span>
-                  </div>
+                    {profile.preferredAccommodation.platform === 'airbnb' && (
+                      <FaAirbnb className="h-5 w-5 mr-1 text-red-500" />
+                    )}
+                    {profile.preferredAccommodation.platform === 'agoda' && (
+                      <MdHotel className="h-5 w-5 mr-1 text-purple-600" />
+                    )}
+                    <span>View</span>
+                    <ExternalLink className="h-3 w-3 ml-0.5" />
+                  </a>
+                </div>
+                
+                <div className="flex items-center">
+                  {profile.preferredAccommodation.isFlexible ? (
+                    <Badge variant="outline" className="h-5 border-green-200 bg-green-50 text-green-600 text-[10px] px-1 py-0 rounded-sm">
+                      <Check className="h-2.5 w-2.5 mr-0.5" />
+                      Open to other options
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="h-5 border-amber-200 bg-amber-50 text-amber-600 text-[10px] px-1 py-0 rounded-sm">
+                      <Lock className="h-2.5 w-2.5 mr-0.5" />
+                      Preferred location only
+                    </Badge>
+                  )}
+                </div>
+                
+                <div className="flex items-center">
+                  <Bed className="h-3 w-3 mr-1 text-gray-600" />
+                  <span className="text-xs text-gray-700">{profile.preferredAccommodation.roomType}</span>
                 </div>
               </div>
             </div>
