@@ -9,7 +9,8 @@ import {
   MessageSquare, 
   Star,
   Users,
-  Gift
+  Gift,
+  Camera
 } from "lucide-react";
 import { SplitStayLogo } from "@/components/icons";
 import { Card, CardContent } from "@/components/ui/card";
@@ -328,6 +329,78 @@ const Dashboard: React.FC = () => {
         )}
       </div>
       
+      {/* Travel Memories */}
+      <div className="mb-6">
+        <div className="flex justify-between items-center mb-3">
+          <h2 className="text-lg font-semibold">Travel Memories</h2>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-xs flex items-center"
+            onClick={() => navigate("/souvenir-review")}
+          >
+            <Camera className="h-3 w-3 mr-1" />
+            Add Memory
+          </Button>
+        </div>
+        {isLoading ? (
+          <div className="grid grid-cols-2 gap-3">
+            <Skeleton className="h-36 w-full" />
+            <Skeleton className="h-36 w-full" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-3">
+            <Card className="overflow-hidden">
+              <div className="aspect-square w-full">
+                <img 
+                  src="https://images.unsplash.com/photo-1503917988258-f87a78e3c995?q=80&w=1974&auto=format&fit=crop" 
+                  alt="Paris memory" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <CardContent className="p-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star 
+                        key={star} 
+                        className={`h-3 w-3 ${star <= 5 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
+                      />
+                    ))}
+                  </div>
+                  <span className="text-xs text-gray-500">2 months ago</span>
+                </div>
+                <p className="text-xs truncate">Amazing trip with Sophie in Paris!</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="overflow-hidden">
+              <div className="aspect-square w-full">
+                <img 
+                  src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=2073&auto=format&fit=crop" 
+                  alt="Paris memory" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <CardContent className="p-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star 
+                        key={star} 
+                        className={`h-3 w-3 ${star <= 4 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
+                      />
+                    ))}
+                  </div>
+                  <span className="text-xs text-gray-500">3 months ago</span>
+                </div>
+                <p className="text-xs truncate">Beautiful view from our hotel!</p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+      </div>
+
       {/* Past Trips */}
       <div className="mb-6">
         <h2 className="text-lg font-semibold mb-3">Past Trips</h2>
@@ -398,13 +471,13 @@ const Dashboard: React.FC = () => {
                       className="text-xs flex-1 h-10"
                       onClick={() => {
                         try {
-                          navigate(`/leave-review/2`);
+                          navigate(`/souvenir-review`);
                         } catch (error) {
-                          handleError(error as Error, "viewing review page");
+                          handleError(error as Error, "viewing souvenir page");
                         }
                       }}
                     >
-                      Leave Review
+                      Share Travel Memory
                     </Button>
                     <Button 
                       variant="default"
