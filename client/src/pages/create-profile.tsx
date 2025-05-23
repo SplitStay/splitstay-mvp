@@ -681,78 +681,27 @@ const CreateProfile: React.FC = () => {
             </div>
             {/* Common quick-select trait options */}
             <div className="flex flex-wrap gap-2 mb-4">
-              {/* Show selected traits with yellow background */}
-              {selectedTraits.length > 0 && (
-                <div className="flex flex-wrap gap-2 w-full mb-2">
-                  {selectedTraits.map((traitId) => {
-                    const trait = allTravelTraits.find(t => t.id === traitId);
-                    return trait ? (
-                      <button
-                        key={traitId}
-                        type="button"
-                        className="py-2 px-4 rounded-full text-sm transition-colors bg-yellow-100 text-gray-800 border border-yellow-300"
-                        onClick={() => toggleTrait(traitId)}
-                      >
-                        {trait.label}
-                      </button>
-                    ) : null;
-                  })}
-                </div>
-              )}
-              
-              {/* Show unselected traits as options */}
+              {/* Show all travel traits, with selected ones highlighted */}
               {["Early Bird", "Night Owl", "Adventurous", "Relaxed", "Foodie", "Budget-conscious", "Clean", "Social", "Quiet", "Nature Lover"].map((label) => {
                 const trait = allTravelTraits.find(t => t.label === label);
                 const traitId = trait ? trait.id : label.toLowerCase().replace(/\s+/g, '_');
                 const isSelected = selectedTraits.includes(traitId);
                 
-                // Only show traits that aren't already selected
-                if (!isSelected) {
-                  return (
-                    <button
-                      key={traitId}
-                      type="button"
-                      className="py-2 px-4 rounded-full text-sm transition-colors bg-white border border-gray-300 text-gray-700 hover:border-yellow-300"
-                      onClick={() => toggleTrait(traitId)}
-                    >
-                      {label}
-                    </button>
-                  );
-                }
-                return null;
-              })}
-            </div>
-            
-            {/* Selected traits */}
-            <div className="flex flex-wrap gap-2">
-              {selectedTraits.length > 0 ? (
-                // Display selected traits
-                selectedTraits.map(traitId => {
-                  const trait = allTravelTraits.find(t => t.id === traitId);
-                  return trait ? (
-                    <button
-                      key={trait.id}
-                      type="button"
-                      className="py-2 px-4 rounded-full text-sm transition-colors bg-yellow-100 text-gray-800 border border-yellow-300"
-                      onClick={() => toggleTrait(trait.id)}
-                    >
-                      {trait.label}
-                    </button>
-                  ) : null;
-                })
-              ) : (
-                // If no traits are selected, show default traits
-                travelTraits.map((trait) => (
+                return (
                   <button
-                    key={trait.id}
+                    key={traitId}
                     type="button"
-                    className="py-2 px-4 rounded-full text-sm transition-colors bg-white border border-gray-300 text-gray-700 hover:border-yellow-300"
-                    onClick={() => toggleTrait(trait.id)}
+                    className={`py-2 px-4 rounded-full text-sm transition-colors ${
+                      isSelected 
+                        ? 'bg-yellow-100 text-gray-800 border border-yellow-300' 
+                        : 'bg-white border border-gray-300 text-gray-700 hover:border-yellow-300'
+                    }`}
+                    onClick={() => toggleTrait(traitId)}
                   >
-                    {trait.label}
+                    {label}
                   </button>
-                ))
-              )}
+                );
+              })}
             </div>
           </div>
           
