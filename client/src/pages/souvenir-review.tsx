@@ -14,8 +14,8 @@ export default function SouvenirReviewPage() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  // Directly reference the selfie image with the correct path
-  const [selectedImage, setSelectedImage] = useState<string | null>("https://images.unsplash.com/photo-1588993608283-7f0eda4438be?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80");
+  // Use the actual uploaded selfie photo
+  const [selectedImage, setSelectedImage] = useState<string | null>("/assets/brussels-selfie.png");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [review, setReview] = useState("Had an amazing time in Brussels with Amara! The Grand Place was so beautiful at sunset. We saved over €120 by sharing the room!");
   const [rating, setRating] = useState(5);
