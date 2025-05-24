@@ -9,6 +9,8 @@ import { Separator } from "@/components/ui/separator";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft, Camera, AlertCircle, Star } from "lucide-react";
 import { uploadSouvenirPhoto, getMockSouvenirs } from "@/lib/supabase";
+// Import selfie image directly
+import selfieImage from "../assets/selfie-brussels.png";
 
 export default function SouvenirReviewPage() {
   const [, navigate] = useLocation();
@@ -255,8 +257,9 @@ export default function SouvenirReviewPage() {
                         style={{ height: "400px", maxWidth: "280px", margin: "0 auto", borderColor: "#e2e8f0" }}
                       >
                         <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                          {/* Use the imported selfie image */}
                           <img
-                            src={selectedImage || ""}
+                            src={selfieImage}
                             alt="Brussels trip selfie"
                             className="h-full object-cover"
                             style={{ width: "auto", maxWidth: "100%" }}
