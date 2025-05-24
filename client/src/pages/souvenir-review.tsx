@@ -210,25 +210,29 @@ export default function SouvenirReviewPage() {
     <MobileContainer>
       <div className="flex flex-col h-full">
         <div className="pt-2">
-          {/* Status bar mockup - cleaner version */}
-          <div className="flex justify-between items-center px-5 py-2 bg-white rounded-t-xl">
-            <div className="text-base font-medium text-gray-800">10:42 AM</div>
-            <div className="flex items-center space-x-2">
-              <div className="h-3">
-                <svg width="17" height="12" viewBox="0 0 17 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1 8.5H2.5V11.5H1V8.5ZM4.5 6H6V11.5H4.5V6ZM8 3H9.5V11.5H8V3ZM11.5 0.5H13V11.5H11.5V0.5ZM15 5H16.5V11.5H15V5Z" fill="black"/>
+          {/* Status bar mockup - exactly like screenshot */}
+          <div className="flex justify-between items-center py-2 bg-white rounded-t-xl">
+            <div className="w-1/3"></div>
+            <div className="w-1/3 text-center">
+              <div className="text-base font-medium text-gray-800">10:42 AM</div>
+            </div>
+            <div className="w-1/3 flex justify-end pr-4 space-x-2">
+              <div>
+                <svg width="17" height="11" viewBox="0 0 17 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M1 9H2V10H1V9ZM4 7H5V10H4V7ZM7 5H8V10H7V5ZM10 3H11V10H10V3ZM13 1H14V10H13V1Z" fill="black"/>
                 </svg>
               </div>
-              <div className="h-3">
+              <div>
                 <svg width="15" height="11" viewBox="0 0 15 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M7.5 2.06694C8.75 2.06694 9.90125 2.54028 10.7437 3.38194C11.5875 4.2236 12.0625 5.3736 12.0625 6.62194C12.0625 7.87194 11.5875 9.02194 10.7437 9.86194C9.90125 10.7036 8.75 11.1769 7.5 11.1769C6.25 11.1769 5.09875 10.7036 4.25625 9.86194C3.41375 9.02194 2.9375 7.87194 2.9375 6.62194C2.9375 5.3736 3.41375 4.2236 4.25625 3.38194C5.09875 2.54028 6.25 2.06694 7.5 2.06694ZM13.5888 1.7786C15.1375 3.32694 16 5.38527 16 6.62194C16 7.86027 15.1375 9.9186 13.5888 11.4669L12.5 10.3786C13.75 9.12694 14.375 7.46194 14.375 6.62194C14.375 5.78194 13.75 4.11694 12.5 2.8653L13.5888 1.7786ZM1.41125 1.7786L2.5 2.8653C1.25 4.11694 0.625 5.78194 0.625 6.62194C0.625 7.46194 1.25 9.12694 2.5 10.3786L1.41125 11.4669C-0.1375 9.9186 -1 7.86027 -1 6.62194C-1 5.38527 -0.1375 3.32694 1.41125 1.7786Z" fill="black"/>
+                  <path d="M7.5 2C8.5 2 9.5 2.5 10.25 3.25C11 4 11.5 5 11.5 6C11.5 7 11 8 10.25 8.75C9.5 9.5 8.5 10 7.5 10C6.5 10 5.5 9.5 4.75 8.75C4 8 3.5 7 3.5 6C3.5 5 4 4 4.75 3.25C5.5 2.5 6.5 2 7.5 2Z" stroke="black"/>
+                  <path d="M0.5 6C0.5 3.5 2.5 0.5 7.5 0.5C12.5 0.5 14.5 3.5 14.5 6" stroke="black"/>
                 </svg>
               </div>
-              <div className="h-3">
-                <svg width="25" height="12" viewBox="0 0 25 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect x="0.833984" y="0.5" width="21" height="11" rx="3" stroke="black"/>
-                  <rect x="2.83398" y="2" width="17" height="8" rx="1.5" fill="black"/>
-                  <path d="M23.334 4V8C24.2164 7.66122 24.8334 6.87313 24.8334 6C24.8334 5.12687 24.2164 4.33878 23.334 4Z" fill="black"/>
+              <div>
+                <svg width="24" height="12" viewBox="0 0 24 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="0.5" y="0.5" width="20" height="10" rx="2.5" stroke="black"/>
+                  <rect x="2" y="2" width="17" height="7" rx="1.5" fill="black"/>
+                  <path d="M23 4.5V7C23.8284 6.7239 24.3 6.1716 24.3 5.75C24.3 5.3284 23.8284 4.7761 23 4.5Z" fill="black"/>
                 </svg>
               </div>
             </div>
