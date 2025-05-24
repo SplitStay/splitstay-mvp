@@ -9,8 +9,9 @@ import { Separator } from "@/components/ui/separator";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft, Camera, AlertCircle, Star } from "lucide-react";
 import { uploadSouvenirPhoto, getMockSouvenirs } from "@/lib/supabase";
-// Import selfie image directly
+// Import selfie images directly
 import selfieImage from "../assets/selfie-brussels.png";
+import amaraImage from "../assets/amara-brussels.jpg";
 
 export default function SouvenirReviewPage() {
   const [, navigate] = useLocation();
@@ -42,10 +43,10 @@ export default function SouvenirReviewPage() {
         // For demo, we'll use our mock function
         const photos = getMockSouvenirs(bookingId);
         
-        // Set up roommate's review with a Brussels landmark
+        // Set up roommate's review with the new Brussels photo
         setExistingReviews([
           {
-            photoUrl: "https://images.unsplash.com/photo-1612288527562-32356fa4b763?q=80&w=1974&auto=format&fit=crop",
+            photoUrl: amaraImage,
             rating: 5,
             reviewText: "Had such a great time sharing this room with Emily! Our Brussels trip was amazing and we saved over €120.",
             userName: roommateName
