@@ -281,8 +281,9 @@ export default function SouvenirReviewPage() {
                       value={review}
                       onChange={(e) => setReview(e.target.value)}
                       placeholder="Share your experience..."
-                      className="w-full p-2 min-h-[100px] border rounded-md"
+                      className="w-full p-2 min-h-[150px] border rounded-md"
                       disabled={isUploading}
+                      style={{ resize: "none" }}
                     />
                   </div>
                   
