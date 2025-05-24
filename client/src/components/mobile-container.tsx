@@ -9,11 +9,18 @@ export function MobileContainer({ children }: MobileContainerProps) {
   return (
     <div className="mobile-container-wrapper">
       <div className="mobile-container">
-        {/* Removed status bar with black marks */}
+        <div className="mobile-status-bar">
+          <div className="mobile-time">9:41</div>
+          <div className="mobile-icons">
+            <div className="mobile-signal"></div>
+            <div className="mobile-wifi"></div>
+            <div className="mobile-battery"></div>
+          </div>
+        </div>
         <div className="mobile-content">
           {children}
         </div>
-        {/* Removed home indicator */}
+        <div className="mobile-home-indicator"></div>
       </div>
     </div>
   );
