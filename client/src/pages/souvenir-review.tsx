@@ -9,16 +9,12 @@ import { Separator } from "@/components/ui/separator";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft, Camera, AlertCircle, Star } from "lucide-react";
 import { uploadSouvenirPhoto, getMockSouvenirs } from "@/lib/supabase";
-// Import selfie images directly
-import selfieImage from "../assets/selfie-brussels.png";
-import amaraImage from "../assets/amara-brussels.jpg";
 
 export default function SouvenirReviewPage() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  // Use the actual uploaded selfie photo with direct path
-  const [selectedImage, setSelectedImage] = useState<string | null>("/brussels-selfie.png");
+  const [selectedImage, setSelectedImage] = useState<string | null>("/assets/selfie.png"); // Pre-select the selfie
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [review, setReview] = useState("Had an amazing time in Brussels with Amara! The Grand Place was so beautiful at sunset. We saved over €120 by sharing the room!");
   const [rating, setRating] = useState(5);
@@ -43,12 +39,12 @@ export default function SouvenirReviewPage() {
         // For demo, we'll use our mock function
         const photos = getMockSouvenirs(bookingId);
         
-        // Set up roommate's review with the new Brussels photo
+        // Set up mock data for roommate's review
         setExistingReviews([
           {
-            photoUrl: amaraImage,
+            photoUrl: "https://images.unsplash.com/photo-1503917988258-f87a78e3c995?q=80&w=1974&auto=format&fit=crop",
             rating: 5,
-            reviewText: "Had such a great time sharing this room with Emily! Our Brussels trip was amazing and we saved over €120.",
+            reviewText: "Had such a great time sharing this room with Emily! The hotel was beautiful and we saved so much money.",
             userName: roommateName
           }
         ]);
@@ -253,18 +249,25 @@ export default function SouvenirReviewPage() {
                         onChange={handleImageChange}
                         disabled={isUploading}
                       />
-                      <div
-                        className="flex flex-col items-center justify-center w-full overflow-hidden"
-                        style={{ height: "400px", width: "100%", margin: "0 auto" }}
+                      <label
+                        htmlFor="souvenir-photo"
+                        className="flex flex-col items-center justify-center w-full h-60 border-2 border-dashed rounded-md cursor-pointer bg-background hover:bg-muted/50"
                       >
-                        {/* Use the imported selfie image with no borders */}
-                        <img
-                          src={selfieImage}
-                          alt="Brussels trip selfie"
-                          className="h-full object-cover"
-                          style={{ width: "100%" }}
-                        />
-                      </div>
+                        {selectedImage ? (
+                          <img
+                            src={selectedImage}
+                            alt="Selected"
+                            className="w-full h-full object-contain rounded-md"
+                          />
+                        ) : (
+                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                            <Camera className="w-8 h-8 mb-2 text-muted-foreground" />
+                            <p className="text-sm text-muted-foreground">
+                              Click to upload a souvenir photo
+                            </p>
+                          </div>
+                        )}
+                      </label>
                     </div>
                   </div>
                   
@@ -281,9 +284,8 @@ export default function SouvenirReviewPage() {
                       value={review}
                       onChange={(e) => setReview(e.target.value)}
                       placeholder="Share your experience..."
-                      className="w-full p-2 min-h-[150px] border rounded-md"
+                      className="w-full p-2 min-h-[100px] border rounded-md"
                       disabled={isUploading}
-                      style={{ resize: "none" }}
                     />
                   </div>
                   

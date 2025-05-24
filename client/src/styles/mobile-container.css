@@ -20,6 +20,39 @@
   position: relative;
 }
 
+.mobile-status-bar {
+  height: 44px;
+  width: 100%;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 10;
+}
+
+.mobile-time {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.mobile-icons {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.mobile-signal, .mobile-wifi, .mobile-battery {
+  width: 18px;
+  height: 12px;
+  background-color: #333;
+  border-radius: 2px;
+}
+
+.mobile-battery {
+  width: 25px;
+}
+
 .mobile-content {
   flex: 1;
   overflow: hidden;
