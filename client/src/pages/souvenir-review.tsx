@@ -39,12 +39,12 @@ export default function SouvenirReviewPage() {
         // For demo, we'll use our mock function
         const photos = getMockSouvenirs(bookingId);
         
-        // Set up mock data for roommate's review
+        // Set up roommate's review with a Brussels landmark
         setExistingReviews([
           {
-            photoUrl: "https://images.unsplash.com/photo-1503917988258-f87a78e3c995?q=80&w=1974&auto=format&fit=crop",
+            photoUrl: "https://images.unsplash.com/photo-1612288527562-32356fa4b763?q=80&w=1974&auto=format&fit=crop",
             rating: 5,
-            reviewText: "Had such a great time sharing this room with Emily! The hotel was beautiful and we saved so much money.",
+            reviewText: "Had such a great time sharing this room with Emily! Our Brussels trip was amazing and we saved over €120.",
             userName: roommateName
           }
         ]);
