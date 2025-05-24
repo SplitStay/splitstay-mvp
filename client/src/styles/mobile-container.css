@@ -23,12 +23,13 @@
 .mobile-status-bar {
   height: 44px;
   width: 100%;
-  background-color: white;
+  background-color: #f8f8f8;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
   z-index: 10;
+  border-bottom: 1px solid #ebebeb;
 }
 
 .mobile-time {
