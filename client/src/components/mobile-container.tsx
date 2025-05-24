@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/mobile-container.css";
 
 interface MobileContainerProps {
@@ -6,11 +6,33 @@ interface MobileContainerProps {
 }
 
 export function MobileContainer({ children }: MobileContainerProps) {
+  const [currentTime, setCurrentTime] = useState<string>("");
+  
+  useEffect(() => {
+    // Set current time and update it every minute
+    const updateTime = () => {
+      const now = new Date();
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      const period = hours >= 12 ? 'PM' : 'AM';
+      const displayHours = hours % 12 || 12; // Convert 0 to 12 for 12-hour format
+      const displayMinutes = minutes < 10 ? `0${minutes}` : minutes;
+      
+      setCurrentTime(`${displayHours}:${displayMinutes} ${period}`);
+    };
+    
+    updateTime(); // Initial call
+    
+    const interval = setInterval(updateTime, 60000); // Update every minute
+    
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, []);
+  
   return (
     <div className="mobile-container-wrapper">
       <div className="mobile-container">
         <div className="mobile-status-bar">
-          <div className="mobile-time">10:42 AM</div>
+          <div className="mobile-time">{currentTime}</div>
           <div className="mobile-icons">
             {/* Signal Icon */}
             <svg width="17" height="11" viewBox="0 0 17 11" fill="none" xmlns="http://www.w3.org/2000/svg">
