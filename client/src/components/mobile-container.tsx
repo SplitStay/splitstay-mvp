@@ -31,9 +31,30 @@ export function MobileContainer({ children }: MobileContainerProps) {
   return (
     <div className="mobile-container-wrapper">
       <div className="mobile-container">
-        <div className="mobile-status-bar">
-          <div className="mobile-time">{currentTime}</div>
-          <div className="mobile-icons">
+        <div style={{
+          height: '44px',
+          padding: '0 16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          background: 'white',
+          position: 'relative'
+        }}>
+          <div style={{
+            position: 'absolute',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            fontWeight: '500',
+            fontSize: '15px'
+          }}>
+            {currentTime}
+          </div>
+          <div style={{
+            marginLeft: 'auto',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
+          }}>
             {/* Signal Icon */}
             <svg width="17" height="11" viewBox="0 0 17 11" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M1 9H2V10H1V9ZM4 7H5V10H4V7ZM7 5H8V10H7V5ZM10 3H11V10H10V3ZM13 1H14V10H13V1Z" fill="black"/>
