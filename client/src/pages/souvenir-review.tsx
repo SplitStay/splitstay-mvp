@@ -251,14 +251,18 @@ export default function SouvenirReviewPage() {
                       />
                       <label
                         htmlFor="souvenir-photo"
-                        className="flex flex-col items-center justify-center w-full h-60 border-2 border-dashed rounded-md cursor-pointer bg-background hover:bg-muted/50"
+                        className="flex flex-col items-center justify-center w-full border-2 border-dashed rounded-md cursor-pointer bg-background hover:bg-muted/50 overflow-hidden"
+                        style={{ height: "400px", maxWidth: "280px", margin: "0 auto" }}
                       >
                         {selectedImage ? (
-                          <img
-                            src={selectedImage}
-                            alt="Selected"
-                            className="w-full h-full object-contain rounded-md"
-                          />
+                          <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                            <img
+                              src={selectedImage}
+                              alt="Selected"
+                              className="h-full object-cover"
+                              style={{ width: "auto", maxWidth: "100%" }}
+                            />
+                          </div>
                         ) : (
                           <div className="flex flex-col items-center justify-center pt-5 pb-6">
                             <Camera className="w-8 h-8 mb-2 text-muted-foreground" />
