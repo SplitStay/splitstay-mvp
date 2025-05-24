@@ -253,18 +253,16 @@ export default function SouvenirReviewPage() {
                         disabled={isUploading}
                       />
                       <div
-                        className="flex flex-col items-center justify-center w-full border-2 border-solid rounded-md overflow-hidden"
-                        style={{ height: "400px", maxWidth: "280px", margin: "0 auto", borderColor: "#e2e8f0" }}
+                        className="flex flex-col items-center justify-center w-full overflow-hidden"
+                        style={{ height: "400px", width: "100%", margin: "0 auto" }}
                       >
-                        <div className="w-full h-full flex items-center justify-center bg-gray-50">
-                          {/* Use the imported selfie image */}
-                          <img
-                            src={selfieImage}
-                            alt="Brussels trip selfie"
-                            className="h-full object-cover"
-                            style={{ width: "auto", maxWidth: "100%" }}
-                          />
-                        </div>
+                        {/* Use the imported selfie image with no borders */}
+                        <img
+                          src={selfieImage}
+                          alt="Brussels trip selfie"
+                          className="h-full object-cover"
+                          style={{ width: "100%" }}
+                        />
                       </div>
                     </div>
                   </div>
