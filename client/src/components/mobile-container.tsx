@@ -1,5 +1,4 @@
 import React from "react";
-import "../styles/mobile-container.css";
 
 interface MobileContainerProps {
   children: React.ReactNode;
@@ -7,20 +6,9 @@ interface MobileContainerProps {
 
 export function MobileContainer({ children }: MobileContainerProps) {
   return (
-    <div className="mobile-container-wrapper">
-      <div className="mobile-container">
-        <div className="mobile-status-bar">
-          <div className="mobile-time">9:41</div>
-          <div className="mobile-icons">
-            <div className="mobile-signal"></div>
-            <div className="mobile-wifi"></div>
-            <div className="mobile-battery"></div>
-          </div>
-        </div>
-        <div className="mobile-content">
-          {children}
-        </div>
-        <div className="mobile-home-indicator"></div>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
+      <div className="w-full max-w-md bg-white rounded-xl shadow-lg overflow-hidden flex flex-col">
+        {children}
       </div>
     </div>
   );
