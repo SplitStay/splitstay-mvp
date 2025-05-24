@@ -116,13 +116,13 @@ export default function SouvenirReviewPage() {
                     />
                     <label
                       htmlFor="souvenir-photo"
-                      className="flex flex-col items-center justify-center w-full h-60 border-2 border-dashed rounded-md cursor-pointer bg-background hover:bg-muted/50"
+                      className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-md cursor-pointer bg-background hover:bg-muted/50"
                     >
                       {selectedImage ? (
                         <img
                           src={selectedImage}
                           alt="Selected"
-                          className="w-full h-full object-contain rounded-md"
+                          className="w-full h-full object-cover rounded-md"
                         />
                       ) : (
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
