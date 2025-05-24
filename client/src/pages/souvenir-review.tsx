@@ -205,11 +205,11 @@ export default function SouvenirReviewPage() {
   return (
     <MobileContainer>
       <div className="flex flex-col h-full">
-        <div className="px-4 py-3 flex items-center bg-white">
+        <div className="px-4 py-3 flex items-center bg-white border-b">
           <Button variant="ghost" size="icon" onClick={() => navigate("/dashboard")}>
             <ChevronLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-lg font-medium ml-2">Rate Your Experience</h1>
+          <h1 className="text-lg font-semibold ml-2">Rate Your Experience</h1>
         </div>
         
         <div className="flex-1 overflow-auto p-4">
