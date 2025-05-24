@@ -250,29 +250,19 @@ export default function SouvenirReviewPage() {
                         onChange={handleImageChange}
                         disabled={isUploading}
                       />
-                      <label
-                        htmlFor="souvenir-photo"
-                        className="flex flex-col items-center justify-center w-full border-2 border-dashed rounded-md cursor-pointer bg-background hover:bg-muted/50 overflow-hidden"
-                        style={{ height: "400px", maxWidth: "280px", margin: "0 auto" }}
+                      <div
+                        className="flex flex-col items-center justify-center w-full border-2 border-solid rounded-md overflow-hidden"
+                        style={{ height: "400px", maxWidth: "280px", margin: "0 auto", borderColor: "#e2e8f0" }}
                       >
-                        {selectedImage ? (
-                          <div className="w-full h-full flex items-center justify-center bg-gray-50">
-                            <img
-                              src={selectedImage}
-                              alt="Selected"
-                              className="h-full object-cover"
-                              style={{ width: "auto", maxWidth: "100%" }}
-                            />
-                          </div>
-                        ) : (
-                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                            <Camera className="w-8 h-8 mb-2 text-muted-foreground" />
-                            <p className="text-sm text-muted-foreground">
-                              Click to upload a souvenir photo
-                            </p>
-                          </div>
-                        )}
-                      </label>
+                        <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                          <img
+                            src={selectedImage || ""}
+                            alt="Brussels trip selfie"
+                            className="h-full object-cover"
+                            style={{ width: "auto", maxWidth: "100%" }}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                   
