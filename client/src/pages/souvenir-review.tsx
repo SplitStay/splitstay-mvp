@@ -209,11 +209,40 @@ export default function SouvenirReviewPage() {
   return (
     <MobileContainer>
       <div className="flex flex-col h-full">
-        <div className="px-4 py-3 flex items-center bg-white">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/dashboard")}>
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-lg font-medium ml-2">Rate Your Experience</h1>
+        <div className="pt-2">
+          {/* Status bar mockup */}
+          <div className="flex justify-between items-center px-4 py-1">
+            <div className="text-sm font-medium">10:41 AM</div>
+            <div className="flex items-center space-x-1">
+              <div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 2l12 20H6z"></path>
+                </svg>
+              </div>
+              <div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+                  <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+                  <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+                  <line x1="12" y1="20" x2="12" y2="20"></line>
+                </svg>
+              </div>
+              <div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="1" y="6" width="18" height="12" rx="2" ry="2"></rect>
+                  <line x1="23" y1="13" x2="23" y2="11"></line>
+                </svg>
+              </div>
+            </div>
+          </div>
+          
+          {/* Regular header */}
+          <div className="px-4 py-3 flex items-center bg-white">
+            <Button variant="ghost" size="icon" onClick={() => navigate("/dashboard")}>
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-lg font-medium ml-2">Rate Your Experience</h1>
+          </div>
         </div>
         
         <div className="flex-1 overflow-auto p-4">
