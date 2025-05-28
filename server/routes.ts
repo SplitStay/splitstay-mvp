@@ -15,8 +15,15 @@ import researchRoutes from "./research-routes";
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
   
-  // Serve static files from public directory
-  app.use(express.static(path.join(process.cwd(), 'public')));
+  // Serve profile images directly
+  app.get('/*.png', (req, res, next) => {
+    const imagePath = path.join(process.cwd(), 'public', req.path);
+    res.sendFile(imagePath, (err) => {
+      if (err) {
+        next(); // Let other middleware handle it
+      }
+    });
+  });
   
   // API routes
   const apiRouter = express.Router();
