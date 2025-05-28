@@ -27,6 +27,7 @@ import RateRoommate from "@/pages/rate-roommate";
 import SharedExperience from "@/pages/shared-experience";
 import SouvenirReview from "@/pages/souvenir-review";
 import ResearchAdmin from "@/pages/research-admin";
+import { SafetyVerificationPage } from "@/pages/safety-verification";
 import Layout from "@/components/layout";
 import ResearchProvider from "@/components/research-provider";
 
@@ -70,6 +71,7 @@ function Router() {
         <Route path="/rate-roommate/:id" component={RateRoommate} />
         <Route path="/shared-experience" component={SharedExperience} />
         <Route path="/souvenir-review" component={SouvenirReview} />
+        <Route path="/safety-verification" component={SafetyVerificationPage} />
         <Route path="/research-admin" component={ResearchAdmin} />
         <Route component={NotFound} />
       </Switch>
