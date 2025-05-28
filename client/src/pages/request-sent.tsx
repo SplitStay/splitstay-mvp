@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import UserAvatar from "@/components/user-avatar";
 import { UserProfile } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
+import { format } from "date-fns";
 
 interface RequestSentProps {
   params: {
@@ -18,6 +19,36 @@ interface RequestSentProps {
 const RequestSent: React.FC<RequestSentProps> = ({ params }) => {
   const [_, navigate] = useLocation();
   const userId = parseInt(params.id, 10);
+  
+  // Get search data including dates from session storage
+  const getSearchData = () => {
+    try {
+      const savedSearchData = sessionStorage.getItem("splitstay_search");
+      if (savedSearchData) {
+        return JSON.parse(savedSearchData);
+      }
+    } catch (error) {
+      console.error("Error retrieving search data:", error);
+    }
+    return null;
+  };
+  
+  const searchData = getSearchData();
+  
+  // Format the dates from search data
+  const formatBookingDates = () => {
+    if (!searchData?.startDate || !searchData?.endDate) {
+      return "May 12–15"; // Fallback
+    }
+    
+    const startDate = new Date(searchData.startDate);
+    const endDate = new Date(searchData.endDate);
+    
+    const formattedStart = format(startDate, "MMM d");
+    const formattedEnd = format(endDate, "d");
+    
+    return `${formattedStart}–${formattedEnd}`;
+  };
   
   const { data: profile, isLoading } = useQuery({
     queryKey: [`/api/users/${userId}`],
@@ -107,7 +138,7 @@ const RequestSent: React.FC<RequestSentProps> = ({ params }) => {
         <CardContent className="p-4">
           <h3 className="font-semibold">MEININGER Hotel Bruxelles</h3>
           <div className="text-gray-700">
-            <div>May 12–15</div>
+            <div>{formatBookingDates()}</div>
             <div>Twin Room • €63 per night each</div>
             <div className="italic text-gray-500">Pending confirmation</div>
           </div>
