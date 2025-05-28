@@ -23,6 +23,21 @@ const Chat: React.FC<ChatProps> = ({ params }) => {
   const bookingId = 1; // In a real app, this would be from the URL or context
   const userId = parseInt(params.id, 10);
   
+  // Get search data including dates from session storage
+  const getSearchData = () => {
+    try {
+      const savedSearchData = sessionStorage.getItem("splitstay_search");
+      if (savedSearchData) {
+        return JSON.parse(savedSearchData);
+      }
+    } catch (error) {
+      console.error("Error retrieving search data:", error);
+    }
+    return null;
+  };
+  
+  const searchData = getSearchData();
+  
   // Use hardcoded Amara profile instead of fetching from API
   const { isLoading: isLoadingUser } = useQuery({
     queryKey: [`/api/users/${userId}`],
@@ -243,21 +258,22 @@ const Chat: React.FC<ChatProps> = ({ params }) => {
         )}
         
         {/* Trip details */}
-        {bookingDetails && (
-          <StayDetails
-            hotelName={bookingDetails.hotel.name}
-            roomType="Twin Room"
-            checkInDate={new Date(bookingDetails.checkInDate)}
-            checkOutDate={new Date(bookingDetails.checkOutDate)}
-            totalCost={bookingDetails.totalCost}
-            cancellationDate={new Date("2023-05-10")}
-            isIdVerified={true}
-            hasPositiveReviews={true}
-            showButtons={true}
-            onViewBooking={handleViewBookingDetails}
-            onDownloadConfirmation={handleDownloadConfirmation}
-          />
-        )}
+        <StayDetails
+          hotelName="MEININGER Hotel"
+          roomType="Twin Room"
+          checkInDate={searchData?.startDate ? new Date(searchData.startDate) : new Date("2025-05-12")}
+          checkOutDate={searchData?.endDate ? new Date(searchData.endDate) : new Date("2025-05-15")}
+          totalCost={searchData?.startDate && searchData?.endDate ? 
+            Math.ceil((new Date(searchData.endDate).getTime() - new Date(searchData.startDate).getTime()) / (1000 * 60 * 60 * 24)) * 100 : 
+            300
+          }
+          cancellationDate={new Date("2023-05-10")}
+          isIdVerified={true}
+          hasPositiveReviews={true}
+          showButtons={true}
+          onViewBooking={handleViewBookingDetails}
+          onDownloadConfirmation={handleDownloadConfirmation}
+        />
       </div>
       
       {/* Fixed message input at bottom */}
