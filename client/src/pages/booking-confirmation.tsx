@@ -8,7 +8,7 @@ import UserAvatar from "@/components/user-avatar";
 import { HotelIcon } from "@/components/icons";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BookingDetails } from "@shared/schema";
-import { daysUntilCheckIn } from "@/lib/utils";
+import { daysUntilCheckIn, formatPrice, calculateNights } from "@/lib/utils";
 import PaymentSplitCalculator from "@/components/payment-split-calculator";
 import {
   Dialog,
@@ -30,6 +30,9 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({ params }) => 
   const [showSplitCalculator, setShowSplitCalculator] = useState(false);
   const bookingId = parseInt(params.id, 10);
   
+  // Get search data from sessionStorage for dynamic pricing and dates
+  const searchData = JSON.parse(sessionStorage.getItem('searchData') || '{}');
+  
   const { data: bookingDetails, isLoading } = useQuery({
     queryKey: [`/api/bookings/${bookingId}/details`],
     queryFn: async () => {
@@ -38,6 +41,18 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({ params }) => 
       return res.json() as Promise<BookingDetails>;
     }
   });
+
+  // Calculate dynamic pricing based on search data
+  const checkInDate = searchData.startDate ? new Date(searchData.startDate) : new Date(bookingDetails?.checkInDate || '');
+  const checkOutDate = searchData.endDate ? new Date(searchData.endDate) : new Date(bookingDetails?.checkOutDate || '');
+  const nights = calculateNights(checkInDate, checkOutDate);
+  
+  // Dynamic cost calculation
+  const baseRoomCost = 100; // €100 per night for Brussels hotels
+  const totalRoomCost = baseRoomCost * nights;
+  const splitCost = totalRoomCost / 2; // Split between 2 people
+  const serviceFee = Math.round(splitCost * 0.1); // 10% service fee
+  const finalTotal = splitCost + serviceFee;
   
   const handleOpenChat = () => {
     if (bookingDetails?.participants[0]) {
@@ -87,16 +102,14 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({ params }) => 
               {isLoading ? (
                 <Skeleton className="h-5 w-24" />
               ) : (
-                bookingDetails && (
-                  `${new Date(bookingDetails.checkInDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}–${new Date(bookingDetails.checkOutDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
-                )
+                `${checkInDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}–${checkOutDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
               )}
             </div>
           </div>
           <div className="p-4">
             <div className="text-center">
               <div className="font-bold text-2xl text-primary">
-                {isLoading ? <Skeleton className="h-8 w-8 mx-auto" /> : daysUntilCheckIn(new Date(bookingDetails!.checkInDate))}
+                {isLoading ? <Skeleton className="h-8 w-8 mx-auto" /> : daysUntilCheckIn(checkInDate)}
               </div>
               <div>days until<br />check-in</div>
             </div>
@@ -112,7 +125,7 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({ params }) => 
                 </span>
               </div>
               <div className="text-2xl font-bold text-primary">
-                ${(bookingDetails.totalCost / 100).toFixed(2)}
+                {formatPrice(finalTotal)}
               </div>
             </div>
             <Dialog open={showSplitCalculator} onOpenChange={setShowSplitCalculator}>
