@@ -306,28 +306,28 @@ export class MemStorage implements IStorage {
     // Create users
     const users: InsertUser[] = [
       {
-        username: "alina",
+        username: "emily",
         password: "password123",
-        fullName: "Alina",
-        email: "alina@example.com",
-        profilePicture: "https://images.unsplash.com/photo-1614644147798-f8c0fc9da7f6?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&h=100",
+        fullName: "Emily",
+        email: "emily@example.com",
+        profilePicture: "/assets/Emily Profile Photo.png",
         age: "21-25",
         gender: "female",
-        languages: ["English", "German"],
-        bio: "Spontaneous traveler who enjoys quiet time",
+        languages: ["English", "Spanish"],
+        bio: "Marketing professional who loves exploring new cultures",
         isVerified: true,
         preferences: { sleepHabits: "early_bird", noiseLevel: "quiet" }
       },
       {
-        username: "sophie",
+        username: "amara",
         password: "password123",
-        fullName: "Sophie",
-        email: "sophie@example.com",
-        profilePicture: "https://images.unsplash.com/photo-1589571894960-20bbe2828d0a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&h=100",
+        fullName: "Amara",
+        email: "amara@example.com",
+        profilePicture: "/assets/Amara Profile Photo.png",
         age: "26-30",
         gender: "female",
         languages: ["English", "French"],
-        bio: "Musician on tour. Like to explore new places.",
+        bio: "Digital nomad with a passion for sustainable travel",
         isVerified: true,
         preferences: { sleepHabits: "night_owl", noiseLevel: "moderate" }
       },
@@ -421,13 +421,13 @@ export class MemStorage implements IStorage {
     const participants: InsertBookingParticipant[] = [
       {
         bookingId: createdBooking.id,
-        userId: 1, // Alina
+        userId: 1, // Emily
         status: "confirmed",
         cost: 9450 // €94.50
       },
       {
         bookingId: createdBooking.id,
-        userId: 2, // Sophie
+        userId: 2, // Amara
         status: "confirmed",
         cost: 9450 // €94.50
       }
