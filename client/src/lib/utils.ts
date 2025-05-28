@@ -12,7 +12,7 @@ export function formatPrice(amount: number) {
     currency: 'EUR',
     minimumFractionDigits: 0,
     maximumFractionDigits: 2
-  }).format(amount / 100);
+  }).format(amount);
 }
 
 // Format date range
