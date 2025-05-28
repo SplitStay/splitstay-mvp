@@ -18,6 +18,24 @@ export const users = pgTable("users", {
   bio: text("bio"),
   isVerified: boolean("is_verified").default(false),
   preferences: jsonb("preferences"), // Store travel preferences as JSON
+  
+  // Safety Verification Fields
+  phoneNumber: text("phone_number"),
+  phoneVerified: boolean("phone_verified").default(false),
+  phoneVerifiedAt: timestamp("phone_verified_at"),
+  
+  // Social Media Verification
+  linkedinProfile: text("linkedin_profile"),
+  linkedinVerified: boolean("linkedin_verified").default(false),
+  facebookProfile: text("facebook_profile"),
+  facebookVerified: boolean("facebook_verified").default(false),
+  socialVerifiedAt: timestamp("social_verified_at"),
+  
+  // Emergency Contact
+  emergencyContactName: text("emergency_contact_name"),
+  emergencyContactPhone: text("emergency_contact_phone"),
+  emergencyContactRelation: text("emergency_contact_relation"),
+  
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -166,6 +184,11 @@ export const souvenirsRelations = relations(souvenirs, ({ one }) => ({
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
+  phoneVerified: true,
+  phoneVerifiedAt: true,
+  linkedinVerified: true,
+  facebookVerified: true,
+  socialVerifiedAt: true,
 });
 
 export const insertHotelSchema = createInsertSchema(hotels).omit({
@@ -196,7 +219,53 @@ export const insertSouvenirSchema = createInsertSchema(souvenirs).omit({
   timestamp: true,
 });
 
+// User References/Travel Reviews for Safety
+export const userReferences = pgTable("user_references", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(), // User being referenced
+  referenceType: text("reference_type").notNull(), // "travel_buddy", "hotel_staff", "host", "roommate"
+  referrerName: text("referrer_name").notNull(),
+  referrerEmail: text("referrer_email"),
+  referrerPhone: text("referrer_phone"),
+  relationship: text("relationship").notNull(), // How they know the user
+  rating: integer("rating").notNull(), // 1-5 stars
+  comment: text("comment").notNull(),
+  verificationStatus: text("verification_status").default("pending"), // "pending", "verified", "rejected"
+  verifiedAt: timestamp("verified_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
 
+// Phone Verification Codes (for SMS verification)
+export const phoneVerificationCodes = pgTable("phone_verification_codes", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  phoneNumber: text("phone_number").notNull(),
+  code: text("code").notNull(), // 6-digit verification code
+  expiresAt: timestamp("expires_at").notNull(),
+  verified: boolean("verified").default(false),
+  attempts: integer("attempts").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User References relations
+export const userReferencesRelations = relations(userReferences, ({ one }) => ({
+  user: one(users, {
+    fields: [userReferences.userId],
+    references: [users.id],
+  }),
+}));
+
+// Safety verification schemas
+export const insertUserReferenceSchema = createInsertSchema(userReferences).omit({
+  id: true,
+  verifiedAt: true,
+  createdAt: true,
+});
+
+export const insertPhoneVerificationSchema = createInsertSchema(phoneVerificationCodes).omit({
+  id: true,
+  createdAt: true,
+});
 
 // Types
 export type User = typeof users.$inferSelect;
@@ -219,6 +288,11 @@ export type InsertReview = z.infer<typeof insertReviewSchema>;
 
 export type Souvenir = typeof souvenirs.$inferSelect;
 export type InsertSouvenir = z.infer<typeof insertSouvenirSchema>;
+
+export type UserReference = typeof userReferences.$inferSelect;
+export type InsertUserReference = z.infer<typeof insertUserReferenceSchema>;
+export type PhoneVerification = typeof phoneVerificationCodes.$inferSelect;
+export type InsertPhoneVerification = z.infer<typeof insertPhoneVerificationSchema>;
 
 // Extended types for frontend use
 export type PreferredAccommodation = {
