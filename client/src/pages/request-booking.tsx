@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import UserAvatar from "@/components/user-avatar";
 import { UserProfile } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
+import { format } from "date-fns";
 
 interface RequestBookingProps {
   params: {
@@ -17,6 +18,19 @@ interface RequestBookingProps {
 const RequestBooking: React.FC<RequestBookingProps> = ({ params }) => {
   const [_, navigate] = useLocation();
   const userId = parseInt(params.id, 10);
+  
+  // Get search data including dates from session storage
+  const getSearchData = () => {
+    try {
+      const savedSearchData = sessionStorage.getItem("splitstay_search");
+      if (savedSearchData) {
+        return JSON.parse(savedSearchData);
+      }
+    } catch (error) {
+      console.error("Error retrieving search data:", error);
+    }
+    return null;
+  };
   
   // First try to get the profile from the browse profiles data
   const getProfileFromSessionStorage = (): UserProfile | null => {
@@ -35,6 +49,23 @@ const RequestBooking: React.FC<RequestBookingProps> = ({ params }) => {
   };
 
   const localProfile = getProfileFromSessionStorage();
+  const searchData = getSearchData();
+  
+  // Format the dates from search data
+  const formatBookingDates = () => {
+    if (!searchData?.startDate || !searchData?.endDate) {
+      return "May 12–15 • 3 nights"; // Fallback
+    }
+    
+    const startDate = new Date(searchData.startDate);
+    const endDate = new Date(searchData.endDate);
+    const nights = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    
+    const formattedStart = format(startDate, "MMM d");
+    const formattedEnd = format(endDate, "d");
+    
+    return `${formattedStart}–${formattedEnd} • ${nights} nights`;
+  };
 
   const { data: profile, isLoading } = useQuery({
     queryKey: [`/api/users/${userId}`],
@@ -163,7 +194,7 @@ const RequestBooking: React.FC<RequestBookingProps> = ({ params }) => {
               <h3 className="text-lg font-semibold">MEININGER Hotel</h3>
               <div className="mt-1">
                 <div>2 Single Beds</div>
-                <div>May 12–15 • 3 nights</div>
+                <div>{formatBookingDates()}</div>
                 <div className="font-medium">€ 100 / night • Split € 50 each</div>
               </div>
             </div>
