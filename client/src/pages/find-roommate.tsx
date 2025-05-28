@@ -313,6 +313,11 @@ const FindRoommate: React.FC = () => {
               onChange={(e) => {
                 setLocationSearch(e.target.value);
                 setShowDropdown(e.target.value.length > 1);
+                
+                // Clear destination if user starts typing again
+                if (destination && e.target.value !== destination) {
+                  setDestination("");
+                }
               }}
               onFocus={() => setShowDropdown(locationSearch.length > 1)}
               onKeyDown={(e) => {
@@ -321,27 +326,27 @@ const FindRoommate: React.FC = () => {
                   
                   // Auto-select current input text as destination
                   if (locationSearch.length > 0) {
-                    // Check if this city exists in multiple countries
-                    const matchingLocations = globalLocations.filter(
+                    // Check if this city exists in our locations list
+                    const exactCityMatch = globalLocations.filter(
                       location => location.city.toLowerCase() === locationSearch.toLowerCase()
                     );
                     
-                    if (matchingLocations.length > 1) {
-                      // If multiple countries, keep dropdown open to let user choose
-                      setShowDropdown(true);
-                    } else if (matchingLocations.length === 1) {
+                    if (exactCityMatch.length === 1) {
                       // If exactly one match, use that city and country
-                      const fullLocation = `${matchingLocations[0].city}, ${matchingLocations[0].country}`;
+                      const fullLocation = `${exactCityMatch[0].city}, ${exactCityMatch[0].country}`;
                       setDestination(fullLocation);
                       setLocationSearch(fullLocation);
                       setShowDropdown(false);
-                    } else if (!locationSearch.includes(',')) {
-                      // For custom locations, ask user to choose a country
+                    } else if (exactCityMatch.length > 1) {
+                      // If multiple countries, keep dropdown open to let user choose
                       setShowDropdown(true);
-                    } else {
-                      // Input already has a country specified
+                    } else if (locationSearch.includes(',')) {
+                      // Input already has a country specified, accept it
                       setDestination(locationSearch);
                       setShowDropdown(false);
+                    } else {
+                      // No exact match and no country - show dropdown for selection
+                      setShowDropdown(true);
                     }
                   }
                 }
@@ -386,6 +391,12 @@ const FindRoommate: React.FC = () => {
                         setDestination(fullLocation);
                         setLocationSearch(fullLocation);
                         setShowDropdown(false);
+                        
+                        // Force the input to blur to ensure the selection is registered
+                        const input = document.querySelector('input[placeholder="Enter any destination worldwide"]') as HTMLInputElement;
+                        if (input) {
+                          input.blur();
+                        }
                       }}
                     >
                       <span className="font-medium">{location.city}</span>
