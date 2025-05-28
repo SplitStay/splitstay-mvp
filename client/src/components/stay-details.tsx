@@ -42,7 +42,7 @@ const StayDetails: React.FC<StayDetailsProps> = ({
   const [isOpen, setIsOpen] = React.useState(defaultOpen);
   const nights = calculateNights(checkInDate, checkOutDate);
   const costPerNight = Math.round(totalCost / nights);
-  const costPerPerson = Math.round(totalCost / 2);
+  const costPerPerson = totalCost; // totalCost is already the cost per person
   const dateRange = formatDateRange(checkInDate, checkOutDate);
 
   return (
