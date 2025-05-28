@@ -51,10 +51,17 @@ const RequestBooking: React.FC<RequestBookingProps> = ({ params }) => {
   const localProfile = getProfileFromSessionStorage();
   const searchData = getSearchData();
   
-  // Format the dates from search data
-  const formatBookingDates = () => {
+  // Calculate nights and pricing based on search data
+  const calculateBookingDetails = () => {
     if (!searchData?.startDate || !searchData?.endDate) {
-      return "May 12–15 • 3 nights"; // Fallback
+      return {
+        formattedDates: "May 12–15 • 3 nights",
+        nights: 3,
+        totalRate: 300,
+        splitCost: 150,
+        serviceFee: 15,
+        finalTotal: 165
+      };
     }
     
     const startDate = new Date(searchData.startDate);
@@ -63,9 +70,26 @@ const RequestBooking: React.FC<RequestBookingProps> = ({ params }) => {
     
     const formattedStart = format(startDate, "MMM d");
     const formattedEnd = format(endDate, "d");
+    const formattedDates = `${formattedStart}–${formattedEnd} • ${nights} nights`;
     
-    return `${formattedStart}–${formattedEnd} • ${nights} nights`;
+    // Calculate pricing (€100 per night)
+    const ratePerNight = 100;
+    const totalRate = ratePerNight * nights;
+    const splitCost = totalRate / 2;
+    const serviceFee = Math.round(splitCost * 0.1); // 10% service fee
+    const finalTotal = splitCost + serviceFee;
+    
+    return {
+      formattedDates,
+      nights,
+      totalRate,
+      splitCost,
+      serviceFee,
+      finalTotal
+    };
   };
+  
+  const bookingDetails = calculateBookingDetails();
 
   const { data: profile, isLoading } = useQuery({
     queryKey: [`/api/users/${userId}`],
@@ -194,7 +218,7 @@ const RequestBooking: React.FC<RequestBookingProps> = ({ params }) => {
               <h3 className="text-lg font-semibold">MEININGER Hotel</h3>
               <div className="mt-1">
                 <div>2 Single Beds</div>
-                <div>{formatBookingDates()}</div>
+                <div>{bookingDetails.formattedDates}</div>
                 <div className="font-medium">€ 100 / night • Split € 50 each</div>
               </div>
             </div>
@@ -240,20 +264,20 @@ const RequestBooking: React.FC<RequestBookingProps> = ({ params }) => {
           <h3 className="font-semibold mb-3">Price Breakdown</h3>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span>Room rate (3 nights)</span>
-              <span>€300</span>
+              <span>Room rate ({bookingDetails.nights} nights)</span>
+              <span>€{bookingDetails.totalRate}</span>
             </div>
             <div className="flex justify-between">
               <span>Split cost (50%)</span>
-              <span className="text-green-600">-€150</span>
+              <span className="text-green-600">-€{bookingDetails.splitCost}</span>
             </div>
             <div className="flex justify-between">
               <span>Service fee</span>
-              <span>€15</span>
+              <span>€{bookingDetails.serviceFee}</span>
             </div>
             <div className="flex justify-between font-medium text-base border-t pt-2 mt-2">
               <span>Total</span>
-              <span>€165</span>
+              <span>€{bookingDetails.finalTotal}</span>
             </div>
           </div>
         </CardContent>
