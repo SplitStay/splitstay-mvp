@@ -575,7 +575,12 @@ const CreateProfile: React.FC = () => {
               <h3 className="text-xl font-medium text-navy">Travel Traits</h3>
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button size="sm" variant="outline" className="h-8 px-2">
+                  <Button size="sm" variant="outline" className="h-8 px-2"
+                    onClick={() => {
+                      // Initialize temp selection with current selection
+                      setTempSelectedTraits([...selectedTraits]);
+                    }}
+                  >
                     <Plus className="h-4 w-4 mr-1" />
                     Add
                   </Button>
@@ -676,7 +681,7 @@ const CreateProfile: React.FC = () => {
             </div>
             {/* Common quick-select trait options */}
             <div className="flex flex-wrap gap-2 mb-4">
-              {/* Show all travel traits, with selected ones highlighted */}
+              {/* Show all travel traits as options to add */}
               {["Early Bird", "Night Owl", "Adventurous", "Relaxed", "Foodie", "Budget-conscious", "Clean", "Social", "Quiet", "Nature Lover"].map((label) => {
                 const trait = allTravelTraits.find(t => t.label === label);
                 const traitId = trait ? trait.id : label.toLowerCase().replace(/\s+/g, '_');
@@ -686,18 +691,44 @@ const CreateProfile: React.FC = () => {
                   <button
                     key={traitId}
                     type="button"
-                    className={`py-2 px-4 rounded-full text-sm transition-colors ${
-                      isSelected 
-                        ? 'bg-yellow-100 text-gray-800 border border-yellow-300' 
-                        : 'bg-white border border-gray-300 text-gray-700 hover:border-yellow-300'
-                    }`}
+                    className="py-2 px-4 rounded-full text-sm bg-white border border-gray-300 text-gray-700 hover:border-yellow-300 transition-colors"
                     onClick={() => toggleTrait(traitId)}
+                    disabled={isSelected}
                   >
                     {label}
                   </button>
                 );
               })}
             </div>
+            
+            {/* Selected Traits Display */}
+            {selectedTraits.length > 0 && (
+              <div className="border-t pt-4">
+                <p className="text-sm font-medium text-gray-700 mb-3">Selected traits:</p>
+                <div className="flex flex-wrap gap-2">
+                  {selectedTraits.map(traitId => {
+                    const trait = allTravelTraits.find(t => t.id === traitId);
+                    const label = trait ? trait.label : traitId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    
+                    return (
+                      <div
+                        key={traitId}
+                        className="bg-yellow-100 text-gray-800 border border-yellow-300 px-3 py-1 rounded-full text-sm flex items-center gap-1"
+                      >
+                        {label}
+                        <button 
+                          className="ml-1 text-gray-500 hover:text-gray-800 font-medium"
+                          onClick={() => toggleTrait(traitId)}
+                          title="Remove trait"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
           
           {/* ID Verification Section - Moved below travel traits */}
