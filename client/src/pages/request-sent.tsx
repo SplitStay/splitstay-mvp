@@ -9,6 +9,7 @@ import UserAvatar from "@/components/user-avatar";
 import { UserProfile } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
+import { calculateNights } from "@/lib/utils";
 
 interface RequestSentProps {
   params: {
@@ -35,10 +36,32 @@ const RequestSent: React.FC<RequestSentProps> = ({ params }) => {
   
   const searchData = getSearchData();
   
+  // Calculate dynamic pricing based on search data
+  const calculatePricing = () => {
+    if (!searchData?.startDate || !searchData?.endDate) {
+      return { nights: 2, pricePerNight: 55 }; // Default for May 29-31
+    }
+    
+    const startDate = new Date(searchData.startDate);
+    const endDate = new Date(searchData.endDate);
+    const nights = calculateNights(startDate, endDate);
+    
+    // €100 per night total room cost, split between 2 people = €50 per person per night
+    // Add 10% service fee: €50 + €5 = €55 per person per night
+    const baseRoomCost = 100; // per night
+    const splitCost = baseRoomCost / 2; // €50 per person per night
+    const serviceFee = splitCost * 0.1; // 10% service fee
+    const pricePerNight = splitCost + serviceFee; // €55 per person per night
+    
+    return { nights, pricePerNight: Math.round(pricePerNight) };
+  };
+  
+  const { nights, pricePerNight } = calculatePricing();
+  
   // Format the dates from search data
   const formatBookingDates = () => {
     if (!searchData?.startDate || !searchData?.endDate) {
-      return "May 12–15"; // Fallback
+      return "May 29–31"; // Updated fallback
     }
     
     const startDate = new Date(searchData.startDate);
@@ -139,7 +162,7 @@ const RequestSent: React.FC<RequestSentProps> = ({ params }) => {
           <h3 className="font-semibold">MEININGER Hotel Bruxelles</h3>
           <div className="text-gray-700">
             <div>{formatBookingDates()}</div>
-            <div>Twin Room • €63 per night each</div>
+            <div>Twin Room • €{pricePerNight} per night each</div>
             <div className="italic text-gray-500">Pending confirmation</div>
           </div>
           
