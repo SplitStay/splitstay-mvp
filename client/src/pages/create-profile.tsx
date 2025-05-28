@@ -681,24 +681,28 @@ const CreateProfile: React.FC = () => {
             </div>
             {/* Common quick-select trait options */}
             <div className="flex flex-wrap gap-2 mb-4">
-              {/* Show all travel traits as options to add */}
-              {["Early Bird", "Night Owl", "Adventurous", "Relaxed", "Foodie", "Budget-conscious", "Clean", "Social", "Quiet", "Nature Lover"].map((label) => {
-                const trait = allTravelTraits.find(t => t.label === label);
-                const traitId = trait ? trait.id : label.toLowerCase().replace(/\s+/g, '_');
-                const isSelected = selectedTraits.includes(traitId);
-                
-                return (
-                  <button
-                    key={traitId}
-                    type="button"
-                    className="py-2 px-4 rounded-full text-sm bg-white border border-gray-300 text-gray-700 hover:border-yellow-300 transition-colors"
-                    onClick={() => toggleTrait(traitId)}
-                    disabled={isSelected}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
+              {/* Show only unselected travel traits as options to add */}
+              {["Early Bird", "Night Owl", "Adventurous", "Relaxed", "Foodie", "Budget-conscious", "Clean", "Social", "Quiet", "Nature Lover"]
+                .filter((label) => {
+                  const trait = allTravelTraits.find(t => t.label === label);
+                  const traitId = trait ? trait.id : label.toLowerCase().replace(/\s+/g, '_');
+                  return !selectedTraits.includes(traitId);
+                })
+                .map((label) => {
+                  const trait = allTravelTraits.find(t => t.label === label);
+                  const traitId = trait ? trait.id : label.toLowerCase().replace(/\s+/g, '_');
+                  
+                  return (
+                    <button
+                      key={traitId}
+                      type="button"
+                      className="py-2 px-4 rounded-full text-sm bg-white border border-gray-300 text-gray-700 hover:border-yellow-300 transition-colors"
+                      onClick={() => toggleTrait(traitId)}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
             </div>
             
             {/* Selected Traits Display */}
