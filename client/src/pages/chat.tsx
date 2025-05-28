@@ -266,10 +266,13 @@ const Chat: React.FC<ChatProps> = ({ params }) => {
           totalCost={searchData?.startDate && searchData?.endDate ? 
             (() => {
               const nights = Math.ceil((new Date(searchData.endDate).getTime() - new Date(searchData.startDate).getTime()) / (1000 * 60 * 60 * 24));
+              console.log("Chat page calculation:", { nights, searchData });
               const totalRoomCost = nights * 100; // €100 per night total
               const splitCost = totalRoomCost / 2; // Split between 2 people
               const serviceFee = Math.round(splitCost * 0.1); // 10% service fee on your portion
-              return Math.round(splitCost + serviceFee);
+              const finalTotal = Math.round(splitCost + serviceFee);
+              console.log("Chat cost breakdown:", { totalRoomCost, splitCost, serviceFee, finalTotal });
+              return finalTotal;
             })() : 
             189
           }
