@@ -43,9 +43,16 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({ params }) => 
   });
 
   // Calculate dynamic pricing based on search data
-  const checkInDate = searchData.startDate ? new Date(searchData.startDate) : new Date(bookingDetails?.checkInDate || '');
-  const checkOutDate = searchData.endDate ? new Date(searchData.endDate) : new Date(bookingDetails?.checkOutDate || '');
+  const checkInDate = searchData.startDate ? new Date(searchData.startDate) : new Date('2025-05-29');
+  const checkOutDate = searchData.endDate ? new Date(searchData.endDate) : new Date('2025-05-31');
   const nights = calculateNights(checkInDate, checkOutDate);
+  
+  console.log('Booking confirmation calculation:', { 
+    nights, 
+    searchData,
+    checkInDate: checkInDate.toISOString(),
+    checkOutDate: checkOutDate.toISOString() 
+  });
   
   // Dynamic cost calculation
   const baseRoomCost = 100; // €100 per night for Brussels hotels
@@ -53,6 +60,13 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({ params }) => 
   const splitCost = totalRoomCost / 2; // Split between 2 people
   const serviceFee = Math.round(splitCost * 0.1); // 10% service fee
   const finalTotal = splitCost + serviceFee;
+  
+  console.log('Booking cost breakdown:', {
+    totalRoomCost,
+    splitCost,
+    serviceFee,
+    finalTotal
+  });
   
   const handleOpenChat = () => {
     if (bookingDetails?.participants[0]) {
