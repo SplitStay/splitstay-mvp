@@ -1,5 +1,6 @@
 import express, { type Express } from "express";
 import { createServer, type Server } from "http";
+import path from "path";
 import { storage } from "./storage";
 import { z } from "zod";
 import { 
@@ -13,6 +14,9 @@ import researchRoutes from "./research-routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
+  
+  // Serve static files from public directory
+  app.use(express.static(path.join(process.cwd(), 'public')));
   
   // API routes
   const apiRouter = express.Router();
