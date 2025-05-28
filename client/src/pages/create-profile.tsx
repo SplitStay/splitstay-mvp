@@ -544,26 +544,47 @@ const CreateProfile: React.FC = () => {
                 </DialogContent>
               </Dialog>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {/* Show all language options, with selected ones highlighted */}
-              {languages.map((language) => {
-                const isSelected = selectedLanguages.includes(language);
-                return (
-                  <button
-                    key={language}
-                    type="button"
-                    className={`py-2 px-4 rounded-full text-sm transition-colors ${
-                      isSelected 
-                        ? 'bg-yellow-100 text-gray-800 border border-yellow-300' 
-                        : 'bg-white border border-gray-300 text-gray-700 hover:border-yellow-300'
-                    }`}
-                    onClick={() => toggleLanguage(language)}
-                  >
-                    {language}
-                  </button>
-                );
-              })}
+            <div className="flex flex-wrap gap-2 mb-4">
+              {/* Show only unselected language options */}
+              {languages
+                .filter(language => !selectedLanguages.includes(language))
+                .map((language) => {
+                  return (
+                    <button
+                      key={language}
+                      type="button"
+                      className="py-2 px-4 rounded-full text-sm bg-white border border-gray-300 text-gray-700 hover:border-yellow-300 transition-colors"
+                      onClick={() => toggleLanguage(language)}
+                    >
+                      {language}
+                    </button>
+                  );
+                })}
             </div>
+            
+            {/* Selected Languages Display */}
+            {selectedLanguages.length > 0 && (
+              <div className="border-t pt-4">
+                <p className="text-sm font-medium text-gray-700 mb-3">Selected languages:</p>
+                <div className="flex flex-wrap gap-2">
+                  {selectedLanguages.map(language => (
+                    <div
+                      key={language}
+                      className="bg-yellow-100 text-gray-800 border border-yellow-300 px-3 py-1 rounded-full text-sm flex items-center gap-1"
+                    >
+                      {language}
+                      <button 
+                        className="ml-1 text-gray-500 hover:text-gray-800 font-medium"
+                        onClick={() => toggleLanguage(language)}
+                        title="Remove language"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
