@@ -12,6 +12,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { toast } from "@/hooks/use-toast";
 import { trackProfileCreation } from "@/lib/analytics";
 import { format } from "date-fns";
+import { calculateAge, getAgeRange } from "@/lib/age-utils";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import emilyProfilePic from "../assets/emily-profile-2025.png";
@@ -226,10 +227,14 @@ const CreateProfile: React.FC = () => {
   };
 
   const handleCreateProfile = () => {
+    // Calculate age range from birth date for consistent age handling
+    const ageRange = dateOfBirth ? getAgeRange(dateOfBirth) : "26-30";
+    
     // Save profile data to localStorage for demo purposes
     localStorage.setItem('splitstay_profile', JSON.stringify({
       name: name || "Jane",
       bio: bio || "Love hiking, exploring, and catching sunrises",
+      age: ageRange, // Store as age range instead of birth date
       dateOfBirth: dateOfBirth || new Date("1995-01-01"),
       travelReason,
       languages: selectedLanguages.length > 0 ? selectedLanguages : ["English"],

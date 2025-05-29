@@ -10,6 +10,7 @@ import { UserProfile } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { getAgeRangeFromString, AGE_RANGE_OPTIONS } from "@/lib/age-utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
@@ -26,12 +27,10 @@ const BrowseProfiles: React.FC = () => {
   const [filterDialogOpen, setFilterDialogOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState(false);
   const [filters, setFilters] = useState({
-    ageRanges: {
-      "18-25": false,
-      "26-30": false,
-      "31-40": false,
-      "40+": false
-    },
+    ageRanges: AGE_RANGE_OPTIONS.reduce((acc, range) => {
+      acc[range] = false;
+      return acc;
+    }, {} as Record<string, boolean>),
     languages: {
       "English": false,
       "French": false,
