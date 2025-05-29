@@ -12,6 +12,7 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Slider } from "@/components/ui/slider";
 import { format } from "date-fns";
 import { trackRoommateSearch } from "@/lib/analytics";
+import { SessionStorageManager } from "@/lib/session-storage";
 
 // Define location interface
 interface LocationItem {
@@ -218,15 +219,14 @@ const FindRoommate: React.FC = () => {
     // Track roommate search in Google Analytics
     trackRoommateSearch(destination);
     
-    // Save the search criteria as serializable values in session storage instead of local storage
-    // This ensures data is cleared when the browser is closed or on logout
-    sessionStorage.setItem('splitstay_search', JSON.stringify({
+    // Save the search criteria using centralized session storage manager
+    SessionStorageManager.saveSearchData({
       destination,
       startDate: startDate ? startDate.toISOString() : null,
       endDate: endDate ? endDate.toISOString() : null,
       isFlexible,
       preferences
-    }));
+    });
     
     // Navigate to browse profiles
     navigate("/browse-profiles");
@@ -234,41 +234,35 @@ const FindRoommate: React.FC = () => {
 
   // Load saved search data when the component mounts
   React.useEffect(() => {
-    const savedSearchData = sessionStorage.getItem("splitstay_search");
+    const savedData = SessionStorageManager.getSearchData();
     
-    if (savedSearchData) {
-      try {
-        const parsedData = JSON.parse(savedSearchData);
-        
-        // Restore destination
-        if (parsedData.destination) {
-          setDestination(parsedData.destination);
-          setLocationSearch(parsedData.destination);
-        }
-        
-        // Restore dates
-        if (parsedData.startDate) {
-          setStartDate(new Date(parsedData.startDate));
-        }
-        
-        if (parsedData.endDate) {
-          setEndDate(new Date(parsedData.endDate));
-        }
-        
-        // Restore flexible dates option
-        if (parsedData.isFlexible !== undefined) {
-          setIsFlexible(parsedData.isFlexible);
-        }
-        
-        // Restore preferences
-        if (parsedData.preferences) {
-          setPreferences({
-            ...preferences,
-            ...parsedData.preferences
-          });
-        }
-      } catch (error) {
-        console.error("Error loading saved search data:", error);
+    if (savedData) {
+      // Restore destination
+      if (savedData.destination) {
+        setDestination(savedData.destination);
+        setLocationSearch(savedData.destination);
+      }
+      
+      // Restore dates
+      if (savedData.startDate) {
+        setStartDate(new Date(savedData.startDate));
+      }
+      
+      if (savedData.endDate) {
+        setEndDate(new Date(savedData.endDate));
+      }
+      
+      // Restore flexible dates option
+      if (savedData.isFlexible !== undefined) {
+        setIsFlexible(savedData.isFlexible);
+      }
+      
+      // Restore preferences
+      if (savedData.preferences) {
+        setPreferences({
+          ...preferences,
+          ...savedData.preferences
+        });
       }
     }
   }, []);
