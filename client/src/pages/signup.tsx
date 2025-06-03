@@ -154,6 +154,19 @@ const SignUp: React.FC = () => {
           </Button>
         </form>
         
+        <div className="text-center mb-6">
+          <p className="text-gray-600">
+            Already have an account?{" "}
+            <Button 
+              variant="link" 
+              className="text-navy p-0 h-auto font-semibold"
+              onClick={() => navigate("/login")}
+            >
+              Log in
+            </Button>
+          </p>
+        </div>
+        
         <div className="flex items-center my-6">
           <Separator className="flex-1" />
           <span className="px-4 text-gray-500 text-sm">or continue with</span>
@@ -182,19 +195,6 @@ const SignUp: React.FC = () => {
             <FaFacebook className="text-blue-600" />
             <span>Facebook</span>
           </Button>
-        </div>
-        
-        <div className="mt-auto pt-6 text-center">
-          <p className="text-gray-600">
-            Already have an account?{" "}
-            <Button 
-              variant="link" 
-              className="text-navy p-0 h-auto font-semibold"
-              onClick={() => navigate("/login")}
-            >
-              Log in
-            </Button>
-          </p>
         </div>
       </div>
     </div>
