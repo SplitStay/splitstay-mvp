@@ -39,6 +39,19 @@ const Home: React.FC = () => {
           </div>
           <ChevronRight />
         </Button>
+        
+        <div className="text-center">
+          <p className="text-gray-600">
+            Already have an account?{" "}
+            <Button 
+              variant="link" 
+              className="text-navy p-0 h-auto font-semibold"
+              onClick={() => navigate("/login")}
+            >
+              Log In
+            </Button>
+          </p>
+        </div>
       </div>
       
       {/* Features */}
@@ -67,20 +80,6 @@ const Home: React.FC = () => {
             </div>
           </li>
         </ul>
-      </div>
-      
-      {/* Login */}
-      <div className="mt-10 w-full">
-        <div className="flex flex-col space-y-3">
-          <Button
-            type="button"
-            variant="outline"
-            className="border-2"
-            onClick={() => navigate("/login")} 
-          >
-            Already have an account? Log in
-          </Button>
-        </div>
       </div>
     </div>
   );
