@@ -63,19 +63,11 @@ const CreateProfile: React.FC = () => {
         setProfileImage(e.target?.result as string);
       };
       reader.readAsDataURL(file);
-    } else {
-      // For the MVP demo, automatically set Emily's profile image
-      const emilyImageUrl = "/images/emily-profile.png";
-      setProfileImage(emilyImageUrl);
     }
+    // No else block - if no file is selected, keep profileImage as null
   };
   
-  // Set demo image for Emily's profile
-  const setDemoProfileImage = () => {
-    // Using Emily's image from public folder
-    const emilyImageUrl = "/images/emily-profile.png";
-    setProfileImage(emilyImageUrl);
-  };
+
 
   // Predefined values
   const languages = ["English", "Spanish", "French", "German", "Chinese", "Japanese"];
@@ -273,7 +265,6 @@ const CreateProfile: React.FC = () => {
             <label htmlFor="profile-upload" className="cursor-pointer">
               <div 
                 className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-3 relative overflow-hidden hover:opacity-90 transition-opacity border-2 border-dashed border-navy"
-                onClick={setDemoProfileImage} // Added for demo to auto-set Emily's photo on click
               >
                 {profileImage ? (
                   <img 
