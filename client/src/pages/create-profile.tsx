@@ -42,41 +42,17 @@ const CreateProfile: React.FC = () => {
   // For the demo, we'll use a placeholder that will be replaced
   // with the right image when you click the profile section
   
-  // Emily's demo data for the MVP video
-  const emilyData = {
-    fullName: "Emily Zhang",
-    bio: "Discovering hidden local spots in new cities and capturing sunrise moments with my camera. Nothing beats the feeling of getting lost in a new place and stumbling upon something amazing!",
-    dateOfBirth: new Date(1998, 5, 12), // June 12, 1998 
-    travelReason: "leisure" as const,
-    languages: ["English", "Mandarin"],
-    profileImage: emilyProfilePic, // Emily's profile photo
-    traits: ["Early bird", "Adventurous", "Clean", "Foodie"],
-    interests: ["Photography", "Hiking", "Local cuisine", "Architecture"]
-  };
-  
-  // Pre-fill data based on mode
-  const defaultUserData = isEditMode ? {
-    fullName: "Alina Chen",
-    bio: "Spontaneous traveler who enjoys quiet time. Love exploring new cities and making memories!",
-    dateOfBirth: new Date(2002, 0, 15), // Jan 15, 2002 for age 23
-    travelReason: "leisure" as const,
-    languages: ["English", "German"],
-    profileImage: "https://i.pravatar.cc/150?img=31",
-    traits: ["Early bird", "Quiet", "Clean", "Budget-conscious"],
-    interests: ["Photography", "Hiking", "Food", "Museums"]
-  } : isDemoMode ? emilyData : null;
-  
-  // Personal info states - use Emily's data for demo mode
-  const [name, setName] = useState(defaultUserData?.fullName || "");
-  const [bio, setBio] = useState(defaultUserData?.bio || "");
-  const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>(defaultUserData?.dateOfBirth);
-  const [travelReason, setTravelReason] = useState<"leisure" | "business">(defaultUserData?.travelReason || "leisure");
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(defaultUserData?.languages || []);
-  const [profileImage, setProfileImage] = useState<string | null>(defaultUserData?.profileImage || null);
+  // Personal info states - empty for new users
+  const [name, setName] = useState("");
+  const [bio, setBio] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>(undefined);
+  const [travelReason, setTravelReason] = useState<"leisure" | "business">("leisure");
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
   
   // Travel traits
-  const [selectedTraits, setSelectedTraits] = useState<string[]>(defaultUserData?.traits || []);
-  const [selectedInterests, setSelectedInterests] = useState<string[]>(defaultUserData?.interests || []);
+  const [selectedTraits, setSelectedTraits] = useState<string[]>([]);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   
   // Handle profile image upload
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -227,19 +203,29 @@ const CreateProfile: React.FC = () => {
   };
 
   const handleCreateProfile = () => {
-    // Calculate age range from birth date for consistent age handling
-    const ageRange = dateOfBirth ? getAgeRange(dateOfBirth) : "26-30";
+    // Validate required fields
+    if (!name || !bio || !dateOfBirth) {
+      toast({
+        title: "Please complete your profile",
+        description: "Name, bio, and date of birth are required.",
+        variant: "destructive",
+      });
+      return;
+    }
     
-    // Save profile data to localStorage for demo purposes
+    // Calculate age range from birth date for consistent age handling
+    const ageRange = getAgeRange(dateOfBirth);
+    
+    // Save profile data to localStorage
     localStorage.setItem('splitstay_profile', JSON.stringify({
-      name: name || "Jane",
-      bio: bio || "Love hiking, exploring, and catching sunrises",
-      age: ageRange, // Store as age range instead of birth date
-      dateOfBirth: dateOfBirth || new Date("1995-01-01"),
+      name,
+      bio,
+      age: ageRange,
+      dateOfBirth,
       travelReason,
-      languages: selectedLanguages.length > 0 ? selectedLanguages : ["English"],
+      languages: selectedLanguages,
       traits: selectedTraits,
-      profileImage: profileImage,
+      profileImage,
       interests: selectedInterests
     }));
     
