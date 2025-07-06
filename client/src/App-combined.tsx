@@ -4,7 +4,9 @@ import { X, Plus } from "lucide-react";
 function CreateProfile() {
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [selectedTraits, setSelectedTraits] = useState<string[]>([]);
+  const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
   const [customLanguage, setCustomLanguage] = useState("");
+  const [customCountry, setCustomCountry] = useState("");
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -12,8 +14,7 @@ function CreateProfile() {
     bio: "",
     dayOfBirth: "",
     monthOfBirth: "",
-    yearOfBirth: "",
-    travelReason: ""
+    yearOfBirth: ""
   });
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,12 +51,28 @@ function CreateProfile() {
     }
   };
 
+  const handleCountryToggle = (country: string) => {
+    setSelectedCountries(prev => 
+      prev.includes(country) 
+        ? prev.filter(c => c !== country)
+        : [...prev, country]
+    );
+  };
+
+  const handleAddCustomCountry = () => {
+    if (customCountry.trim() && !selectedCountries.includes(customCountry.trim())) {
+      setSelectedCountries(prev => [...prev, customCountry.trim()]);
+      setCustomCountry("");
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const profileData = {
       ...formData,
       selectedLanguages,
       selectedTraits,
+      selectedCountries,
       profileImage: profileImagePreview
     };
     console.log("Profile Data:", profileData);
@@ -66,7 +83,7 @@ function CreateProfile() {
                       formData.dayOfBirth && 
                       formData.monthOfBirth && 
                       formData.yearOfBirth &&
-                      formData.travelReason;
+                      profileImagePreview;
 
   const dayOptions = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
   const monthOptions = [
@@ -89,7 +106,16 @@ function CreateProfile() {
     "Early Bird", "Night Owl", "Adventurous", "Relaxed", "Social", "Quiet", 
     "Foodie", "Fitness Enthusiast", "Culture Lover", "Nature Lover", 
     "Tech Savvy", "Minimalist", "Photographer", "Music Lover", "Budget Traveler",
-    "Luxury Traveler", "Backpacker", "City Explorer", "Beach Lover", "Mountain Hiker"
+    "Luxury Traveler", "Backpacker", "City Explorer", "Beach Lover", "Mountain Hiker",
+    "Art Enthusiast", "History Buff", "Spontaneous", "Planner", "Solo Traveler",
+    "Group Traveler", "Digital Nomad", "Weekend Warrior", "Long-term Traveler",
+    "Eco-conscious", "Local Experience Seeker", "Comfort Seeker", "Thrill Seeker"
+  ];
+
+  const popularCountries = [
+    "United States", "United Kingdom", "Canada", "Australia", "Germany", "France", 
+    "Spain", "Italy", "Japan", "South Korea", "Brazil", "Mexico", "India", 
+    "Thailand", "Netherlands", "Sweden", "Norway", "Switzerland", "New Zealand"
   ];
 
   // Landing page view
@@ -320,6 +346,9 @@ function CreateProfile() {
             <div className="space-y-6">
               {/* Profile Photo Upload */}
               <div className="text-center">
+                <label className="block text-base font-medium text-gray-700 mb-3">
+                  Profile Photo <span className="text-red-500">*</span>
+                </label>
                 <div className="flex flex-col items-center">
                   {profileImagePreview ? (
                     <div className="relative">
@@ -378,6 +407,7 @@ function CreateProfile() {
                   placeholder="e.g. Jane"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg transition-all"
                   style={{ fontSize: '16px', fontFamily: 'system-ui, Inter, sans-serif' }}
+                  autoFocus
                   required
                 />
               </div>
@@ -453,38 +483,80 @@ function CreateProfile() {
                 <p className="text-sm text-gray-500 mt-2 italic">Must be at least 18 years old</p>
               </div>
 
-              {/* Trip Type */}
+              {/* Countries Visited or Lived In */}
               <div>
                 <label className="block text-base font-medium text-gray-700 mb-3">
-                  What best describes this trip? <span className="text-red-500">*</span>
+                  Countries visited or lived in <span className="text-gray-400">(optional)</span>
+                  <span className="ml-2 text-xs text-gray-500 cursor-help" title="This helps us match you with travelers who share similar cultural experiences and destinations">
+                    ℹ️
+                  </span>
                 </label>
-                <div className="flex gap-4">
-                  <label className="flex items-center space-x-3 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="travelReason"
-                      value="leisure"
-                      checked={formData.travelReason === "leisure"}
-                      onChange={(e) => setFormData(prev => ({...prev, travelReason: e.target.value}))}
-                      className="w-4 h-4 transition-colors"
-                      style={{ accentColor: '#1e2a78' }}
-                      required
-                    />
-                    <span className="font-medium text-gray-700">Leisure</span>
-                  </label>
-                  <label className="flex items-center space-x-3 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="travelReason"
-                      value="business"
-                      checked={formData.travelReason === "business"}
-                      onChange={(e) => setFormData(prev => ({...prev, travelReason: e.target.value}))}
-                      className="w-4 h-4 transition-colors"
-                      style={{ accentColor: '#1e2a78' }}
-                    />
-                    <span className="font-medium text-gray-700">Business</span>
-                  </label>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {popularCountries.map((country) => (
+                    <button
+                      key={country}
+                      type="button"
+                      onClick={() => handleCountryToggle(country)}
+                      className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                        selectedCountries.includes(country)
+                          ? "text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                      style={{ 
+                        backgroundColor: selectedCountries.includes(country) ? '#1e2a78' : undefined 
+                      }}
+                    >
+                      {country}
+                    </button>
+                  ))}
                 </div>
+                
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={customCountry}
+                    onChange={(e) => setCustomCountry(e.target.value)}
+                    placeholder="Add another country"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
+                    style={{ fontSize: '16px', fontFamily: 'system-ui, Inter, sans-serif' }}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddCustomCountry();
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCustomCountry}
+                    className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+                
+                {selectedCountries.length > 0 && (
+                  <div className="mt-3">
+                    <p className="text-sm text-gray-600 mb-2">Selected countries:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {selectedCountries.map((country) => (
+                        <span 
+                          key={country} 
+                          className="inline-flex items-center bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm"
+                        >
+                          {country}
+                          <button
+                            type="button"
+                            onClick={() => handleCountryToggle(country)}
+                            className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -576,6 +648,9 @@ function CreateProfile() {
               <div>
                 <label className="block text-base font-medium text-gray-700 mb-3">
                   Travel traits (select up to 5)
+                  <span className="ml-2 text-xs text-gray-500 cursor-help" title="These traits help us find roommates who share your travel style and preferences">
+                    ℹ️
+                  </span>
                 </label>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {traitOptions.map((trait) => (
