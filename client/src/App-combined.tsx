@@ -330,20 +330,20 @@ function CreateProfile() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="max-w-7xl mx-auto px-4 pb-32">
-        {/* Two-column layout on desktop, stacked on mobile */}
-        <div className="grid lg:grid-cols-2 gap-8">
+      <form onSubmit={handleSubmit} className="max-w-7xl mx-auto px-4 pb-24">
+        {/* 12-column grid layout: 5 cols left, 7 cols right */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
-          {/* Step 1 - Left Panel */}
-          <div className="bg-white rounded-lg shadow-lg p-8">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold mb-2" style={{ color: '#1e2a78' }}>
+          {/* Step 1 - Left Panel (5 columns) */}
+          <div className="lg:col-span-5 bg-white rounded-lg shadow-lg p-6">
+            <div className="mb-4">
+              <h2 className="text-xl font-bold mb-1" style={{ color: '#1e2a78' }}>
                 👉 Build your traveler profile
               </h2>
-              <p className="text-gray-600">Let's start with the basics</p>
+              <p className="text-gray-600 text-sm">Let's start with the basics</p>
             </div>
             
-            <div className="space-y-6">
+            <div className="space-y-4">
               {/* Profile Photo Upload */}
               <div className="text-center">
                 <label className="block text-base font-medium text-gray-700 mb-3">
@@ -428,19 +428,18 @@ function CreateProfile() {
                 />
               </div>
 
-              {/* Date of Birth */}
-              <div>
-                <label className="block text-base font-medium text-gray-700 mb-3">
-                  Date of Birth <span className="text-red-500">*</span>
-                </label>
-                <div className="grid grid-cols-3 gap-3">
-                  <div>
-                    <label className="text-sm text-gray-600 block mb-1">Day</label>
+              {/* Date of Birth and Countries - Two Column Layout */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Date of Birth */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Date of Birth <span className="text-red-500">*</span>
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
                     <select
                       value={formData.dayOfBirth}
                       onChange={(e) => setFormData(prev => ({...prev, dayOfBirth: e.target.value}))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg transition-all"
-                      style={{ fontSize: '16px', fontFamily: 'system-ui, Inter, sans-serif' }}
+                      className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
                       required
                     >
                       <option value="">Day</option>
@@ -448,14 +447,10 @@ function CreateProfile() {
                         <option key={day} value={day}>{day}</option>
                       ))}
                     </select>
-                  </div>
-                  <div>
-                    <label className="text-sm text-gray-600 block mb-1">Month</label>
                     <select
                       value={formData.monthOfBirth}
                       onChange={(e) => setFormData(prev => ({...prev, monthOfBirth: e.target.value}))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg transition-all"
-                      style={{ fontSize: '16px', fontFamily: 'system-ui, Inter, sans-serif' }}
+                      className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
                       required
                     >
                       <option value="">Month</option>
@@ -463,14 +458,10 @@ function CreateProfile() {
                         <option key={month.value} value={month.value}>{month.label}</option>
                       ))}
                     </select>
-                  </div>
-                  <div>
-                    <label className="text-sm text-gray-600 block mb-1">Year</label>
                     <select
                       value={formData.yearOfBirth}
                       onChange={(e) => setFormData(prev => ({...prev, yearOfBirth: e.target.value}))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg transition-all"
-                      style={{ fontSize: '16px', fontFamily: 'system-ui, Inter, sans-serif' }}
+                      className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
                       required
                     >
                       <option value="">Year</option>
@@ -479,110 +470,106 @@ function CreateProfile() {
                       ))}
                     </select>
                   </div>
+                  <p className="text-xs text-gray-500 mt-1">Must be 18+</p>
                 </div>
-                <p className="text-sm text-gray-500 mt-2 italic">Must be at least 18 years old</p>
-              </div>
 
-              {/* Countries Visited or Lived In */}
-              <div>
-                <label className="block text-base font-medium text-gray-700 mb-3">
-                  Countries visited or lived in <span className="text-gray-400">(optional)</span>
-                  <span className="ml-2 text-xs text-gray-500 cursor-help" title="This helps us match you with travelers who share similar cultural experiences and destinations">
-                    ℹ️
-                  </span>
-                </label>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {popularCountries.map((country) => (
-                    <button
-                      key={country}
-                      type="button"
-                      onClick={() => handleCountryToggle(country)}
-                      className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                        selectedCountries.includes(country)
-                          ? "text-white"
-                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                      }`}
-                      style={{ 
-                        backgroundColor: selectedCountries.includes(country) ? '#1e2a78' : undefined 
+                {/* Countries Visited */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Countries visited 
+                    <span className="ml-1 text-xs text-gray-500 cursor-help" title="This helps us match you with travelers who share similar cultural experiences">
+                      ℹ️
+                    </span>
+                  </label>
+                  <div className="flex gap-2 mb-2">
+                    <input
+                      type="text"
+                      value={customCountry}
+                      onChange={(e) => setCustomCountry(e.target.value)}
+                      placeholder="Add country"
+                      className="flex-1 px-2 py-1.5 border border-gray-300 rounded text-sm"
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleAddCustomCountry();
+                        }
                       }}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddCustomCountry}
+                      className="px-2 py-1.5 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
                     >
-                      {country}
+                      <Plus className="w-3 h-3" />
                     </button>
-                  ))}
-                </div>
-                
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={customCountry}
-                    onChange={(e) => setCustomCountry(e.target.value)}
-                    placeholder="Add another country"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
-                    style={{ fontSize: '16px', fontFamily: 'system-ui, Inter, sans-serif' }}
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        handleAddCustomCountry();
-                      }
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddCustomCountry}
-                    className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
-                
-                {selectedCountries.length > 0 && (
-                  <div className="mt-3">
-                    <p className="text-sm text-gray-600 mb-2">Selected countries:</p>
-                    <div className="flex flex-wrap gap-1">
-                      {selectedCountries.map((country) => (
-                        <span 
-                          key={country} 
-                          className="inline-flex items-center bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm"
-                        >
-                          {country}
-                          <button
-                            type="button"
-                            onClick={() => handleCountryToggle(country)}
-                            className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </span>
-                      ))}
-                    </div>
                   </div>
-                )}
+                  <div className="flex flex-wrap gap-1">
+                    {popularCountries.slice(0, 8).map((country) => (
+                      <button
+                        key={country}
+                        type="button"
+                        onClick={() => handleCountryToggle(country)}
+                        className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${
+                          selectedCountries.includes(country)
+                            ? "text-white"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                        style={{ 
+                          backgroundColor: selectedCountries.includes(country) ? '#1e2a78' : undefined 
+                        }}
+                      >
+                        {country}
+                      </button>
+                    ))}
+                  </div>
+                  {selectedCountries.length > 0 && (
+                    <div className="mt-2">
+                      <div className="flex flex-wrap gap-1">
+                        {selectedCountries.map((country) => (
+                          <span 
+                            key={country} 
+                            className="inline-flex items-center bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs"
+                          >
+                            {country}
+                            <button
+                              type="button"
+                              onClick={() => handleCountryToggle(country)}
+                              className="ml-1 hover:bg-blue-200 rounded-full p-0.5"
+                            >
+                              <X className="w-2 h-2" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Step 2 - Right Panel */}
-          <div className="bg-white rounded-lg shadow-lg p-8">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold mb-2" style={{ color: '#1e2a78' }}>
+          {/* Step 2 - Right Panel (7 columns) */}
+          <div className="lg:col-span-7 bg-white rounded-lg shadow-lg p-6">
+            <div className="mb-4">
+              <h2 className="text-xl font-bold mb-1" style={{ color: '#1e2a78' }}>
                 👉 Tell us how you travel
               </h2>
-              <p className="text-gray-600">Help us match you with compatible travelers</p>
+              <p className="text-gray-600 text-sm">Help us match you with compatible travelers</p>
             </div>
             
-            <div className="space-y-8">
+            <div className="space-y-5">
               {/* Languages Section */}
               <div>
-                <label className="block text-base font-medium text-gray-700 mb-3">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Languages you speak
                 </label>
-                <div className="flex flex-wrap gap-2 mb-4">
+                <div className="flex flex-wrap gap-1.5 mb-3">
                   {languageOptions.map((language) => (
                     <button
                       key={language}
                       type="button"
                       onClick={() => handleLanguageToggle(language)}
-                      className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                      className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
                         selectedLanguages.includes(language)
                           ? "text-white"
                           : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -601,9 +588,8 @@ function CreateProfile() {
                     type="text"
                     value={customLanguage}
                     onChange={(e) => setCustomLanguage(e.target.value)}
-                    placeholder="Add another language"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
-                    style={{ fontSize: '16px', fontFamily: 'system-ui, Inter, sans-serif' }}
+                    placeholder="Add language"
+                    className="flex-1 px-2 py-1.5 border border-gray-300 rounded text-sm"
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
@@ -614,28 +600,27 @@ function CreateProfile() {
                   <button
                     type="button"
                     onClick={handleAddCustomLanguage}
-                    className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="px-2 py-1.5 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
                   >
-                    <Plus className="w-4 h-4" />
+                    <Plus className="w-3 h-3" />
                   </button>
                 </div>
                 
                 {selectedLanguages.length > 0 && (
-                  <div className="mt-3">
-                    <p className="text-sm text-gray-600 mb-2">Selected languages:</p>
+                  <div className="mt-2">
                     <div className="flex flex-wrap gap-1">
                       {selectedLanguages.map((language) => (
                         <span 
                           key={language} 
-                          className="inline-flex items-center bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm"
+                          className="inline-flex items-center bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs"
                         >
                           {language}
                           <button
                             type="button"
                             onClick={() => handleLanguageToggle(language)}
-                            className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                            className="ml-1 hover:bg-blue-200 rounded-full p-0.5"
                           >
-                            <X className="w-3 h-3" />
+                            <X className="w-2 h-2" />
                           </button>
                         </span>
                       ))}
@@ -646,20 +631,21 @@ function CreateProfile() {
 
               {/* Travel Traits Section */}
               <div>
-                <label className="block text-base font-medium text-gray-700 mb-3">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Travel traits (select up to 5)
-                  <span className="ml-2 text-xs text-gray-500 cursor-help" title="These traits help us find roommates who share your travel style and preferences">
+                  <span className="ml-1 text-xs text-gray-500 cursor-help" title="These traits help us find roommates who share your travel style">
                     ℹ️
                   </span>
                 </label>
-                <div className="flex flex-wrap gap-2 mb-3">
+                {/* Two-column grid for traits */}
+                <div className="grid grid-cols-2 gap-1.5 mb-3">
                   {traitOptions.map((trait) => (
                     <button
                       key={trait}
                       type="button"
                       onClick={() => handleTraitToggle(trait)}
                       disabled={!selectedTraits.includes(trait) && selectedTraits.length >= 5}
-                      className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                      className={`px-2 py-1 rounded text-xs font-medium transition-colors text-left ${
                         selectedTraits.includes(trait)
                           ? "text-white"
                           : selectedTraits.length >= 5
@@ -676,21 +662,21 @@ function CreateProfile() {
                 </div>
                 
                 {selectedTraits.length > 0 && (
-                  <div className="mt-3">
-                    <p className="text-sm text-gray-600 mb-2">Selected traits ({selectedTraits.length}/5):</p>
+                  <div className="mt-2">
+                    <p className="text-xs text-gray-600 mb-1">Selected ({selectedTraits.length}/5):</p>
                     <div className="flex flex-wrap gap-1">
                       {selectedTraits.map((trait) => (
                         <span 
                           key={trait} 
-                          className="inline-flex items-center bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm"
+                          className="inline-flex items-center bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs"
                         >
                           {trait}
                           <button
                             type="button"
                             onClick={() => handleTraitToggle(trait)}
-                            className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                            className="ml-1 hover:bg-green-200 rounded-full p-0.5"
                           >
-                            <X className="w-3 h-3" />
+                            <X className="w-2 h-2" />
                           </button>
                         </span>
                       ))}
@@ -703,20 +689,19 @@ function CreateProfile() {
         </div>
       </form>
 
-      {/* Sticky Footer */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row gap-3 justify-center">
+      {/* Compact Sticky Footer */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 shadow-lg">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row gap-2 justify-center">
           <button 
             type="submit"
             onClick={handleSubmit}
             disabled={!isFormValid}
-            className={`px-8 py-3 text-lg font-semibold rounded-lg transition-all duration-300 ${
+            className={`px-6 py-2.5 text-base font-semibold rounded-lg transition-all duration-300 ${
               isFormValid
                 ? "text-white shadow-md hover:shadow-lg transform hover:scale-[1.02]"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
             style={{ 
-              fontSize: '16px', 
               fontFamily: 'system-ui, Inter, sans-serif',
               backgroundColor: isFormValid ? '#1e2a78' : '#d1d5db'
             }}
@@ -727,9 +712,8 @@ function CreateProfile() {
           <button 
             type="button"
             onClick={() => alert("You can complete this later in your settings")}
-            className="px-8 py-3 text-lg font-semibold transition-colors text-gray-600 hover:text-gray-800"
+            className="px-6 py-2.5 text-base font-semibold transition-colors text-gray-600 hover:text-gray-800"
             style={{ 
-              fontSize: '16px', 
               fontFamily: 'system-ui, Inter, sans-serif'
             }}
           >
