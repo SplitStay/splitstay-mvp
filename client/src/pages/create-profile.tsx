@@ -1,9 +1,5 @@
 import React, { useState } from "react";
 import { useLocation } from "wouter";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,140 +7,47 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { X, Upload, Plus } from "lucide-react";
-import { apiRequest, queryClient as defaultQueryClient } from "@/lib/queryClient";
-
-// Form schemas for two-step process
-const step1Schema = z.object({
-  fullName: z.string().min(1, "Name is required"),
-  profileImage: z.any().optional(),
-  bio: z.string().optional(),
-  dayOfBirth: z.string().min(1, "Day is required"),
-  monthOfBirth: z.string().min(1, "Month is required"),
-  yearOfBirth: z.string().min(1, "Year is required"),
-  travelReason: z.enum(["leisure", "business"], {
-    required_error: "Please select a reason for travel",
-  }),
-}).refine((data) => {
-  const currentYear = new Date().getFullYear();
-  const birthYear = parseInt(data.yearOfBirth);
-  const age = currentYear - birthYear;
-  return age >= 18;
-}, {
-  message: "You must be 18 or older to use SplitStay",
-  path: ["yearOfBirth"],
-});
-
-const step2Schema = z.object({
-  languages: z.array(z.string()).min(1, "At least one language is required"),
-  travelTraits: z.array(z.string()).max(5, "You can select up to 5 traits"),
-});
-
-type Step1Form = z.infer<typeof step1Schema>;
-type Step2Form = z.infer<typeof step2Schema>;
 
 export default function CreateProfile() {
   const [, navigate] = useLocation();
-  const { toast } = useToast();
-  // Using the queryClient directly from imports since useQueryClient hook is having issues
   const [currentStep, setCurrentStep] = useState(1);
-  const [step1Data, setStep1Data] = useState<Step1Form | null>(null);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [selectedTraits, setSelectedTraits] = useState<string[]>([]);
   const [customLanguage, setCustomLanguage] = useState("");
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
-  
+  const [formData, setFormData] = useState({
+    fullName: "",
+    bio: "",
+    dayOfBirth: "",
+    monthOfBirth: "",
+    yearOfBirth: "",
+    travelReason: ""
+  });
+
   // Check user path from URL
   const urlParams = new URLSearchParams(window.location.search);
   const userPath = urlParams.get('path');
 
-  const step1Form = useForm<Step1Form>({
-    resolver: zodResolver(step1Schema),
-    defaultValues: {
-      fullName: "",
-      bio: "",
-      dayOfBirth: "",
-      monthOfBirth: "",
-      yearOfBirth: "",
-      travelReason: undefined,
-    },
-  });
-
-  const step2Form = useForm<Step2Form>({
-    resolver: zodResolver(step2Schema),
-    defaultValues: {
-      languages: [],
-      travelTraits: [],
-    },
-  });
-
-  const mutation = useMutation({
-    mutationFn: async (data: any) => {
-      return await apiRequest("/api/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-    },
-    onSuccess: () => {
-      toast({
-        title: "Profile created successfully!",
-        description: "Welcome to SplitStay!",
-      });
-      defaultQueryClient.invalidateQueries({ queryKey: ["/api/users"] });
-      
-      // Navigate based on user path
-      if (userPath === "host") {
-        navigate("/create-trip");
-      } else if (userPath === "guest") {
-        navigate("/browse-trips");
-      } else {
-        navigate("/find-roommate");
-      }
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Error creating profile",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleStep1Submit = (data: Step1Form) => {
-    setStep1Data(data);
+  const handleStep1Submit = (e: React.FormEvent) => {
+    e.preventDefault();
     setCurrentStep(2);
   };
 
-  const handleStep2Submit = (data: Step2Form) => {
-    if (!step1Data) return;
-    
-    const combinedData = {
-      ...step1Data,
-      ...data,
-      languages: selectedLanguages,
-      travelTraits: selectedTraits,
-      dateOfBirth: `${step1Data.yearOfBirth}-${step1Data.monthOfBirth.padStart(2, '0')}-${step1Data.dayOfBirth.padStart(2, '0')}`,
-    };
-    
-    mutation.mutate(combinedData);
+  const handleStep2Submit = () => {
+    // For now, just navigate based on user path
+    if (userPath === "host") {
+      navigate("/create-trip");
+    } else if (userPath === "guest") {
+      navigate("/browse-trips");
+    } else {
+      navigate("/find-roommate");
+    }
   };
 
   const handleSkipStep2 = () => {
-    if (!step1Data) return;
-    
-    const combinedData = {
-      ...step1Data,
-      languages: ["English"],
-      travelTraits: [],
-      dateOfBirth: `${step1Data.yearOfBirth}-${step1Data.monthOfBirth.padStart(2, '0')}-${step1Data.dayOfBirth.padStart(2, '0')}`,
-    };
-    
-    mutation.mutate(combinedData);
+    handleStep2Submit();
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -155,7 +58,6 @@ export default function CreateProfile() {
         setProfileImagePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
-      step1Form.setValue("profileImage", file);
     }
   };
 
@@ -208,10 +110,10 @@ export default function CreateProfile() {
   const yearOptions = Array.from({ length: 82 }, (_, i) => (currentYear - 18 - i).toString());
 
   // Check if step 1 form is valid
-  const isStep1Valid = step1Form.watch("fullName") && 
-                      step1Form.watch("dayOfBirth") && 
-                      step1Form.watch("monthOfBirth") && 
-                      step1Form.watch("yearOfBirth") &&
+  const isStep1Valid = formData.fullName && 
+                      formData.dayOfBirth && 
+                      formData.monthOfBirth && 
+                      formData.yearOfBirth &&
                       profileImagePreview;
 
   if (currentStep === 1) {
@@ -232,7 +134,7 @@ export default function CreateProfile() {
               <CardTitle className="text-xl text-navy">Step 1 of 2</CardTitle>
             </CardHeader>
             <CardContent>
-              <form onSubmit={step1Form.handleSubmit(handleStep1Submit)} className="space-y-6">
+              <form onSubmit={handleStep1Submit} className="space-y-6">
                 {/* Profile Photo Upload */}
                 <div className="text-center">
                   <Label className="text-base font-medium text-gray-700 mb-3 block">
@@ -248,10 +150,7 @@ export default function CreateProfile() {
                         />
                         <button
                           type="button"
-                          onClick={() => {
-                            setProfileImagePreview(null);
-                            step1Form.setValue("profileImage", undefined);
-                          }}
+                          onClick={() => setProfileImagePreview(null)}
                           className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors"
                         >
                           <X className="w-4 h-4" />
@@ -285,15 +184,12 @@ export default function CreateProfile() {
                   </Label>
                   <Input
                     id="fullName"
-                    {...step1Form.register("fullName")}
+                    value={formData.fullName}
+                    onChange={(e) => setFormData(prev => ({...prev, fullName: e.target.value}))}
                     placeholder="Enter your full name"
                     className="mt-2 h-12 text-base"
+                    required
                   />
-                  {step1Form.formState.errors.fullName && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {step1Form.formState.errors.fullName.message}
-                    </p>
-                  )}
                 </div>
 
                 {/* Bio */}
@@ -303,7 +199,8 @@ export default function CreateProfile() {
                   </Label>
                   <Textarea
                     id="bio"
-                    {...step1Form.register("bio")}
+                    value={formData.bio}
+                    onChange={(e) => setFormData(prev => ({...prev, bio: e.target.value}))}
                     placeholder="Share what excites you about travel..."
                     rows={3}
                     className="mt-2 text-base"
@@ -318,7 +215,7 @@ export default function CreateProfile() {
                   <div className="grid grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor="dayOfBirth" className="text-sm text-gray-600">Day</Label>
-                      <Select onValueChange={(value) => step1Form.setValue("dayOfBirth", value)}>
+                      <Select onValueChange={(value) => setFormData(prev => ({...prev, dayOfBirth: value}))}>
                         <SelectTrigger className="mt-1 h-12">
                           <SelectValue placeholder="Day" />
                         </SelectTrigger>
@@ -331,7 +228,7 @@ export default function CreateProfile() {
                     </div>
                     <div>
                       <Label htmlFor="monthOfBirth" className="text-sm text-gray-600">Month</Label>
-                      <Select onValueChange={(value) => step1Form.setValue("monthOfBirth", value)}>
+                      <Select onValueChange={(value) => setFormData(prev => ({...prev, monthOfBirth: value}))}>
                         <SelectTrigger className="mt-1 h-12">
                           <SelectValue placeholder="Month" />
                         </SelectTrigger>
@@ -344,7 +241,7 @@ export default function CreateProfile() {
                     </div>
                     <div>
                       <Label htmlFor="yearOfBirth" className="text-sm text-gray-600">Year</Label>
-                      <Select onValueChange={(value) => step1Form.setValue("yearOfBirth", value)}>
+                      <Select onValueChange={(value) => setFormData(prev => ({...prev, yearOfBirth: value}))}>
                         <SelectTrigger className="mt-1 h-12">
                           <SelectValue placeholder="Year" />
                         </SelectTrigger>
@@ -356,11 +253,6 @@ export default function CreateProfile() {
                       </Select>
                     </div>
                   </div>
-                  {step1Form.formState.errors.yearOfBirth && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {step1Form.formState.errors.yearOfBirth.message}
-                    </p>
-                  )}
                 </div>
 
                 {/* Travel Reason */}
@@ -369,8 +261,8 @@ export default function CreateProfile() {
                     Reason for travel
                   </Label>
                   <RadioGroup 
-                    value={step1Form.watch("travelReason")} 
-                    onValueChange={(value) => step1Form.setValue("travelReason", value as "leisure" | "business")}
+                    value={formData.travelReason} 
+                    onValueChange={(value) => setFormData(prev => ({...prev, travelReason: value}))}
                     className="grid grid-cols-2 gap-4"
                   >
                     <div className="flex items-center space-x-2 p-4 border rounded-lg hover:bg-gray-50 transition-colors">
@@ -420,7 +312,7 @@ export default function CreateProfile() {
             <CardTitle className="text-xl text-navy">Step 2 of 2</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={step2Form.handleSubmit(handleStep2Submit)} className="space-y-6">
+            <div className="space-y-6">
               {/* Languages */}
               <div>
                 <Label className="text-base font-medium text-gray-700 mb-3 block">
@@ -538,24 +430,21 @@ export default function CreateProfile() {
               {/* Buttons */}
               <div className="flex flex-col gap-3 pt-4">
                 <Button 
-                  type="submit"
+                  onClick={handleStep2Submit}
                   className="w-full bg-navy text-white hover:bg-navy/90 py-6 text-lg font-semibold"
-                  disabled={mutation.isPending}
                 >
-                  {mutation.isPending ? "Creating Profile..." : "Create My Profile"}
+                  Create My Profile
                 </Button>
                 
                 <Button 
-                  type="button"
                   variant="outline"
                   onClick={handleSkipStep2}
                   className="w-full py-6 text-lg font-semibold"
-                  disabled={mutation.isPending}
                 >
                   Skip for Now
                 </Button>
               </div>
-            </form>
+            </div>
           </CardContent>
         </Card>
       </div>
