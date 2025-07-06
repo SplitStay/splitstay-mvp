@@ -8,6 +8,7 @@ function CreateProfile() {
   const [customLanguage, setCustomLanguage] = useState("");
   const [customCountry, setCustomCountry] = useState("");
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
+  const [travelPhotos, setTravelPhotos] = useState<string[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
@@ -66,6 +67,27 @@ function CreateProfile() {
     }
   };
 
+  const handleTravelPhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      const newPhotos: string[] = [];
+      Array.from(files).slice(0, 3 - travelPhotos.length).forEach(file => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          newPhotos.push(reader.result as string);
+          if (newPhotos.length === Math.min(files.length, 3 - travelPhotos.length)) {
+            setTravelPhotos(prev => [...prev, ...newPhotos].slice(0, 3));
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  };
+
+  const removeTravelPhoto = (index: number) => {
+    setTravelPhotos(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const profileData = {
@@ -73,7 +95,8 @@ function CreateProfile() {
       selectedLanguages,
       selectedTraits,
       selectedCountries,
-      profileImage: profileImagePreview
+      profileImage: profileImagePreview,
+      travelPhotos
     };
     console.log("Profile Data:", profileData);
     alert("Profile created! Check console for data.");
@@ -330,91 +353,88 @@ function CreateProfile() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="max-w-7xl mx-auto px-4 pb-20">
+      <form onSubmit={handleSubmit} className="max-w-7xl mx-auto px-4 pb-16">
         {/* 12-column grid layout: 5 cols left, 7 cols right */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           
           {/* Step 1 - Left Panel (5 columns) */}
-          <div className="lg:col-span-5 bg-white rounded-lg shadow-lg p-6">
-            <div className="mb-4">
-              <h2 className="text-xl font-bold mb-1" style={{ color: '#1e2a78' }}>
+          <div className="lg:col-span-5 bg-white rounded-lg shadow-lg p-4">
+            <div className="mb-3">
+              <h2 className="text-lg font-bold mb-1" style={{ color: '#1e2a78' }}>
                 👉 Build your traveler profile
               </h2>
-              <p className="text-gray-600 text-sm">Let's start with the basics</p>
+              <p className="text-gray-600 text-xs">Let's start with the basics</p>
             </div>
             
             <div className="space-y-3">
-              {/* Profile Photo Upload */}
-              <div className="text-center">
-                <label className="block text-base font-medium text-gray-700 mb-3">
-                  Profile Photo <span className="text-red-500">*</span>
-                </label>
-                <div className="flex flex-col items-center">
-                  {profileImagePreview ? (
-                    <div className="relative">
-                      <img
-                        src={profileImagePreview}
-                        alt="Profile preview"
-                        className="w-24 h-24 rounded-full object-cover border-2 border-gray-300"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setProfileImagePreview(null)}
-                        className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors text-xs"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="w-24 h-24 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center">
-                      <svg className="w-10 h-10 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                      </svg>
-                    </div>
-                  )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                    id="profile-image-upload"
-                  />
-                  <div className="flex items-center gap-3 mt-4">
+              {/* Profile Photo and Name Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* Profile Photo Upload */}
+                <div className="text-center">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Profile Photo <span className="text-red-500">*</span>
+                  </label>
+                  <div className="flex flex-col items-center">
+                    {profileImagePreview ? (
+                      <div className="relative">
+                        <img
+                          src={profileImagePreview}
+                          alt="Profile preview"
+                          className="w-20 h-20 rounded-full object-cover border-2 border-gray-300"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setProfileImagePreview(null)}
+                          className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center hover:bg-red-600 transition-colors text-xs"
+                        >
+                          <X className="w-2 h-2" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="w-20 h-20 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center">
+                        <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      id="profile-image-upload"
+                    />
                     <label
                       htmlFor="profile-image-upload"
-                      className="cursor-pointer text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+                      className="cursor-pointer text-white px-3 py-1.5 rounded text-xs font-medium mt-2"
                       style={{ backgroundColor: '#1e2a78' }}
                     >
-                      Upload Photo
+                      Upload
                     </label>
-                    <button type="button" className="text-sm text-gray-500 hover:text-gray-700 underline">
-                      Add later
-                    </button>
                   </div>
                 </div>
-              </div>
 
-              {/* Name Input */}
-              <div>
-                <label htmlFor="fullName" className="block text-base font-medium text-gray-700 mb-2">
-                  How should travelers call you? <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="fullName"
-                  type="text"
-                  value={formData.fullName}
-                  onChange={(e) => setFormData(prev => ({...prev, fullName: e.target.value}))}
-                  placeholder="e.g. Jane"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg transition-all"
-                  style={{ fontSize: '16px', fontFamily: 'system-ui, Inter, sans-serif' }}
-                  autoFocus
-                  required
-                />
+                {/* Name Input */}
+                <div>
+                  <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
+                    How should travelers call you? <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="fullName"
+                    type="text"
+                    value={formData.fullName}
+                    onChange={(e) => setFormData(prev => ({...prev, fullName: e.target.value}))}
+                    placeholder="e.g. Jane"
+                    className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+                    autoFocus
+                    required
+                  />
+                </div>
               </div>
 
               {/* What makes you feel alive */}
               <div>
-                <label htmlFor="bio" className="block text-base font-medium text-gray-700 mb-2">
+                <label htmlFor="bio" className="block text-sm font-medium text-gray-700 mb-2">
                   What makes you feel alive? <span className="text-gray-400">(optional)</span>
                 </label>
                 <textarea
@@ -422,10 +442,52 @@ function CreateProfile() {
                   value={formData.bio}
                   onChange={(e) => setFormData(prev => ({...prev, bio: e.target.value}))}
                   placeholder="e.g. chasing sunsets, street food tours, spontaneous hikes..."
-                  rows={3}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg transition-all resize-none"
-                  style={{ fontSize: '16px', fontFamily: 'system-ui, Inter, sans-serif' }}
+                  rows={2}
+                  className="w-full px-3 py-2 border border-gray-300 rounded text-sm resize-none"
                 />
+              </div>
+
+              {/* Travel Photos Section */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Top 3 Travel Photos <span className="text-gray-400">(optional)</span>
+                </label>
+                <div className="flex gap-2 mb-2">
+                  {travelPhotos.map((photo, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={photo}
+                        alt={`Travel photo ${index + 1}`}
+                        className="w-16 h-16 object-cover rounded border"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeTravelPhoto(index)}
+                        className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center hover:bg-red-600 transition-colors text-xs"
+                      >
+                        <X className="w-2 h-2" />
+                      </button>
+                    </div>
+                  ))}
+                  {travelPhotos.length < 3 && (
+                    <div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleTravelPhotoUpload}
+                        className="hidden"
+                        id="travel-photos-upload"
+                      />
+                      <label
+                        htmlFor="travel-photos-upload"
+                        className="cursor-pointer w-16 h-16 border-2 border-dashed border-gray-300 rounded flex items-center justify-center hover:border-gray-400 transition-colors"
+                      >
+                        <Plus className="w-6 h-6 text-gray-400" />
+                      </label>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Date of Birth and Countries - Two Column Layout */}
@@ -549,12 +611,12 @@ function CreateProfile() {
           </div>
 
           {/* Step 2 - Right Panel (7 columns) */}
-          <div className="lg:col-span-7 bg-white rounded-lg shadow-lg p-6">
-            <div className="mb-4">
-              <h2 className="text-xl font-bold mb-1" style={{ color: '#1e2a78' }}>
+          <div className="lg:col-span-7 bg-white rounded-lg shadow-lg p-4">
+            <div className="mb-3">
+              <h2 className="text-lg font-bold mb-1" style={{ color: '#1e2a78' }}>
                 👉 Tell us how you travel
               </h2>
-              <p className="text-gray-600 text-sm">Help us match you with compatible travelers</p>
+              <p className="text-gray-600 text-xs">Help us match you with compatible travelers</p>
             </div>
             
             <div className="space-y-3">
@@ -637,15 +699,15 @@ function CreateProfile() {
                     ℹ️
                   </span>
                 </label>
-                {/* Compact flexible wrap layout for traits */}
-                <div className="flex flex-wrap gap-1 mb-3">
+                {/* Two-column grid for balanced layout */}
+                <div className="grid grid-cols-2 gap-1 mb-2">
                   {traitOptions.map((trait) => (
                     <button
                       key={trait}
                       type="button"
                       onClick={() => handleTraitToggle(trait)}
                       disabled={!selectedTraits.includes(trait) && selectedTraits.length >= 5}
-                      className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${
+                      className={`px-2 py-0.5 rounded text-xs font-medium transition-colors text-left ${
                         selectedTraits.includes(trait)
                           ? "text-white"
                           : selectedTraits.length >= 5
@@ -690,15 +752,15 @@ function CreateProfile() {
       </form>
 
       {/* Compact Sticky Footer */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 shadow-lg">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-2 shadow-lg">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row gap-2 justify-center">
           <button 
             type="submit"
             onClick={handleSubmit}
             disabled={!isFormValid}
-            className={`px-6 py-2.5 text-base font-semibold rounded-lg transition-all duration-300 ${
+            className={`px-5 py-2 text-sm font-semibold rounded transition-all duration-300 ${
               isFormValid
-                ? "text-white shadow-md hover:shadow-lg transform hover:scale-[1.02]"
+                ? "text-white shadow-md hover:shadow-lg"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
             style={{ 
@@ -712,7 +774,7 @@ function CreateProfile() {
           <button 
             type="button"
             onClick={() => alert("You can complete this later in your settings")}
-            className="px-6 py-2.5 text-base font-semibold transition-colors text-gray-600 hover:text-gray-800"
+            className="px-5 py-2 text-sm font-semibold transition-colors text-gray-600 hover:text-gray-800"
             style={{ 
               fontFamily: 'system-ui, Inter, sans-serif'
             }}
