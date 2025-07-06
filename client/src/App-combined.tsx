@@ -194,7 +194,7 @@ function CreateProfile() {
             <img 
               src={splitstayLogo} 
               alt="SplitStay Logo" 
-              className="h-20 md:h-24 mb-6"
+              className="h-32 md:h-40 mb-6"
             />
           </div>
           
