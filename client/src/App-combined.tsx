@@ -12,6 +12,7 @@ function CreateProfile() {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
+    country: "",
     bio: "",
     dayOfBirth: "",
     monthOfBirth: "",
@@ -103,6 +104,7 @@ function CreateProfile() {
   };
 
   const isFormValid = formData.fullName && 
+                      formData.country &&
                       formData.dayOfBirth && 
                       formData.monthOfBirth && 
                       formData.yearOfBirth &&
@@ -135,10 +137,23 @@ function CreateProfile() {
     "Eco-conscious", "Local Experience Seeker", "Comfort Seeker", "Thrill Seeker"
   ];
 
-  const popularCountries = [
-    "United States", "United Kingdom", "Canada", "Australia", "Germany", "France", 
-    "Spain", "Italy", "Japan", "South Korea", "Brazil", "Mexico", "India", 
-    "Thailand", "Netherlands", "Sweden", "Norway", "Switzerland", "New Zealand"
+  const countryOptions = [
+    "Afghanistan", "Albania", "Algeria", "Argentina", "Armenia", "Australia", 
+    "Austria", "Azerbaijan", "Bahrain", "Bangladesh", "Belarus", "Belgium", 
+    "Bolivia", "Bosnia and Herzegovina", "Brazil", "Bulgaria", "Cambodia", 
+    "Canada", "Chile", "China", "Colombia", "Costa Rica", "Croatia", "Cuba", 
+    "Czech Republic", "Denmark", "Dominican Republic", "Ecuador", "Egypt", 
+    "Estonia", "Ethiopia", "Finland", "France", "Georgia", "Germany", "Ghana", 
+    "Greece", "Guatemala", "Honduras", "Hungary", "Iceland", "India", 
+    "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", 
+    "Japan", "Jordan", "Kazakhstan", "Kenya", "Kuwait", "Latvia", "Lebanon", 
+    "Lithuania", "Luxembourg", "Malaysia", "Mexico", "Morocco", "Netherlands", 
+    "New Zealand", "Nicaragua", "Nigeria", "North Korea", "Norway", "Pakistan", 
+    "Panama", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", 
+    "Russia", "Saudi Arabia", "Serbia", "Singapore", "Slovakia", "Slovenia", 
+    "South Africa", "South Korea", "Spain", "Sri Lanka", "Sweden", "Switzerland", 
+    "Thailand", "Turkey", "Ukraine", "United Arab Emirates", "United Kingdom", 
+    "United States", "Uruguay", "Venezuela", "Vietnam", "Yemen", "Zimbabwe"
   ];
 
   // Landing page view
@@ -361,7 +376,7 @@ function CreateProfile() {
           <div className="lg:col-span-5 bg-white rounded-lg shadow-lg p-5">
             <div className="mb-3">
               <h2 className="text-lg font-bold mb-1" style={{ color: '#1e2a78' }}>
-                👉 Build your traveler profile
+                👉 Tell us about you
               </h2>
               <p className="text-gray-600 text-xs">Let's start with the basics</p>
             </div>
@@ -427,6 +442,25 @@ function CreateProfile() {
                   autoFocus
                   required
                 />
+              </div>
+
+              {/* Where are you from? - New required field */}
+              <div>
+                <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-2">
+                  Where are you from? <span className="text-red-500">*</span>
+                </label>
+                <select
+                  id="country"
+                  value={formData.country || ''}
+                  onChange={(e) => setFormData(prev => ({...prev, country: e.target.value}))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+                  required
+                >
+                  <option value="">Select your country</option>
+                  {countryOptions.map((country) => (
+                    <option key={country} value={country}>{country}</option>
+                  ))}
+                </select>
               </div>
 
               {/* What makes you feel alive */}
@@ -566,7 +600,7 @@ function CreateProfile() {
           <div className="lg:col-span-7 bg-white rounded-lg shadow-lg p-5">
             
             {/* Section 2: Tell us how you travel */}
-            <div className="mb-8">
+            <div className="mb-8" style={{marginTop: '32px'}}>
               <div className="mb-3">
                 <h2 className="text-lg font-bold mb-1" style={{ color: '#1e2a78' }}>
                   👉 Tell us how you travel
@@ -630,7 +664,7 @@ function CreateProfile() {
             </div>
 
             {/* Section 3: Tell us about your travel experience */}
-            <div>
+            <div style={{marginTop: '32px'}}>
               <div className="mb-3">
                 <h2 className="text-lg font-bold mb-1" style={{ color: '#1e2a78' }}>
                   👉 Tell us about your travel experience
@@ -649,23 +683,21 @@ function CreateProfile() {
                   </span>
                 </label>
                 <div className="flex gap-2 mb-2">
-                  <input
-                    type="text"
+                  <select
                     value={customCountry}
                     onChange={(e) => setCustomCountry(e.target.value)}
-                    placeholder="e.g. Thailand, France, Argentina..."
                     className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs"
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        handleAddCustomCountry();
-                      }
-                    }}
-                  />
+                  >
+                    <option value="">Select a country...</option>
+                    {countryOptions.filter(country => !selectedCountries.includes(country)).map((country) => (
+                      <option key={country} value={country}>{country}</option>
+                    ))}
+                  </select>
                   <button
                     type="button"
                     onClick={handleAddCustomCountry}
-                    className="px-2 py-1 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                    disabled={!customCountry}
+                    className="px-2 py-1 border border-gray-300 rounded hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Plus className="w-3 h-3" />
                   </button>
@@ -726,7 +758,7 @@ function CreateProfile() {
                           <img
                             src={travelPhotos[index]}
                             alt={`Travel photo ${index + 1}`}
-                            className="w-16 h-16 object-cover rounded border"
+                            className="w-20 h-20 object-cover rounded border p-1"
                           />
                           <button
                             type="button"
@@ -747,7 +779,7 @@ function CreateProfile() {
                           />
                           <label
                             htmlFor={`travel-photo-${index}`}
-                            className="cursor-pointer w-16 h-16 border-2 border-dashed border-gray-300 rounded flex items-center justify-center hover:border-gray-400 transition-colors"
+                            className="cursor-pointer w-20 h-20 border-2 border-dashed border-gray-300 rounded flex items-center justify-center hover:border-gray-400 transition-colors"
                           >
                             <Plus className="w-4 h-4 text-gray-400" />
                           </label>
