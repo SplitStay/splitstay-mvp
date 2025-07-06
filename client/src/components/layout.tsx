@@ -43,6 +43,16 @@ const Layout: React.FC<LayoutProps> = ({
     return () => clearInterval(interval);
   }, []);
 
+  // For home page, use full-width desktop layout
+  if (location === "/") {
+    return (
+      <div className="w-full h-full">
+        {children}
+      </div>
+    );
+  }
+
+  // For other pages, use mobile layout
   return (
     <div className="mobile-wrapper">
       {/* Scrollable mobile content area */}
