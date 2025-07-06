@@ -703,7 +703,7 @@ function CreateProfile() {
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-1 mb-2">
-                  {popularCountries.map((country) => (
+                  {countryOptions.slice(0, 15).map((country) => (
                     <button
                       key={country}
                       type="button"

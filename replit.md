@@ -79,6 +79,7 @@ The application is configured for deployment on Replit with autoscaling:
 
 ## Changelog
 
+- July 6, 2025: Enhanced form validation and UX - renamed left panel to "Tell us about you", added required "Where are you from?" field with country dropdown, improved travel photo display size (80px), implemented comprehensive country validation for both origin and travel experience sections, added 32px vertical spacing between sections
 - July 6, 2025: Final layout refinement - moved travel photos to right panel, improved spacing between sections (space-y-6), expanded container to 1350px max-width, eliminated scrollbars for optimal desktop experience
 - July 6, 2025: Final MVP optimization - moved countries to travel section, implemented flex-wrap for traits with fixed height, added scroll containers for max height sections, balanced left/right panel heights for 1280px+ screens
 - July 6, 2025: Optimized profile form layout - added travel photos upload (max 3), grouped inputs in side-by-side rows, implemented 2-column grid for traits, reduced padding/margins to eliminate scrolling on laptop screens
