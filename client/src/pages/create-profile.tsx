@@ -108,17 +108,16 @@ export default function CreateProfile() {
   const currentYear = new Date().getFullYear();
   const yearOptions = Array.from({ length: 82 }, (_, i) => (currentYear - 18 - i).toString());
 
-  // Check if step 1 form is valid
+  // Check if step 1 form is valid (photo is now optional)
   const isStep1Valid = formData.fullName && 
                       formData.dayOfBirth && 
                       formData.monthOfBirth && 
-                      formData.yearOfBirth &&
-                      profileImagePreview;
+                      formData.yearOfBirth;
 
   if (currentStep === 1) {
     return (
       <div className="min-h-screen bg-gray-50 p-4">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-[600px] mx-auto">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-navy mb-2">
               Build your traveler profile
@@ -128,7 +127,7 @@ export default function CreateProfile() {
             </p>
           </div>
 
-          <Card className="shadow-lg border-0 bg-white">
+          <Card className="shadow-md border-0 bg-white">
             <CardHeader>
               <CardTitle className="text-xl text-navy">Step 1 of 2</CardTitle>
             </CardHeader>
@@ -137,7 +136,7 @@ export default function CreateProfile() {
                 {/* Profile Photo Upload */}
                 <div className="text-center">
                   <Label className="text-base font-medium text-gray-700 mb-3 block">
-                    Profile Photo <span className="text-red-500">*</span>
+                    Profile Photo
                   </Label>
                   <div className="flex flex-col items-center">
                     {profileImagePreview ? (
@@ -157,7 +156,9 @@ export default function CreateProfile() {
                       </div>
                     ) : (
                       <div className="w-32 h-32 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center">
-                        <Upload className="w-8 h-8 text-gray-400" />
+                        <svg className="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
                       </div>
                     )}
                     <input
@@ -167,26 +168,36 @@ export default function CreateProfile() {
                       className="hidden"
                       id="profile-image-upload"
                     />
-                    <Label
-                      htmlFor="profile-image-upload"
-                      className="mt-4 bg-navy text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-navy/90 transition-colors"
-                    >
-                      {profileImagePreview ? "Change Photo" : "Upload Photo"}
-                    </Label>
+                    <div className="flex items-center gap-3 mt-4">
+                      <Label
+                        htmlFor="profile-image-upload"
+                        className="bg-navy text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-navy/90 transition-colors text-sm"
+                      >
+                        {profileImagePreview ? "Change Photo" : "Upload Photo"}
+                      </Label>
+                      <button
+                        type="button"
+                        className="text-sm text-gray-500 hover:text-gray-700 underline"
+                        onClick={() => {/* Add later functionality */}}
+                      >
+                        Add later
+                      </button>
+                    </div>
                   </div>
                 </div>
 
                 {/* Name */}
                 <div>
                   <Label htmlFor="fullName" className="text-base font-medium text-gray-700">
-                    Name <span className="text-red-500">*</span>
+                    How should travelers call you? <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="fullName"
                     value={formData.fullName}
                     onChange={(e) => setFormData(prev => ({...prev, fullName: e.target.value}))}
-                    placeholder="Enter your full name"
+                    placeholder="e.g. Jane"
                     className="mt-2 h-12 text-base"
+                    style={{ fontSize: '16px' }}
                     required
                   />
                 </div>
@@ -200,9 +211,10 @@ export default function CreateProfile() {
                     id="bio"
                     value={formData.bio}
                     onChange={(e) => setFormData(prev => ({...prev, bio: e.target.value}))}
-                    placeholder="Share what excites you about travel..."
+                    placeholder="e.g. chasing sunsets, street food tours, spontaneous hikes…"
                     rows={3}
                     className="mt-2 text-base"
+                    style={{ fontSize: '16px' }}
                   />
                 </div>
 
@@ -211,11 +223,11 @@ export default function CreateProfile() {
                   <Label className="text-base font-medium text-gray-700 mb-3 block">
                     Date of Birth <span className="text-red-500">*</span>
                   </Label>
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-3 gap-3">
                     <div>
                       <Label htmlFor="dayOfBirth" className="text-sm text-gray-600">Day</Label>
                       <Select onValueChange={(value) => setFormData(prev => ({...prev, dayOfBirth: value}))}>
-                        <SelectTrigger className="mt-1 h-12">
+                        <SelectTrigger className="mt-1 h-10">
                           <SelectValue placeholder="Day" />
                         </SelectTrigger>
                         <SelectContent>
@@ -228,7 +240,7 @@ export default function CreateProfile() {
                     <div>
                       <Label htmlFor="monthOfBirth" className="text-sm text-gray-600">Month</Label>
                       <Select onValueChange={(value) => setFormData(prev => ({...prev, monthOfBirth: value}))}>
-                        <SelectTrigger className="mt-1 h-12">
+                        <SelectTrigger className="mt-1 h-10">
                           <SelectValue placeholder="Month" />
                         </SelectTrigger>
                         <SelectContent>
@@ -241,7 +253,7 @@ export default function CreateProfile() {
                     <div>
                       <Label htmlFor="yearOfBirth" className="text-sm text-gray-600">Year</Label>
                       <Select onValueChange={(value) => setFormData(prev => ({...prev, yearOfBirth: value}))}>
-                        <SelectTrigger className="mt-1 h-12">
+                        <SelectTrigger className="mt-1 h-10">
                           <SelectValue placeholder="Year" />
                         </SelectTrigger>
                         <SelectContent>
@@ -252,12 +264,13 @@ export default function CreateProfile() {
                       </Select>
                     </div>
                   </div>
+                  <p className="text-sm text-gray-500 mt-2">Must be at least 18 years old</p>
                 </div>
 
                 {/* Travel Reason */}
                 <div>
                   <Label className="text-base font-medium text-gray-700 mb-3 block">
-                    Reason for travel
+                    What best describes this trip?
                   </Label>
                   <RadioGroup 
                     value={formData.travelReason} 
@@ -283,8 +296,9 @@ export default function CreateProfile() {
                       ? "bg-blue-900 text-white hover:bg-blue-800"
                       : "bg-gray-300 text-gray-500 cursor-not-allowed"
                   }`}
+                  style={{ fontSize: '16px' }}
                 >
-                  Next
+                  Continue to Step 2
                 </Button>
               </form>
             </CardContent>
@@ -296,7 +310,7 @@ export default function CreateProfile() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-[600px] mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-navy mb-2">
             Tell us how you travel
@@ -306,7 +320,7 @@ export default function CreateProfile() {
           </p>
         </div>
 
-        <Card className="shadow-lg border-0 bg-white">
+        <Card className="shadow-md border-0 bg-white">
           <CardHeader>
             <CardTitle className="text-xl text-navy">Step 2 of 2</CardTitle>
           </CardHeader>
