@@ -21,39 +21,39 @@ const Home: React.FC = () => {
           />
         </div>
         
+        {/* Headline */}
+        <h1 className="text-3xl lg:text-4xl font-bold text-navy mb-4">
+          Share your hotel room. Save money. Meet travelers.
+        </h1>
+        
         {/* Subtitle */}
-        <p className="text-xl text-navy mb-8 leading-relaxed">
-          You're early — and that's exactly the point.<br />
-          SplitStay is just opening up. The first few travelers<br />
-          shape what this becomes. Want to be one of<br />
-          them?
+        <p className="text-lg text-navy mb-8 leading-relaxed max-w-4xl mx-auto">
+          You're early — and that's exactly the point. SplitStay is just opening up. The first few travelers shape what this becomes. Want to be one of them?
         </p>
         
-        {/* Two columns section */}
-        <div className="w-full mb-8">
-          <div className="flex justify-between items-start px-20">
+        {/* User Path CTA Section - Two Cards */}
+        <div className="w-full mb-8 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-6 px-4">
             
-            {/* Left column */}
-            <div className="w-1/2 text-center pr-16">
-              <h2 className="text-2xl font-bold text-navy mb-4">
-                Have an accommodation<br />
-                to share?
+            {/* Card 1 */}
+            <div className="bg-white border-2 border-gray-200 rounded-lg p-6 hover:shadow-lg hover:border-navy transition-all duration-300 cursor-pointer"
+                 onClick={() => navigate("/create-profile")}>
+              <h2 className="text-xl font-bold text-navy mb-3">
+                Have an accommodation to share?
               </h2>
-              <p className="text-lg text-navy opacity-80">
-                Post your stay to<br />
-                find a roommate
+              <p className="text-gray-600">
+                Already booked a place? Post your stay to find a roommate.
               </p>
             </div>
             
-            {/* Right column */}
-            <div className="w-1/2 text-center pl-16">
-              <h2 className="text-2xl font-bold text-navy mb-4">
-                Looking to join<br />
-                someone else's trip?
+            {/* Card 2 */}
+            <div className="bg-white border-2 border-gray-200 rounded-lg p-6 hover:shadow-lg hover:border-navy transition-all duration-300 cursor-pointer"
+                 onClick={() => navigate("/find-roommate")}>
+              <h2 className="text-xl font-bold text-navy mb-3">
+                Looking to join someone else's trip?
               </h2>
-              <p className="text-lg text-navy opacity-80">
-                Browse open stays<br />
-                and save money
+              <p className="text-gray-600">
+                Browse open stays and message the traveler.
               </p>
             </div>
             
@@ -63,67 +63,61 @@ const Home: React.FC = () => {
         {/* CTA Button */}
         <div className="mb-12">
           <Button
-            className="bg-navy hover:bg-navy-dark text-white px-12 py-4 text-xl font-semibold rounded-xl"
-            onClick={() => navigate("/signup")}
+            className="bg-navy hover:bg-navy-dark text-white px-8 py-3 text-lg font-semibold rounded-lg transition-colors"
+            onClick={() => navigate("/find-roommate")}
           >
-            Create your profile
+            Find Your Roommate
           </Button>
         </div>
         
-        {/* Location examples */}
-        <div className="text-left mb-16 space-y-6 px-64">
-          <div className="flex items-start">
-            <span className="text-2xl mr-3">🍺</span>
-            <div>
-              <span className="font-bold text-navy">Munich – Oktoberfest:</span>
-              <span className="text-navy opacity-80 ml-2">18 travelers open to sharing a hotel room this September</span>
-            </div>
-          </div>
-          
-          <div className="flex items-start">
-            <span className="text-2xl mr-3">🏰</span>
-            <div>
-              <span className="font-bold text-navy">Barcelona – August:</span>
-              <span className="text-navy opacity-80 ml-2">7 shared trips posted this week</span>
-            </div>
+        {/* Stats Section */}
+        <div className="mb-16 max-w-4xl mx-auto">
+          <h3 className="text-2xl font-bold text-navy mb-6 text-center">
+            Top cities this month:
+          </h3>
+          <div className="space-y-4 text-center">
+            <p className="text-lg text-gray-700">
+              <span className="font-semibold text-navy">Munich</span> – 18 travelers looking to share rooms
+            </p>
+            <p className="text-lg text-gray-700">
+              <span className="font-semibold text-navy">Barcelona</span> – 7 shared trips posted this week
+            </p>
+            <p className="text-lg text-gray-700">
+              <span className="font-semibold text-navy">New York</span> – 12 open stays available
+            </p>
           </div>
         </div>
         
         {/* Incentives section */}
-        <div className="mb-8">
-          <h3 className="text-3xl font-bold text-navy mb-12">
-            Incentives to share:
-          </h3>
-          
-          <div className="grid md:grid-cols-3 gap-12 px-64">
-            <div className="bg-navy text-white p-8 rounded-2xl text-center">
-              <div className="text-3xl mb-4">💫</div>
-              <h4 className="text-xl font-bold mb-3">Ambassador</h4>
-              <p className="text-cream opacity-90">
-                Shared journey<br />
-                + invited 3 friends
+        <div className="mb-16 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-6 px-4">
+            <div className="bg-white border-2 border-gray-200 rounded-lg p-6 text-center">
+              <h4 className="text-xl font-bold text-navy mb-3">Ambassador</h4>
+              <p className="text-gray-600">
+                Shared their journey and invited 3 friends
               </p>
             </div>
             
-            <div className="bg-navy text-white p-8 rounded-2xl text-center">
-              <div className="text-3xl mb-4">🏨</div>
-              <h4 className="text-xl font-bold mb-3">Room Sharer</h4>
-              <p className="text-cream opacity-90">
-                Posted a hotel<br />
-                room and matched
+            <div className="bg-white border-2 border-gray-200 rounded-lg p-6 text-center">
+              <h4 className="text-xl font-bold text-navy mb-3">Room Sharer</h4>
+              <p className="text-gray-600">
+                Posted a hotel room and matched successfully
               </p>
             </div>
             
-            <div className="bg-navy text-white p-8 rounded-2xl text-center">
-              <div className="text-3xl mb-4">🚀</div>
-              <h4 className="text-xl font-bold mb-3">Pioneer</h4>
-              <p className="text-cream opacity-90">
-                One of the first<br />
-                100 active users
+            <div className="bg-white border-2 border-gray-200 rounded-lg p-6 text-center">
+              <h4 className="text-xl font-bold text-navy mb-3">Pioneer</h4>
+              <p className="text-gray-600">
+                One of the first 100 active users
               </p>
             </div>
           </div>
         </div>
+        
+        {/* Footer */}
+        <footer className="text-center text-gray-500 py-8">
+          <p>© 2025 SplitStay · Built with love by solo travelers</p>
+        </footer>
         
       </div>
     </div>

@@ -1,0 +1,93 @@
+Create a minimalist and mobile-responsive landing page for a startup called **SplitStay** — a platform that helps solo travelers split hotel rooms to save money and connect with others.
+
+### Design Goals:
+- Minimalist and clean UI
+- Friendly to Gen Z / digital nomads
+- No emojis
+- Fast loading, MVP-ready
+
+---
+
+### Header Section
+
+- Display logo (placeholder or text: SplitStay)
+- Headline: `Share your hotel room. Save money. Meet travelers.`
+- Subtext below:  
+  `You're early — and that’s exactly the point. SplitStay is just opening up. The first few travelers shape what this becomes. Want to be one of them?`
+
+---
+
+### User Path CTA Section (Two Cards)
+
+Create two side-by-side (or stacked on mobile) clickable cards:
+
+**Card 1:**
+
+- Header: `Have an accommodation to share?`
+- Text: `Already booked a place? Post your stay to find a roommate.`
+
+**Card 2:**
+
+- Header: `Looking to join someone else’s trip?`
+- Text: `Browse open stays and message the traveler.`
+
+Add hover effects (like subtle box-shadow or background change) and make them clickable.
+
+---
+
+### CTA Button (centered)
+
+- Button Text: `Find Your Roommate`
+- Make it styled in the brand's primary color, with smooth hover
+
+---
+
+### Stats Section (dynamic-ready)
+
+Replace any emojis/events with a clean text section titled:
+
+**Top cities this month:**
+
+- Munich – 18 travelers looking to share rooms
+- Barcelona – 7 shared trips posted this week
+- New York – 12 open stays available
+
+(Make this easy to replace with dynamic content later)
+
+---
+
+### Incentives Section
+
+Display 3 horizontal (or stacked) cards with clean text:
+
+**Card 1:**  
+- Title: `Ambassador`  
+- Text: `Shared their journey and invited 3 friends`
+
+**Card 2:**  
+- Title: `Room Sharer`  
+- Text: `Posted a hotel room and matched successfully`
+
+**Card 3:**  
+- Title: `Pioneer`  
+- Text: `One of the first 100 active users`
+
+Use clear color blocks or outlined boxes — no icons or emojis needed for now.
+
+---
+
+### Footer (optional)
+
+Include a simple footer:  
+`© 2025 SplitStay · Built with love by solo travelers`
+
+---
+
+### Technical Notes:
+
+- Use HTML + Tailwind CSS or standard CSS
+- Mobile-first layout
+- Do not include emojis or unnecessary graphics
+- Use clean, semantic tags: `<section>`, `<h1>`, `<p>`, `<button>`, etc.
+
+Output the full HTML/CSS code for this page in one file.
