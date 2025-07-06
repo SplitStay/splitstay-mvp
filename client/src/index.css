@@ -94,5 +94,29 @@
 }
 
 .text-navy {
-  color: #001F3F;
+  color: #1e2a78;
+}
+
+.bg-navy {
+  background-color: #1e2a78;
+}
+
+.bg-navy-dark {
+  background-color: #1a2466;
+}
+
+.border-navy {
+  border-color: #1e2a78;
+}
+
+.hover\:bg-navy-dark:hover {
+  background-color: #1a2466;
+}
+
+.hover\:text-navy:hover {
+  color: #1e2a78;
+}
+
+.bg-cream {
+  background-color: #f5f1eb;
 }

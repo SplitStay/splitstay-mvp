@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Plus } from "lucide-react";
 import splitstayLogo from "@assets/Splitstay Logo Transparent.png";
+import HowItWorks from "./components/HowItWorks";
 
 function CreateProfile() {
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
@@ -188,6 +189,45 @@ function CreateProfile() {
   if (!showForm) {
     return (
       <div className="min-h-screen bg-cream py-2">
+        {/* Header Navigation */}
+        <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 mb-4">
+          <div className="max-w-7xl mx-auto px-4 py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <img 
+                  src={splitstayLogo} 
+                  alt="SplitStay Logo" 
+                  className="h-8"
+                />
+                <span className="text-navy font-bold text-lg">SplitStay</span>
+              </div>
+              <nav className="hidden md:flex space-x-6">
+                <a 
+                  href="/" 
+                  className="text-navy font-medium border-b-2 border-navy pb-1"
+                >
+                  Home
+                </a>
+                <button
+                  onClick={() => {
+                    window.history.pushState({}, '', '/how-it-works');
+                    window.dispatchEvent(new PopStateEvent('popstate'));
+                  }}
+                  className="text-gray-700 hover:text-navy font-medium transition-colors"
+                >
+                  How it Works
+                </button>
+              </nav>
+              <button
+                onClick={() => setShowForm(true)}
+                className="px-4 py-2 bg-navy text-white rounded-lg hover:bg-navy-dark transition-colors font-medium"
+              >
+                Get Started
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div className="w-full text-center">
           
           {/* Logo */}
@@ -884,6 +924,22 @@ function CreateProfile() {
 
 // Simple router to handle URL-based routing
 function App() {
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentPath(window.location.pathname);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Route to different components based on path
+  if (currentPath === '/how-it-works') {
+    return <HowItWorks />;
+  }
+
   return <CreateProfile />;
 }
 
