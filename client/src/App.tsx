@@ -14,6 +14,7 @@ import Profile from "@/pages/profile";
 import CreateProfile from "@/pages/create-profile";
 import TestSimple from "@/pages/test-simple";
 import TestRoute from "@/pages/test-route";
+import SimpleTest from "@/pages/simple-test";
 import CreateProfileSimple from "@/pages/create-profile-simple";
 import CreateTrip from "@/pages/create-trip";
 import BrowseTrips from "@/pages/browse-trips";
