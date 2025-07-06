@@ -383,24 +383,46 @@ function CreateProfile() {
     <div className="min-h-screen bg-cream">
       {/* Header with Back Button */}
       <div className="max-w-[1350px] mx-auto px-4 pt-3 pb-4">
-        <div className="relative mb-2">
+        {/* Mobile Layout - Stack vertically */}
+        <div className="block md:hidden mb-4">
           <button
             onClick={() => setShowForm(false)}
-            className="absolute left-0 top-0 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors cursor-pointer flex items-center gap-2"
+            className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors cursor-pointer flex items-center gap-2 mb-3"
             style={{ color: '#4B4B4B', fontFamily: 'system-ui, Inter, sans-serif' }}
           >
             ← Back to Home
           </button>
           <div className="text-center">
-            <h1 className="text-3xl font-bold" style={{ color: '#1e2a78' }}>
+            <h1 className="text-2xl font-bold mb-2" style={{ color: '#1e2a78' }}>
               ✨ Build your traveler profile
             </h1>
+            <p className="text-gray-600 text-sm">
+              Tell us about yourself and how you travel
+            </p>
           </div>
         </div>
-        <div className="text-center">
-          <p className="text-gray-600 text-sm">
-            Tell us about yourself and how you travel
-          </p>
+
+        {/* Desktop Layout - Side by side */}
+        <div className="hidden md:block">
+          <div className="relative mb-2">
+            <button
+              onClick={() => setShowForm(false)}
+              className="absolute left-0 top-0 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors cursor-pointer flex items-center gap-2"
+              style={{ color: '#4B4B4B', fontFamily: 'system-ui, Inter, sans-serif' }}
+            >
+              ← Back to Home
+            </button>
+            <div className="text-center">
+              <h1 className="text-3xl font-bold" style={{ color: '#1e2a78' }}>
+                ✨ Build your traveler profile
+              </h1>
+            </div>
+          </div>
+          <div className="text-center">
+            <p className="text-gray-600 text-sm">
+              Tell us about yourself and how you travel
+            </p>
+          </div>
         </div>
       </div>
 
