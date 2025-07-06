@@ -378,17 +378,8 @@ function CreateProfile() {
 
   return (
     <div className="min-h-screen bg-cream">
-      {/* Optimized Header with Back Button */}
+      {/* Optimized Header */}
       <div className="max-w-[1350px] mx-auto px-4 pt-3 pb-4">
-        <div className="flex items-center justify-between mb-2">
-          <button
-            onClick={() => setShowForm(false)}
-            className="text-sm text-gray-600 hover:text-gray-800 transition-colors flex items-center gap-1"
-          >
-            ← Back to Home
-          </button>
-          <div></div> {/* Spacer for left alignment */}
-        </div>
         <div className="text-center">
           <h1 className="text-3xl font-bold mb-1" style={{ color: '#1e2a78' }}>
             ✨ Build your traveler profile
@@ -847,6 +838,18 @@ function CreateProfile() {
             }}
           >
             Skip for Now
+          </button>
+        </div>
+
+        {/* Back to Home button - relocated below form buttons */}
+        <div className="flex justify-center mt-8 mb-8">
+          <button
+            type="button"
+            onClick={() => setShowForm(false)}
+            className="w-full max-w-xs px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors cursor-pointer flex items-center justify-center gap-2"
+            style={{ color: '#4B4B4B', fontFamily: 'system-ui, Inter, sans-serif' }}
+          >
+            ← Back to Home
           </button>
         </div>
       </div>
