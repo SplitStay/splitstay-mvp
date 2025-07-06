@@ -845,14 +845,14 @@ function CreateProfile() {
         </div>
       </form>
 
-      {/* Compact Sticky Footer */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-2 shadow-lg">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row gap-2 justify-center">
+      {/* Form Action Buttons - Positioned after form content */}
+      <div className="max-w-[1350px] mx-auto px-4 py-6 bg-white border-t border-gray-200">
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <button 
             type="submit"
             onClick={handleSubmit}
             disabled={!isFormValid}
-            className={`px-5 py-2 text-sm font-semibold rounded transition-all duration-300 ${
+            className={`px-6 py-3 text-sm font-semibold rounded transition-all duration-300 ${
               isFormValid
                 ? "text-white shadow-md hover:shadow-lg"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -868,7 +868,7 @@ function CreateProfile() {
           <button 
             type="button"
             onClick={() => alert("You can complete this later in your settings")}
-            className="px-5 py-2 text-sm font-semibold transition-colors text-gray-600 hover:text-gray-800"
+            className="px-6 py-3 text-sm font-semibold transition-colors text-gray-600 hover:text-gray-800"
             style={{ 
               fontFamily: 'system-ui, Inter, sans-serif'
             }}
@@ -876,8 +876,6 @@ function CreateProfile() {
             Skip for Now
           </button>
         </div>
-
-
       </div>
     </div>
   );
