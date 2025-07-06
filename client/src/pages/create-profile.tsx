@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,9 +14,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { X, Upload, Plus } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient as defaultQueryClient } from "@/lib/queryClient";
 
-// Two-step form schemas
+// Form schemas for two-step process
 const step1Schema = z.object({
   fullName: z.string().min(1, "Name is required"),
   profileImage: z.any().optional(),
@@ -48,7 +48,7 @@ type Step2Form = z.infer<typeof step2Schema>;
 export default function CreateProfile() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
+  // Using the queryClient directly from imports since useQueryClient hook is having issues
   const [currentStep, setCurrentStep] = useState(1);
   const [step1Data, setStep1Data] = useState<Step1Form | null>(null);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
@@ -56,10 +56,9 @@ export default function CreateProfile() {
   const [customLanguage, setCustomLanguage] = useState("");
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
   
-  // Check if we're in edit mode and get user path
+  // Check user path from URL
   const urlParams = new URLSearchParams(window.location.search);
-  const isEditMode = urlParams.get('mode') === 'edit';
-  const userPath = urlParams.get('path'); // 'host' or 'guest'
+  const userPath = urlParams.get('path');
 
   const step1Form = useForm<Step1Form>({
     resolver: zodResolver(step1Schema),
@@ -96,7 +95,7 @@ export default function CreateProfile() {
         title: "Profile created successfully!",
         description: "Welcome to SplitStay!",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      defaultQueryClient.invalidateQueries({ queryKey: ["/api/users"] });
       
       // Navigate based on user path
       if (userPath === "host") {
@@ -124,7 +123,6 @@ export default function CreateProfile() {
   const handleStep2Submit = (data: Step2Form) => {
     if (!step1Data) return;
     
-    // Combine both steps data
     const combinedData = {
       ...step1Data,
       ...data,
@@ -141,8 +139,8 @@ export default function CreateProfile() {
     
     const combinedData = {
       ...step1Data,
-      languages: ["English"], // Default language
-      travelTraits: [], // Empty traits
+      languages: ["English"],
+      travelTraits: [],
       dateOfBirth: `${step1Data.yearOfBirth}-${step1Data.monthOfBirth.padStart(2, '0')}-${step1Data.dayOfBirth.padStart(2, '0')}`,
     };
     
@@ -196,35 +194,25 @@ export default function CreateProfile() {
     "Luxury Traveler", "Backpacker", "City Explorer", "Beach Lover", "Mountain Hiker"
   ];
 
-  // Generate day options (1-31)
+  // Generate options for date dropdowns
   const dayOptions = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
-  
-  // Generate month options
   const monthOptions = [
-    { value: "1", label: "January" },
-    { value: "2", label: "February" },
-    { value: "3", label: "March" },
-    { value: "4", label: "April" },
-    { value: "5", label: "May" },
-    { value: "6", label: "June" },
-    { value: "7", label: "July" },
-    { value: "8", label: "August" },
-    { value: "9", label: "September" },
-    { value: "10", label: "October" },
-    { value: "11", label: "November" },
-    { value: "12", label: "December" },
+    { value: "1", label: "January" }, { value: "2", label: "February" },
+    { value: "3", label: "March" }, { value: "4", label: "April" },
+    { value: "5", label: "May" }, { value: "6", label: "June" },
+    { value: "7", label: "July" }, { value: "8", label: "August" },
+    { value: "9", label: "September" }, { value: "10", label: "October" },
+    { value: "11", label: "November" }, { value: "12", label: "December" },
   ];
-  
-  // Generate year options (current year - 100 to current year - 18)
   const currentYear = new Date().getFullYear();
   const yearOptions = Array.from({ length: 82 }, (_, i) => (currentYear - 18 - i).toString());
 
-  // Check if step 1 form is valid for enabling Next button
+  // Check if step 1 form is valid
   const isStep1Valid = step1Form.watch("fullName") && 
                       step1Form.watch("dayOfBirth") && 
                       step1Form.watch("monthOfBirth") && 
                       step1Form.watch("yearOfBirth") &&
-                      profileImagePreview; // Profile image is required
+                      profileImagePreview;
 
   if (currentStep === 1) {
     return (
@@ -308,7 +296,7 @@ export default function CreateProfile() {
                   )}
                 </div>
 
-                {/* What makes you feel alive */}
+                {/* Bio */}
                 <div>
                   <Label htmlFor="bio" className="text-base font-medium text-gray-700">
                     What makes you feel alive? <span className="text-gray-400">(optional)</span>
@@ -368,16 +356,6 @@ export default function CreateProfile() {
                       </Select>
                     </div>
                   </div>
-                  {step1Form.formState.errors.dayOfBirth && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {step1Form.formState.errors.dayOfBirth.message}
-                    </p>
-                  )}
-                  {step1Form.formState.errors.monthOfBirth && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {step1Form.formState.errors.monthOfBirth.message}
-                    </p>
-                  )}
                   {step1Form.formState.errors.yearOfBirth && (
                     <p className="text-red-500 text-sm mt-1">
                       {step1Form.formState.errors.yearOfBirth.message}
@@ -385,7 +363,7 @@ export default function CreateProfile() {
                   )}
                 </div>
 
-                {/* Reason for Travel */}
+                {/* Travel Reason */}
                 <div>
                   <Label className="text-base font-medium text-gray-700 mb-3 block">
                     Reason for travel
@@ -404,11 +382,6 @@ export default function CreateProfile() {
                       <Label htmlFor="business" className="font-medium cursor-pointer">Business</Label>
                     </div>
                   </RadioGroup>
-                  {step1Form.formState.errors.travelReason && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {step1Form.formState.errors.travelReason.message}
-                    </p>
-                  )}
                 </div>
 
                 <Button 
@@ -470,7 +443,6 @@ export default function CreateProfile() {
                   ))}
                 </div>
                 
-                {/* Custom Language Input */}
                 <div className="flex gap-2">
                   <Input
                     value={customLanguage}
@@ -489,7 +461,6 @@ export default function CreateProfile() {
                   </Button>
                 </div>
                 
-                {/* Selected Languages */}
                 {selectedLanguages.length > 0 && (
                   <div className="mt-3">
                     <p className="text-sm text-gray-600 mb-2">Selected languages:</p>
@@ -539,7 +510,6 @@ export default function CreateProfile() {
                   ))}
                 </div>
                 
-                {/* Selected Traits */}
                 {selectedTraits.length > 0 && (
                   <div className="mt-3">
                     <p className="text-sm text-gray-600 mb-2">Selected traits ({selectedTraits.length}/5):</p>

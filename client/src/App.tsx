@@ -59,7 +59,7 @@ function Router() {
         <Route path="/dashboard" component={Dashboard} />
         <Route path="/profile" component={Profile} />
         <Route path="/profile/edit" component={CreateProfile} />
-        <Route path="/create-profile" component={CreateProfileSimple} />
+        <Route path="/create-profile" component={CreateProfile} />
         <Route path="/create-trip" component={CreateTrip} />
         <Route path="/browse-trips" component={BrowseTrips} />
         <Route path="/find-roommate" component={FindRoommate} />
