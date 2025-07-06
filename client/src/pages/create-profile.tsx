@@ -11,23 +11,24 @@ import { Badge } from "@/components/ui/badge";
 import { X, Upload, Plus } from "lucide-react";
 
 export default function CreateProfile() {
-  console.log("CreateProfile component is loading");
-  
-  // Create a simple test render first
-  return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-navy mb-2">
-            Build your traveler profile
-          </h1>
-          <p className="text-gray-600">
-            Component is loading successfully!
-          </p>
-        </div>
-      </div>
-    </div>
-  );
+  const [, navigate] = useLocation();
+  const [currentStep, setCurrentStep] = useState(1);
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+  const [selectedTraits, setSelectedTraits] = useState<string[]>([]);
+  const [customLanguage, setCustomLanguage] = useState("");
+  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    fullName: "",
+    bio: "",
+    dayOfBirth: "",
+    monthOfBirth: "",
+    yearOfBirth: "",
+    travelReason: ""
+  });
+
+  // Check user path from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const userPath = urlParams.get('path');
 
   const handleStep1Submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +36,6 @@ export default function CreateProfile() {
   };
 
   const handleStep2Submit = () => {
-    // For now, just navigate based on user path
     if (userPath === "host") {
       navigate("/create-trip");
     } else if (userPath === "guest") {
@@ -280,7 +280,7 @@ export default function CreateProfile() {
                   disabled={!isStep1Valid}
                   className={`w-full py-6 text-lg font-semibold transition-all duration-300 ${
                     isStep1Valid
-                      ? "bg-navy text-white hover:bg-navy/90"
+                      ? "bg-blue-900 text-white hover:bg-blue-800"
                       : "bg-gray-300 text-gray-500 cursor-not-allowed"
                   }`}
                 >
@@ -324,7 +324,7 @@ export default function CreateProfile() {
                       variant={selectedLanguages.includes(language) ? "default" : "outline"}
                       className={`cursor-pointer px-3 py-1 transition-colors ${
                         selectedLanguages.includes(language)
-                          ? "bg-navy text-white hover:bg-navy/90"
+                          ? "bg-blue-900 text-white hover:bg-blue-800"
                           : "hover:bg-gray-100"
                       }`}
                       onClick={() => handleLanguageToggle(language)}
@@ -389,7 +389,7 @@ export default function CreateProfile() {
                       variant={selectedTraits.includes(trait) ? "default" : "outline"}
                       className={`cursor-pointer px-3 py-1 transition-colors ${
                         selectedTraits.includes(trait)
-                          ? "bg-navy text-white hover:bg-navy/90"
+                          ? "bg-blue-900 text-white hover:bg-blue-800"
                           : selectedTraits.length >= 5
                           ? "opacity-50 cursor-not-allowed"
                           : "hover:bg-gray-100"
@@ -430,7 +430,7 @@ export default function CreateProfile() {
               <div className="flex flex-col gap-3 pt-4">
                 <Button 
                   onClick={handleStep2Submit}
-                  className="w-full bg-navy text-white hover:bg-navy/90 py-6 text-lg font-semibold"
+                  className="w-full bg-blue-900 text-white hover:bg-blue-800 py-6 text-lg font-semibold"
                 >
                   Create My Profile
                 </Button>
