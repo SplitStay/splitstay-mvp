@@ -119,27 +119,36 @@ const Home: React.FC = () => {
           </div>
         </div>
         
-        {/* Incentives section */}
-        <div className="mb-16 max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-6 px-4">
-            <div className="bg-white border-2 border-gray-200 rounded-lg p-6 text-center">
+        {/* Badges section */}
+        <div className="mb-16 max-w-6xl mx-auto px-4">
+          <div className="text-center mb-8">
+            <h3 className="text-2xl font-bold text-navy mb-2">
+              🏅 Earn your badge. Join the SplitStay movement.
+            </h3>
+            <p className="text-gray-600">
+              Celebrate your contribution and unlock early perks with SplitStay.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white border-2 border-gray-200 rounded-lg p-6 text-center hover:shadow-lg hover:border-navy transition-all duration-300">
               <h4 className="text-xl font-bold text-navy mb-3">Ambassador</h4>
               <p className="text-gray-600">
-                Shared their journey and invited 3 friends
+                Invited 3+ friends to SplitStay — help the community grow
               </p>
             </div>
             
-            <div className="bg-white border-2 border-gray-200 rounded-lg p-6 text-center">
-              <h4 className="text-xl font-bold text-navy mb-3">Room Sharer</h4>
+            <div className="bg-white border-2 border-gray-200 rounded-lg p-6 text-center hover:shadow-lg hover:border-navy transition-all duration-300">
+              <h4 className="text-xl font-bold text-navy mb-3">Trip Host</h4>
               <p className="text-gray-600">
-                Posted a hotel room and matched successfully
+                Posted accommodation and successfully matched with a traveler
               </p>
             </div>
             
-            <div className="bg-white border-2 border-gray-200 rounded-lg p-6 text-center">
+            <div className="bg-white border-2 border-gray-200 rounded-lg p-6 text-center hover:shadow-lg hover:border-navy transition-all duration-300">
               <h4 className="text-xl font-bold text-navy mb-3">Pioneer</h4>
               <p className="text-gray-600">
-                One of the first 100 active users
+                One of the first 100 active users on the platform
               </p>
             </div>
           </div>
