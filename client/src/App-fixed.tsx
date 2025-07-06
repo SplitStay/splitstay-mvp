@@ -1,13 +1,5 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { X, Plus, ArrowLeft } from "lucide-react";
+import { X, ArrowLeft } from "lucide-react";
 
 function CreateProfile() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -41,45 +33,11 @@ function CreateProfile() {
     }
   };
 
-  const handleLanguageToggle = (language: string) => {
-    setSelectedLanguages(prev => 
-      prev.includes(language) 
-        ? prev.filter(l => l !== language)
-        : [...prev, language]
-    );
-  };
-
-  const handleAddCustomLanguage = () => {
-    if (customLanguage.trim() && !selectedLanguages.includes(customLanguage.trim())) {
-      setSelectedLanguages(prev => [...prev, customLanguage.trim()]);
-      setCustomLanguage("");
-    }
-  };
-
-  const handleTraitToggle = (trait: string) => {
-    if (selectedTraits.includes(trait)) {
-      setSelectedTraits(prev => prev.filter(t => t !== trait));
-    } else if (selectedTraits.length < 5) {
-      setSelectedTraits(prev => [...prev, trait]);
-    }
-  };
-
   const isStep1Valid = formData.fullName && 
                       formData.dayOfBirth && 
                       formData.monthOfBirth && 
-                      formData.yearOfBirth;
-
-  const languageOptions = [
-    "English", "Spanish", "French", "German", "Italian", "Portuguese", 
-    "Dutch", "Japanese", "Korean", "Chinese", "Arabic", "Russian", "Hindi"
-  ];
-
-  const traitOptions = [
-    "Early Bird", "Night Owl", "Adventurous", "Relaxed", "Social", "Quiet", 
-    "Foodie", "Fitness Enthusiast", "Culture Lover", "Nature Lover", 
-    "Tech Savvy", "Minimalist", "Photographer", "Music Lover", "Budget Traveler",
-    "Luxury Traveler", "Backpacker", "City Explorer", "Beach Lover", "Mountain Hiker"
-  ];
+                      formData.yearOfBirth &&
+                      formData.travelReason;
 
   const dayOptions = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
   const monthOptions = [
@@ -151,13 +109,12 @@ function CreateProfile() {
           
           {/* CTA Section */}
           <div className="mb-4">
-            <Button 
+            <button 
               onClick={() => setShowForm(true)}
-              size="lg"
               className="bg-navy text-white hover:bg-navy/90 text-lg px-8 py-6 rounded-lg font-semibold transition-all duration-300"
             >
               Create My Profile
-            </Button>
+            </button>
           </div>
           
           {/* Benefits Section */}
@@ -197,7 +154,7 @@ function CreateProfile() {
               <div className="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
                 <div className="w-16 h-16 bg-navy/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg className="w-8 h-8 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 919.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 515.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 919.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
                 </div>
                 <h4 className="text-xl font-bold text-navy mb-3">Verified Matches</h4>
@@ -290,7 +247,7 @@ function CreateProfile() {
 
   if (currentStep === 1) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-4" style={{ background: 'linear-gradient(to bottom, #f5f9ff, white)' }}>
+      <div className="min-h-screen p-4" style={{ background: 'linear-gradient(to bottom, #f5f9ff, white)' }}>
         <div className="max-w-[600px] mx-auto">
           {/* Back to Home link */}
           <div className="mb-8">
@@ -357,8 +314,6 @@ function CreateProfile() {
                       htmlFor="profile-image-upload"
                       className="cursor-pointer text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
                       style={{ backgroundColor: '#1e2a78' }}
-                      onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#1a2466'}
-                      onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#1e2a78'}
                     >
                       Upload Photo
                     </label>
@@ -380,10 +335,8 @@ function CreateProfile() {
                   value={formData.fullName}
                   onChange={(e) => setFormData(prev => ({...prev, fullName: e.target.value}))}
                   placeholder="e.g. Jane"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                  style={{ fontSize: '16px', fontFamily: 'system-ui, Inter, sans-serif', outline: 'none', focusRingColor: '#1e2a78' }}
-                  onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 2px #1e2a78'}
-                  onBlur={(e) => e.currentTarget.style.boxShadow = 'none'}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg transition-all"
+                  style={{ fontSize: '16px', fontFamily: 'system-ui, Inter, sans-serif' }}
                   required
                 />
               </div>
@@ -399,10 +352,8 @@ function CreateProfile() {
                   onChange={(e) => setFormData(prev => ({...prev, bio: e.target.value}))}
                   placeholder="e.g. chasing sunsets, street food tours, spontaneous hikes..."
                   rows={3}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all resize-none"
-                  style={{ fontSize: '16px', fontFamily: 'system-ui, Inter, sans-serif', outline: 'none' }}
-                  onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 2px #1e2a78'}
-                  onBlur={(e) => e.currentTarget.style.boxShadow = 'none'}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg transition-all resize-none"
+                  style={{ fontSize: '16px', fontFamily: 'system-ui, Inter, sans-serif' }}
                 />
               </div>
 
@@ -417,10 +368,8 @@ function CreateProfile() {
                     <select
                       value={formData.dayOfBirth}
                       onChange={(e) => setFormData(prev => ({...prev, dayOfBirth: e.target.value}))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                      style={{ fontSize: '16px', fontFamily: 'system-ui, Inter, sans-serif', outline: 'none' }}
-                      onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 2px #1e2a78'}
-                      onBlur={(e) => e.currentTarget.style.boxShadow = 'none'}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg transition-all"
+                      style={{ fontSize: '16px', fontFamily: 'system-ui, Inter, sans-serif' }}
                       required
                     >
                       <option value="">Day</option>
@@ -434,10 +383,8 @@ function CreateProfile() {
                     <select
                       value={formData.monthOfBirth}
                       onChange={(e) => setFormData(prev => ({...prev, monthOfBirth: e.target.value}))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                      style={{ fontSize: '16px', fontFamily: 'system-ui, Inter, sans-serif', outline: 'none' }}
-                      onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 2px #1e2a78'}
-                      onBlur={(e) => e.currentTarget.style.boxShadow = 'none'}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg transition-all"
+                      style={{ fontSize: '16px', fontFamily: 'system-ui, Inter, sans-serif' }}
                       required
                     >
                       <option value="">Month</option>
@@ -451,10 +398,8 @@ function CreateProfile() {
                     <select
                       value={formData.yearOfBirth}
                       onChange={(e) => setFormData(prev => ({...prev, yearOfBirth: e.target.value}))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                      style={{ fontSize: '16px', fontFamily: 'system-ui, Inter, sans-serif', outline: 'none' }}
-                      onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 2px #1e2a78'}
-                      onBlur={(e) => e.currentTarget.style.boxShadow = 'none'}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg transition-all"
+                      style={{ fontSize: '16px', fontFamily: 'system-ui, Inter, sans-serif' }}
                       required
                     >
                       <option value="">Year</option>
@@ -514,12 +459,6 @@ function CreateProfile() {
                   fontFamily: 'system-ui, Inter, sans-serif',
                   backgroundColor: isStep1Valid ? '#1e2a78' : '#d1d5db'
                 }}
-                onMouseOver={(e) => {
-                  if (isStep1Valid) e.currentTarget.style.backgroundColor = '#1a2466';
-                }}
-                onMouseOut={(e) => {
-                  if (isStep1Valid) e.currentTarget.style.backgroundColor = '#1e2a78';
-                }}
               >
                 Continue to Step 2
               </button>
@@ -531,157 +470,16 @@ function CreateProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="max-w-[600px] mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <Button
-            variant="ghost"
-            onClick={() => setCurrentStep(1)}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-800"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Step 1
-          </Button>
-        </div>
-        
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-navy mb-2">
-            Tell us how you travel
-          </h1>
-          <p className="text-gray-600 text-lg">
-            Help us match you with compatible travelers
-          </p>
-        </div>
-
-        <Card className="shadow-xl border-0 bg-white/95 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-xl text-navy">Step 2 of 2</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              <div>
-                <Label className="text-base font-medium text-gray-700 mb-3 block">
-                  Languages you speak
-                </Label>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {languageOptions.map((language) => (
-                    <Badge
-                      key={language}
-                      variant={selectedLanguages.includes(language) ? "default" : "outline"}
-                      className={`cursor-pointer px-3 py-1 transition-colors ${
-                        selectedLanguages.includes(language)
-                          ? "bg-blue-900 text-white hover:bg-blue-800"
-                          : "hover:bg-gray-100"
-                      }`}
-                      onClick={() => handleLanguageToggle(language)}
-                    >
-                      {language}
-                    </Badge>
-                  ))}
-                </div>
-                
-                <div className="flex gap-2">
-                  <Input
-                    value={customLanguage}
-                    onChange={(e) => setCustomLanguage(e.target.value)}
-                    placeholder="Add another language"
-                    className="flex-1"
-                  />
-                  <Button
-                    type="button"
-                    onClick={handleAddCustomLanguage}
-                    variant="outline"
-                    size="sm"
-                    className="px-3"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
-                
-                {selectedLanguages.length > 0 && (
-                  <div className="mt-3">
-                    <p className="text-sm text-gray-600 mb-2">Selected languages:</p>
-                    <div className="flex flex-wrap gap-1">
-                      {selectedLanguages.map((language) => (
-                        <Badge key={language} variant="secondary" className="pr-1">
-                          {language}
-                          <button
-                            type="button"
-                            onClick={() => handleLanguageToggle(language)}
-                            className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <Label className="text-base font-medium text-gray-700 mb-3 block">
-                  Travel traits (select up to 5)
-                </Label>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {traitOptions.map((trait) => (
-                    <Badge
-                      key={trait}
-                      variant={selectedTraits.includes(trait) ? "default" : "outline"}
-                      className={`cursor-pointer px-3 py-1 transition-colors ${
-                        selectedTraits.includes(trait)
-                          ? "bg-blue-900 text-white hover:bg-blue-800"
-                          : selectedTraits.length >= 5
-                          ? "opacity-50 cursor-not-allowed"
-                          : "hover:bg-gray-100"
-                      }`}
-                      onClick={() => handleTraitToggle(trait)}
-                    >
-                      {trait}
-                    </Badge>
-                  ))}
-                </div>
-                
-                {selectedTraits.length > 0 && (
-                  <div className="mt-3">
-                    <p className="text-sm text-gray-600 mb-2">Selected traits ({selectedTraits.length}/5):</p>
-                    <div className="flex flex-wrap gap-1">
-                      {selectedTraits.map((trait) => (
-                        <Badge key={trait} variant="secondary" className="pr-1">
-                          {trait}
-                          <button
-                            type="button"
-                            onClick={() => handleTraitToggle(trait)}
-                            className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex flex-col gap-3 pt-4">
-                <Button 
-                  onClick={() => alert("Profile created! Welcome to SplitStay!")}
-                  className="w-full bg-blue-900 text-white hover:bg-blue-800 py-6 text-lg font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
-                >
-                  Create My Profile
-                </Button>
-                
-                <Button 
-                  variant="outline"
-                  onClick={() => alert("You can complete this later in your settings")}
-                  className="w-full py-6 text-lg font-semibold border-2 hover:bg-gray-50"
-                >
-                  Skip for Now
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+    <div className="min-h-screen bg-gray-50 p-4">
+      <div className="max-w-[600px] mx-auto text-center">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">Step 2 - Coming Soon!</h2>
+        <p className="text-gray-600 mb-8">Language selection and travel traits will be here.</p>
+        <button
+          onClick={() => setCurrentStep(1)}
+          className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Back to Step 1
+        </button>
       </div>
     </div>
   );
@@ -689,9 +487,6 @@ function CreateProfile() {
 
 // Simple router to handle URL-based routing
 function App() {
-  const path = window.location.pathname;
-  
-  // Always show the profile creation form directly
   return <CreateProfile />;
 }
 
