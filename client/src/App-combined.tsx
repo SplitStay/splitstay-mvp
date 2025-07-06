@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { X, Plus } from "lucide-react";
+import splitstayLogo from "@assets/Splitstay Logo Transparent.png";
 
 function CreateProfile() {
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
@@ -189,10 +190,12 @@ function CreateProfile() {
         <div className="w-full text-center">
           
           {/* Logo */}
-          <div className="mb-2">
-            <h1 className="text-5xl md:text-6xl font-bold text-navy mb-6">
-              SplitStay
-            </h1>
+          <div className="mb-2 flex justify-center">
+            <img 
+              src={splitstayLogo} 
+              alt="SplitStay Logo" 
+              className="h-20 md:h-24 mb-6"
+            />
           </div>
           
           {/* Headline */}
@@ -281,11 +284,11 @@ function CreateProfile() {
                 </p>
               </div>
 
-              {/* Meaningful Matches Card */}
+              {/* Verified Matches Card */}
               <div className="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
                 <div className="w-16 h-16 bg-navy/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg className="w-8 h-8 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 515.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 919.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
                 </div>
                 <h4 className="text-xl font-bold text-navy mb-3">Verified Matches</h4>
