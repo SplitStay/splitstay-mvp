@@ -11,6 +11,14 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       colors: {
+        navy: {
+          DEFAULT: "#1E3A8A",  // Navy blue from the logo
+          dark: "#1D4ED8",     // Darker navy for hover states
+        },
+        cream: {
+          DEFAULT: "#F5F1EB",  // Cream background color
+          light: "#FEFCF7",    // Lighter cream
+        },
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
