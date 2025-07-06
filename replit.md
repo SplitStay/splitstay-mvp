@@ -79,6 +79,7 @@ The application is configured for deployment on Replit with autoscaling:
 
 ## Changelog
 
+- July 6, 2025: Restored original beautiful landing page with badges, progress indicators, and detailed sections while maintaining profile form integration
 - July 6, 2025: Integrated profile creation form directly into main landing page, removing intermediate navigation step
 - July 6, 2025: Fixed persistent routing issues by implementing custom pathname-based routing solution, bypassing wouter dependency
 - July 6, 2025: Completed two-step profile creation form with all web-first MVP optimizations

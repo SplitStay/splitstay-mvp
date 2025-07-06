@@ -96,57 +96,193 @@ function CreateProfile() {
   // Landing page view
   if (!showForm) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="container mx-auto px-4 py-12">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="mb-12">
-              <h1 className="text-5xl md:text-6xl font-bold text-navy mb-6">
-                SplitStay
-              </h1>
-              <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-2xl mx-auto">
-                Find compatible roommates and share hotel rooms to reduce costs while traveling solo
+      <div className="min-h-screen bg-cream py-2">
+        <div className="w-full text-center">
+          
+          {/* Logo */}
+          <div className="mb-2">
+            <h1 className="text-5xl md:text-6xl font-bold text-navy mb-6">
+              SplitStay
+            </h1>
+          </div>
+          
+          {/* Headline */}
+          <h1 className="text-3xl lg:text-4xl font-bold text-navy mb-4">
+            Share your accommodation. Save money. Meet travelers.
+          </h1>
+          
+          {/* Subtitle */}
+          <p className="text-lg text-navy mb-8 leading-relaxed max-w-4xl mx-auto">
+            You're early — and that's exactly the point. SplitStay is just opening up. The first few travelers shape what this becomes. Want to be one of them?
+          </p>
+          
+          {/* User Path Selection Cards */}
+          <div className="w-full mb-8 max-w-6xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-6 px-4">
+              
+              {/* Host Card */}
+              <div 
+                className="bg-white border-2 border-gray-200 hover:border-navy rounded-lg p-6 hover:shadow-lg transition-all duration-300 cursor-pointer"
+                onClick={() => setShowForm(true)}
+              >
+                <h2 className="text-xl font-bold text-navy mb-3">
+                  Have an accommodation to share?
+                </h2>
+                <p className="text-gray-600">
+                  Already booked a place? Post your stay to find a roommate.
+                </p>
+              </div>
+              
+              {/* Guest Card */}
+              <div 
+                className="bg-white border-2 border-gray-200 hover:border-navy rounded-lg p-6 hover:shadow-lg transition-all duration-300 cursor-pointer"
+                onClick={() => setShowForm(true)}
+              >
+                <h2 className="text-xl font-bold text-navy mb-3">
+                  Looking to join someone else's trip?
+                </h2>
+                <p className="text-gray-600">
+                  Browse open stays and message the traveler.
+                </p>
+              </div>
+              
+            </div>
+          </div>
+          
+          {/* CTA Section */}
+          <div className="mb-4">
+            <Button 
+              onClick={() => setShowForm(true)}
+              size="lg"
+              className="bg-navy text-white hover:bg-navy/90 text-lg px-8 py-6 rounded-lg font-semibold transition-all duration-300"
+            >
+              Create My Profile
+            </Button>
+          </div>
+          
+          {/* Benefits Section */}
+          <div className="mb-16 max-w-6xl mx-auto px-4">
+            <h3 className="text-2xl font-bold text-navy mb-8 text-center">
+              Why travelers love SplitStay
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              
+              {/* Cost Savings Card */}
+              <div className="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
+                <div className="w-16 h-16 bg-navy/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                  </svg>
+                </div>
+                <h4 className="text-xl font-bold text-navy mb-3">Cost Savings</h4>
+                <p className="text-gray-600 leading-relaxed">
+                  Save up to 50% on your accommodation costs by sharing with verified travelers
+                </p>
+              </div>
+
+              {/* Flexible Accommodations Card */}
+              <div className="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
+                <div className="w-16 h-16 bg-navy/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                </div>
+                <h4 className="text-xl font-bold text-navy mb-3">Flexible Options</h4>
+                <p className="text-gray-600 leading-relaxed">
+                  Split hotel rooms or full apartments at any destination
+                </p>
+              </div>
+
+              {/* Meaningful Matches Card */}
+              <div className="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
+                <div className="w-16 h-16 bg-navy/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 919.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <h4 className="text-xl font-bold text-navy mb-3">Verified Matches</h4>
+                <p className="text-gray-600 leading-relaxed">
+                  Connect with verified travelers for meaningful and safe experiences
+                </p>
+              </div>
+
+            </div>
+          </div>
+          
+          {/* Badges section */}
+          <div className="mb-16 max-w-6xl mx-auto px-4">
+            <div className="text-center mb-8">
+              <h3 className="text-2xl font-bold text-navy mb-2">
+                Earn your badge. Join the SplitStay movement.
+              </h3>
+              <p className="text-gray-600">
+                Celebrate your contribution and unlock early perks with SplitStay.
               </p>
             </div>
             
-            <div className="grid md:grid-cols-3 gap-8 mb-12">
-              <div className="bg-white p-6 rounded-xl shadow-lg">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-navy mb-2">Find Compatible Roommates</h3>
-                <p className="text-gray-600">Match with travelers who share your interests and travel style</p>
-              </div>
-              
-              <div className="bg-white p-6 rounded-xl shadow-lg">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Ambassador Badge */}
+              <div className="bg-white border-2 border-gray-200 rounded-lg p-6 text-center hover:shadow-xl hover:scale-[1.02] hover:border-green-300 transition-all duration-300">
+                <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-navy mb-2">Save Money</h3>
-                <p className="text-gray-600">Split accommodation costs and travel more for less</p>
+                <h4 className="text-2xl font-extrabold text-navy mb-3">Ambassador</h4>
+                <p className="text-gray-600 mb-4">
+                  Invited 3+ friends to SplitStay — help the community grow
+                </p>
+                {/* Progress Indicator */}
+                <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                  <div className="bg-green-500 h-2 rounded-full w-2/3"></div>
+                </div>
+                <p className="text-sm text-gray-500">Invited 2 of 3 friends</p>
               </div>
               
-              <div className="bg-white p-6 rounded-xl shadow-lg">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              {/* Trip Host Badge */}
+              <div className="bg-white border-2 border-gray-200 rounded-lg p-6 text-center hover:shadow-xl hover:scale-[1.02] hover:border-blue-300 transition-all duration-300">
+                <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-navy mb-2">Safe & Verified</h3>
-                <p className="text-gray-600">All travelers are verified for your safety and peace of mind</p>
+                <h4 className="text-2xl font-extrabold text-navy mb-3">Trip Host</h4>
+                <p className="text-gray-600 mb-4">
+                  Post a stay and match with at least 1 traveler to earn this badge
+                </p>
+                {/* Progress Indicator */}
+                <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                  <div className="bg-blue-500 h-2 rounded-full w-full"></div>
+                </div>
+                <p className="text-sm text-gray-500">1 of 1 successful match</p>
+              </div>
+              
+              {/* Pioneer Badge */}
+              <div className="bg-white border-2 border-gray-200 rounded-lg p-6 text-center hover:shadow-xl hover:scale-[1.02] hover:border-purple-300 transition-all duration-300">
+                <div className="w-16 h-16 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                </div>
+                <h4 className="text-2xl font-extrabold text-navy mb-3">Pioneer</h4>
+                <p className="text-gray-600 mb-4">
+                  One of the first 100 active users on the platform
+                </p>
+                {/* Progress Indicator */}
+                <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                  <div className="bg-purple-500 h-2 rounded-full w-4/5"></div>
+                </div>
+                <p className="text-sm text-gray-500">User #47 of 100</p>
               </div>
             </div>
-            
-            <Button 
-              onClick={() => setShowForm(true)}
-              className="bg-blue-900 hover:bg-blue-800 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105"
-            >
-              Start Building Your Profile
-            </Button>
           </div>
+          
+          {/* Footer */}
+          <footer className="text-center text-gray-500 py-8">
+            <p>© 2025 SplitStay · Built with love by solo travelers</p>
+          </footer>
+          
         </div>
       </div>
     );
