@@ -79,6 +79,7 @@ The application is configured for deployment on Replit with autoscaling:
 
 ## Changelog
 
+- July 6, 2025: Created combined side-by-side profile creation form with Step 1 (left panel) and Step 2 (right panel), responsive design that stacks on mobile, sticky footer with form validation
 - July 6, 2025: Restored original beautiful landing page with badges, progress indicators, and detailed sections while maintaining profile form integration
 - July 6, 2025: Integrated profile creation form directly into main landing page, removing intermediate navigation step
 - July 6, 2025: Fixed persistent routing issues by implementing custom pathname-based routing solution, bypassing wouter dependency

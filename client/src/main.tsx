@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client";
-import App from "./App-fixed";
+import App from "./App-combined";
 import "./index.css";
 import { Helmet } from "react-helmet";
 
