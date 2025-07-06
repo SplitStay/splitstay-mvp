@@ -621,7 +621,7 @@ function CreateProfile() {
           <div className="lg:col-span-7 bg-white rounded-lg shadow-lg p-5">
             
             {/* Section 2: Tell us how you travel */}
-            <div className="mb-8" style={{marginTop: '24px'}}>
+            <div className="mb-8">
               <div className="mb-4">
                 <h2 className="text-lg font-bold mb-1" style={{ color: '#1e2a78' }}>
                   👉 Tell us how you travel
@@ -770,7 +770,7 @@ function CreateProfile() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Top 3 Travel Photos <span className="text-gray-400">(optional)</span>
                 </label>
-                <div className="flex space-x-2">
+                <div className="flex space-x-3">
                   {/* Always show 3 placeholders */}
                   {[0, 1, 2].map((index) => (
                     <div key={index} className="relative">
@@ -779,14 +779,14 @@ function CreateProfile() {
                           <img
                             src={travelPhotos[index]}
                             alt={`Travel photo ${index + 1}`}
-                            className="w-20 h-20 object-cover rounded border-2 border-gray-200 p-0.5"
+                            className="w-32 h-32 object-cover rounded-lg border-2 border-gray-200 shadow-sm"
                           />
                           <button
                             type="button"
                             onClick={() => removeTravelPhoto(index)}
-                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center hover:bg-red-600 transition-colors text-xs"
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors text-xs"
                           >
-                            <X className="w-2 h-2" />
+                            <X className="w-3 h-3" />
                           </button>
                         </>
                       ) : (
@@ -800,9 +800,9 @@ function CreateProfile() {
                           />
                           <label
                             htmlFor={`travel-photo-${index}`}
-                            className="cursor-pointer w-20 h-20 border-2 border-dashed border-gray-300 rounded flex items-center justify-center hover:border-gray-400 transition-colors"
+                            className="cursor-pointer w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center hover:border-gray-400 transition-colors"
                           >
-                            <Plus className="w-4 h-4 text-gray-400" />
+                            <Plus className="w-6 h-6 text-gray-400" />
                           </label>
                         </>
                       )}
