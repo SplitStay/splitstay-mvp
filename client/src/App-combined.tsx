@@ -366,7 +366,7 @@ function CreateProfile() {
               <p className="text-gray-600 text-xs">Let's start with the basics</p>
             </div>
             
-            <div className="space-y-3">
+            <div className="space-y-2">
               {/* Profile Photo and Name Row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {/* Profile Photo Upload */}
@@ -452,41 +452,44 @@ function CreateProfile() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Top 3 Travel Photos <span className="text-gray-400">(optional)</span>
                 </label>
-                <div className="flex gap-2 mb-2">
-                  {travelPhotos.map((photo, index) => (
+                <div className="flex space-x-2">
+                  {/* Always show 3 placeholders */}
+                  {[0, 1, 2].map((index) => (
                     <div key={index} className="relative">
-                      <img
-                        src={photo}
-                        alt={`Travel photo ${index + 1}`}
-                        className="w-16 h-16 object-cover rounded border"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeTravelPhoto(index)}
-                        className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center hover:bg-red-600 transition-colors text-xs"
-                      >
-                        <X className="w-2 h-2" />
-                      </button>
+                      {travelPhotos[index] ? (
+                        <>
+                          <img
+                            src={travelPhotos[index]}
+                            alt={`Travel photo ${index + 1}`}
+                            className="w-16 h-16 object-cover rounded border"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeTravelPhoto(index)}
+                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center hover:bg-red-600 transition-colors text-xs"
+                          >
+                            <X className="w-2 h-2" />
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleTravelPhotoUpload}
+                            className="hidden"
+                            id={`travel-photo-${index}`}
+                          />
+                          <label
+                            htmlFor={`travel-photo-${index}`}
+                            className="cursor-pointer w-16 h-16 border-2 border-dashed border-gray-300 rounded flex items-center justify-center hover:border-gray-400 transition-colors"
+                          >
+                            <Plus className="w-4 h-4 text-gray-400" />
+                          </label>
+                        </>
+                      )}
                     </div>
                   ))}
-                  {travelPhotos.length < 3 && (
-                    <div>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        onChange={handleTravelPhotoUpload}
-                        className="hidden"
-                        id="travel-photos-upload"
-                      />
-                      <label
-                        htmlFor="travel-photos-upload"
-                        className="cursor-pointer w-16 h-16 border-2 border-dashed border-gray-300 rounded flex items-center justify-center hover:border-gray-400 transition-colors"
-                      >
-                        <Plus className="w-6 h-6 text-gray-400" />
-                      </label>
-                    </div>
-                  )}
                 </div>
               </div>
 
@@ -619,7 +622,7 @@ function CreateProfile() {
               <p className="text-gray-600 text-xs">Help us match you with compatible travelers</p>
             </div>
             
-            <div className="space-y-3">
+            <div className="space-y-2">
               {/* Languages Section */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -699,15 +702,15 @@ function CreateProfile() {
                     ℹ️
                   </span>
                 </label>
-                {/* Two-column grid for balanced layout */}
-                <div className="grid grid-cols-2 gap-1 mb-2">
+                {/* Flexible wrap layout for traits */}
+                <div className="flex flex-wrap gap-2 mb-2">
                   {traitOptions.map((trait) => (
                     <button
                       key={trait}
                       type="button"
                       onClick={() => handleTraitToggle(trait)}
                       disabled={!selectedTraits.includes(trait) && selectedTraits.length >= 5}
-                      className={`px-2 py-0.5 rounded text-xs font-medium transition-colors text-left ${
+                      className={`px-2 py-1 rounded text-xs font-medium transition-colors h-7 ${
                         selectedTraits.includes(trait)
                           ? "text-white"
                           : selectedTraits.length >= 5
