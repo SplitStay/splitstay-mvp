@@ -129,7 +129,8 @@ function CreateProfile() {
                       formData.dayOfBirth && 
                       formData.monthOfBirth && 
                       formData.yearOfBirth &&
-                      profileImagePreview;
+                      profileImagePreview &&
+                      selectedLanguages.length > 0;
 
   const dayOptions = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
   const monthOptions = [
@@ -584,7 +585,7 @@ function CreateProfile() {
               {/* Languages Section - Moved from right column */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Languages you speak
+                  Languages you speak <span className="text-red-500">*</span>
                 </label>
                 
                 {/* Popular Languages Quick Selection */}
