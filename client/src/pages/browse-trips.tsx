@@ -74,7 +74,7 @@ const BrowseTrips: React.FC = () => {
             size="lg"
             className="bg-navy text-white hover:bg-navy/90 transition-colors duration-300 text-lg px-8 py-6 rounded-lg font-semibold"
           >
-            Browse Trips
+            Browse Stays
           </Button>
         </div>
       </div>

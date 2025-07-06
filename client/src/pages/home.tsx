@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Bed, UserPlus, Eye, CheckCircle, ChevronRight } from "lucide-react";
 // Import the SplitStay logo with transparent background
 import logoImage from "@assets/Splitstay Logo Transparent_1751765053004.png";
@@ -76,19 +77,33 @@ const Home: React.FC = () => {
         </div>
         
         {/* CTA Section */}
-        <div className="mb-8">
-          <Button 
-            onClick={() => navigate(`/create-profile?path=${selectedPath}`)}
-            size="lg"
-            disabled={!selectedPath}
-            className={`text-lg px-8 py-6 rounded-lg font-semibold transition-all duration-300 ${
-              selectedPath 
-                ? "bg-navy text-white hover:bg-navy/90" 
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-            }`}
-          >
-            Create My Profile
-          </Button>
+        <div className="mb-4">
+          {selectedPath ? (
+            <Button 
+              onClick={() => navigate(`/create-profile?path=${selectedPath}`)}
+              size="lg"
+              className="bg-navy text-white hover:bg-navy/90 text-lg px-8 py-6 rounded-lg font-semibold transition-all duration-300"
+            >
+              Create My Profile
+            </Button>
+          ) : (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <Button 
+                    disabled
+                    size="lg"
+                    className="bg-gray-300 text-gray-500 cursor-not-allowed text-lg px-8 py-6 rounded-lg font-semibold"
+                  >
+                    Create My Profile
+                  </Button>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Select an option above to continue</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
         
         {/* Login Link */}
@@ -97,9 +112,9 @@ const Home: React.FC = () => {
             Already have a profile?{" "}
             <button 
               onClick={() => navigate("/login")}
-              className="text-navy hover:text-navy/80 underline transition-colors duration-300"
+              className="text-navy hover:text-navy/80 underline transition-colors duration-300 lowercase"
             >
-              Log in here
+              log in here
             </button>
           </p>
         </div>
@@ -172,7 +187,7 @@ const Home: React.FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                 </svg>
               </div>
-              <h4 className="text-xl font-bold text-navy mb-3">Ambassador</h4>
+              <h4 className="text-2xl font-extrabold text-navy mb-3">Ambassador</h4>
               <p className="text-gray-600 mb-4">
                 Invited 3+ friends to SplitStay — help the community grow
               </p>
@@ -191,15 +206,15 @@ const Home: React.FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4" />
                 </svg>
               </div>
-              <h4 className="text-xl font-bold text-navy mb-3">Trip Host</h4>
+              <h4 className="text-2xl font-extrabold text-navy mb-3">Trip Host</h4>
               <p className="text-gray-600 mb-4">
-                Posted accommodation and successfully matched with a traveler
+                Post a stay and match with at least 1 traveler to earn this badge
               </p>
               {/* Progress Indicator */}
               <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-                <div className="bg-blue-500 h-2 rounded-full w-1/2"></div>
+                <div className="bg-blue-500 h-2 rounded-full w-full"></div>
               </div>
-              <p className="text-sm text-gray-500">1 successful match</p>
+              <p className="text-sm text-gray-500">1 of 1 successful match</p>
             </div>
             
             {/* Pioneer Badge */}
@@ -209,7 +224,7 @@ const Home: React.FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
               </div>
-              <h4 className="text-xl font-bold text-navy mb-3">Pioneer</h4>
+              <h4 className="text-2xl font-extrabold text-navy mb-3">Pioneer</h4>
               <p className="text-gray-600 mb-4">
                 One of the first 100 active users on the platform
               </p>
