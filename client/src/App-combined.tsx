@@ -45,6 +45,20 @@ function CreateProfile() {
     }
   };
 
+  const handleLanguageDropdownChange = (language: string) => {
+    if (language && !selectedLanguages.includes(language)) {
+      setSelectedLanguages(prev => [...prev, language]);
+      setCustomLanguage("");
+    }
+  };
+
+  const handleCountryDropdownChange = (country: string) => {
+    if (country && !selectedCountries.includes(country)) {
+      setSelectedCountries(prev => [...prev, country]);
+      setCustomCountry("");
+    }
+  };
+
   const handleTraitToggle = (trait: string) => {
     if (selectedTraits.includes(trait)) {
       setSelectedTraits(prev => prev.filter(t => t !== trait));
@@ -67,6 +81,12 @@ function CreateProfile() {
       setCustomCountry("");
     }
   };
+
+  // Popular languages for quick selection
+  const popularLanguages = ["English", "Spanish", "French", "German", "Dutch", "Italian", "Portuguese", "Chinese (Mandarin)", "Japanese", "Korean"];
+
+  // Popular countries for quick selection  
+  const popularCountries = ["United States", "France", "Spain", "Japan", "Thailand", "Netherlands", "Germany", "Italy", "United Kingdom", "Australia"];
 
   const handleTravelPhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -357,21 +377,26 @@ function CreateProfile() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(to bottom, #f5f9ff, white)' }}>
-      {/* Header */}
-      <div className="text-center py-8">
-        <button
-          onClick={() => setShowForm(false)}
-          className="text-sm text-gray-500 hover:text-gray-700 underline transition-colors mb-6"
-        >
-          Back to Home
-        </button>
-        <h1 className="text-4xl font-bold mb-2" style={{ color: '#1e2a78', fontFamily: 'system-ui, Inter, sans-serif' }}>
-          ✨ Build your traveler profile
-        </h1>
-        <p className="text-gray-600 text-lg">
-          Tell us about yourself and how you travel
-        </p>
+    <div className="min-h-screen bg-cream">
+      {/* Optimized Header with Back Button */}
+      <div className="max-w-[1350px] mx-auto px-4 pt-3 pb-4">
+        <div className="flex items-center justify-between mb-2">
+          <button
+            onClick={() => setShowForm(false)}
+            className="text-sm text-gray-600 hover:text-gray-800 transition-colors flex items-center gap-1"
+          >
+            ← Back to Home
+          </button>
+          <div></div> {/* Spacer for left alignment */}
+        </div>
+        <div className="text-center">
+          <h1 className="text-3xl font-bold mb-1" style={{ color: '#1e2a78' }}>
+            ✨ Build your traveler profile
+          </h1>
+          <p className="text-gray-600 text-sm">
+            Tell us about yourself and how you travel
+          </p>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="max-w-[1350px] mx-auto px-4 pb-16">
@@ -535,25 +560,36 @@ function CreateProfile() {
                   Languages you speak
                 </label>
                 
+                {/* Popular Languages Quick Selection */}
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {popularLanguages.map((language) => (
+                    <button
+                      key={language}
+                      type="button"
+                      onClick={() => handleLanguageDropdownChange(language)}
+                      disabled={selectedLanguages.includes(language)}
+                      className={`px-2 py-0.5 rounded text-xs font-medium transition-colors h-6 ${
+                        selectedLanguages.includes(language)
+                          ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                          : "bg-gray-100 text-gray-700 hover:bg-blue-100 hover:text-blue-700"
+                      }`}
+                    >
+                      {language}
+                    </button>
+                  ))}
+                </div>
+                
                 <div className="mb-3">
                   <select
-                    value={customLanguage}
-                    onChange={(e) => setCustomLanguage(e.target.value)}
+                    value=""
+                    onChange={(e) => handleLanguageDropdownChange(e.target.value)}
                     className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
                   >
-                    <option value="">Select a language...</option>
+                    <option value="">More languages...</option>
                     {languageOptions.filter(language => !selectedLanguages.includes(language)).map((language) => (
                       <option key={language} value={language}>{language}</option>
                     ))}
                   </select>
-                  <button
-                    type="button"
-                    onClick={handleAddCustomLanguage}
-                    disabled={!customLanguage}
-                    className="mt-2 w-full px-3 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded text-sm hover:bg-blue-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Add Language
-                  </button>
                 </div>
                 
                 {selectedLanguages.length > 0 && (
@@ -667,13 +703,33 @@ function CreateProfile() {
                     ℹ️
                   </span>
                 </label>
+                
+                {/* Popular Countries Quick Selection */}
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {popularCountries.map((country) => (
+                    <button
+                      key={country}
+                      type="button"
+                      onClick={() => handleCountryDropdownChange(country)}
+                      disabled={selectedCountries.includes(country)}
+                      className={`px-2 py-0.5 rounded text-xs font-medium transition-colors h-6 ${
+                        selectedCountries.includes(country)
+                          ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                          : "bg-gray-100 text-gray-700 hover:bg-green-100 hover:text-green-700"
+                      }`}
+                    >
+                      {country}
+                    </button>
+                  ))}
+                </div>
+                
                 <div className="mb-3">
                   <select
-                    value={customCountry}
-                    onChange={(e) => setCustomCountry(e.target.value)}
+                    value=""
+                    onChange={(e) => handleCountryDropdownChange(e.target.value)}
                     className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
                   >
-                    <option value="">Select a country...</option>
+                    <option value="">More countries...</option>
                     <optgroup label="Popular Destinations">
                       {countryOptions.slice(0, 20).filter(country => !selectedCountries.includes(country)).map((country) => (
                         <option key={country} value={country}>{country}</option>
@@ -685,14 +741,6 @@ function CreateProfile() {
                       ))}
                     </optgroup>
                   </select>
-                  <button
-                    type="button"
-                    onClick={handleAddCustomCountry}
-                    disabled={!customCountry}
-                    className="mt-2 w-full px-3 py-2 bg-green-50 text-green-700 border border-green-200 rounded text-sm hover:bg-green-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Add Country
-                  </button>
                 </div>
                 {selectedCountries.length > 0 && (
                   <div className="mb-2">
