@@ -23,7 +23,7 @@ const Home: React.FC = () => {
         
         {/* Headline */}
         <h1 className="text-3xl lg:text-4xl font-bold text-navy mb-4">
-          Share your hotel room. Save money. Meet travelers.
+          Share your accommodation. Save money. Meet travelers.
         </h1>
         
         {/* Subtitle */}
@@ -70,20 +70,23 @@ const Home: React.FC = () => {
           </Button>
         </div>
         
-        {/* Stats Section */}
+        {/* Benefits Section */}
         <div className="mb-16 max-w-4xl mx-auto">
           <h3 className="text-2xl font-bold text-navy mb-6 text-center">
-            Top cities this month:
+            Why travelers love SplitStay
           </h3>
-          <div className="space-y-4 text-center">
-            <p className="text-lg text-gray-700">
-              <span className="font-semibold text-navy">Munich</span> – 18 travelers looking to share rooms
+          <div className="space-y-4 text-left max-w-2xl mx-auto">
+            <p className="text-lg text-gray-700 flex items-start">
+              <span className="mr-3">•</span>
+              <span>Save up to 50% on your accommodation</span>
             </p>
-            <p className="text-lg text-gray-700">
-              <span className="font-semibold text-navy">Barcelona</span> – 7 shared trips posted this week
+            <p className="text-lg text-gray-700 flex items-start">
+              <span className="mr-3">•</span>
+              <span>Split rooms, apartments, or weekend stays</span>
             </p>
-            <p className="text-lg text-gray-700">
-              <span className="font-semibold text-navy">New York</span> – 12 open stays available
+            <p className="text-lg text-gray-700 flex items-start">
+              <span className="mr-3">•</span>
+              <span>Verified matches, meaningful connections</span>
             </p>
           </div>
         </div>

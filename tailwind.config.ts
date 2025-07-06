@@ -12,8 +12,8 @@ export default {
       },
       colors: {
         navy: {
-          DEFAULT: "#1E3A8A",  // Navy blue from the logo
-          dark: "#1D4ED8",     // Darker navy for hover states
+          DEFAULT: "#1A1E62",  // SplitStay logo blue
+          dark: "#141A55",     // Darker navy for hover states
         },
         cream: {
           DEFAULT: "#F5F1EB",  // Cream background color
