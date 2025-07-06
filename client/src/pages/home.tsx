@@ -9,7 +9,7 @@ const Home: React.FC = () => {
   const [_, navigate] = useLocation();
 
   return (
-    <div className="min-h-screen bg-gray-50 px-16 py-16">
+    <div className="min-h-screen bg-gray-50 py-16">
       <div className="w-full text-center">
         
         {/* Main Title */}
@@ -26,32 +26,34 @@ const Home: React.FC = () => {
         </p>
         
         {/* Two columns section */}
-        <div className="grid md:grid-cols-2 gap-32 mb-16 px-32">
-          
-          {/* Left column */}
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-black mb-6">
-              Have an accommodation<br />
-              to share?
-            </h2>
-            <p className="text-xl text-gray-700">
-              Post your stay to<br />
-              find a roommate
-            </p>
+        <div className="w-full mb-16">
+          <div className="flex justify-between items-start px-20">
+            
+            {/* Left column */}
+            <div className="w-1/2 text-center pr-16">
+              <h2 className="text-3xl font-bold text-black mb-6">
+                Have an accommodation<br />
+                to share?
+              </h2>
+              <p className="text-xl text-gray-700">
+                Post your stay to<br />
+                find a roommate
+              </p>
+            </div>
+            
+            {/* Right column */}
+            <div className="w-1/2 text-center pl-16">
+              <h2 className="text-3xl font-bold text-black mb-6">
+                Looking to join<br />
+                someone else's trip?
+              </h2>
+              <p className="text-xl text-gray-700">
+                Browse open stays<br />
+                and save money
+              </p>
+            </div>
+            
           </div>
-          
-          {/* Right column */}
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-black mb-6">
-              Looking to join<br />
-              someone else's trip?
-            </h2>
-            <p className="text-xl text-gray-700">
-              Browse open stays<br />
-              and save money
-            </p>
-          </div>
-          
         </div>
         
         {/* CTA Button */}
@@ -65,7 +67,7 @@ const Home: React.FC = () => {
         </div>
         
         {/* Location examples */}
-        <div className="text-left mx-auto mb-16 space-y-6 px-32">
+        <div className="text-left mb-16 space-y-6 px-64">
           <div className="flex items-start">
             <span className="text-2xl mr-3">🍺</span>
             <div>
@@ -89,7 +91,7 @@ const Home: React.FC = () => {
             Incentives to share:
           </h3>
           
-          <div className="grid md:grid-cols-3 gap-12 px-32">
+          <div className="grid md:grid-cols-3 gap-12 px-64">
             <div className="bg-purple-600 text-white p-8 rounded-2xl text-center">
               <div className="text-3xl mb-4">💫</div>
               <h4 className="text-xl font-bold mb-3">Ambassador</h4>
