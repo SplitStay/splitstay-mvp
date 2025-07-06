@@ -427,23 +427,8 @@ function CreateProfile() {
 function App() {
   const path = window.location.pathname;
   
-  if (path === "/create-profile") {
-    return <CreateProfile />;
-  }
-  
-  return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-4xl mx-auto text-center">
-        <h1 className="text-4xl font-bold text-navy mb-4">SplitStay</h1>
-        <p className="text-xl text-gray-600 mb-8">Find compatible roommates and share hotel rooms</p>
-        <div className="space-y-4">
-          <a href="/create-profile" className="block bg-blue-900 text-white px-6 py-3 rounded-lg hover:bg-blue-800 transition-colors">
-            Go to Create Profile
-          </a>
-        </div>
-      </div>
-    </div>
-  );
+  // Always show the profile creation form directly
+  return <CreateProfile />;
 }
 
 export default App;
