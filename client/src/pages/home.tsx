@@ -9,8 +9,8 @@ const Home: React.FC = () => {
   const [_, navigate] = useLocation();
 
   return (
-    <div className="min-h-screen bg-gray-50 px-8 py-16">
-      <div className="max-w-4xl mx-auto text-center">
+    <div className="min-h-screen bg-gray-50 px-16 py-16">
+      <div className="w-full text-center">
         
         {/* Main Title */}
         <h1 className="text-7xl font-bold text-black mb-12">
@@ -18,7 +18,7 @@ const Home: React.FC = () => {
         </h1>
         
         {/* Subtitle */}
-        <p className="text-2xl text-gray-700 mb-16 leading-relaxed max-w-3xl mx-auto">
+        <p className="text-2xl text-gray-700 mb-16 leading-relaxed">
           You're early — and that's exactly the point.<br />
           SplitStay is just opening up. The first few travelers<br />
           shape what this becomes. Want to be one of<br />
@@ -26,7 +26,7 @@ const Home: React.FC = () => {
         </p>
         
         {/* Two columns section */}
-        <div className="grid md:grid-cols-2 gap-16 mb-16 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-32 mb-16 px-32">
           
           {/* Left column */}
           <div className="text-center">
@@ -65,7 +65,7 @@ const Home: React.FC = () => {
         </div>
         
         {/* Location examples */}
-        <div className="text-left max-w-2xl mx-auto mb-16 space-y-6">
+        <div className="text-left mx-auto mb-16 space-y-6 px-32">
           <div className="flex items-start">
             <span className="text-2xl mr-3">🍺</span>
             <div>
@@ -89,7 +89,7 @@ const Home: React.FC = () => {
             Incentives to share:
           </h3>
           
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-12 px-32">
             <div className="bg-purple-600 text-white p-8 rounded-2xl text-center">
               <div className="text-3xl mb-4">💫</div>
               <h4 className="text-xl font-bold mb-3">Ambassador</h4>
