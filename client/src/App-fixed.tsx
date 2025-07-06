@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, ArrowLeft } from "lucide-react";
+import { X, ArrowLeft, Plus } from "lucide-react";
 
 function CreateProfile() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -317,9 +317,7 @@ function CreateProfile() {
                     >
                       Upload Photo
                     </label>
-                    <button type="button" className="text-sm text-gray-500 hover:text-gray-700 underline">
-                      Add later
-                    </button>
+
                   </div>
                 </div>
               </div>
@@ -469,17 +467,226 @@ function CreateProfile() {
     );
   }
 
+  const handleLanguageToggle = (language: string) => {
+    setSelectedLanguages(prev => 
+      prev.includes(language) 
+        ? prev.filter(l => l !== language)
+        : [...prev, language]
+    );
+  };
+
+  const handleAddCustomLanguage = () => {
+    if (customLanguage.trim() && !selectedLanguages.includes(customLanguage.trim())) {
+      setSelectedLanguages(prev => [...prev, customLanguage.trim()]);
+      setCustomLanguage("");
+    }
+  };
+
+  const handleTraitToggle = (trait: string) => {
+    if (selectedTraits.includes(trait)) {
+      setSelectedTraits(prev => prev.filter(t => t !== trait));
+    } else if (selectedTraits.length < 5) {
+      setSelectedTraits(prev => [...prev, trait]);
+    }
+  };
+
+  const languageOptions = [
+    "English", "Spanish", "French", "German", "Italian", "Portuguese", 
+    "Dutch", "Japanese", "Korean", "Chinese", "Arabic", "Russian", "Hindi"
+  ];
+
+  const traitOptions = [
+    "Early Bird", "Night Owl", "Adventurous", "Relaxed", "Social", "Quiet", 
+    "Foodie", "Fitness Enthusiast", "Culture Lover", "Nature Lover", 
+    "Tech Savvy", "Minimalist", "Photographer", "Music Lover", "Budget Traveler",
+    "Luxury Traveler", "Backpacker", "City Explorer", "Beach Lover", "Mountain Hiker"
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-[600px] mx-auto text-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Step 2 - Coming Soon!</h2>
-        <p className="text-gray-600 mb-8">Language selection and travel traits will be here.</p>
-        <button
-          onClick={() => setCurrentStep(1)}
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Back to Step 1
-        </button>
+    <div className="min-h-screen p-4" style={{ background: 'linear-gradient(to bottom, #f5f9ff, white)' }}>
+      <div className="max-w-[600px] mx-auto">
+        {/* Back to Step 1 link */}
+        <div className="mb-8">
+          <button
+            onClick={() => setCurrentStep(1)}
+            className="text-sm text-gray-500 hover:text-gray-700 underline transition-colors"
+          >
+            Back to Step 1
+          </button>
+        </div>
+        
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold mb-2" style={{ color: '#1e2a78', fontFamily: 'system-ui, Inter, sans-serif' }}>
+            👉 Tell us how you travel
+          </h1>
+          <p className="text-gray-600 text-lg italic">
+            Help us match you with compatible travelers
+          </p>
+        </div>
+
+        {/* Form Card */}
+        <div className="bg-white rounded-lg shadow-lg border-0 p-8">
+          {/* Step indicator */}
+          <div className="mb-6">
+            <h2 className="text-xl font-bold" style={{ color: '#1e2a78' }}>Step 2 of 2</h2>
+          </div>
+          
+          <div className="space-y-8">
+            {/* Languages Section */}
+            <div>
+              <label className="block text-base font-medium text-gray-700 mb-3">
+                Languages you speak
+              </label>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {languageOptions.map((language) => (
+                  <button
+                    key={language}
+                    type="button"
+                    onClick={() => handleLanguageToggle(language)}
+                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                      selectedLanguages.includes(language)
+                        ? "text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                    style={{ 
+                      backgroundColor: selectedLanguages.includes(language) ? '#1e2a78' : undefined 
+                    }}
+                  >
+                    {language}
+                  </button>
+                ))}
+              </div>
+              
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={customLanguage}
+                  onChange={(e) => setCustomLanguage(e.target.value)}
+                  placeholder="Add another language"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
+                  style={{ fontSize: '16px', fontFamily: 'system-ui, Inter, sans-serif' }}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddCustomLanguage();
+                    }
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={handleAddCustomLanguage}
+                  className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
+              
+              {selectedLanguages.length > 0 && (
+                <div className="mt-3">
+                  <p className="text-sm text-gray-600 mb-2">Selected languages:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {selectedLanguages.map((language) => (
+                      <span 
+                        key={language} 
+                        className="inline-flex items-center bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm"
+                      >
+                        {language}
+                        <button
+                          type="button"
+                          onClick={() => handleLanguageToggle(language)}
+                          className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Travel Traits Section */}
+            <div>
+              <label className="block text-base font-medium text-gray-700 mb-3">
+                Travel traits (select up to 5)
+              </label>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {traitOptions.map((trait) => (
+                  <button
+                    key={trait}
+                    type="button"
+                    onClick={() => handleTraitToggle(trait)}
+                    disabled={!selectedTraits.includes(trait) && selectedTraits.length >= 5}
+                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                      selectedTraits.includes(trait)
+                        ? "text-white"
+                        : selectedTraits.length >= 5
+                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                    style={{ 
+                      backgroundColor: selectedTraits.includes(trait) ? '#1e2a78' : undefined 
+                    }}
+                  >
+                    {trait}
+                  </button>
+                ))}
+              </div>
+              
+              {selectedTraits.length > 0 && (
+                <div className="mt-3">
+                  <p className="text-sm text-gray-600 mb-2">Selected traits ({selectedTraits.length}/5):</p>
+                  <div className="flex flex-wrap gap-1">
+                    {selectedTraits.map((trait) => (
+                      <span 
+                        key={trait} 
+                        className="inline-flex items-center bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm"
+                      >
+                        {trait}
+                        <button
+                          type="button"
+                          onClick={() => handleTraitToggle(trait)}
+                          className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col gap-3 pt-4">
+              <button 
+                onClick={() => alert("Profile created! Welcome to SplitStay!")}
+                className="w-full py-4 text-lg font-semibold rounded-lg text-white shadow-md hover:shadow-lg transform hover:scale-[1.02] transition-all duration-300"
+                style={{ 
+                  fontSize: '16px', 
+                  fontFamily: 'system-ui, Inter, sans-serif',
+                  backgroundColor: '#1e2a78'
+                }}
+              >
+                Create My Profile
+              </button>
+              
+              <button 
+                onClick={() => alert("You can complete this later in your settings")}
+                className="w-full py-4 text-lg font-semibold rounded-lg border-2 hover:bg-gray-50 transition-colors"
+                style={{ 
+                  fontSize: '16px', 
+                  fontFamily: 'system-ui, Inter, sans-serif',
+                  borderColor: '#1e2a78',
+                  color: '#1e2a78'
+                }}
+              >
+                Skip for Now
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
