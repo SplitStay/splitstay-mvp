@@ -17,7 +17,7 @@ const Home: React.FC = () => {
           <img 
             src={logoImage} 
             alt="SplitStay Logo" 
-            className="h-32 lg:h-40 w-auto mx-auto"
+            className="h-64 lg:h-80 w-auto mx-auto"
           />
         </div>
         
