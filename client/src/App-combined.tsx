@@ -330,7 +330,7 @@ function CreateProfile() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="max-w-7xl mx-auto px-4 pb-24">
+      <form onSubmit={handleSubmit} className="max-w-7xl mx-auto px-4 pb-20">
         {/* 12-column grid layout: 5 cols left, 7 cols right */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
@@ -343,7 +343,7 @@ function CreateProfile() {
               <p className="text-gray-600 text-sm">Let's start with the basics</p>
             </div>
             
-            <div className="space-y-4">
+            <div className="space-y-3">
               {/* Profile Photo Upload */}
               <div className="text-center">
                 <label className="block text-base font-medium text-gray-700 mb-3">
@@ -557,7 +557,7 @@ function CreateProfile() {
               <p className="text-gray-600 text-sm">Help us match you with compatible travelers</p>
             </div>
             
-            <div className="space-y-5">
+            <div className="space-y-3">
               {/* Languages Section */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -637,15 +637,15 @@ function CreateProfile() {
                     ℹ️
                   </span>
                 </label>
-                {/* Two-column grid for traits */}
-                <div className="grid grid-cols-2 gap-1.5 mb-3">
+                {/* Compact flexible wrap layout for traits */}
+                <div className="flex flex-wrap gap-1 mb-3">
                   {traitOptions.map((trait) => (
                     <button
                       key={trait}
                       type="button"
                       onClick={() => handleTraitToggle(trait)}
                       disabled={!selectedTraits.includes(trait) && selectedTraits.length >= 5}
-                      className={`px-2 py-1 rounded text-xs font-medium transition-colors text-left ${
+                      className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${
                         selectedTraits.includes(trait)
                           ? "text-white"
                           : selectedTraits.length >= 5
@@ -662,13 +662,13 @@ function CreateProfile() {
                 </div>
                 
                 {selectedTraits.length > 0 && (
-                  <div className="mt-2">
+                  <div className="mt-1">
                     <p className="text-xs text-gray-600 mb-1">Selected ({selectedTraits.length}/5):</p>
                     <div className="flex flex-wrap gap-1">
                       {selectedTraits.map((trait) => (
                         <span 
                           key={trait} 
-                          className="inline-flex items-center bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs"
+                          className="inline-flex items-center bg-green-100 text-green-800 px-1.5 py-0.5 rounded text-xs"
                         >
                           {trait}
                           <button
