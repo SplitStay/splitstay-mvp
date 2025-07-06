@@ -99,7 +99,7 @@ const Home: React.FC = () => {
               </div>
               <h4 className="text-xl font-bold text-navy mb-3">Flexible Options</h4>
               <p className="text-gray-600 leading-relaxed">
-                Split rooms, apartments, or weekend stays across any destination
+                Split hotel rooms or full apartments at any destination
               </p>
             </div>
 
@@ -123,7 +123,7 @@ const Home: React.FC = () => {
         <div className="mb-16 max-w-6xl mx-auto px-4">
           <div className="text-center mb-8">
             <h3 className="text-2xl font-bold text-navy mb-2">
-              🏅 Earn your badge. Join the SplitStay movement.
+              Earn your badge. Join the SplitStay movement.
             </h3>
             <p className="text-gray-600">
               Celebrate your contribution and unlock early perks with SplitStay.
@@ -131,21 +131,39 @@ const Home: React.FC = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Ambassador Badge */}
             <div className="bg-white border-2 border-gray-200 rounded-lg p-6 text-center hover:shadow-lg hover:border-navy transition-all duration-300">
+              <div className="w-16 h-16 bg-navy/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                </svg>
+              </div>
               <h4 className="text-xl font-bold text-navy mb-3">Ambassador</h4>
               <p className="text-gray-600">
                 Invited 3+ friends to SplitStay — help the community grow
               </p>
             </div>
             
+            {/* Trip Host Badge */}
             <div className="bg-white border-2 border-gray-200 rounded-lg p-6 text-center hover:shadow-lg hover:border-navy transition-all duration-300">
+              <div className="w-16 h-16 bg-navy/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                </svg>
+              </div>
               <h4 className="text-xl font-bold text-navy mb-3">Trip Host</h4>
               <p className="text-gray-600">
                 Posted accommodation and successfully matched with a traveler
               </p>
             </div>
             
+            {/* Pioneer Badge */}
             <div className="bg-white border-2 border-gray-200 rounded-lg p-6 text-center hover:shadow-lg hover:border-navy transition-all duration-300">
+              <div className="w-16 h-16 bg-navy/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
               <h4 className="text-xl font-bold text-navy mb-3">Pioneer</h4>
               <p className="text-gray-600">
                 One of the first 100 active users on the platform
