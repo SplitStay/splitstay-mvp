@@ -353,7 +353,7 @@ function CreateProfile() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="max-w-7xl mx-auto px-4 pb-16">
+      <form onSubmit={handleSubmit} className="max-w-screen-lg mx-auto px-4 pb-16">
         {/* 12-column grid layout: 5 cols left, 7 cols right */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           
@@ -493,122 +493,47 @@ function CreateProfile() {
                 </div>
               </div>
 
-              {/* Date of Birth and Countries - Two Column Layout */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Date of Birth */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Date of Birth <span className="text-red-500">*</span>
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    <select
-                      value={formData.dayOfBirth}
-                      onChange={(e) => setFormData(prev => ({...prev, dayOfBirth: e.target.value}))}
-                      className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
-                      required
-                    >
-                      <option value="">Day</option>
-                      {dayOptions.map((day) => (
-                        <option key={day} value={day}>{day}</option>
-                      ))}
-                    </select>
-                    <select
-                      value={formData.monthOfBirth}
-                      onChange={(e) => setFormData(prev => ({...prev, monthOfBirth: e.target.value}))}
-                      className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
-                      required
-                    >
-                      <option value="">Month</option>
-                      {monthOptions.map((month) => (
-                        <option key={month.value} value={month.value}>{month.label}</option>
-                      ))}
-                    </select>
-                    <select
-                      value={formData.yearOfBirth}
-                      onChange={(e) => setFormData(prev => ({...prev, yearOfBirth: e.target.value}))}
-                      className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
-                      required
-                    >
-                      <option value="">Year</option>
-                      {yearOptions.map((year) => (
-                        <option key={year} value={year}>{year}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">Must be 18+</p>
-                </div>
-
-                {/* Countries Visited */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Countries visited 
-                    <span className="ml-1 text-xs text-gray-500 cursor-help" title="This helps us match you with travelers who share similar cultural experiences">
-                      ℹ️
-                    </span>
-                  </label>
-                  <div className="flex gap-2 mb-2">
-                    <input
-                      type="text"
-                      value={customCountry}
-                      onChange={(e) => setCustomCountry(e.target.value)}
-                      placeholder="Add country"
-                      className="flex-1 px-2 py-1.5 border border-gray-300 rounded text-sm"
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          handleAddCustomCountry();
-                        }
-                      }}
-                    />
-                    <button
-                      type="button"
-                      onClick={handleAddCustomCountry}
-                      className="px-2 py-1.5 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
-                    >
-                      <Plus className="w-3 h-3" />
-                    </button>
-                  </div>
-                  <div className="flex flex-wrap gap-1">
-                    {popularCountries.slice(0, 8).map((country) => (
-                      <button
-                        key={country}
-                        type="button"
-                        onClick={() => handleCountryToggle(country)}
-                        className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${
-                          selectedCountries.includes(country)
-                            ? "text-white"
-                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                        }`}
-                        style={{ 
-                          backgroundColor: selectedCountries.includes(country) ? '#1e2a78' : undefined 
-                        }}
-                      >
-                        {country}
-                      </button>
+              {/* Date of Birth */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Date of Birth <span className="text-red-500">*</span>
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  <select
+                    value={formData.dayOfBirth}
+                    onChange={(e) => setFormData(prev => ({...prev, dayOfBirth: e.target.value}))}
+                    className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                    required
+                  >
+                    <option value="">Day</option>
+                    {dayOptions.map((day) => (
+                      <option key={day} value={day}>{day}</option>
                     ))}
-                  </div>
-                  {selectedCountries.length > 0 && (
-                    <div className="mt-2">
-                      <div className="flex flex-wrap gap-1">
-                        {selectedCountries.map((country) => (
-                          <span 
-                            key={country} 
-                            className="inline-flex items-center bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs"
-                          >
-                            {country}
-                            <button
-                              type="button"
-                              onClick={() => handleCountryToggle(country)}
-                              className="ml-1 hover:bg-blue-200 rounded-full p-0.5"
-                            >
-                              <X className="w-2 h-2" />
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  </select>
+                  <select
+                    value={formData.monthOfBirth}
+                    onChange={(e) => setFormData(prev => ({...prev, monthOfBirth: e.target.value}))}
+                    className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                    required
+                  >
+                    <option value="">Month</option>
+                    {monthOptions.map((month) => (
+                      <option key={month.value} value={month.value}>{month.label}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={formData.yearOfBirth}
+                    onChange={(e) => setFormData(prev => ({...prev, yearOfBirth: e.target.value}))}
+                    className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                    required
+                  >
+                    <option value="">Year</option>
+                    {yearOptions.map((year) => (
+                      <option key={year} value={year}>{year}</option>
+                    ))}
+                  </select>
                 </div>
+                <p className="text-xs text-gray-500 mt-1">Must be 18+</p>
               </div>
             </div>
           </div>
@@ -628,13 +553,13 @@ function CreateProfile() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Languages you speak
                 </label>
-                <div className="flex flex-wrap gap-1.5 mb-3">
+                <div className="flex flex-wrap gap-1.5 mb-2">
                   {languageOptions.map((language) => (
                     <button
                       key={language}
                       type="button"
                       onClick={() => handleLanguageToggle(language)}
-                      className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                      className={`px-2 py-0.5 rounded text-xs font-medium transition-colors h-6 ${
                         selectedLanguages.includes(language)
                           ? "text-white"
                           : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -648,13 +573,13 @@ function CreateProfile() {
                   ))}
                 </div>
                 
-                <div className="flex gap-2">
+                <div className="flex gap-2 mb-2">
                   <input
                     type="text"
                     value={customLanguage}
                     onChange={(e) => setCustomLanguage(e.target.value)}
                     placeholder="Add language"
-                    className="flex-1 px-2 py-1.5 border border-gray-300 rounded text-sm"
+                    className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs"
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
@@ -665,14 +590,14 @@ function CreateProfile() {
                   <button
                     type="button"
                     onClick={handleAddCustomLanguage}
-                    className="px-2 py-1.5 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                    className="px-2 py-1 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
                   >
                     <Plus className="w-3 h-3" />
                   </button>
                 </div>
                 
                 {selectedLanguages.length > 0 && (
-                  <div className="mt-2">
+                  <div className="mb-2">
                     <div className="flex flex-wrap gap-1">
                       {selectedLanguages.map((language) => (
                         <span 
@@ -684,6 +609,78 @@ function CreateProfile() {
                             type="button"
                             onClick={() => handleLanguageToggle(language)}
                             className="ml-1 hover:bg-blue-200 rounded-full p-0.5"
+                          >
+                            <X className="w-2 h-2" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Countries Visited Section */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Countries visited or lived in 
+                  <span className="ml-1 text-xs text-gray-500 cursor-help" title="This helps us match you with travelers who share similar cultural experiences">
+                    ℹ️
+                  </span>
+                </label>
+                <div className="flex gap-2 mb-2">
+                  <input
+                    type="text"
+                    value={customCountry}
+                    onChange={(e) => setCustomCountry(e.target.value)}
+                    placeholder="e.g. Thailand, France, Argentina..."
+                    className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddCustomCountry();
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCustomCountry}
+                    className="px-2 py-1 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                  >
+                    <Plus className="w-3 h-3" />
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-1 mb-2 max-h-16 overflow-y-auto">
+                  {popularCountries.map((country) => (
+                    <button
+                      key={country}
+                      type="button"
+                      onClick={() => handleCountryToggle(country)}
+                      className={`px-2 py-0.5 rounded text-xs font-medium transition-colors h-6 ${
+                        selectedCountries.includes(country)
+                          ? "text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                      style={{ 
+                        backgroundColor: selectedCountries.includes(country) ? '#1e2a78' : undefined 
+                      }}
+                    >
+                      {country}
+                    </button>
+                  ))}
+                </div>
+                {selectedCountries.length > 0 && (
+                  <div className="mb-2">
+                    <div className="flex flex-wrap gap-1">
+                      {selectedCountries.map((country) => (
+                        <span 
+                          key={country} 
+                          className="inline-flex items-center bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs"
+                        >
+                          {country}
+                          <button
+                            type="button"
+                            onClick={() => handleCountryToggle(country)}
+                            className="ml-1 hover:bg-green-200 rounded-full p-0.5"
                           >
                             <X className="w-2 h-2" />
                           </button>

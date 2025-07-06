@@ -79,6 +79,7 @@ The application is configured for deployment on Replit with autoscaling:
 
 ## Changelog
 
+- July 6, 2025: Final MVP optimization - moved countries to travel section, implemented flex-wrap for traits with fixed height, added scroll containers for max height sections, balanced left/right panel heights for 1280px+ screens
 - July 6, 2025: Optimized profile form layout - added travel photos upload (max 3), grouped inputs in side-by-side rows, implemented 2-column grid for traits, reduced padding/margins to eliminate scrolling on laptop screens
 - July 6, 2025: Created combined side-by-side profile creation form with Step 1 (left panel) and Step 2 (right panel), responsive design that stacks on mobile, sticky footer with form validation
 - July 6, 2025: Restored original beautiful landing page with badges, progress indicators, and detailed sections while maintaining profile form integration
