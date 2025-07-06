@@ -9,20 +9,20 @@ const Home: React.FC = () => {
   const [_, navigate] = useLocation();
 
   return (
-    <div className="min-h-screen bg-cream py-8">
+    <div className="min-h-screen bg-cream py-2">
       <div className="w-full text-center">
         
         {/* Logo */}
-        <div className="mb-4">
+        <div className="mb-2">
           <img 
             src={logoImage} 
             alt="SplitStay Logo" 
-            className="h-64 lg:h-80 w-auto mx-auto"
+            className="h-48 lg:h-64 w-auto mx-auto"
           />
         </div>
         
         {/* Subtitle */}
-        <p className="text-2xl text-navy mb-16 leading-relaxed">
+        <p className="text-xl text-navy mb-8 leading-relaxed">
           You're early — and that's exactly the point.<br />
           SplitStay is just opening up. The first few travelers<br />
           shape what this becomes. Want to be one of<br />
@@ -30,16 +30,16 @@ const Home: React.FC = () => {
         </p>
         
         {/* Two columns section */}
-        <div className="w-full mb-16">
+        <div className="w-full mb-8">
           <div className="flex justify-between items-start px-20">
             
             {/* Left column */}
             <div className="w-1/2 text-center pr-16">
-              <h2 className="text-3xl font-bold text-navy mb-6">
+              <h2 className="text-2xl font-bold text-navy mb-4">
                 Have an accommodation<br />
                 to share?
               </h2>
-              <p className="text-xl text-navy opacity-80">
+              <p className="text-lg text-navy opacity-80">
                 Post your stay to<br />
                 find a roommate
               </p>
@@ -47,11 +47,11 @@ const Home: React.FC = () => {
             
             {/* Right column */}
             <div className="w-1/2 text-center pl-16">
-              <h2 className="text-3xl font-bold text-navy mb-6">
+              <h2 className="text-2xl font-bold text-navy mb-4">
                 Looking to join<br />
                 someone else's trip?
               </h2>
-              <p className="text-xl text-navy opacity-80">
+              <p className="text-lg text-navy opacity-80">
                 Browse open stays<br />
                 and save money
               </p>
@@ -61,7 +61,7 @@ const Home: React.FC = () => {
         </div>
         
         {/* CTA Button */}
-        <div className="mb-20">
+        <div className="mb-12">
           <Button
             className="bg-navy hover:bg-navy-dark text-white px-12 py-4 text-xl font-semibold rounded-xl"
             onClick={() => navigate("/signup")}
