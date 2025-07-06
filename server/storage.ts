@@ -851,9 +851,10 @@ async function seedDatabase() {
 }
 
 // Initialize the database with seed data
-seedDatabase().catch(error => {
-  console.error("Failed to seed database:", error);
-});
+// Temporarily commented out due to schema mismatch
+// seedDatabase().catch(error => {
+//   console.error("Failed to seed database:", error);
+// });
 
 // Export the database storage implementation
 export const storage = new DatabaseStorage();

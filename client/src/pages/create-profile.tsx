@@ -1,864 +1,594 @@
 import React, { useState } from "react";
 import { useLocation } from "wouter";
-import { 
-  ArrowLeft, Calendar, Plus, Search, X, 
-  UserCircle, ShieldCheck, CheckCircle, CreditCard
-} from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
-import { toast } from "@/hooks/use-toast";
-import { trackProfileCreation } from "@/lib/analytics";
-import { format } from "date-fns";
-import { calculateAge, getAgeRange } from "@/lib/age-utils";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import emilyProfilePic from "../assets/emily-profile-2025.png";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription,
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger,
-  DialogFooter,
-  DialogClose
-} from "@/components/ui/dialog";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { X, Upload, Plus } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
 
-interface TravelTrait {
-  id: string;
-  label: string;
-}
+// Two-step form schemas
+const step1Schema = z.object({
+  fullName: z.string().min(1, "Name is required"),
+  profileImage: z.any().optional(),
+  bio: z.string().optional(),
+  dayOfBirth: z.string().min(1, "Day is required"),
+  monthOfBirth: z.string().min(1, "Month is required"),
+  yearOfBirth: z.string().min(1, "Year is required"),
+  travelReason: z.enum(["leisure", "business"], {
+    required_error: "Please select a reason for travel",
+  }),
+}).refine((data) => {
+  const currentYear = new Date().getFullYear();
+  const birthYear = parseInt(data.yearOfBirth);
+  const age = currentYear - birthYear;
+  return age >= 18;
+}, {
+  message: "You must be 18 or older to use SplitStay",
+  path: ["yearOfBirth"],
+});
 
-const CreateProfile: React.FC = () => {
-  const [location, navigate] = useLocation();
-  const isEditMode = location === "/profile/edit";
-  const isDemoMode = !isEditMode; // Consider any new profile creation as demo mode
-  
-  // Get the user path from URL parameters
-  const urlParams = new URLSearchParams(window.location.search);
-  const userPath = urlParams.get('path'); // 'host' or 'guest'
-  
-  // Import Emily's profile image directly
-  // For the demo, we'll use a placeholder that will be replaced
-  // with the right image when you click the profile section
-  
-  // Personal info states - empty for new users
-  const [name, setName] = useState("");
-  const [bio, setBio] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>(undefined);
-  const [travelReason, setTravelReason] = useState<"leisure" | "business">("leisure");
+const step2Schema = z.object({
+  languages: z.array(z.string()).min(1, "At least one language is required"),
+  travelTraits: z.array(z.string()).max(5, "You can select up to 5 traits"),
+});
+
+type Step1Form = z.infer<typeof step1Schema>;
+type Step2Form = z.infer<typeof step2Schema>;
+
+export default function CreateProfile() {
+  const [, navigate] = useLocation();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [currentStep, setCurrentStep] = useState(1);
+  const [step1Data, setStep1Data] = useState<Step1Form | null>(null);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
-  const [profileImage, setProfileImage] = useState<string | null>(null);
-  
-  // Travel traits
   const [selectedTraits, setSelectedTraits] = useState<string[]>([]);
-  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [customLanguage, setCustomLanguage] = useState("");
+  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
   
-  // Handle profile image upload
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setProfileImage(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-    // No else block - if no file is selected, keep profileImage as null
-  };
-  
+  // Check if we're in edit mode and get user path
+  const urlParams = new URLSearchParams(window.location.search);
+  const isEditMode = urlParams.get('mode') === 'edit';
+  const userPath = urlParams.get('path'); // 'host' or 'guest'
 
+  const step1Form = useForm<Step1Form>({
+    resolver: zodResolver(step1Schema),
+    defaultValues: {
+      fullName: "",
+      bio: "",
+      dayOfBirth: "",
+      monthOfBirth: "",
+      yearOfBirth: "",
+      travelReason: undefined,
+    },
+  });
 
-  // Predefined values
-  const languages = ["English", "Spanish", "French", "German", "Chinese", "Japanese"];
-  
-  // Complete list of languages for search - comprehensive global list
-  const allLanguages = [
-    "Afrikaans", "Albanian", "Amharic", "Arabic", "Armenian", "Assamese", "Azerbaijani", "Basque", 
-    "Belarusian", "Bengali", "Bosnian", "Bulgarian", "Burmese", "Catalan", "Cebuano", "Chichewa", 
-    "Chinese", "Corsican", "Croatian", "Czech", "Danish", "Dutch", "English", "Esperanto", "Estonian", 
-    "Farsi", "Filipino", "Finnish", "French", "Frisian", "Galician", "Georgian", "German", "Greek", 
-    "Gujarati", "Haitian Creole", "Hausa", "Hawaiian", "Hebrew", "Hindi", "Hmong", "Hungarian", 
-    "Icelandic", "Igbo", "Indonesian", "Irish", "Italian", "Japanese", "Javanese", "Kannada", 
-    "Kazakh", "Khmer", "Korean", "Kurdish", "Kyrgyz", "Lao", "Latin", "Latvian", "Lithuanian", 
-    "Luxembourgish", "Macedonian", "Malagasy", "Malay", "Malayalam", "Maltese", "Maori", "Marathi", 
-    "Mongolian", "Nepali", "Norwegian", "Odia", "Pashto", "Persian", "Polish", "Portuguese", 
-    "Punjabi", "Romanian", "Russian", "Samoan", "Scots Gaelic", "Serbian", "Sesotho", "Shona", 
-    "Sindhi", "Sinhala", "Slovak", "Slovenian", "Somali", "Spanish", "Sundanese", "Swahili", 
-    "Swedish", "Tajik", "Tamil", "Tatar", "Telugu", "Thai", "Turkish", "Turkmen", "Ukrainian", 
-    "Urdu", "Uyghur", "Uzbek", "Vietnamese", "Welsh", "Xhosa", "Yiddish", "Yoruba", "Zulu",
-    "Tagalog", "Mandarin", "Cantonese", "Wu", "Min", "Hakka", "Gan", "Sign Language"
-  ];
-  
-  // State for language search and selection
-  const [languageSearch, setLanguageSearch] = useState("");
-  const [tempSelectedLanguages, setTempSelectedLanguages] = useState<string[]>([]);
-  const [languageDialogOpen, setLanguageDialogOpen] = useState(false);
-  
-  // State for trait search and selection
-  const [traitSearch, setTraitSearch] = useState("");
-  const [tempSelectedTraits, setTempSelectedTraits] = useState<string[]>([]);
-  const [traitDialogOpen, setTraitDialogOpen] = useState(false);
-  
-  // Main travel traits (organized in logical pairs)
-  const travelTraits: TravelTrait[] = [
-    // Planning style
-    { id: "planner", label: "Planner" },
-    { id: "spontaneous", label: "Spontaneous" },
-    
-    // Activity level
-    { id: "adventure_seeker", label: "Adventure Seeker" },
-    { id: "relaxed", label: "Relaxed" },
-    
-    // Sleep schedule
-    { id: "early_bird", label: "Early Bird" },
-    { id: "night_owl", label: "Night Owl" },
-    
-    // Social style
-    { id: "quiet_time", label: "Quiet Time" },
-    { id: "street_food", label: "Street Food" },
-  ];
-  
-  // Complete list of travel traits for search (organized by related pairs)
-  const allTravelTraits: TravelTrait[] = [
-    // Planning style
-    { id: "planner", label: "Planner" },
-    { id: "spontaneous", label: "Spontaneous" },
-    
-    // Activity level
-    { id: "adventure_seeker", label: "Adventure Seeker" },
-    { id: "relaxed", label: "Relaxed" },
-    
-    // Sleep schedule
-    { id: "early_bird", label: "Early Bird" },
-    { id: "night_owl", label: "Night Owl" },
-    
-    // Social style
-    { id: "quiet_time", label: "Quiet Time" },
-    { id: "chatterbox", label: "Chatterbox" },
-    { id: "party_animal", label: "Party Animal" },
-    { id: "social_butterfly", label: "Social Butterfly" },
-    
-    // Food preferences
-    { id: "street_food", label: "Street Food" },
-    { id: "fine_dining", label: "Fine Dining" },
-    { id: "foodie", label: "Foodie" },
-    
-    // Drink preferences
-    { id: "coffee_lover", label: "Coffee Lover" },
-    { id: "tea_enthusiast", label: "Tea Enthusiast" },
-    
-    // Location preferences
-    { id: "nature_lover", label: "Nature Lover" },
-    { id: "city_lover", label: "City Lover" },
-    { id: "beach_lover", label: "Beach Lover" },
-    { id: "mountain_climber", label: "Mountain Climber" },
-    
-    // Indoor activities
-    { id: "bookworm", label: "Bookworm" },
-    { id: "binge_watcher", label: "Binge Watcher" },
-    
-    // Shopping style
-    { id: "minimalist", label: "Minimalist" },
-    { id: "shopping_addict", label: "Shopping Addict" },
-    
-    // Cultural interests
-    { id: "museum_goer", label: "Museum Goer" },
-    { id: "history_buff", label: "History Buff" },
-    { id: "architecture_buff", label: "Architecture Buff" },
-    { id: "art_enthusiast", label: "Art Enthusiast" },
-    
-    // Other interests
-    { id: "photography_fan", label: "Photography Fan" },
-    { id: "tech_geek", label: "Tech Geek" },
-    { id: "family_oriented", label: "Family Oriented" },
-    { id: "environmentalist", label: "Environmentalist" },
-    { id: "sports_fan", label: "Sports Fan" },
-    { id: "music_lover", label: "Music Lover" },
-    { id: "yoga_enthusiast", label: "Yoga Enthusiast" },
-  ];
+  const step2Form = useForm<Step2Form>({
+    resolver: zodResolver(step2Schema),
+    defaultValues: {
+      languages: [],
+      travelTraits: [],
+    },
+  });
 
-  const toggleLanguage = (language: string) => {
-    if (selectedLanguages.includes(language)) {
-      setSelectedLanguages(selectedLanguages.filter(lang => lang !== language));
-    } else {
-      setSelectedLanguages([...selectedLanguages, language]);
-    }
-  };
-
-  const toggleTrait = (traitId: string) => {
-    if (selectedTraits.includes(traitId)) {
-      setSelectedTraits(selectedTraits.filter(id => id !== traitId));
-    } else {
-      setSelectedTraits([...selectedTraits, traitId]);
-    }
-  };
-
-  const handleCreateProfile = () => {
-    // Validate required fields
-    if (!name || !bio || !dateOfBirth) {
-      toast({
-        title: "Please complete your profile",
-        description: "Name, bio, and date of birth are required.",
-        variant: "destructive",
+  const mutation = useMutation({
+    mutationFn: async (data: any) => {
+      return await apiRequest("/api/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
       });
-      return;
-    }
-    
-    // Calculate age range from birth date for consistent age handling
-    const ageRange = getAgeRange(dateOfBirth);
-    
-    // Save profile data to localStorage
-    localStorage.setItem('splitstay_profile', JSON.stringify({
-      name,
-      bio,
-      age: ageRange,
-      dateOfBirth,
-      travelReason,
-      languages: selectedLanguages,
-      traits: selectedTraits,
-      profileImage,
-      interests: selectedInterests
-    }));
-    
-    // Track profile creation/update event in Google Analytics
-    trackProfileCreation();
-    
-    // Show success toast
-    toast({
-      title: isEditMode ? "Profile updated" : "Profile created",
-      description: isEditMode 
-        ? "Your profile has been updated successfully!" 
-        : "Your profile has been created successfully!",
-    });
-    
-    // Navigate based on mode and user path
-    if (isEditMode) {
-      navigate("/profile");
-    } else {
-      // Redirect based on user's selected path
+    },
+    onSuccess: () => {
+      toast({
+        title: "Profile created successfully!",
+        description: "Welcome to SplitStay!",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      
+      // Navigate based on user path
       if (userPath === "host") {
         navigate("/create-trip");
       } else if (userPath === "guest") {
         navigate("/browse-trips");
       } else {
-        // Fallback for existing users without path
         navigate("/find-roommate");
       }
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error creating profile",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleStep1Submit = (data: Step1Form) => {
+    setStep1Data(data);
+    setCurrentStep(2);
+  };
+
+  const handleStep2Submit = (data: Step2Form) => {
+    if (!step1Data) return;
+    
+    // Combine both steps data
+    const combinedData = {
+      ...step1Data,
+      ...data,
+      languages: selectedLanguages,
+      travelTraits: selectedTraits,
+      dateOfBirth: `${step1Data.yearOfBirth}-${step1Data.monthOfBirth.padStart(2, '0')}-${step1Data.dayOfBirth.padStart(2, '0')}`,
+    };
+    
+    mutation.mutate(combinedData);
+  };
+
+  const handleSkipStep2 = () => {
+    if (!step1Data) return;
+    
+    const combinedData = {
+      ...step1Data,
+      languages: ["English"], // Default language
+      travelTraits: [], // Empty traits
+      dateOfBirth: `${step1Data.yearOfBirth}-${step1Data.monthOfBirth.padStart(2, '0')}-${step1Data.dayOfBirth.padStart(2, '0')}`,
+    };
+    
+    mutation.mutate(combinedData);
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+      step1Form.setValue("profileImage", file);
     }
   };
 
-  const handleSkip = () => {
-    navigate("/find-roommate");
+  const handleLanguageToggle = (language: string) => {
+    setSelectedLanguages(prev => 
+      prev.includes(language) 
+        ? prev.filter(l => l !== language)
+        : [...prev, language]
+    );
   };
 
-  return (
-    <div className="flex flex-col min-h-screen p-5 bg-cream">
-      <div className="flex items-center justify-between mb-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-gray-500"
-          onClick={() => navigate(isEditMode ? "/profile" : "/")}
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <h1 className="text-2xl font-bold text-primary flex-1 text-center">
-          {isEditMode ? "Edit Your Profile" : "Complete Your Profile"}
-        </h1>
-      </div>
-      
-      <div className="flex flex-col gap-5">
-        {/* Left Column - Personal Info */}
-        <div className="bg-white rounded-lg p-5 flex flex-col gap-4">
-          {/* Profile Picture */}
-          <div className="flex flex-col items-center mb-2">
-            <p className="text-sm font-medium text-center mb-2">Add Profile Photo</p>
-            <label htmlFor="profile-upload" className="cursor-pointer">
-              <div 
-                className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-3 relative overflow-hidden hover:opacity-90 transition-opacity border-2 border-dashed border-navy"
-              >
-                {profileImage ? (
-                  <img 
-                    src={profileImage} 
-                    alt="Profile" 
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="flex flex-col items-center justify-center">
-                    <Plus className="w-8 h-8 text-navy" />
-                    <span className="text-xs text-navy font-medium">Upload</span>
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                  <span className="text-white text-xs font-medium">Change photo</span>
-                </div>
-              </div>
-            </label>
-            <input 
-              type="file" 
-              id="profile-upload" 
-              className="hidden" 
-              accept="image/*"
-              onChange={handleImageUpload}
-            />
+  const handleAddCustomLanguage = () => {
+    if (customLanguage.trim() && !selectedLanguages.includes(customLanguage.trim())) {
+      setSelectedLanguages(prev => [...prev, customLanguage.trim()]);
+      setCustomLanguage("");
+    }
+  };
+
+  const handleTraitToggle = (trait: string) => {
+    if (selectedTraits.includes(trait)) {
+      setSelectedTraits(prev => prev.filter(t => t !== trait));
+    } else if (selectedTraits.length < 5) {
+      setSelectedTraits(prev => [...prev, trait]);
+    }
+  };
+
+  const languageOptions = [
+    "English", "Spanish", "French", "German", "Italian", "Portuguese", 
+    "Dutch", "Japanese", "Korean", "Chinese", "Arabic", "Russian", "Hindi"
+  ];
+
+  const traitOptions = [
+    "Early Bird", "Night Owl", "Adventurous", "Relaxed", "Social", "Quiet", 
+    "Foodie", "Fitness Enthusiast", "Culture Lover", "Nature Lover", 
+    "Tech Savvy", "Minimalist", "Photographer", "Music Lover", "Budget Traveler",
+    "Luxury Traveler", "Backpacker", "City Explorer", "Beach Lover", "Mountain Hiker"
+  ];
+
+  // Generate day options (1-31)
+  const dayOptions = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
+  
+  // Generate month options
+  const monthOptions = [
+    { value: "1", label: "January" },
+    { value: "2", label: "February" },
+    { value: "3", label: "March" },
+    { value: "4", label: "April" },
+    { value: "5", label: "May" },
+    { value: "6", label: "June" },
+    { value: "7", label: "July" },
+    { value: "8", label: "August" },
+    { value: "9", label: "September" },
+    { value: "10", label: "October" },
+    { value: "11", label: "November" },
+    { value: "12", label: "December" },
+  ];
+  
+  // Generate year options (current year - 100 to current year - 18)
+  const currentYear = new Date().getFullYear();
+  const yearOptions = Array.from({ length: 82 }, (_, i) => (currentYear - 18 - i).toString());
+
+  // Check if step 1 form is valid for enabling Next button
+  const isStep1Valid = step1Form.watch("fullName") && 
+                      step1Form.watch("dayOfBirth") && 
+                      step1Form.watch("monthOfBirth") && 
+                      step1Form.watch("yearOfBirth") &&
+                      profileImagePreview; // Profile image is required
+
+  if (currentStep === 1) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-4">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-navy mb-2">
+              Build your traveler profile
+            </h1>
+            <p className="text-gray-600">
+              Let's start with the basics
+            </p>
           </div>
 
-
-
-          {/* Name */}
-          <div>
-            <label className="block text-navy font-medium mb-1">What should we call you?</label>
-            <Input 
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Jane"
-              className="w-full border-gray-300"
-            />
-          </div>
-
-          {/* Bio */}
-          <div>
-            <label className="block text-navy font-medium mb-1">What makes you feel alive?</label>
-            <Textarea 
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              placeholder="Love hiking, exploring, and catching sunrises"
-              className="w-full border-gray-300 min-h-[200px]"
-            />
-          </div>
-
-          {/* Date of Birth - Improved with separate select fields */}
-          <div>
-            <label className="block text-navy font-medium mb-1">Date of Birth</label>
-            <div className="flex gap-2">
-              {/* Day Select */}
-              <select
-                value={dateOfBirth ? dateOfBirth.getDate().toString() : "placeholder"}
-                onChange={(e) => {
-                  if (e.target.value === "placeholder") {
-                    // Reset date of birth to undefined for recording purposes
-                    setDateOfBirth(undefined);
-                    return;
-                  }
-                  const day = parseInt(e.target.value);
-                  const newDate = dateOfBirth ? new Date(dateOfBirth) : new Date();
-                  newDate.setDate(day);
-                  setDateOfBirth(newDate);
-                }}
-                className="px-3 py-2 rounded-md border border-gray-300 flex-1"
-                aria-label="Day"
-              >
-                <option value="placeholder">Day</option>
-                {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
-                  <option key={`day-${day}`} value={day}>{day}</option>
-                ))}
-              </select>
-              
-              {/* Month Select */}
-              <select
-                value={dateOfBirth ? dateOfBirth.getMonth().toString() : "placeholder"}
-                onChange={(e) => {
-                  if (e.target.value === "placeholder") {
-                    // Reset date of birth to undefined for recording purposes
-                    setDateOfBirth(undefined);
-                    return;
-                  }
-                  const month = parseInt(e.target.value);
-                  const newDate = dateOfBirth ? new Date(dateOfBirth) : new Date();
-                  newDate.setMonth(month);
-                  setDateOfBirth(newDate);
-                }}
-                className="px-3 py-2 rounded-md border border-gray-300 flex-1"
-                aria-label="Month"
-              >
-                <option value="placeholder">Month</option>
-                {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map((month, index) => (
-                  <option key={`month-${month}`} value={index}>{month}</option>
-                ))}
-              </select>
-              
-              {/* Year Select */}
-              <select
-                value={dateOfBirth ? dateOfBirth.getFullYear().toString() : "placeholder"}
-                onChange={(e) => {
-                  if (e.target.value === "placeholder") {
-                    // Reset date of birth to undefined for recording purposes
-                    setDateOfBirth(undefined);
-                    return;
-                  }
-                  const year = parseInt(e.target.value);
-                  const newDate = dateOfBirth ? new Date(dateOfBirth) : new Date();
-                  newDate.setFullYear(year);
-                  setDateOfBirth(newDate);
-                }}
-                className="px-3 py-2 rounded-md border border-gray-300 flex-1"
-                aria-label="Year"
-              >
-                <option value="placeholder">Year</option>
-                {Array.from({ length: 80 }, (_, i) => new Date().getFullYear() - i).map(year => (
-                  <option key={`year-${year}`} value={year}>{year}</option>
-                ))}
-              </select>
-            </div>
-            <p className="text-xs text-gray-500 mt-1">Must be at least 18 years old</p>
-          </div>
-
-          {/* Travel Reason */}
-          <div>
-            <label className="block text-navy font-medium mb-1">Reason for Travel</label>
-            <div className="flex w-full rounded-md overflow-hidden">
-              <Button 
-                type="button"
-                className={`flex-1 rounded-none hover:bg-accent hover:text-accent-foreground hover:border-accent ${travelReason === 'leisure' 
-                  ? 'bg-yellow-100 text-gray-800 border border-yellow-300' 
-                  : 'bg-white text-navy border border-gray-300'}`}
-                onClick={() => setTravelReason('leisure')}
-              >
-                Leisure
-              </Button>
-              <Button 
-                type="button"
-                className={`flex-1 rounded-none hover:bg-accent hover:text-accent-foreground hover:border-accent ${travelReason === 'business' 
-                  ? 'bg-yellow-100 text-gray-800 border border-yellow-300' 
-                  : 'bg-white text-navy border border-gray-300'}`}
-                onClick={() => setTravelReason('business')}
-              >
-                Business
-              </Button>
-            </div>
-          </div>
-
-          {/* Languages */}
-          <div>
-            <div className="flex justify-between items-center mb-1">
-              <label className="block text-navy font-medium">Languages</label>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button size="sm" variant="outline" className="h-8 px-2" onClick={() => {
-                    // Initialize temporary selected languages with current selections when opening the dialog
-                    setTempSelectedLanguages([...selectedLanguages]);
-                    setLanguageSearch("");
-                  }}>
-                    <Plus className="h-4 w-4 mr-1" />
-                    Add
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Add Languages</DialogTitle>
-                    <DialogDescription>
-                      Search and select languages you speak. Click Confirm when done.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="relative mb-4">
-                    <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input 
-                      className="pl-10" 
-                      placeholder="Search languages" 
-                      value={languageSearch}
-                      onChange={(e) => setLanguageSearch(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex flex-wrap gap-2 max-h-60 overflow-y-auto mb-4">
-                    {allLanguages
-                      .filter(lang => 
-                        lang.toLowerCase().includes(languageSearch.toLowerCase()) &&
-                        !tempSelectedLanguages.includes(lang)
-                      )
-                      .map((lang) => (
-                        <Button 
-                          key={lang} 
-                          variant="outline" 
-                          className="py-1 px-3"
+          <Card className="shadow-lg border-0 bg-white">
+            <CardHeader>
+              <CardTitle className="text-xl text-navy">Step 1 of 2</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={step1Form.handleSubmit(handleStep1Submit)} className="space-y-6">
+                {/* Profile Photo Upload */}
+                <div className="text-center">
+                  <Label className="text-base font-medium text-gray-700 mb-3 block">
+                    Profile Photo <span className="text-red-500">*</span>
+                  </Label>
+                  <div className="flex flex-col items-center">
+                    {profileImagePreview ? (
+                      <div className="relative">
+                        <img
+                          src={profileImagePreview}
+                          alt="Profile preview"
+                          className="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
+                        />
+                        <button
+                          type="button"
                           onClick={() => {
-                            if (!tempSelectedLanguages.includes(lang)) {
-                              setTempSelectedLanguages([...tempSelectedLanguages, lang]);
-                              setLanguageSearch(""); // Clear search after selection
-                            }
+                            setProfileImagePreview(null);
+                            step1Form.setValue("profileImage", undefined);
                           }}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors"
                         >
-                          {lang}
-                        </Button>
-                      ))
-                    }
-                  </div>
-                  
-                  {tempSelectedLanguages.length > 0 && (
-                    <div className="border-t pt-3 mb-3">
-                      <p className="text-sm font-medium mb-2">Selected languages:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {tempSelectedLanguages.map(lang => (
-                          <Badge 
-                            key={lang}
-                            className="bg-yellow-100 text-gray-800 border border-yellow-300 px-2 py-1"
-                          >
-                            {lang}
-                            <button 
-                              className="ml-1 text-gray-500 hover:text-gray-800"
-                              onClick={() => setTempSelectedLanguages(
-                                tempSelectedLanguages.filter(l => l !== lang)
-                              )}
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  
-                  <DialogFooter className="flex justify-between sm:justify-end gap-2">
-                    <DialogClose asChild>
-                      <Button variant="outline" className="flex-1 sm:flex-none">Cancel</Button>
-                    </DialogClose>
-                    <DialogClose asChild>
-                      <Button
-                        type="button"
-                        style={{
-                          backgroundColor: "#001F3F", 
-                          color: "white",
-                          flex: "1 1 auto"
-                        }}
-                        onClick={() => {
-                          // Apply the temporary selections to the actual selections
-                          setSelectedLanguages(tempSelectedLanguages);
-                          
-                          // Show success notification
-                          toast({
-                            title: "Languages updated",
-                            description: `${tempSelectedLanguages.length} languages selected`,
-                          });
-                        }}
-                      >
-                        Confirm Selection
-                      </Button>
-                    </DialogClose>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {/* Show only unselected language options */}
-              {languages
-                .filter(language => !selectedLanguages.includes(language))
-                .map((language) => {
-                  return (
-                    <button
-                      key={language}
-                      type="button"
-                      className="py-2 px-4 rounded-full text-sm bg-white border border-gray-300 text-gray-700 hover:border-yellow-300 transition-colors"
-                      onClick={() => toggleLanguage(language)}
-                    >
-                      {language}
-                    </button>
-                  );
-                })}
-            </div>
-            
-            {/* Selected Languages Display */}
-            {selectedLanguages.length > 0 && (
-              <div className="border-t pt-4">
-                <p className="text-sm font-medium text-gray-700 mb-3">Selected languages:</p>
-                <div className="flex flex-wrap gap-2">
-                  {selectedLanguages.map(language => (
-                    <div
-                      key={language}
-                      className="bg-yellow-100 text-gray-800 border border-yellow-300 px-3 py-1 rounded-full text-sm flex items-center gap-1"
-                    >
-                      {language}
-                      <button 
-                        className="ml-1 text-gray-500 hover:text-gray-800 font-medium"
-                        onClick={() => toggleLanguage(language)}
-                        title="Remove language"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Right Column - Traits */}
-        <div className="flex flex-col gap-5">
-          {/* Travel Traits */}
-          <div className="bg-white rounded-lg p-5">
-            <div className="flex justify-between items-center mb-3">
-              <h3 className="text-xl font-medium text-navy">Travel Traits</h3>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button size="sm" variant="outline" className="h-8 px-2"
-                    onClick={() => {
-                      // Initialize temp selection with current selection
-                      setTempSelectedTraits([...selectedTraits]);
-                    }}
-                  >
-                    <Plus className="h-4 w-4 mr-1" />
-                    Add
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Add Travel Traits</DialogTitle>
-                  </DialogHeader>
-                  <div className="relative mb-4">
-                    <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input 
-                      className="pl-10" 
-                      placeholder="Search traits" 
-                      value={traitSearch}
-                      onChange={(e) => setTraitSearch(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex flex-wrap gap-2 max-h-60 overflow-y-auto mb-4">
-                    {allTravelTraits
-                      .filter(trait => 
-                        trait.label.toLowerCase().includes(traitSearch.toLowerCase()) &&
-                        !tempSelectedTraits.includes(trait.id)
-                      )
-                      .map((trait) => (
-                        <Button 
-                          key={trait.id} 
-                          variant="outline" 
-                          className="py-1 px-3"
-                          onClick={() => {
-                            if (!tempSelectedTraits.includes(trait.id)) {
-                              setTempSelectedTraits([...tempSelectedTraits, trait.id]);
-                              setTraitSearch(""); // Clear search after selection
-                            }
-                          }}
-                        >
-                          {trait.label}
-                        </Button>
-                      ))
-                    }
-                  </div>
-                  
-                  {tempSelectedTraits.length > 0 && (
-                    <div className="border-t pt-3 mb-3">
-                      <p className="text-sm font-medium mb-2">Selected traits:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {tempSelectedTraits.map(traitId => {
-                          const trait = allTravelTraits.find(t => t.id === traitId);
-                          return trait ? (
-                            <Badge 
-                              key={trait.id}
-                              className="bg-yellow-100 text-gray-800 border border-yellow-300 px-2 py-1"
-                            >
-                              {trait.label}
-                              <button 
-                                className="ml-1 text-gray-500 hover:text-gray-800"
-                                onClick={() => setTempSelectedTraits(
-                                  tempSelectedTraits.filter(id => id !== trait.id)
-                                )}
-                              >
-                                ×
-                              </button>
-                            </Badge>
-                          ) : null;
-                        })}
-                      </div>
-                    </div>
-                  )}
-                  
-                  <DialogFooter className="flex justify-between sm:justify-end gap-2">
-                    <DialogClose asChild>
-                      <Button variant="outline" className="flex-1 sm:flex-none">Cancel</Button>
-                    </DialogClose>
-                    <DialogClose asChild>
-                      <Button
-                        type="button"
-                        style={{
-                          backgroundColor: "#001F3F", 
-                          color: "white",
-                          flex: "1 1 auto"
-                        }}
-                        onClick={() => {
-                          // Apply the temporary selections to the actual selections
-                          setSelectedTraits(tempSelectedTraits);
-                          
-                          // Show success notification
-                          toast({
-                            title: "Travel traits updated",
-                            description: `${tempSelectedTraits.length} traits selected`,
-                          });
-                        }}
-                      >
-                        Confirm Selection
-                      </Button>
-                    </DialogClose>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
-            {/* Common quick-select trait options */}
-            <div className="flex flex-wrap gap-2 mb-4">
-              {/* Show only unselected travel traits as options to add */}
-              {["Early Bird", "Night Owl", "Adventurous", "Relaxed", "Foodie", "Budget-conscious", "Clean", "Social", "Quiet", "Nature Lover"]
-                .filter((label) => {
-                  const trait = allTravelTraits.find(t => t.label === label);
-                  const traitId = trait ? trait.id : label.toLowerCase().replace(/\s+/g, '_');
-                  return !selectedTraits.includes(traitId);
-                })
-                .map((label) => {
-                  const trait = allTravelTraits.find(t => t.label === label);
-                  const traitId = trait ? trait.id : label.toLowerCase().replace(/\s+/g, '_');
-                  
-                  return (
-                    <button
-                      key={traitId}
-                      type="button"
-                      className="py-2 px-4 rounded-full text-sm bg-white border border-gray-300 text-gray-700 hover:border-yellow-300 transition-colors"
-                      onClick={() => toggleTrait(traitId)}
-                    >
-                      {label}
-                    </button>
-                  );
-                })}
-            </div>
-            
-            {/* Selected Traits Display */}
-            {selectedTraits.length > 0 && (
-              <div className="border-t pt-4">
-                <p className="text-sm font-medium text-gray-700 mb-3">Selected traits:</p>
-                <div className="flex flex-wrap gap-2">
-                  {selectedTraits.map(traitId => {
-                    const trait = allTravelTraits.find(t => t.id === traitId);
-                    const label = trait ? trait.label : traitId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                    
-                    return (
-                      <div
-                        key={traitId}
-                        className="bg-yellow-100 text-gray-800 border border-yellow-300 px-3 py-1 rounded-full text-sm flex items-center gap-1"
-                      >
-                        {label}
-                        <button 
-                          className="ml-1 text-gray-500 hover:text-gray-800 font-medium"
-                          onClick={() => toggleTrait(traitId)}
-                          title="Remove trait"
-                        >
-                          ×
+                          <X className="w-4 h-4" />
                         </button>
                       </div>
-                    );
-                  })}
+                    ) : (
+                      <div className="w-32 h-32 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center">
+                        <Upload className="w-8 h-8 text-gray-400" />
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      id="profile-image-upload"
+                    />
+                    <Label
+                      htmlFor="profile-image-upload"
+                      className="mt-4 bg-navy text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-navy/90 transition-colors"
+                    >
+                      {profileImagePreview ? "Change Photo" : "Upload Photo"}
+                    </Label>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-          
-          {/* ID Verification Section - Moved below travel traits */}
-          <div className="bg-white rounded-lg p-5 mt-5">
-            <div className="flex items-center mb-2">
-              <ShieldCheck className="h-5 w-5 text-green-600 mr-2" />
-              <h3 className="text-lg font-semibold text-navy">ID Verification</h3>
-            </div>
-            <p className="text-sm text-gray-700 mb-3">
-              To host or be hosted, SplitStay requires a one-time ID verification.
-              Your info is encrypted and never shared.
-            </p>
-            <div className="flex flex-col space-y-3">
-              <div className="flex items-center text-sm">
-                <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
-                <span>Email verified</span>
-              </div>
-              <div className="flex items-center text-sm">
-                <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
-                <span>Phone verified</span>
-              </div>
-              <div className="flex items-center text-sm">
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <span className="inline-block">
-                      <Button 
-                        variant="outline" 
-                        className="text-sm py-1 h-auto border-primary text-primary hover:bg-primary hover:text-white"
-                        size="sm"
-                      >
-                        <CreditCard className="h-3 w-3 mr-1" />
-                        Verify ID Document
-                      </Button>
-                    </span>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>Verify Your Identity</DialogTitle>
-                      <DialogDescription>
-                        This helps build trust in the SplitStay community. Your ID is never shared with other users.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4 py-2">
-                      <div className="flex items-center justify-center p-4 border-2 border-dashed rounded-lg border-gray-300">
-                        <div className="text-center">
-                          <CreditCard className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                          <p className="text-sm font-medium">Upload a government ID</p>
-                          <p className="text-xs text-gray-500 mt-1">Passport, driver's license, or national ID card</p>
-                          <Button size="sm" className="mt-3 bg-primary text-white">Select File</Button>
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Verification Steps:</label>
-                        <div className="flex items-center text-sm mb-1">
-                          <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
-                          <span>Upload your ID document</span>
-                        </div>
-                        <div className="flex items-center text-sm mb-1">
-                          <div className="h-4 w-4 rounded-full border border-gray-300 mr-2" />
-                          <span className="text-gray-600">Take a selfie to confirm it's you</span>
-                        </div>
-                        <div className="flex items-center text-sm">
-                          <div className="h-4 w-4 rounded-full border border-gray-300 mr-2" />
-                          <span className="text-gray-600">Wait for verification (typically 24 hours)</span>
-                        </div>
-                      </div>
+
+                {/* Name */}
+                <div>
+                  <Label htmlFor="fullName" className="text-base font-medium text-gray-700">
+                    Name <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="fullName"
+                    {...step1Form.register("fullName")}
+                    placeholder="Enter your full name"
+                    className="mt-2 h-12 text-base"
+                  />
+                  {step1Form.formState.errors.fullName && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {step1Form.formState.errors.fullName.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* What makes you feel alive */}
+                <div>
+                  <Label htmlFor="bio" className="text-base font-medium text-gray-700">
+                    What makes you feel alive? <span className="text-gray-400">(optional)</span>
+                  </Label>
+                  <Textarea
+                    id="bio"
+                    {...step1Form.register("bio")}
+                    placeholder="Share what excites you about travel..."
+                    rows={3}
+                    className="mt-2 text-base"
+                  />
+                </div>
+
+                {/* Date of Birth */}
+                <div>
+                  <Label className="text-base font-medium text-gray-700 mb-3 block">
+                    Date of Birth <span className="text-red-500">*</span>
+                  </Label>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <Label htmlFor="dayOfBirth" className="text-sm text-gray-600">Day</Label>
+                      <Select onValueChange={(value) => step1Form.setValue("dayOfBirth", value)}>
+                        <SelectTrigger className="mt-1 h-12">
+                          <SelectValue placeholder="Day" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {dayOptions.map((day) => (
+                            <SelectItem key={day} value={day}>{day}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <DialogFooter>
-                      <Button variant="outline" className="w-full sm:w-auto">Cancel</Button>
-                      <Button className="w-full sm:w-auto bg-primary text-white">
-                        Continue Verification
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-                <span className="ml-2 text-xs text-gray-500">Required for safety</span>
-              </div>
-            </div>
-          </div>
+                    <div>
+                      <Label htmlFor="monthOfBirth" className="text-sm text-gray-600">Month</Label>
+                      <Select onValueChange={(value) => step1Form.setValue("monthOfBirth", value)}>
+                        <SelectTrigger className="mt-1 h-12">
+                          <SelectValue placeholder="Month" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {monthOptions.map((month) => (
+                            <SelectItem key={month.value} value={month.value}>{month.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="yearOfBirth" className="text-sm text-gray-600">Year</Label>
+                      <Select onValueChange={(value) => step1Form.setValue("yearOfBirth", value)}>
+                        <SelectTrigger className="mt-1 h-12">
+                          <SelectValue placeholder="Year" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {yearOptions.map((year) => (
+                            <SelectItem key={year} value={year}>{year}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  {step1Form.formState.errors.dayOfBirth && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {step1Form.formState.errors.dayOfBirth.message}
+                    </p>
+                  )}
+                  {step1Form.formState.errors.monthOfBirth && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {step1Form.formState.errors.monthOfBirth.message}
+                    </p>
+                  )}
+                  {step1Form.formState.errors.yearOfBirth && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {step1Form.formState.errors.yearOfBirth.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Reason for Travel */}
+                <div>
+                  <Label className="text-base font-medium text-gray-700 mb-3 block">
+                    Reason for travel
+                  </Label>
+                  <RadioGroup 
+                    value={step1Form.watch("travelReason")} 
+                    onValueChange={(value) => step1Form.setValue("travelReason", value as "leisure" | "business")}
+                    className="grid grid-cols-2 gap-4"
+                  >
+                    <div className="flex items-center space-x-2 p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                      <RadioGroupItem value="leisure" id="leisure" />
+                      <Label htmlFor="leisure" className="font-medium cursor-pointer">Leisure</Label>
+                    </div>
+                    <div className="flex items-center space-x-2 p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                      <RadioGroupItem value="business" id="business" />
+                      <Label htmlFor="business" className="font-medium cursor-pointer">Business</Label>
+                    </div>
+                  </RadioGroup>
+                  {step1Form.formState.errors.travelReason && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {step1Form.formState.errors.travelReason.message}
+                    </p>
+                  )}
+                </div>
+
+                <Button 
+                  type="submit"
+                  disabled={!isStep1Valid}
+                  className={`w-full py-6 text-lg font-semibold transition-all duration-300 ${
+                    isStep1Valid
+                      ? "bg-navy text-white hover:bg-navy/90"
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  }`}
+                >
+                  Next
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
         </div>
       </div>
-      
-      {/* Bottom Buttons */}
-      <div className="grid grid-cols-2 gap-4 mt-8">
-        <Button 
-          variant="outline"
-          className="py-4 text-lg border-navy text-navy"
-          onClick={() => navigate(isEditMode ? "/profile" : "/")}
-        >
-          {isEditMode ? "Cancel" : "Skip for Now"}
-        </Button>
-        <Button 
-          type="button"
-          style={{
-            backgroundColor: "#001F3F", 
-            color: "white",
-            padding: "1rem 1.5rem",
-            fontSize: "1.125rem",
-            fontWeight: "500"
-          }}
-          onClick={handleCreateProfile}
-        >
-          {isEditMode ? "Save Changes" : "Continue"}
-        </Button>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-4">
+      <div className="max-w-2xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-navy mb-2">
+            Tell us how you travel
+          </h1>
+          <p className="text-gray-600">
+            Help us match you with compatible travelers
+          </p>
+        </div>
+
+        <Card className="shadow-lg border-0 bg-white">
+          <CardHeader>
+            <CardTitle className="text-xl text-navy">Step 2 of 2</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={step2Form.handleSubmit(handleStep2Submit)} className="space-y-6">
+              {/* Languages */}
+              <div>
+                <Label className="text-base font-medium text-gray-700 mb-3 block">
+                  Languages you speak
+                </Label>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {languageOptions.map((language) => (
+                    <Badge
+                      key={language}
+                      variant={selectedLanguages.includes(language) ? "default" : "outline"}
+                      className={`cursor-pointer px-3 py-1 transition-colors ${
+                        selectedLanguages.includes(language)
+                          ? "bg-navy text-white hover:bg-navy/90"
+                          : "hover:bg-gray-100"
+                      }`}
+                      onClick={() => handleLanguageToggle(language)}
+                    >
+                      {language}
+                    </Badge>
+                  ))}
+                </div>
+                
+                {/* Custom Language Input */}
+                <div className="flex gap-2">
+                  <Input
+                    value={customLanguage}
+                    onChange={(e) => setCustomLanguage(e.target.value)}
+                    placeholder="Add another language"
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    onClick={handleAddCustomLanguage}
+                    variant="outline"
+                    size="sm"
+                    className="px-3"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+                
+                {/* Selected Languages */}
+                {selectedLanguages.length > 0 && (
+                  <div className="mt-3">
+                    <p className="text-sm text-gray-600 mb-2">Selected languages:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {selectedLanguages.map((language) => (
+                        <Badge
+                          key={language}
+                          variant="secondary"
+                          className="pr-1"
+                        >
+                          {language}
+                          <button
+                            type="button"
+                            onClick={() => handleLanguageToggle(language)}
+                            className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Travel Traits */}
+              <div>
+                <Label className="text-base font-medium text-gray-700 mb-3 block">
+                  Travel traits (select up to 5)
+                </Label>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {traitOptions.map((trait) => (
+                    <Badge
+                      key={trait}
+                      variant={selectedTraits.includes(trait) ? "default" : "outline"}
+                      className={`cursor-pointer px-3 py-1 transition-colors ${
+                        selectedTraits.includes(trait)
+                          ? "bg-navy text-white hover:bg-navy/90"
+                          : selectedTraits.length >= 5
+                          ? "opacity-50 cursor-not-allowed"
+                          : "hover:bg-gray-100"
+                      }`}
+                      onClick={() => handleTraitToggle(trait)}
+                    >
+                      {trait}
+                    </Badge>
+                  ))}
+                </div>
+                
+                {/* Selected Traits */}
+                {selectedTraits.length > 0 && (
+                  <div className="mt-3">
+                    <p className="text-sm text-gray-600 mb-2">Selected traits ({selectedTraits.length}/5):</p>
+                    <div className="flex flex-wrap gap-1">
+                      {selectedTraits.map((trait) => (
+                        <Badge
+                          key={trait}
+                          variant="secondary"
+                          className="pr-1"
+                        >
+                          {trait}
+                          <button
+                            type="button"
+                            onClick={() => handleTraitToggle(trait)}
+                            className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Buttons */}
+              <div className="flex flex-col gap-3 pt-4">
+                <Button 
+                  type="submit"
+                  className="w-full bg-navy text-white hover:bg-navy/90 py-6 text-lg font-semibold"
+                  disabled={mutation.isPending}
+                >
+                  {mutation.isPending ? "Creating Profile..." : "Create My Profile"}
+                </Button>
+                
+                <Button 
+                  type="button"
+                  variant="outline"
+                  onClick={handleSkipStep2}
+                  className="w-full py-6 text-lg font-semibold"
+                  disabled={mutation.isPending}
+                >
+                  Skip for Now
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
-};
-
-export default CreateProfile;
+}
