@@ -9,74 +9,90 @@ const Home: React.FC = () => {
   const [_, navigate] = useLocation();
 
   return (
-    <div className="p-6 flex flex-col items-center">
-      {/* Logo section with proper spacing */}
-      <div className="flex flex-col items-center mb-10 pt-4">
-        <img 
-          src={logoImage} 
-          alt="SplitStay Logo" 
-          className="h-28 w-auto mb-4"
-        />
-        <h1 className="text-3xl font-bold text-primary text-center mb-4">SplitStay</h1>
-        <p className="text-center text-gray-700 mt-2 font-medium text-lg">
-          Find compatible roommates.<br />
-          Split hotel costs.<br />
-          Make new friends.
-        </p>
-      </div>
-      
-      <h2 className="text-2xl font-semibold text-primary text-center mb-6">Ready to find your perfect roommate?</h2>
-      
-      {/* Action buttons */}
-      <div className="w-full space-y-4">
-        <Button
-          className="navy-button flex justify-center items-center"
-          onClick={() => navigate("/signup")}
-        >
-          <UserPlus className="mr-3 h-5 w-5" />
-          <span>Create Profile</span>
-        </Button>
-        
-        <div className="text-center">
-          <p className="text-gray-600">
-            Already have an account?{" "}
-            <Button 
-              variant="link" 
-              className="text-navy p-0 h-auto font-semibold"
-              onClick={() => navigate("/login")}
-            >
-              Log In
-            </Button>
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-cream to-white">
+      {/* Desktop: Two-column layout, Mobile: Single column */}
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          
+          {/* Left Column - Hero Content */}
+          <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
+            {/* Logo section */}
+            <div className="mb-8">
+              <img 
+                src={logoImage} 
+                alt="SplitStay Logo" 
+                className="h-32 lg:h-40 w-auto mb-6 mx-auto lg:mx-0"
+              />
+              <h1 className="text-4xl lg:text-5xl font-bold text-primary mb-6">SplitStay</h1>
+              <p className="text-xl lg:text-2xl text-gray-700 font-medium leading-relaxed">
+                Find compatible roommates.<br />
+                Split hotel costs.<br />
+                Make new friends.
+              </p>
+            </div>
+            
+            <h2 className="text-2xl lg:text-3xl font-semibold text-primary mb-8">
+              Ready to find your perfect roommate?
+            </h2>
+            
+            {/* Action buttons */}
+            <div className="w-full max-w-md space-y-4">
+              <Button
+                className="navy-button flex justify-center items-center w-full text-lg py-6"
+                onClick={() => navigate("/signup")}
+              >
+                <UserPlus className="mr-3 h-6 w-6" />
+                <span>Create Profile</span>
+              </Button>
+              
+              <div className="text-center">
+                <p className="text-gray-600 text-lg">
+                  Already have an account?{" "}
+                  <Button 
+                    variant="link" 
+                    className="text-navy p-0 h-auto font-semibold text-lg"
+                    onClick={() => navigate("/login")}
+                  >
+                    Log In
+                  </Button>
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Right Column - Features */}
+          <div className="lg:pl-8">
+            <h3 className="text-2xl lg:text-3xl font-semibold text-primary mb-8 text-center lg:text-left">
+              Why travelers choose SplitStay:
+            </h3>
+            <div className="space-y-6">
+              <div className="flex items-start bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <CheckCircle className="text-green-500 mt-1 mr-4 h-6 w-6 flex-shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-lg mb-2">Verified Safety</h4>
+                  <p className="text-gray-600">All users are ID verified with a secure review system</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <CheckCircle className="text-green-500 mt-1 mr-4 h-6 w-6 flex-shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-lg mb-2">Smart Matching</h4>
+                  <p className="text-gray-600">Find roommates based on travel style and preferences</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <CheckCircle className="text-green-500 mt-1 mr-4 h-6 w-6 flex-shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-lg mb-2">Save 50% on Accommodation</h4>
+                  <p className="text-gray-600">Split costs with a compatible roommate, no hidden fees</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
         </div>
-      </div>
-      
-      {/* Features */}
-      <div className="mt-10 w-full">
-        <h3 className="text-lg font-medium text-primary mb-4">Why travelers choose SplitStay:</h3>
-        <ul className="space-y-4">
-          <li className="flex items-start bg-gray-50 p-3 rounded-lg">
-            <CheckCircle className="text-green-500 mt-1 mr-3 h-5 w-5 flex-shrink-0" />
-            <div>
-              <span className="font-medium">Verified Safety</span>
-              <p className="text-sm text-gray-600 mt-1">All users are ID verified with a secure review system</p>
-            </div>
-          </li>
-          <li className="flex items-start bg-gray-50 p-3 rounded-lg">
-            <CheckCircle className="text-green-500 mt-1 mr-3 h-5 w-5 flex-shrink-0" />
-            <div>
-              <span className="font-medium">Smart Matching</span>
-              <p className="text-sm text-gray-600 mt-1">Find roommates based on travel style and preferences</p>
-            </div>
-          </li>
-          <li className="flex items-start bg-gray-50 p-3 rounded-lg">
-            <CheckCircle className="text-green-500 mt-1 mr-3 h-5 w-5 flex-shrink-0" />
-            <div>
-              <span className="font-medium">Save 50% on Accommodation</span>
-              <p className="text-sm text-gray-600 mt-1">Split costs with a compatible roommate, no hidden fees</p>
-            </div>
-          </li>
-        </ul>
       </div>
     </div>
   );

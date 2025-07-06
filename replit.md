@@ -1,0 +1,86 @@
+# SplitStay - Travel Roommate Matching Application
+
+## Overview
+
+SplitStay is a full-stack web application that helps solo travelers find compatible roommates to share hotel accommodations and reduce costs. The application is built as a mobile-first progressive web app that connects verified travelers, facilitates cost splitting, and enables social connections during travel.
+
+## System Architecture
+
+The application follows a modern full-stack architecture:
+
+- **Frontend**: React with TypeScript, using Vite for development and building
+- **Backend**: Node.js with Express server
+- **Database**: PostgreSQL with Drizzle ORM for type-safe database operations
+- **Styling**: Tailwind CSS with shadcn/ui components for consistent design
+- **State Management**: TanStack Query for server state and React hooks for local state
+- **Authentication**: Session-based authentication with secure cookie handling
+
+## Key Components
+
+### Frontend Architecture
+- **React Router**: Using Wouter for lightweight client-side routing
+- **Component Library**: shadcn/ui components built on Radix UI primitives
+- **Form Handling**: React Hook Form with Zod validation
+- **Mobile-First Design**: Responsive design optimized for mobile devices with desktop fallback
+
+### Backend Architecture
+- **Express Server**: RESTful API endpoints with middleware for logging and error handling
+- **Database Layer**: Drizzle ORM with PostgreSQL for type-safe database operations
+- **Session Management**: Express sessions with PostgreSQL session store
+- **File Handling**: Static file serving for profile images and assets
+
+### Database Schema
+- **Users**: Profile information, verification status, preferences, and emergency contacts
+- **Hotels**: Accommodation details and amenities
+- **Bookings**: Reservation information with dynamic pricing
+- **Booking Participants**: Many-to-many relationship between users and bookings
+- **Messages**: Chat functionality between matched users
+- **Reviews**: Post-stay rating and feedback system
+- **Research Data**: User behavior tracking and feedback collection
+
+### Authentication & Security
+- **Verification System**: Multi-level verification including ID, phone, email, and social media
+- **Emergency Contacts**: Safety feature requiring emergency contact information
+- **Session Security**: Secure session cookies with proper expiration handling
+
+## Data Flow
+
+1. **User Registration**: Users create profiles with personal information and travel preferences
+2. **Roommate Search**: Location-based search with date filtering and preference matching
+3. **Profile Browsing**: Filtered results with detailed profile cards and compatibility indicators
+4. **Booking Request**: Users can request to book shared accommodations with matched roommates
+5. **Communication**: Built-in messaging system for coordinating travel plans
+6. **Stay Management**: Check-in flow, guest information, and real-time communication with hotel
+7. **Post-Stay**: Review system for rating roommates and providing feedback
+
+## External Dependencies
+
+### Core Dependencies
+- **Database**: PostgreSQL via Neon serverless
+- **UI Components**: Radix UI primitives with shadcn/ui styling
+- **Validation**: Zod for runtime type checking and form validation
+- **Date Handling**: date-fns for consistent date formatting and calculations
+- **Analytics**: Google Analytics for user behavior tracking
+
+### Development Dependencies
+- **Build Tools**: Vite for fast development and optimized production builds
+- **TypeScript**: Full type safety across frontend and backend
+- **ESBuild**: Fast bundling for server-side code
+
+## Deployment Strategy
+
+The application is configured for deployment on Replit with autoscaling:
+
+- **Development**: `npm run dev` starts both frontend and backend in watch mode
+- **Production Build**: `npm run build` creates optimized client bundle and server build
+- **Production Start**: `npm run start` runs the production server
+- **Database**: PostgreSQL module provisioned automatically on Replit
+- **Port Configuration**: Server runs on port 5000, mapped to external port 80
+
+## Changelog
+
+- June 18, 2025. Initial setup
+
+## User Preferences
+
+Preferred communication style: Simple, everyday language.
