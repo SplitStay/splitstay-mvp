@@ -123,8 +123,14 @@ function CreateProfile() {
   const yearOptions = Array.from({ length: 82 }, (_, i) => (currentYear - 18 - i).toString());
 
   const languageOptions = [
-    "English", "Spanish", "French", "German", "Italian", "Portuguese", 
-    "Dutch", "Japanese", "Korean", "Chinese", "Arabic", "Russian", "Hindi"
+    // Most common/popular languages first
+    "English", "Spanish", "French", "German", "Italian", "Portuguese", "Chinese (Mandarin)", 
+    "Japanese", "Korean", "Arabic", "Russian", "Hindi", "Dutch", "Swedish", "Norwegian", 
+    "Danish", "Finnish", "Polish", "Czech", "Hungarian", "Romanian", "Bulgarian", "Croatian", 
+    "Serbian", "Greek", "Turkish", "Hebrew", "Thai", "Vietnamese", "Indonesian", "Malay", 
+    "Tagalog", "Swahili", "Yoruba", "Zulu", "Afrikaans", "Amharic", "Bengali", "Gujarati", 
+    "Punjabi", "Tamil", "Telugu", "Urdu", "Persian (Farsi)", "Pashto", "Kurdish", "Uzbek", 
+    "Kazakh", "Mongolian", "Tibetan", "Burmese", "Khmer", "Lao", "Sinhala", "Nepali"
   ];
 
   const traitOptions = [
@@ -138,22 +144,22 @@ function CreateProfile() {
   ];
 
   const countryOptions = [
-    "Afghanistan", "Albania", "Algeria", "Argentina", "Armenia", "Australia", 
-    "Austria", "Azerbaijan", "Bahrain", "Bangladesh", "Belarus", "Belgium", 
-    "Bolivia", "Bosnia and Herzegovina", "Brazil", "Bulgaria", "Cambodia", 
-    "Canada", "Chile", "China", "Colombia", "Costa Rica", "Croatia", "Cuba", 
-    "Czech Republic", "Denmark", "Dominican Republic", "Ecuador", "Egypt", 
-    "Estonia", "Ethiopia", "Finland", "France", "Georgia", "Germany", "Ghana", 
-    "Greece", "Guatemala", "Honduras", "Hungary", "Iceland", "India", 
-    "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", 
-    "Japan", "Jordan", "Kazakhstan", "Kenya", "Kuwait", "Latvia", "Lebanon", 
-    "Lithuania", "Luxembourg", "Malaysia", "Mexico", "Morocco", "Netherlands", 
-    "New Zealand", "Nicaragua", "Nigeria", "North Korea", "Norway", "Pakistan", 
-    "Panama", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", 
-    "Russia", "Saudi Arabia", "Serbia", "Singapore", "Slovakia", "Slovenia", 
-    "South Africa", "South Korea", "Spain", "Sri Lanka", "Sweden", "Switzerland", 
-    "Thailand", "Turkey", "Ukraine", "United Arab Emirates", "United Kingdom", 
-    "United States", "Uruguay", "Venezuela", "Vietnam", "Yemen", "Zimbabwe"
+    // Popular travel destinations first
+    "United States", "France", "Spain", "Thailand", "Japan", "United Kingdom", "Germany", 
+    "Italy", "Australia", "Canada", "Netherlands", "Switzerland", "Greece", "Portugal", 
+    "South Korea", "Singapore", "New Zealand", "Sweden", "Norway", "Denmark", "Belgium", 
+    "Austria", "Ireland", "Czech Republic", "Croatia", "Mexico", "Brazil", "Argentina", 
+    "Chile", "Peru", "Colombia", "Costa Rica", "India", "China", "Indonesia", "Malaysia", 
+    "Philippines", "Vietnam", "Turkey", "Egypt", "Morocco", "South Africa", "Kenya", 
+    "Israel", "Jordan", "Russia", "Poland", "Hungary", "Romania", "Bulgaria", "Serbia", 
+    "Bosnia and Herzegovina", "Slovenia", "Slovakia", "Estonia", "Latvia", "Lithuania", 
+    "Finland", "Iceland", "Luxembourg", "Ukraine", "Belarus", "Georgia", "Armenia", 
+    "Azerbaijan", "Kazakhstan", "Uzbek", "Mongolia", "Pakistan", "Bangladesh", "Sri Lanka", 
+    "Nepal", "Myanmar", "Cambodia", "Laos", "North Korea", "Taiwan", "Hong Kong", "Macau",
+    "Afghanistan", "Albania", "Algeria", "Bahrain", "Bolivia", "Cuba", "Dominican Republic", 
+    "Ecuador", "Ethiopia", "Ghana", "Guatemala", "Honduras", "Iran", "Iraq", "Jamaica", 
+    "Kuwait", "Lebanon", "Libya", "Nicaragua", "Nigeria", "Panama", "Qatar", "Saudi Arabia", 
+    "Tunisia", "United Arab Emirates", "Uruguay", "Venezuela", "Yemen", "Zimbabwe"
   ];
 
   // Landing page view
@@ -374,14 +380,14 @@ function CreateProfile() {
           
           {/* Step 1 - Left Panel (5 columns) */}
           <div className="lg:col-span-5 bg-white rounded-lg shadow-lg p-5">
-            <div className="mb-3">
+            <div className="mb-4">
               <h2 className="text-lg font-bold mb-1" style={{ color: '#1e2a78' }}>
                 👉 Tell us about you
               </h2>
               <p className="text-gray-600 text-xs">Let's start with the basics</p>
             </div>
             
-            <div className="space-y-3">
+            <div className="space-y-4">
               {/* Profile Photo Upload */}
               <div className="text-center">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -528,51 +534,30 @@ function CreateProfile() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Languages you speak
                 </label>
-                <div className="flex flex-wrap gap-1.5 mb-2">
-                  {languageOptions.map((language) => (
-                    <button
-                      key={language}
-                      type="button"
-                      onClick={() => handleLanguageToggle(language)}
-                      className={`px-2 py-0.5 rounded text-xs font-medium transition-colors h-6 ${
-                        selectedLanguages.includes(language)
-                          ? "text-white"
-                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                      }`}
-                      style={{ 
-                        backgroundColor: selectedLanguages.includes(language) ? '#1e2a78' : undefined 
-                      }}
-                    >
-                      {language}
-                    </button>
-                  ))}
-                </div>
                 
-                <div className="flex gap-2 mb-2">
-                  <input
-                    type="text"
+                <div className="mb-3">
+                  <select
                     value={customLanguage}
                     onChange={(e) => setCustomLanguage(e.target.value)}
-                    placeholder="Add language"
-                    className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs"
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        handleAddCustomLanguage();
-                      }
-                    }}
-                  />
+                    className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                  >
+                    <option value="">Select a language...</option>
+                    {languageOptions.filter(language => !selectedLanguages.includes(language)).map((language) => (
+                      <option key={language} value={language}>{language}</option>
+                    ))}
+                  </select>
                   <button
                     type="button"
                     onClick={handleAddCustomLanguage}
-                    className="px-2 py-1 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                    disabled={!customLanguage}
+                    className="mt-2 w-full px-3 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded text-sm hover:bg-blue-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <Plus className="w-3 h-3" />
+                    Add Language
                   </button>
                 </div>
                 
                 {selectedLanguages.length > 0 && (
-                  <div className="mb-2">
+                  <div className="mb-3">
                     <div className="flex flex-wrap gap-1">
                       {selectedLanguages.map((language) => (
                         <span 
@@ -600,8 +585,8 @@ function CreateProfile() {
           <div className="lg:col-span-7 bg-white rounded-lg shadow-lg p-5">
             
             {/* Section 2: Tell us how you travel */}
-            <div className="mb-8" style={{marginTop: '32px'}}>
-              <div className="mb-3">
+            <div className="mb-8" style={{marginTop: '24px'}}>
+              <div className="mb-4">
                 <h2 className="text-lg font-bold mb-1" style={{ color: '#1e2a78' }}>
                   👉 Tell us how you travel
                 </h2>
@@ -664,15 +649,15 @@ function CreateProfile() {
             </div>
 
             {/* Section 3: Tell us about your travel experience */}
-            <div style={{marginTop: '32px'}}>
-              <div className="mb-3">
+            <div style={{marginTop: '24px'}}>
+              <div className="mb-4">
                 <h2 className="text-lg font-bold mb-1" style={{ color: '#1e2a78' }}>
                   👉 Tell us about your travel experience
                 </h2>
                 <p className="text-gray-600 text-xs">Share your travel background</p>
               </div>
               
-              <div className="space-y-6">
+              <div className="space-y-4">
 
               {/* Countries Visited Section */}
               <div>
@@ -682,44 +667,32 @@ function CreateProfile() {
                     ℹ️
                   </span>
                 </label>
-                <div className="flex gap-2 mb-2">
+                <div className="mb-3">
                   <select
                     value={customCountry}
                     onChange={(e) => setCustomCountry(e.target.value)}
-                    className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs"
+                    className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
                   >
                     <option value="">Select a country...</option>
-                    {countryOptions.filter(country => !selectedCountries.includes(country)).map((country) => (
-                      <option key={country} value={country}>{country}</option>
-                    ))}
+                    <optgroup label="Popular Destinations">
+                      {countryOptions.slice(0, 20).filter(country => !selectedCountries.includes(country)).map((country) => (
+                        <option key={country} value={country}>{country}</option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="All Countries">
+                      {countryOptions.slice(20).filter(country => !selectedCountries.includes(country)).map((country) => (
+                        <option key={country} value={country}>{country}</option>
+                      ))}
+                    </optgroup>
                   </select>
                   <button
                     type="button"
                     onClick={handleAddCustomCountry}
                     disabled={!customCountry}
-                    className="px-2 py-1 border border-gray-300 rounded hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="mt-2 w-full px-3 py-2 bg-green-50 text-green-700 border border-green-200 rounded text-sm hover:bg-green-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <Plus className="w-3 h-3" />
+                    Add Country
                   </button>
-                </div>
-                <div className="flex flex-wrap gap-1 mb-2">
-                  {countryOptions.slice(0, 15).map((country) => (
-                    <button
-                      key={country}
-                      type="button"
-                      onClick={() => handleCountryToggle(country)}
-                      className={`px-2 py-0.5 rounded text-xs font-medium transition-colors h-6 ${
-                        selectedCountries.includes(country)
-                          ? "text-white"
-                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                      }`}
-                      style={{ 
-                        backgroundColor: selectedCountries.includes(country) ? '#1e2a78' : undefined 
-                      }}
-                    >
-                      {country}
-                    </button>
-                  ))}
                 </div>
                 {selectedCountries.length > 0 && (
                   <div className="mb-2">
@@ -758,7 +731,7 @@ function CreateProfile() {
                           <img
                             src={travelPhotos[index]}
                             alt={`Travel photo ${index + 1}`}
-                            className="w-20 h-20 object-cover rounded border p-1"
+                            className="w-20 h-20 object-cover rounded border-2 border-gray-200 p-0.5"
                           />
                           <button
                             type="button"
