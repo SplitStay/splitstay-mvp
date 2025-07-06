@@ -9,11 +9,11 @@ const Home: React.FC = () => {
   const [_, navigate] = useLocation();
 
   return (
-    <div className="min-h-screen bg-cream py-16">
+    <div className="min-h-screen bg-cream py-8">
       <div className="w-full text-center">
         
         {/* Logo */}
-        <div className="mb-8">
+        <div className="mb-4">
           <img 
             src={logoImage} 
             alt="SplitStay Logo" 
