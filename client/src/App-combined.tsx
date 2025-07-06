@@ -380,18 +380,19 @@ function CreateProfile() {
     <div className="min-h-screen bg-cream">
       {/* Header with Back Button */}
       <div className="max-w-[1350px] mx-auto px-4 pt-3 pb-4">
-        <div className="flex items-center justify-between mb-2">
+        <div className="relative mb-2">
           <button
             onClick={() => setShowForm(false)}
-            className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors cursor-pointer flex items-center gap-2"
+            className="absolute left-0 top-0 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors cursor-pointer flex items-center gap-2"
             style={{ color: '#4B4B4B', fontFamily: 'system-ui, Inter, sans-serif' }}
           >
             ← Back to Home
           </button>
-          <h1 className="text-3xl font-bold" style={{ color: '#1e2a78' }}>
-            ✨ Build your traveler profile
-          </h1>
-          <div></div> {/* Spacer for centering */}
+          <div className="text-center">
+            <h1 className="text-3xl font-bold" style={{ color: '#1e2a78' }}>
+              ✨ Build your traveler profile
+            </h1>
+          </div>
         </div>
         <div className="text-center">
           <p className="text-gray-600 text-sm">
