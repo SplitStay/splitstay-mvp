@@ -12,24 +12,22 @@ import { X, Upload, Plus } from "lucide-react";
 
 export default function CreateProfile() {
   console.log("CreateProfile component is loading");
-  const [, navigate] = useLocation();
-  const [currentStep, setCurrentStep] = useState(1);
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
-  const [selectedTraits, setSelectedTraits] = useState<string[]>([]);
-  const [customLanguage, setCustomLanguage] = useState("");
-  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
-    fullName: "",
-    bio: "",
-    dayOfBirth: "",
-    monthOfBirth: "",
-    yearOfBirth: "",
-    travelReason: ""
-  });
-
-  // Check user path from URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const userPath = urlParams.get('path');
+  
+  // Create a simple test render first
+  return (
+    <div className="min-h-screen bg-gray-50 p-4">
+      <div className="max-w-2xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-navy mb-2">
+            Build your traveler profile
+          </h1>
+          <p className="text-gray-600">
+            Component is loading successfully!
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 
   const handleStep1Submit = (e: React.FormEvent) => {
     e.preventDefault();
