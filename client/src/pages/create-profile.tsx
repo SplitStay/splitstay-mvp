@@ -171,14 +171,13 @@ export default function CreateProfile() {
                     <div className="flex items-center gap-3 mt-4">
                       <Label
                         htmlFor="profile-image-upload"
-                        className="bg-navy text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-navy/90 transition-colors text-sm"
+                        className="bg-blue-900 text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-blue-800 transition-colors text-sm"
                       >
                         {profileImagePreview ? "Change Photo" : "Upload Photo"}
                       </Label>
                       <button
                         type="button"
                         className="text-sm text-gray-500 hover:text-gray-700 underline"
-                        onClick={() => {/* Add later functionality */}}
                       >
                         Add later
                       </button>
@@ -196,7 +195,7 @@ export default function CreateProfile() {
                     value={formData.fullName}
                     onChange={(e) => setFormData(prev => ({...prev, fullName: e.target.value}))}
                     placeholder="e.g. Jane"
-                    className="mt-2 h-12 text-base"
+                    className="mt-2 h-12"
                     style={{ fontSize: '16px' }}
                     required
                   />
@@ -213,7 +212,7 @@ export default function CreateProfile() {
                     onChange={(e) => setFormData(prev => ({...prev, bio: e.target.value}))}
                     placeholder="e.g. chasing sunsets, street food tours, spontaneous hikes…"
                     rows={3}
-                    className="mt-2 text-base"
+                    className="mt-2"
                     style={{ fontSize: '16px' }}
                   />
                 </div>
