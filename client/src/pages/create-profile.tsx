@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { X, Upload, Plus } from "lucide-react";
 
 export default function CreateProfile() {
+  console.log("CreateProfile component is loading");
   const [, navigate] = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
