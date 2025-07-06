@@ -2,8 +2,8 @@ import React from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Bed, UserPlus, Eye, CheckCircle, ChevronRight } from "lucide-react";
-// Import the SplitStay logo
-import logoImage from "@assets/Logo_1751764733084.jpg";
+// Import the SplitStay logo with transparent background
+import logoImage from "@assets/Splitstay Logo Transparent_1751765053004.png";
 
 const Home: React.FC = () => {
   const [_, navigate] = useLocation();
