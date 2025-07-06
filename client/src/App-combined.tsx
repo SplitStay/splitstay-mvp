@@ -353,7 +353,7 @@ function CreateProfile() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="max-w-[1300px] mx-auto px-4 pb-16">
+      <form onSubmit={handleSubmit} className="max-w-[1350px] mx-auto px-4 pb-16">
         {/* 12-column grid layout: 5 cols left, 7 cols right */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
@@ -366,7 +366,7 @@ function CreateProfile() {
               <p className="text-gray-600 text-xs">Let's start with the basics</p>
             </div>
             
-            <div className="space-y-2">
+            <div className="space-y-3">
               {/* Profile Photo Upload */}
               <div className="text-center">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -444,51 +444,7 @@ function CreateProfile() {
                 />
               </div>
 
-              {/* Travel Photos Section */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Top 3 Travel Photos <span className="text-gray-400">(optional)</span>
-                </label>
-                <div className="flex space-x-2">
-                  {/* Always show 3 placeholders */}
-                  {[0, 1, 2].map((index) => (
-                    <div key={index} className="relative">
-                      {travelPhotos[index] ? (
-                        <>
-                          <img
-                            src={travelPhotos[index]}
-                            alt={`Travel photo ${index + 1}`}
-                            className="w-16 h-16 object-cover rounded border"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeTravelPhoto(index)}
-                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center hover:bg-red-600 transition-colors text-xs"
-                          >
-                            <X className="w-2 h-2" />
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleTravelPhotoUpload}
-                            className="hidden"
-                            id={`travel-photo-${index}`}
-                          />
-                          <label
-                            htmlFor={`travel-photo-${index}`}
-                            className="cursor-pointer w-16 h-16 border-2 border-dashed border-gray-300 rounded flex items-center justify-center hover:border-gray-400 transition-colors"
-                          >
-                            <Plus className="w-4 h-4 text-gray-400" />
-                          </label>
-                        </>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
+
 
               {/* Date of Birth */}
               <div>
@@ -544,7 +500,7 @@ function CreateProfile() {
               <p className="text-gray-600 text-xs">Help us match you with compatible travelers</p>
             </div>
             
-            <div className="space-y-2">
+            <div className="space-y-6">
               {/* Languages Section */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -686,6 +642,52 @@ function CreateProfile() {
                     </div>
                   </div>
                 )}
+              </div>
+
+              {/* Travel Photos Section - Moved from left column */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Top 3 Travel Photos <span className="text-gray-400">(optional)</span>
+                </label>
+                <div className="flex space-x-2">
+                  {/* Always show 3 placeholders */}
+                  {[0, 1, 2].map((index) => (
+                    <div key={index} className="relative">
+                      {travelPhotos[index] ? (
+                        <>
+                          <img
+                            src={travelPhotos[index]}
+                            alt={`Travel photo ${index + 1}`}
+                            className="w-16 h-16 object-cover rounded border"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeTravelPhoto(index)}
+                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center hover:bg-red-600 transition-colors text-xs"
+                          >
+                            <X className="w-2 h-2" />
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleTravelPhotoUpload}
+                            className="hidden"
+                            id={`travel-photo-${index}`}
+                          />
+                          <label
+                            htmlFor={`travel-photo-${index}`}
+                            className="cursor-pointer w-16 h-16 border-2 border-dashed border-gray-300 rounded flex items-center justify-center hover:border-gray-400 transition-colors"
+                          >
+                            <Plus className="w-4 h-4 text-gray-400" />
+                          </label>
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* Travel Traits Section */}
