@@ -79,6 +79,8 @@ The application is configured for deployment on Replit with autoscaling:
 
 ## Changelog
 
+- July 6, 2025: Fixed persistent routing issues by implementing custom pathname-based routing solution, bypassing wouter dependency
+- July 6, 2025: Completed two-step profile creation form with all web-first MVP optimizations
 - July 6, 2025: Fixed server configuration for Vite development middleware and client-side routing issues
 - July 6, 2025: Implemented two-step profile creation form with web-optimized design improvements
 - June 18, 2025: Initial setup
