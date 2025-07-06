@@ -388,12 +388,12 @@ function CreateProfile() {
           >
             ← Back to Home
           </button>
-          <div></div> {/* Spacer for left alignment */}
-        </div>
-        <div className="text-center">
-          <h1 className="text-3xl font-bold mb-1" style={{ color: '#1e2a78' }}>
+          <h1 className="text-3xl font-bold" style={{ color: '#1e2a78' }}>
             ✨ Build your traveler profile
           </h1>
+          <div></div> {/* Spacer for centering */}
+        </div>
+        <div className="text-center">
           <p className="text-gray-600 text-sm">
             Tell us about yourself and how you travel
           </p>
