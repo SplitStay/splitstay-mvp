@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { X, Upload, Plus } from "lucide-react";
+import { X, Plus } from "lucide-react";
 
 export default function CreateProfile() {
   const [, navigate] = useLocation();
@@ -45,10 +45,6 @@ export default function CreateProfile() {
     }
   };
 
-  const handleSkipStep2 = () => {
-    handleStep2Submit();
-  };
-
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -83,6 +79,12 @@ export default function CreateProfile() {
     }
   };
 
+  // Form validation: only name and date required
+  const isStep1Valid = formData.fullName && 
+                      formData.dayOfBirth && 
+                      formData.monthOfBirth && 
+                      formData.yearOfBirth;
+
   const languageOptions = [
     "English", "Spanish", "French", "German", "Italian", "Portuguese", 
     "Dutch", "Japanese", "Korean", "Chinese", "Arabic", "Russian", "Hindi"
@@ -95,7 +97,7 @@ export default function CreateProfile() {
     "Luxury Traveler", "Backpacker", "City Explorer", "Beach Lover", "Mountain Hiker"
   ];
 
-  // Generate options for date dropdowns
+  // Generate date options
   const dayOptions = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
   const monthOptions = [
     { value: "1", label: "January" }, { value: "2", label: "February" },
@@ -107,12 +109,6 @@ export default function CreateProfile() {
   ];
   const currentYear = new Date().getFullYear();
   const yearOptions = Array.from({ length: 82 }, (_, i) => (currentYear - 18 - i).toString());
-
-  // Check if step 1 form is valid (photo is now optional)
-  const isStep1Valid = formData.fullName && 
-                      formData.dayOfBirth && 
-                      formData.monthOfBirth && 
-                      formData.yearOfBirth;
 
   if (currentStep === 1) {
     return (
@@ -133,7 +129,7 @@ export default function CreateProfile() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleStep1Submit} className="space-y-6">
-                {/* Profile Photo Upload */}
+                {/* Profile Photo Upload - Optional */}
                 <div className="text-center">
                   <Label className="text-base font-medium text-gray-700 mb-3 block">
                     Profile Photo
@@ -175,17 +171,14 @@ export default function CreateProfile() {
                       >
                         {profileImagePreview ? "Change Photo" : "Upload Photo"}
                       </Label>
-                      <button
-                        type="button"
-                        className="text-sm text-gray-500 hover:text-gray-700 underline"
-                      >
+                      <button type="button" className="text-sm text-gray-500 hover:text-gray-700 underline">
                         Add later
                       </button>
                     </div>
                   </div>
                 </div>
 
-                {/* Name */}
+                {/* Name - Required */}
                 <div>
                   <Label htmlFor="fullName" className="text-base font-medium text-gray-700">
                     How should travelers call you? <span className="text-red-500">*</span>
@@ -201,7 +194,7 @@ export default function CreateProfile() {
                   />
                 </div>
 
-                {/* Bio */}
+                {/* Bio - Optional */}
                 <div>
                   <Label htmlFor="bio" className="text-base font-medium text-gray-700">
                     What makes you feel alive? <span className="text-gray-400">(optional)</span>
@@ -217,7 +210,7 @@ export default function CreateProfile() {
                   />
                 </div>
 
-                {/* Date of Birth */}
+                {/* Date of Birth - Required */}
                 <div>
                   <Label className="text-base font-medium text-gray-700 mb-3 block">
                     Date of Birth <span className="text-red-500">*</span>
@@ -307,6 +300,7 @@ export default function CreateProfile() {
     );
   }
 
+  // Step 2
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       <div className="max-w-[600px] mx-auto">
@@ -370,11 +364,7 @@ export default function CreateProfile() {
                     <p className="text-sm text-gray-600 mb-2">Selected languages:</p>
                     <div className="flex flex-wrap gap-1">
                       {selectedLanguages.map((language) => (
-                        <Badge
-                          key={language}
-                          variant="secondary"
-                          className="pr-1"
-                        >
+                        <Badge key={language} variant="secondary" className="pr-1">
                           {language}
                           <button
                             type="button"
@@ -419,11 +409,7 @@ export default function CreateProfile() {
                     <p className="text-sm text-gray-600 mb-2">Selected traits ({selectedTraits.length}/5):</p>
                     <div className="flex flex-wrap gap-1">
                       {selectedTraits.map((trait) => (
-                        <Badge
-                          key={trait}
-                          variant="secondary"
-                          className="pr-1"
-                        >
+                        <Badge key={trait} variant="secondary" className="pr-1">
                           {trait}
                           <button
                             type="button"
@@ -439,7 +425,6 @@ export default function CreateProfile() {
                 )}
               </div>
 
-              {/* Buttons */}
               <div className="flex flex-col gap-3 pt-4">
                 <Button 
                   onClick={handleStep2Submit}
@@ -450,7 +435,7 @@ export default function CreateProfile() {
                 
                 <Button 
                   variant="outline"
-                  onClick={handleSkipStep2}
+                  onClick={handleStep2Submit}
                   className="w-full py-6 text-lg font-semibold"
                 >
                   Skip for Now

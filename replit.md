@@ -79,7 +79,9 @@ The application is configured for deployment on Replit with autoscaling:
 
 ## Changelog
 
-- June 18, 2025. Initial setup
+- July 6, 2025: Fixed server configuration for Vite development middleware and client-side routing issues
+- July 6, 2025: Implemented two-step profile creation form with web-optimized design improvements
+- June 18, 2025: Initial setup
 
 ## User Preferences
 
