@@ -415,7 +415,7 @@ function CreateProfile() {
               {/* Name Input - Now directly under profile photo */}
               <div>
                 <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
-                  How should travelers call you? <span className="text-red-500">*</span>
+                  How do you want to be called? <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="fullName"
@@ -488,20 +488,8 @@ function CreateProfile() {
                 </div>
                 <p className="text-xs text-gray-500 mt-1">Must be 18+</p>
               </div>
-            </div>
-          </div>
 
-          {/* Step 2 - Right Panel (7 columns) */}
-          <div className="lg:col-span-7 bg-white rounded-lg shadow-lg p-5">
-            <div className="mb-3">
-              <h2 className="text-lg font-bold mb-1" style={{ color: '#1e2a78' }}>
-                👉 Tell us how you travel
-              </h2>
-              <p className="text-gray-600 text-xs">Help us match you with compatible travelers</p>
-            </div>
-            
-            <div className="space-y-6">
-              {/* Languages Section */}
+              {/* Languages Section - Moved from right column */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Languages you speak
@@ -571,6 +559,86 @@ function CreateProfile() {
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+
+          {/* Step 2 - Right Panel (7 columns) */}
+          <div className="lg:col-span-7 bg-white rounded-lg shadow-lg p-5">
+            
+            {/* Section 2: Tell us how you travel */}
+            <div className="mb-8">
+              <div className="mb-3">
+                <h2 className="text-lg font-bold mb-1" style={{ color: '#1e2a78' }}>
+                  👉 Tell us how you travel
+                </h2>
+                <p className="text-gray-600 text-xs">Help us match you with compatible travelers</p>
+              </div>
+              
+              {/* Travel Traits Section */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Travel traits <span className="text-gray-400">(select up to 5)</span>
+                  <span className="ml-1 text-xs text-gray-500 cursor-help" title="These traits help us find roommates who share your travel style">
+                    ℹ️
+                  </span>
+                </label>
+                {/* Compact inline tags - flex-wrapped */}
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {traitOptions.map((trait) => (
+                    <button
+                      key={trait}
+                      type="button"
+                      onClick={() => handleTraitToggle(trait)}
+                      disabled={!selectedTraits.includes(trait) && selectedTraits.length >= 5}
+                      className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${
+                        selectedTraits.includes(trait)
+                          ? "text-white"
+                          : selectedTraits.length >= 5
+                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                      style={{ 
+                        backgroundColor: selectedTraits.includes(trait) ? '#1e2a78' : undefined 
+                      }}
+                    >
+                      {trait}
+                    </button>
+                  ))}
+                </div>
+                {selectedTraits.length > 0 && (
+                  <div className="mb-2">
+                    <div className="flex flex-wrap gap-1">
+                      {selectedTraits.map((trait) => (
+                        <span 
+                          key={trait} 
+                          className="inline-flex items-center bg-purple-100 text-purple-800 px-2 py-0.5 rounded text-xs"
+                        >
+                          {trait}
+                          <button
+                            type="button"
+                            onClick={() => handleTraitToggle(trait)}
+                            className="ml-1 hover:bg-purple-200 rounded-full p-0.5"
+                          >
+                            <X className="w-2 h-2" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Section 3: Tell us about your travel experience */}
+            <div>
+              <div className="mb-3">
+                <h2 className="text-lg font-bold mb-1" style={{ color: '#1e2a78' }}>
+                  👉 Tell us about your travel experience
+                </h2>
+                <p className="text-gray-600 text-xs">Share your travel background</p>
+              </div>
+              
+              <div className="space-y-6">
 
               {/* Countries Visited Section */}
               <div>
@@ -690,60 +758,7 @@ function CreateProfile() {
                 </div>
               </div>
 
-              {/* Travel Traits Section */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Travel traits (select up to 5)
-                  <span className="ml-1 text-xs text-gray-500 cursor-help" title="These traits help us find roommates who share your travel style">
-                    ℹ️
-                  </span>
-                </label>
-                {/* Compact inline tags - flex-wrapped */}
-                <div className="flex flex-wrap gap-1.5 mb-2">
-                  {traitOptions.map((trait) => (
-                    <button
-                      key={trait}
-                      type="button"
-                      onClick={() => handleTraitToggle(trait)}
-                      disabled={!selectedTraits.includes(trait) && selectedTraits.length >= 5}
-                      className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${
-                        selectedTraits.includes(trait)
-                          ? "text-white"
-                          : selectedTraits.length >= 5
-                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                      }`}
-                      style={{ 
-                        backgroundColor: selectedTraits.includes(trait) ? '#1e2a78' : undefined 
-                      }}
-                    >
-                      {trait}
-                    </button>
-                  ))}
-                </div>
-                
-                {selectedTraits.length > 0 && (
-                  <div className="mt-1">
-                    <p className="text-xs text-gray-600 mb-1">Selected ({selectedTraits.length}/5):</p>
-                    <div className="flex flex-wrap gap-1">
-                      {selectedTraits.map((trait) => (
-                        <span 
-                          key={trait} 
-                          className="inline-flex items-center bg-green-100 text-green-800 px-1.5 py-0.5 rounded text-xs"
-                        >
-                          {trait}
-                          <button
-                            type="button"
-                            onClick={() => handleTraitToggle(trait)}
-                            className="ml-1 hover:bg-green-200 rounded-full p-0.5"
-                          >
-                            <X className="w-2 h-2" />
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
+
               </div>
             </div>
           </div>
