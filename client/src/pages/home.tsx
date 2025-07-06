@@ -1,12 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Bed, UserPlus, Eye, CheckCircle, ChevronRight } from "lucide-react";
 // Import the SplitStay logo with transparent background
 import logoImage from "@assets/Splitstay Logo Transparent_1751765053004.png";
 
+type UserPath = "host" | "guest" | null;
+
 const Home: React.FC = () => {
   const [_, navigate] = useLocation();
+  const [selectedPath, setSelectedPath] = useState<UserPath>(null);
 
   return (
     <div className="min-h-screen bg-cream py-2">
@@ -31,13 +34,19 @@ const Home: React.FC = () => {
           You're early — and that's exactly the point. SplitStay is just opening up. The first few travelers shape what this becomes. Want to be one of them?
         </p>
         
-        {/* User Path CTA Section - Two Cards */}
+        {/* User Path Selection Cards */}
         <div className="w-full mb-8 max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-6 px-4">
             
-            {/* Card 1 */}
-            <div className="bg-white border-2 border-gray-200 rounded-lg p-6 hover:shadow-lg hover:border-navy transition-all duration-300 cursor-pointer"
-                 onClick={() => navigate("/create-profile")}>
+            {/* Host Card */}
+            <div 
+              className={`bg-white border-2 rounded-lg p-6 hover:shadow-lg transition-all duration-300 cursor-pointer ${
+                selectedPath === "host" 
+                  ? "border-navy bg-navy/5 shadow-lg" 
+                  : "border-gray-200 hover:border-navy"
+              }`}
+              onClick={() => setSelectedPath("host")}
+            >
               <h2 className="text-xl font-bold text-navy mb-3">
                 Have an accommodation to share?
               </h2>
@@ -46,9 +55,15 @@ const Home: React.FC = () => {
               </p>
             </div>
             
-            {/* Card 2 */}
-            <div className="bg-white border-2 border-gray-200 rounded-lg p-6 hover:shadow-lg hover:border-navy transition-all duration-300 cursor-pointer"
-                 onClick={() => navigate("/find-roommate")}>
+            {/* Guest Card */}
+            <div 
+              className={`bg-white border-2 rounded-lg p-6 hover:shadow-lg transition-all duration-300 cursor-pointer ${
+                selectedPath === "guest" 
+                  ? "border-navy bg-navy/5 shadow-lg" 
+                  : "border-gray-200 hover:border-navy"
+              }`}
+              onClick={() => setSelectedPath("guest")}
+            >
               <h2 className="text-xl font-bold text-navy mb-3">
                 Looking to join someone else's trip?
               </h2>
@@ -60,14 +75,33 @@ const Home: React.FC = () => {
           </div>
         </div>
         
-        {/* CTA Button */}
-        <div className="mb-12">
-          <Button
-            className="bg-navy hover:bg-navy-dark text-white px-8 py-3 text-lg font-semibold rounded-lg transition-colors"
-            onClick={() => navigate("/find-roommate")}
+        {/* CTA Section */}
+        <div className="mb-8">
+          <Button 
+            onClick={() => navigate(`/create-profile?path=${selectedPath}`)}
+            size="lg"
+            disabled={!selectedPath}
+            className={`text-lg px-8 py-6 rounded-lg font-semibold transition-all duration-300 ${
+              selectedPath 
+                ? "bg-navy text-white hover:bg-navy/90" 
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }`}
           >
-            Find Your Roommate
+            Create My Profile
           </Button>
+        </div>
+        
+        {/* Login Link */}
+        <div className="mb-16">
+          <p className="text-gray-600">
+            Already have a profile?{" "}
+            <button 
+              onClick={() => navigate("/login")}
+              className="text-navy hover:text-navy/80 underline transition-colors duration-300"
+            >
+              Log in here
+            </button>
+          </p>
         </div>
         
         {/* Benefits Section */}

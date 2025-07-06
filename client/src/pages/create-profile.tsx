@@ -38,6 +38,10 @@ const CreateProfile: React.FC = () => {
   const isEditMode = location === "/profile/edit";
   const isDemoMode = !isEditMode; // Consider any new profile creation as demo mode
   
+  // Get the user path from URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const userPath = urlParams.get('path'); // 'host' or 'guest'
+  
   // Import Emily's profile image directly
   // For the demo, we'll use a placeholder that will be replaced
   // with the right image when you click the profile section
@@ -232,8 +236,20 @@ const CreateProfile: React.FC = () => {
         : "Your profile has been created successfully!",
     });
     
-    // Navigate based on mode
-    navigate(isEditMode ? "/profile" : "/find-roommate");
+    // Navigate based on mode and user path
+    if (isEditMode) {
+      navigate("/profile");
+    } else {
+      // Redirect based on user's selected path
+      if (userPath === "host") {
+        navigate("/create-trip");
+      } else if (userPath === "guest") {
+        navigate("/browse-trips");
+      } else {
+        // Fallback for existing users without path
+        navigate("/find-roommate");
+      }
+    }
   };
 
   const handleSkip = () => {

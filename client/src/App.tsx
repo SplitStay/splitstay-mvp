@@ -12,6 +12,8 @@ import SignUp from "@/pages/signup";
 import Dashboard from "@/pages/dashboard";
 import Profile from "@/pages/profile";
 import CreateProfile from "@/pages/create-profile";
+import CreateTrip from "@/pages/create-trip";
+import BrowseTrips from "@/pages/browse-trips";
 import FindRoommate from "@/pages/find-roommate";
 import BrowseProfiles from "@/pages/browse-profiles-fixed";
 import LeaveReview from "@/pages/leave-review";
@@ -57,6 +59,8 @@ function Router() {
         <Route path="/profile" component={Profile} />
         <Route path="/profile/edit" component={CreateProfile} />
         <Route path="/create-profile" component={CreateProfile} />
+        <Route path="/create-trip" component={CreateTrip} />
+        <Route path="/browse-trips" component={BrowseTrips} />
         <Route path="/find-roommate" component={FindRoommate} />
         <Route path="/browse-profiles" component={BrowseProfiles} />
         <Route path="/messages" component={Messages} />
