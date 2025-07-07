@@ -74,20 +74,22 @@ function HowItWorks() {
               <img src={splitstayLogo} alt="SplitStay" className="h-8 w-auto" />
               <span className="text-xl font-bold text-navy">SplitStay</span>
             </div>
-            <nav className="hidden md:flex space-x-6">
-              <a href="/" className="text-gray-700 hover:text-navy font-medium">
-                Home
-              </a>
-              <a href="/how-it-works" className="text-navy font-medium border-b-2 border-navy pb-1">
-                How it Works
-              </a>
-            </nav>
-            <button
-              onClick={() => window.location.href = "/"}
-              className="px-4 py-2 bg-navy text-white rounded-lg hover:bg-navy-dark transition-colors"
-            >
-              Get Started
-            </button>
+            <div className="flex items-center space-x-4">
+              <nav className="flex space-x-4 md:space-x-6">
+                <a href="/" className="text-gray-700 hover:text-navy font-medium text-sm md:text-base">
+                  Home
+                </a>
+                <a href="/how-it-works" className="text-navy font-medium border-b-2 border-navy pb-1 text-sm md:text-base">
+                  How it Works
+                </a>
+              </nav>
+              <button
+                onClick={() => window.location.href = "/"}
+                className="px-3 py-2 md:px-4 bg-navy text-white rounded-lg hover:bg-navy-dark transition-colors text-sm md:text-base"
+              >
+                Get Started
+              </button>
+            </div>
           </div>
         </div>
       </div>

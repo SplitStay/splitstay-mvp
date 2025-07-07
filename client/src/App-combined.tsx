@@ -205,29 +205,31 @@ function CreateProfile() {
                 />
                 <span className="text-navy font-bold text-lg">SplitStay</span>
               </div>
-              <nav className="hidden md:flex space-x-6">
-                <a 
-                  href="/" 
-                  className="text-navy font-medium border-b-2 border-navy pb-1"
-                >
-                  Home
-                </a>
+              <div className="flex items-center space-x-4">
+                <nav className="flex space-x-4 md:space-x-6">
+                  <a 
+                    href="/" 
+                    className="text-navy font-medium border-b-2 border-navy pb-1 text-sm md:text-base"
+                  >
+                    Home
+                  </a>
+                  <button
+                    onClick={() => {
+                      window.history.pushState({}, '', '/how-it-works');
+                      window.dispatchEvent(new PopStateEvent('popstate'));
+                    }}
+                    className="text-gray-700 hover:text-navy font-medium transition-colors text-sm md:text-base"
+                  >
+                    How it Works
+                  </button>
+                </nav>
                 <button
-                  onClick={() => {
-                    window.history.pushState({}, '', '/how-it-works');
-                    window.dispatchEvent(new PopStateEvent('popstate'));
-                  }}
-                  className="text-gray-700 hover:text-navy font-medium transition-colors"
+                  onClick={() => setShowForm(true)}
+                  className="px-3 py-2 md:px-4 bg-navy text-white rounded-lg hover:bg-navy-dark transition-colors font-medium text-sm md:text-base"
                 >
-                  How it Works
+                  Get Started
                 </button>
-              </nav>
-              <button
-                onClick={() => setShowForm(true)}
-                className="px-4 py-2 bg-navy text-white rounded-lg hover:bg-navy-dark transition-colors font-medium"
-              >
-                Get Started
-              </button>
+              </div>
             </div>
           </div>
         </div>
