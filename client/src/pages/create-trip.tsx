@@ -509,7 +509,7 @@ export default function CreateTrip() {
       </div>
 
       {/* Form Content */}
-      <div className="max-w-3xl mx-auto px-4 py-8">
+      <div className="max-w-3xl mx-auto px-4 py-8 pb-20 md:pb-8">
         <div className="bg-white rounded-lg shadow-md p-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Create Your Trip Post</h2>
           
@@ -596,10 +596,43 @@ export default function CreateTrip() {
             </div>
           </div>
 
-          {/* Step 2: Trip Details - Only show after booking link is processed */}
+          {/* Step 2: Booking Overview - Only show after booking link is processed */}
           {isBookingLinkProcessed && (
             <div className="space-y-6 mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Step 2: Trip Details</h3>
+              <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Step 2: Booking Overview</h3>
+              
+              {/* Booking Preview Card */}
+              {accommodationDetails && (
+                <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                  <div className="flex gap-4">
+                    {accommodationDetails.image && (
+                      <img
+                        src={accommodationDetails.image}
+                        alt={accommodationDetails.title}
+                        className="w-24 h-24 object-cover rounded-lg flex-shrink-0"
+                      />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-gray-900 truncate">
+                        {accommodationDetails.title || 'Accommodation'}
+                      </h4>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {formData.destination}
+                      </p>
+                      <div className="flex items-center gap-4 mt-2 text-sm text-gray-700">
+                        <span>{formData.startDate}</span>
+                        <span>→</span>
+                        <span>{formData.endDate}</span>
+                      </div>
+                      {accommodationDetails.price && (
+                        <p className="text-lg font-semibold text-blue-600 mt-2">
+                          {accommodationDetails.price}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
               
               {/* Destination */}
               <div className="relative">
@@ -670,56 +703,91 @@ export default function CreateTrip() {
               </div>
             </div>
 
-            {/* Booking Status */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Have you already booked this room? *
-              </label>
-              <div className="space-y-2">
-                <label className="flex items-center">
+            {/* Core Trip Details */}
+            <div className="space-y-6">
+              {/* Price Details */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Cost per Night *
+                  </label>
                   <input
-                    type="radio"
-                    name="bookingStatus"
-                    value="not-booked"
-                    checked={formData.bookingStatus === 'not-booked'}
-                    onChange={(e) => handleInputChange('bookingStatus', e.target.value)}
-                    className="mr-2"
+                    type="number"
+                    value={formData.costPerNight}
+                    onChange={(e) => handleInputChange('costPerNight', e.target.value)}
+                    placeholder="50"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
                   />
-                  <span>Not yet booked (preferred option)</span>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="bookingStatus"
-                    value="booked"
-                    checked={formData.bookingStatus === 'booked'}
-                    onChange={(e) => handleInputChange('bookingStatus', e.target.value)}
-                    className="mr-2"
-                  />
-                  <span>Yes, already booked</span>
-                </label>
-              </div>
-              
-              {/* Warning message for already booked */}
-              {formData.bookingStatus === 'booked' && (
-                <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-                  <div className="flex items-start gap-2">
-                    <span className="text-yellow-600 mt-0.5">⚠️</span>
-                    <p className="text-sm text-yellow-800">
-                      <strong>Heads up!</strong> If no match is found, you may be responsible for the full room cost. Check the platform for cancellation options.
-                    </p>
-                  </div>
                 </div>
-              )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Currency *
+                  </label>
+                  <select
+                    value={formData.currency}
+                    onChange={(e) => handleInputChange('currency', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  >
+                    {currencies.map(currency => (
+                      <option key={currency} value={currency}>{currency}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Booking Status */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Have you already booked this room? *
+                </label>
+                <div className="space-y-2">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="bookingStatus"
+                      value="not-booked"
+                      checked={formData.bookingStatus === 'not-booked'}
+                      onChange={(e) => handleInputChange('bookingStatus', e.target.value)}
+                      className="mr-2"
+                    />
+                    <span>Not yet booked (preferred option)</span>
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="bookingStatus"
+                      value="booked"
+                      checked={formData.bookingStatus === 'booked'}
+                      onChange={(e) => handleInputChange('bookingStatus', e.target.value)}
+                      className="mr-2"
+                    />
+                    <span>Yes, already booked</span>
+                  </label>
+                </div>
+                
+                {/* Warning message for already booked */}
+                {formData.bookingStatus === 'booked' && (
+                  <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                    <div className="flex items-start gap-2">
+                      <span className="text-yellow-600 mt-0.5">⚠️</span>
+                      <p className="text-sm text-yellow-800">
+                        <strong>Heads up!</strong> If no match is found, you may be responsible for the full room cost. Check the platform for cancellation options.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           )}
 
-          {/* Step 3 & Submit - Only show after booking link is processed */}
+          {/* Step 3: Additional Details - Only show after booking link is processed */}
           {isBookingLinkProcessed && (
             <>
               <div className="space-y-6 mb-8">
-                <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Step 3: Trip Details</h3>
+                <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Step 3: Tell Us About Your Trip</h3>
                 
                 {/* Description */}
                 <div>
@@ -790,40 +858,10 @@ export default function CreateTrip() {
                 </div>
               </div>
 
-              {/* Optional Fields */}
+              {/* Optional Details */}
               <div className="space-y-6 mb-8">
                 <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Optional Details</h3>
                 
-                {/* Cost and Currency */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Cost per Night
-                    </label>
-                    <input
-                      type="number"
-                      value={formData.costPerNight}
-                      onChange={(e) => handleInputChange('costPerNight', e.target.value)}
-                      placeholder="50"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Currency
-                    </label>
-                    <select
-                      value={formData.currency}
-                      onChange={(e) => handleInputChange('currency', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      {currencies.map(currency => (
-                        <option key={currency} value={currency}>{currency}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
                 {/* Number of Spots Available */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -840,27 +878,29 @@ export default function CreateTrip() {
                 </div>
               </div>
               
-              {/* Submit Button */}
-              <div className="flex gap-4">
-                <button
-                  type="button"
-                  onClick={handleBack}
-                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSubmit}
-                  disabled={!isFormValid() || isSubmitting}
-                  className={`flex-1 px-6 py-3 rounded-md transition-colors ${
-                    isFormValid() && !isSubmitting
-                      ? 'bg-blue-600 text-white hover:bg-blue-700'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  {isSubmitting ? 'Posting Trip...' : 'Post Trip'}
-                </button>
+              {/* Submit Button - Sticky on mobile */}
+              <div className="sticky bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 md:static md:border-t-0 md:p-0 md:bg-transparent -mx-6 md:mx-0">
+                <div className="flex gap-4">
+                  <button
+                    type="button"
+                    onClick={handleBack}
+                    className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSubmit}
+                    disabled={!isFormValid() || isSubmitting}
+                    className={`flex-1 px-6 py-3 rounded-md transition-colors ${
+                      isFormValid() && !isSubmitting
+                        ? 'bg-blue-600 text-white hover:bg-blue-700'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
+                  >
+                    {isSubmitting ? 'Posting Trip...' : 'Post Trip'}
+                  </button>
+                </div>
               </div>
             </>
           )}
