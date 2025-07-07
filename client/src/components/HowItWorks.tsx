@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, Shield, Users, DollarSign, Award, Calendar, CheckCircle } from "lucide-react";
+import { ArrowRight, Shield, Users, DollarSign, Award, Calendar, CheckCircle, MessageCircle } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import splitstayLogo from "@assets/Splitstay Logo Transparent.png";
 
@@ -28,9 +28,9 @@ function HowItWorks() {
       description: "Invite friends, match with more travelers, and earn SplitStay badges as you go."
     },
     {
-      icon: "🔄",
-      title: "Stay Flexible",
-      description: "Need a solo option last minute? You'll always see solo rates too."
+      icon: "💬",
+      title: "Chat & Connect Before You Book",
+      description: "Get to know your match through messaging — so your stay feels smooth from day one."
     }
   ];
 
