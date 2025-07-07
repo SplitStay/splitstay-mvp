@@ -1,0 +1,70 @@
+🔧 TASK: Improve the "Plan Your First Trip" and Dashboard for SplitStay MVP
+
+🎯 GOAL: 
+Make it easier for users to share trips, add accommodation info from OTAs (Booking, Agoda, Airbnb), and create viral growth loops.
+
+---
+
+✅ PART 1: Update "Plan Your First Trip" Page
+
+📝 Rename:
+- Page title → “Plan Your First Trip”
+- Post button → “Post Trip”
+
+📌 Required Fields:
+- Destination (City, Country) — input text
+- Start Date — date picker
+- End Date — date picker
+- Accommodation Link — input URL, must accept Booking, Agoda, or Airbnb links
+- Short Description (max 300 characters)
+
+📌 Optional Fields:
+- Cost per Night — numeric input (remove dollar sign prefix)
+- Currency — dropdown: USD, EUR, GBP, PHP, THB, IDR, etc.
+- Number of Spots Available — dropdown (1 to 5)
+- Trip Type — select one: Chill, Party, Culture, Mixed
+- Preferred Co-Traveler — dropdown:
+  - Open to Anyone
+  - Same Gender
+  - Similar Age
+  - Digital Nomads
+  - Female-Only
+
+🚀 Autofill Enhancements:
+- When user enters Accommodation Link:
+  - Try to extract: accommodation title, nightly rate, currency from metadata
+  - Show OTA favicon icon (e.g. Booking.com, Agoda) next to link for preview
+
+💬 Remove “Languages Spoken” — use from user profile instead
+
+---
+
+✅ PART 2: Dashboard Display Improvements
+
+🎡 Explore Trips Section:
+- Use horizontal card scroll layout (carousel-style)
+- Each trip card shows:
+  - Destination and trip dates
+  - Traveler name and country
+  - Accommodation source icon (e.g. Booking.com, Airbnb)
+  - “View Trip” and “Message” buttons
+
+📆 My Travel Plans Section:
+- Show calendar icon if no trips exist (restore original empty state design)
+
+---
+
+✅ PART 3: Viral Sharing Feature (Growth Hack)
+
+📣 After user posts a trip, show popup/modal:
+- “🎉 Your trip is live! Want to find a match faster?”
+  - CTA buttons:
+    - [ Copy Shareable Link ]
+    - [ Share on Instagram ]
+    - [ Share on WhatsApp ]
+- Generate public trip page link like: `splitstay.io/t/tripID`
+- Add Open Graph preview meta tags for these pages (title, destination, user message)
+
+---
+
+Make sure the form validates properly, stores the trip in the backend, and displays it on the dashboard after submission. Also link the "Plan Your First Trip" button on the dashboard to this updated page.
