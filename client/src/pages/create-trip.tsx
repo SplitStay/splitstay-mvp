@@ -18,6 +18,8 @@ interface TripFormData {
 export default function CreateTrip() {
   const [currentStep, setCurrentStep] = useState<'form' | 'success'>('form');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDestinationSuggestions, setShowDestinationSuggestions] = useState(false);
+  const [destinationSuggestions, setDestinationSuggestions] = useState<string[]>([]);
   const [formData, setFormData] = useState<TripFormData>({
     destination: '',
     startDate: '',
@@ -50,6 +52,21 @@ export default function CreateTrip() {
     { value: 'digital-nomads', label: 'Digital Nomads' }
   ];
 
+  // Popular destinations for autocomplete
+  const popularDestinations = [
+    'Tokyo, Japan', 'Bangkok, Thailand', 'Singapore, Singapore', 'Manila, Philippines',
+    'Seoul, South Korea', 'Kuala Lumpur, Malaysia', 'Ho Chi Minh City, Vietnam',
+    'Jakarta, Indonesia', 'Hong Kong, Hong Kong', 'Taipei, Taiwan',
+    'London, United Kingdom', 'Paris, France', 'Barcelona, Spain', 'Berlin, Germany',
+    'Amsterdam, Netherlands', 'Rome, Italy', 'Prague, Czech Republic', 'Vienna, Austria',
+    'New York, United States', 'Los Angeles, United States', 'San Francisco, United States',
+    'Toronto, Canada', 'Vancouver, Canada', 'Sydney, Australia', 'Melbourne, Australia',
+    'Dubai, UAE', 'Istanbul, Turkey', 'Cairo, Egypt', 'Mumbai, India', 'Delhi, India',
+    'Bali, Indonesia', 'Phuket, Thailand', 'Boracay, Philippines', 'Jeju, South Korea',
+    'Kyoto, Japan', 'Osaka, Japan', 'Chiang Mai, Thailand', 'Penang, Malaysia',
+    'Hanoi, Vietnam', 'Da Nang, Vietnam', 'Siem Reap, Cambodia', 'Yangon, Myanmar'
+  ];
+
 
 
   const handleBack = () => {
@@ -76,6 +93,27 @@ export default function CreateTrip() {
         platform: detectedPlatform
       }));
     }
+
+    // Handle destination search
+    if (field === 'destination' && typeof value === 'string') {
+      if (value.length > 1) {
+        const filtered = popularDestinations.filter(dest =>
+          dest.toLowerCase().includes(value.toLowerCase())
+        ).slice(0, 8); // Show max 8 suggestions
+        setDestinationSuggestions(filtered);
+        setShowDestinationSuggestions(true);
+      } else {
+        setShowDestinationSuggestions(false);
+      }
+    }
+  };
+
+  const handleDestinationSelect = (destination: string) => {
+    setFormData(prev => ({
+      ...prev,
+      destination: destination
+    }));
+    setShowDestinationSuggestions(false);
   };
 
 
@@ -273,7 +311,7 @@ export default function CreateTrip() {
             <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Required Information</h3>
             
             {/* Destination */}
-            <div>
+            <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Destination (City, Country) *
               </label>
@@ -283,10 +321,30 @@ export default function CreateTrip() {
                   type="text"
                   value={formData.destination}
                   onChange={(e) => handleInputChange('destination', e.target.value)}
+                  onBlur={() => setTimeout(() => setShowDestinationSuggestions(false), 200)}
                   placeholder="e.g. Tokyo, Japan"
                   className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
+                
+                {/* Autocomplete Dropdown */}
+                {showDestinationSuggestions && destinationSuggestions.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                    {destinationSuggestions.map((destination, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => handleDestinationSelect(destination)}
+                        className="w-full text-left px-4 py-2 hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
+                      >
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-4 h-4 text-gray-400" />
+                          <span className="text-gray-900">{destination}</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
