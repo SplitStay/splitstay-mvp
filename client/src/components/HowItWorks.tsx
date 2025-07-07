@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, Shield, Users, DollarSign, Award, Calendar, CheckCircle, MessageCircle } from "lucide-react";
+import { ArrowRight, Shield, Users, DollarSign, Award, Calendar, CheckCircle, MessageCircle, ToggleLeft } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import splitstayLogo from "@assets/Splitstay Logo Transparent.png";
 
@@ -46,7 +46,7 @@ function HowItWorks() {
       description: "Build lasting connections with fellow travelers who share your values"
     },
     {
-      icon: <DollarSign className="w-8 h-8 text-navy" />,
+      icon: <ToggleLeft className="w-8 h-8 text-navy" />,
       title: "Flexibility",
       description: "Match or go solo — no pressure"
     }
