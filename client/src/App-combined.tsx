@@ -299,7 +299,10 @@ function CreateProfile() {
             <p className="mt-4 text-gray-600">
               Already have a profile?{' '}
               <button 
-                onClick={() => setShowForm(true)}
+                onClick={() => {
+                  window.history.pushState({}, '', '/login');
+                  window.dispatchEvent(new PopStateEvent('popstate'));
+                }}
                 className="text-navy hover:text-navy/80 font-medium underline"
               >
                 Log in
