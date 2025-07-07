@@ -661,6 +661,7 @@ export default function CreateTrip() {
                 </div>
               )}
             </div>
+          </div>
           )}
 
           {/* Step 3: Trip Details */}
@@ -760,8 +761,6 @@ export default function CreateTrip() {
                 ))}
               </div>
             </div>
-          </div>
-
             {/* Preferred Co-traveler */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -780,6 +779,7 @@ export default function CreateTrip() {
               </select>
             </div>
           </div>
+          
           {/* Submit Button */}
           <div className="flex gap-4">
             <button
