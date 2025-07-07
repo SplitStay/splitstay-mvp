@@ -387,7 +387,7 @@ export default function CreateTrip() {
                   value={formData.destination}
                   onChange={(e) => handleInputChange('destination', e.target.value)}
                   onBlur={() => setTimeout(() => setShowDestinationSuggestions(false), 200)}
-                  placeholder="Type any city, e.g. Eindhoven, Netherlands"
+                  placeholder="Type any city, e.g. Barcelona, Spain"
                   className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
