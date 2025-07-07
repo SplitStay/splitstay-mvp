@@ -11,7 +11,11 @@ function CreateProfile() {
   const [customCountry, setCustomCountry] = useState("");
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
   const [travelPhotos, setTravelPhotos] = useState<string[]>([]);
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(() => {
+    // Check if URL has profile parameter to show form directly
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('profile') === 'true';
+  });
   const [formData, setFormData] = useState({
     fullName: "",
     country: "",

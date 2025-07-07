@@ -102,7 +102,7 @@ function HowItWorks() {
             Split hotel stays with like-minded travelers — here's how it works.
           </p>
           <button
-            onClick={() => window.location.href = "/"}
+            onClick={() => window.location.href = "/?profile=true"}
             className="inline-flex items-center px-6 py-3 bg-navy text-white rounded-lg hover:bg-navy-dark transition-colors font-medium"
           >
             Create Your Profile
@@ -195,7 +195,7 @@ function HowItWorks() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
-                onClick={() => window.location.href = "/"}
+                onClick={() => window.location.href = "/?profile=true"}
                 className="inline-flex items-center px-8 py-3 bg-navy text-white rounded-lg hover:bg-navy-dark transition-colors font-medium"
               >
                 Create Your Profile
