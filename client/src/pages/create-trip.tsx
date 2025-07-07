@@ -43,6 +43,9 @@ export default function CreateTrip() {
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
   const [accommodationDetails, setAccommodationDetails] = useState<AccommodationDetails | null>(null);
   const [isLoadingAccommodation, setIsLoadingAccommodation] = useState(false);
+  const [isBookingLinkProcessed, setIsBookingLinkProcessed] = useState(false);
+  const [scrapingError, setScrapingError] = useState<string | null>(null);
+  const [maxTripVibesSelected, setMaxTripVibesSelected] = useState(false);
   const [formData, setFormData] = useState<TripFormData>({
     accommodationLink: '',
     platform: '',
@@ -121,6 +124,7 @@ export default function CreateTrip() {
   const fetchAccommodationDetails = async (url: string) => {
     setIsLoadingAccommodation(true);
     setAccommodationDetails(null);
+    setScrapingError(null);
     
     try {
       const response = await fetch('/api/accommodation/details', {
@@ -152,9 +156,16 @@ export default function CreateTrip() {
           // Auto-fill cost if extracted
           costPerNight: details.price?.replace(/[^0-9.]/g, '') || prev.costPerNight
         }));
+        
+        setIsBookingLinkProcessed(true);
+      } else {
+        setScrapingError('Could not auto-load booking details. Please check the URL or enter manually.');
+        setIsBookingLinkProcessed(true);
       }
     } catch (error) {
       console.error('Error fetching accommodation details:', error);
+      setScrapingError('Could not auto-load booking details. Please check the URL or enter manually.');
+      setIsBookingLinkProcessed(true);
     } finally {
       setIsLoadingAccommodation(false);
     }
@@ -502,9 +513,19 @@ export default function CreateTrip() {
         <div className="bg-white rounded-lg shadow-md p-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Create Your Trip Post</h2>
           
-          {/* Step 1: Accommodation Link */}
+          {/* Error Banner */}
+          {scrapingError && (
+            <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+              <div className="flex items-start gap-2">
+                <span className="text-yellow-600 mt-0.5">⚠️</span>
+                <p className="text-sm text-yellow-800">{scrapingError}</p>
+              </div>
+            </div>
+          )}
+          
+          {/* Step 1: Booking Link */}
           <div className="space-y-6 mb-8">
-            <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Step 1: Accommodation Link</h3>
+            <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Step 1: Booking Link</h3>
             
             {/* Accommodation Link */}
             <div>
@@ -575,8 +596,8 @@ export default function CreateTrip() {
             </div>
           </div>
 
-          {/* Step 2: Trip Details - Only show after accommodation detected */}
-          {(accommodationDetails || formData.destination) && (
+          {/* Step 2: Trip Details - Only show after booking link is processed */}
+          {isBookingLinkProcessed && (
             <div className="space-y-6 mb-8">
               <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Step 2: Trip Details</h3>
               
@@ -694,144 +715,155 @@ export default function CreateTrip() {
           </div>
           )}
 
-          {/* Step 3: Trip Details */}
-          <div className="space-y-6 mb-8">
-            <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Step 3: Trip Details</h3>
-            
-            {/* Description */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Short Description * (max 300 characters)
-              </label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
-                placeholder="Tell others about your trip plans and what you're looking for in a travel buddy..."
-                maxLength={300}
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-              <p className="text-sm text-gray-500 mt-1">
-                {formData.description.length}/300 characters
-              </p>
-            </div>
-          </div>
+          {/* Step 3 & Submit - Only show after booking link is processed */}
+          {isBookingLinkProcessed && (
+            <>
+              <div className="space-y-6 mb-8">
+                <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Step 3: Trip Details</h3>
+                
+                {/* Description */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Short Description * (max 300 characters)
+                  </label>
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => handleInputChange('description', e.target.value)}
+                    placeholder="Tell others about your trip plans and what you're looking for in a travel buddy..."
+                    maxLength={300}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                  <p className="text-sm text-gray-500 mt-1">
+                    {formData.description.length}/300 characters
+                  </p>
+                </div>
 
-          {/* Optional Fields */}
-          <div className="space-y-6 mb-8">
-            <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Optional Details</h3>
-            
-            {/* Cost and Currency */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Cost per Night
-                </label>
-                <input
-                  type="number"
-                  value={formData.costPerNight}
-                  onChange={(e) => handleInputChange('costPerNight', e.target.value)}
-                  placeholder="50"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Currency
-                </label>
-                <select
-                  value={formData.currency}
-                  onChange={(e) => handleInputChange('currency', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  {currencies.map(currency => (
-                    <option key={currency} value={currency}>{currency}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
+                {/* Trip Vibes */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Trip Vibes (select up to 2) *
+                  </label>
+                  <div className="flex flex-wrap gap-3">
+                    {tripVibes.map((vibe) => (
+                      <button
+                        key={vibe}
+                        type="button"
+                        onClick={() => handleTripVibeToggle(vibe)}
+                        disabled={!formData.tripVibes.includes(vibe) && formData.tripVibes.length >= 2}
+                        className={`px-4 py-2 rounded-md text-sm transition-colors ${
+                          formData.tripVibes.includes(vibe)
+                            ? 'bg-blue-600 text-white'
+                            : formData.tripVibes.length >= 2
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        {vibe}
+                      </button>
+                    ))}
+                  </div>
+                  {formData.tripVibes.length >= 2 && (
+                    <p className="text-sm text-blue-600 mt-2">
+                      Maximum 2 vibes selected. Remove one to select another.
+                    </p>
+                  )}
+                </div>
 
-            {/* Number of Spots Available */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Number of Spots Available
-              </label>
-              <select
-                value={formData.spotsAvailable}
-                onChange={(e) => handleInputChange('spotsAvailable', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="1">1 spot</option>
-                <option value="2">2 spots</option>
-              </select>
-            </div>
-
-
-
-            {/* Trip Vibe Categories */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Trip Vibe (Select up to 2)
-              </label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {tripVibes.map((vibe) => (
-                  <button
-                    key={vibe}
-                    type="button"
-                    onClick={() => handleTripVibeToggle(vibe)}
-                    className={`px-4 py-2 rounded-md text-sm transition-colors ${
-                      formData.tripVibes.includes(vibe)
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
+                {/* Preferred Co-traveler */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Preferred Co-traveler
+                  </label>
+                  <select
+                    value={formData.preferredCoTraveler}
+                    onChange={(e) => handleInputChange('preferredCoTraveler', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    {vibe}
-                  </button>
-                ))}
+                    {coTravelerOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
-            </div>
-            {/* Preferred Co-traveler */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Preferred Co-traveler
-              </label>
-              <select
-                value={formData.preferredCoTraveler}
-                onChange={(e) => handleInputChange('preferredCoTraveler', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {coTravelerOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-          
-          {/* Submit Button */}
-          <div className="flex gap-4">
-            <button
-              type="button"
-              onClick={handleBack}
-              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={!isFormValid() || isSubmitting}
-              className={`flex-1 px-6 py-3 rounded-md transition-colors ${
-                isFormValid() && !isSubmitting
-                  ? 'bg-blue-600 text-white hover:bg-blue-700'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
-            >
-              {isSubmitting ? 'Posting Trip...' : 'Post Trip'}
-            </button>
-          </div>
+
+              {/* Optional Fields */}
+              <div className="space-y-6 mb-8">
+                <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Optional Details</h3>
+                
+                {/* Cost and Currency */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Cost per Night
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.costPerNight}
+                      onChange={(e) => handleInputChange('costPerNight', e.target.value)}
+                      placeholder="50"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Currency
+                    </label>
+                    <select
+                      value={formData.currency}
+                      onChange={(e) => handleInputChange('currency', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      {currencies.map(currency => (
+                        <option key={currency} value={currency}>{currency}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Number of Spots Available */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Number of Spots Available
+                  </label>
+                  <select
+                    value={formData.spotsAvailable}
+                    onChange={(e) => handleInputChange('spotsAvailable', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="1">1 spot</option>
+                    <option value="2">2 spots</option>
+                  </select>
+                </div>
+              </div>
+              
+              {/* Submit Button */}
+              <div className="flex gap-4">
+                <button
+                  type="button"
+                  onClick={handleBack}
+                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={!isFormValid() || isSubmitting}
+                  className={`flex-1 px-6 py-3 rounded-md transition-colors ${
+                    isFormValid() && !isSubmitting
+                      ? 'bg-blue-600 text-white hover:bg-blue-700'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  {isSubmitting ? 'Posting Trip...' : 'Post Trip'}
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
