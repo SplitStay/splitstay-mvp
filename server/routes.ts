@@ -465,8 +465,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "URL is required" });
       }
       
-      const details = await scrapeAccommodationDetailsEnhanced(url);
-      res.json(details);
+      const details = await scrapeAccommodationDetails(url);
+      
+      // Enhance the response with currency detection and warnings
+      const warnings = [];
+      let currency = '';
+      let pricePerNight = '';
+      
+      if (details.price) {
+        // Extract currency and price
+        if (details.price.includes('€')) currency = 'EUR';
+        else if (details.price.includes('$')) currency = 'USD';
+        else if (details.price.includes('£')) currency = 'GBP';
+        else if (details.price.includes('¥')) currency = 'JPY';
+        else if (details.price.includes('₹')) currency = 'INR';
+        else if (details.price.includes('₱')) currency = 'PHP';
+        else if (details.price.includes('₦')) currency = 'NGN';
+        else if (details.price.includes('₨')) currency = 'PKR';
+        else if (details.price.includes('CHF')) currency = 'CHF';
+        
+        // Extract numeric value
+        const numericMatch = details.price.match(/[\d,]+\.?\d*/);
+        if (numericMatch) {
+          pricePerNight = numericMatch[0].replace(/,/g, '');
+        }
+      }
+      
+      if (!currency && details.price) {
+        warnings.push("Unable to detect currency – please verify manually");
+      }
+      
+      if (!details.price) {
+        warnings.push("Price not found – please enter manually");
+      }
+      
+      if (!details.title) {
+        warnings.push("Hotel name not found – please enter manually");
+      }
+      
+      // Enhanced response structure
+      const enhancedDetails = {
+        ...details,
+        hotel_name: details.title,
+        image_url: details.image,
+        price_per_night: pricePerNight,
+        currency: currency,
+        check_in: '',
+        check_out: '',
+        destination: '',
+        extraction_status: {
+          hotel_name: !!details.title,
+          image_url: !!details.image,
+          price_detected: !!details.price,
+          currency_detected: !!currency,
+          dates_detected: false,
+          destination_detected: false
+        },
+        warnings: warnings,
+        price_confidence: currency && pricePerNight ? 'high' : pricePerNight ? 'medium' : 'low'
+      };
+      
+      res.json(enhancedDetails);
     } catch (error) {
       console.error('Error scraping accommodation details:', error);
       res.status(500).json({ message: "Failed to fetch accommodation details" });
