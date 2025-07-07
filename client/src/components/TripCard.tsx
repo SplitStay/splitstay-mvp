@@ -16,9 +16,10 @@ interface TripCardProps {
   };
   onViewTrip: (tripId: number) => void;
   onMessage: (userId: string) => void;
+  onCardClick?: (trip: any) => void;
 }
 
-export default function TripCard({ trip, onViewTrip, onMessage }: TripCardProps) {
+export default function TripCard({ trip, onViewTrip, onMessage, onCardClick }: TripCardProps) {
   // Generate a consistent profile picture color based on the user's name
   const getProfileColor = (name: string) => {
     const colors = [
@@ -30,7 +31,10 @@ export default function TripCard({ trip, onViewTrip, onMessage }: TripCardProps)
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 hover:shadow-lg transition-shadow h-full">
+    <div 
+      className="bg-white rounded-lg shadow-md border border-gray-200 p-6 hover:shadow-lg transition-shadow h-full cursor-pointer"
+      onClick={() => onCardClick?.(trip)}
+    >
       {/* Destination & Date */}
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-2">
@@ -80,14 +84,20 @@ export default function TripCard({ trip, onViewTrip, onMessage }: TripCardProps)
       {/* Action Buttons */}
       <div className="flex gap-3 pt-4 border-t border-gray-100 mt-auto">
         <button
-          onClick={() => onViewTrip(trip.id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onViewTrip(trip.id);
+          }}
           className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
         >
           <Eye className="w-4 h-4" />
           View Trip
         </button>
         <button
-          onClick={() => onMessage(trip.userId)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onMessage(trip.userId);
+          }}
           className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
         >
           <MessageCircle className="w-4 h-4" />
