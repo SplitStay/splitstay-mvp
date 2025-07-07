@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ArrowLeft, Plus, MapPin, Calendar, DollarSign, Users, Globe, Heart, Share2, Copy, MessageCircle, Loader2 } from "lucide-react";
+import { useLocation } from "wouter";
 
 interface TripFormData {
   accommodationLink: string;
@@ -53,6 +54,7 @@ interface AccommodationDetails {
 }
 
 export default function CreateTrip() {
+  const [, navigate] = useLocation();
   const [currentStep, setCurrentStep] = useState<'form' | 'success'>('form');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showDestinationSuggestions, setShowDestinationSuggestions] = useState(false);
@@ -131,7 +133,7 @@ export default function CreateTrip() {
 
 
   const handleBack = () => {
-    window.history.back();
+    navigate('/dashboard');
   };
 
   const detectPlatform = (url: string) => {
@@ -458,7 +460,7 @@ export default function CreateTrip() {
         <div className="bg-white border-b border-gray-200 px-4 py-4">
           <div className="max-w-3xl mx-auto flex items-center gap-4">
             <button
-              onClick={() => window.location.href = '/dashboard'}
+              onClick={() => navigate('/dashboard')}
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
             >
               <ArrowLeft className="w-5 h-5" />
