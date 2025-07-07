@@ -65,6 +65,7 @@ export default function CreateTrip() {
   const [scrapingError, setScrapingError] = useState<string | null>(null);
   const [maxTripVibesSelected, setMaxTripVibesSelected] = useState(false);
   const [extractionWarnings, setExtractionWarnings] = useState<string[]>([]);
+  const [showRoomSharingWarning, setShowRoomSharingWarning] = useState(false);
   const [formData, setFormData] = useState<TripFormData>({
     accommodationLink: '',
     platform: '',
@@ -138,6 +139,18 @@ export default function CreateTrip() {
       p.domains.some(domain => url.toLowerCase().includes(domain))
     );
     return platform ? platform.name : 'Other';
+  };
+
+  const checkRoomSharingCompatibility = (url: string): boolean => {
+    const lowerUrl = url.toLowerCase();
+    const sharingKeywords = [
+      'twin', 'two beds', '2 beds', 'separate beds', 'double room',
+      'triple', 'quad', 'family room', 'apartment', 'suite',
+      'bedroom', '2 bedroom', 'two bedroom', 'multiple rooms',
+      'bunk', 'shared', 'hostel', 'dorm'
+    ];
+    
+    return sharingKeywords.some(keyword => lowerUrl.includes(keyword));
   };
 
   const isValidUrl = (url: string): boolean => {
@@ -249,12 +262,16 @@ export default function CreateTrip() {
         platform: detectedPlatform
       }));
       
-      // Fetch accommodation details if it's a valid URL
+      // Check room sharing compatibility and show warning if needed
       if (value.trim() && isValidUrl(value)) {
+        const isCompatible = checkRoomSharingCompatibility(value);
+        setShowRoomSharingWarning(!isCompatible);
+        
         fetchAccommodationDetails(value);
         parseBookingURL(value);
       } else {
         setAccommodationDetails(null);
+        setShowRoomSharingWarning(false);
       }
     }
 
@@ -576,6 +593,23 @@ export default function CreateTrip() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
+              
+              {/* Smart Instructions */}
+              <p className="text-sm text-gray-500 mt-2 italic">
+                💡 <em>For best results, use a Booking.com link with twin beds or multiple bedrooms selected — ideal for sharing!</em>
+              </p>
+              
+              {/* Room Sharing Compatibility Warning */}
+              {showRoomSharingWarning && formData.accommodationLink && (
+                <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md">
+                  <div className="flex items-start gap-2">
+                    <span className="text-amber-600 mt-0.5">⚠️</span>
+                    <p className="text-sm text-amber-800">
+                      <strong>Room sharing tip:</strong> This accommodation may not be ideal for room-sharing. Consider twin beds or 2-bedroom options for better compatibility.
+                    </p>
+                  </div>
+                </div>
+              )}
               
               {/* Platform Detection */}
               {formData.platform && (
