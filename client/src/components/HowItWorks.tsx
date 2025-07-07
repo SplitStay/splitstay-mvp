@@ -4,23 +4,23 @@ import { Helmet } from "react-helmet-async";
 import splitstayLogo from "@assets/Splitstay Logo Transparent.png";
 
 function HowItWorks() {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(0);
 
   const steps = [
     {
-      icon: "👤",
+      icon: "✨",
       title: "Create Your Profile",
-      description: "Tell us how you travel — your style, your languages, and your dream destinations."
+      description: "Tell us about yourself — your travel style, interests, and what kind of roommate you'd be."
     },
     {
-      icon: "🤝",
-      title: "Match With Verified Travelers",
-      description: "We'll suggest trusted travelers with compatible travel styles. Review their profiles before confirming."
+      icon: "🔍",
+      title: "Browse & Match",
+      description: "See compatible travelers heading to your destination. Check out their profiles and preferences."
     },
     {
-      icon: "🏨",
-      title: "Book & Split Your Stay",
-      description: "Pick a hotel together and enjoy all the comfort — at half the price."
+      icon: "💰",
+      title: "Split the Cost",
+      description: "Book together and split hotel costs — you could save 30-50% on your accommodation."
     },
     {
       icon: "🏆",
@@ -36,17 +36,17 @@ function HowItWorks() {
 
   const whyDifferent = [
     {
-      icon: <Shield className="w-6 h-6 text-blue-600" />,
-      title: "Safety",
-      description: "Verified matches only"
+      icon: <Shield className="w-8 h-8 text-navy" />,
+      title: "Safety First",
+      description: "Verified profiles, background checks, and emergency contacts for peace of mind"
     },
     {
-      icon: <Users className="w-6 h-6 text-green-600" />,
+      icon: <Users className="w-8 h-8 text-navy" />,
       title: "Community",
-      description: "You're never alone if you don't want to be"
+      description: "Build lasting connections with fellow travelers who share your values"
     },
     {
-      icon: <Calendar className="w-6 h-6 text-purple-600" />,
+      icon: <DollarSign className="w-8 h-8 text-navy" />,
       title: "Flexibility",
       description: "Match or go solo — no pressure"
     }
@@ -65,16 +65,14 @@ function HowItWorks() {
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://splitstay.travel/how-it-works" />
       </Helmet>
+      
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <img 
-                src={splitstayLogo} 
-                alt="SplitStay Logo" 
-                className="h-8"
-              />
+            <div className="flex items-center space-x-2">
+              <img src={splitstayLogo} alt="SplitStay" className="h-8 w-auto" />
+              <span className="text-xl font-bold text-navy">SplitStay</span>
             </div>
             <nav className="hidden md:flex space-x-6">
               <a href="/" className="text-gray-700 hover:text-navy font-medium">
@@ -129,31 +127,22 @@ function HowItWorks() {
             {steps.map((step, index) => (
               <div
                 key={index}
-                className={`flex flex-col md:flex-row items-center p-6 rounded-lg transition-all duration-300 ${
-                  index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
-                } ${currentStep === index ? 'bg-blue-50 shadow-lg' : 'bg-gray-50 hover:bg-gray-100'}`}
-                onMouseEnter={() => setCurrentStep(index)}
+                className="flex items-center p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                onClick={() => setActiveStep(index)}
               >
-                {/* Step Number & Icon */}
-                <div className="flex-shrink-0 mb-4 md:mb-0 md:mx-8">
-                  <div className="relative">
-                    <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-md border-2 border-navy">
-                      <span className="text-3xl">{step.icon}</span>
-                    </div>
-                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-navy text-white rounded-full flex items-center justify-center text-sm font-bold">
-                      {index + 1}
-                    </div>
-                  </div>
+                <div className="flex-shrink-0 w-16 h-16 bg-navy text-white rounded-full flex items-center justify-center text-2xl font-bold mr-6">
+                  {index + 1}
                 </div>
-
-                {/* Step Content */}
-                <div className="flex-1 text-center md:text-left">
-                  <h3 className="text-2xl font-bold text-navy mb-3">
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-navy mb-2">
                     {step.title}
                   </h3>
-                  <p className="text-gray-600 text-lg leading-relaxed">
+                  <p className="text-gray-600 leading-relaxed">
                     {step.description}
                   </p>
+                </div>
+                <div className="flex-shrink-0 text-3xl ml-4">
+                  {step.icon}
                 </div>
               </div>
             ))}
@@ -195,28 +184,30 @@ function HowItWorks() {
       </div>
 
       {/* CTA Section */}
-      <div className="py-16 bg-navy text-white">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-6">
-            Ready to Start Your Journey?
-          </h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Join thousands of travelers who are already saving money and making connections with SplitStay
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={() => window.location.href = "/?profile=true"}
-              className="inline-flex items-center px-8 py-3 bg-white text-navy rounded-lg hover:bg-gray-100 transition-colors font-medium"
-            >
-              Create Your Profile
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </button>
-            <button
-              onClick={() => window.location.href = "/"}
-              className="inline-flex items-center px-8 py-3 border-2 border-white text-white rounded-lg hover:bg-white hover:text-navy transition-colors font-medium"
-            >
-              Learn More
-            </button>
+      <div className="py-8 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="bg-blue-50 rounded-lg p-8 text-center">
+            <h2 className="text-3xl font-bold text-navy mb-6">
+              You're Just in Time to Help Shape SplitStay
+            </h2>
+            <p className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
+              You're early — and that's exactly the point. Be part of our first wave of travelers helping shape what SplitStay becomes.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={() => window.location.href = "/?profile=true"}
+                className="inline-flex items-center px-8 py-3 bg-navy text-white rounded-lg hover:bg-navy-dark transition-colors font-medium"
+              >
+                Create Your Profile
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </button>
+              <button
+                onClick={() => window.location.href = "/"}
+                className="inline-flex items-center px-8 py-3 border-2 border-navy text-navy rounded-lg hover:bg-navy hover:text-white transition-colors font-medium"
+              >
+                Learn More
+              </button>
+            </div>
           </div>
         </div>
       </div>
