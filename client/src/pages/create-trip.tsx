@@ -11,7 +11,7 @@ interface TripFormData {
   costPerNight: string;
   currency: string;
   spotsAvailable: string;
-  tripType: string;
+  tripVibes: string[];
   preferredCoTraveler: string;
 }
 
@@ -32,7 +32,7 @@ export default function CreateTrip() {
     costPerNight: '',
     currency: 'USD',
     spotsAvailable: '1',
-    tripType: '',
+    tripVibes: [],
     preferredCoTraveler: 'open'
   });
 
@@ -45,7 +45,7 @@ export default function CreateTrip() {
     { name: 'Other', domains: [], icon: '🔗' }
   ];
 
-  const tripTypes = ['Chill', 'Party', 'Culture', 'Mixed'];
+  const tripVibes = ['Relax & Recharge', 'Explore & Discover', 'Social & Fun', 'Adventure & Activities', 'Remote Work Friendly'];
   const currencies = ['USD', 'EUR', 'GBP', 'PHP', 'THB', 'IDR', 'SGD', 'AUD', 'CAD', 'JPY'];
   const coTravelerOptions = [
     { value: 'open', label: 'Open to Anyone' },
@@ -122,6 +122,30 @@ export default function CreateTrip() {
     }
   };
 
+  const handleTripVibeToggle = (vibe: string) => {
+    setFormData(prev => {
+      const currentVibes = prev.tripVibes;
+      const isSelected = currentVibes.includes(vibe);
+      
+      if (isSelected) {
+        // Remove the vibe
+        return {
+          ...prev,
+          tripVibes: currentVibes.filter(v => v !== vibe)
+        };
+      } else {
+        // Add the vibe, but only if we don't already have 2
+        if (currentVibes.length < 2) {
+          return {
+            ...prev,
+            tripVibes: [...currentVibes, vibe]
+          };
+        }
+        return prev; // Don't add if already at max
+      }
+    });
+  };
+
   const searchCities = async (query: string) => {
     if (query.length < 3) return;
     
@@ -134,7 +158,7 @@ export default function CreateTrip() {
       
       if (response.ok) {
         const data = await response.json();
-        console.log('API Response:', data); // Debug log
+        // console.log('API Response:', data); // Debug log
         
         const cities = data
           .filter((item: any) => {
@@ -532,24 +556,25 @@ export default function CreateTrip() {
 
 
 
-            {/* Trip Type */}
+            {/* Trip Vibe Categories */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Trip Type
+                Trip Vibe Categories
+                <span className="text-xs text-gray-500 ml-2">(Select 1-2 vibes)</span>
               </label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {tripTypes.map((type) => (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {tripVibes.map((vibe) => (
                   <button
-                    key={type}
+                    key={vibe}
                     type="button"
-                    onClick={() => handleInputChange('tripType', type === formData.tripType ? '' : type)}
+                    onClick={() => handleTripVibeToggle(vibe)}
                     className={`px-4 py-2 rounded-md text-sm transition-colors ${
-                      formData.tripType === type
+                      formData.tripVibes.includes(vibe)
                         ? 'bg-blue-600 text-white'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
-                    {type}
+                    {vibe}
                   </button>
                 ))}
               </div>
