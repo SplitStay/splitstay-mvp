@@ -14,6 +14,7 @@ import researchRoutes from "./research-routes";
 import * as cheerio from "cheerio";
 import fetch from "node-fetch";
 import { extractBookingDetails } from "./utils/url-parser";
+import { scrapeAccommodationDetailsEnhanced } from "./utils/enhanced-scraper";
 
 async function scrapeAccommodationDetails(url: string) {
   const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36';
@@ -464,7 +465,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "URL is required" });
       }
       
-      const details = await scrapeAccommodationDetails(url);
+      const details = await scrapeAccommodationDetailsEnhanced(url);
       res.json(details);
     } catch (error) {
       console.error('Error scraping accommodation details:', error);
