@@ -47,8 +47,7 @@ export default function CreateTrip() {
     { value: 'open', label: 'Open to Anyone' },
     { value: 'same-gender', label: 'Same Gender' },
     { value: 'similar-age', label: 'Similar Age' },
-    { value: 'digital-nomads', label: 'Digital Nomads' },
-    { value: 'female-only', label: 'Female-Only' }
+    { value: 'digital-nomads', label: 'Digital Nomads' }
   ];
 
 
@@ -405,9 +404,6 @@ export default function CreateTrip() {
               >
                 <option value="1">1 spot</option>
                 <option value="2">2 spots</option>
-                <option value="3">3 spots</option>
-                <option value="4">4 spots</option>
-                <option value="5">5 spots</option>
               </select>
             </div>
 
