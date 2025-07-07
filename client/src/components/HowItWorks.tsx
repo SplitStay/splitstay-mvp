@@ -84,7 +84,7 @@ function HowItWorks() {
                 </a>
               </nav>
               <button
-                onClick={() => window.location.href = "/"}
+                onClick={() => window.location.href = "/?profile=true"}
                 className="px-3 py-2 md:px-4 bg-navy text-white rounded-lg hover:bg-navy-dark transition-colors text-sm md:text-base"
               >
                 Get Started
