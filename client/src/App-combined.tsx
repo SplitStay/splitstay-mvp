@@ -192,9 +192,9 @@ function CreateProfile() {
   // Landing page view
   if (!showForm) {
     return (
-      <div className="min-h-screen bg-cream py-2">
+      <div className="min-h-screen bg-cream py-1">
         {/* Header Navigation */}
-        <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 mb-4">
+        <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 mb-2">
           <div className="max-w-7xl mx-auto px-4 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
@@ -241,22 +241,22 @@ function CreateProfile() {
             <img 
               src={splitstayLogo} 
               alt="SplitStay Logo" 
-              className="h-48 md:h-64 mb-2"
+              className="h-32 md:h-40 mb-1"
             />
           </div>
           
           {/* Headline */}
-          <h1 className="text-3xl lg:text-4xl font-bold text-navy mb-4 mt-2">
+          <h1 className="text-3xl lg:text-4xl font-bold text-navy mb-3 mt-1">
             Share your accommodation. Save money. Meet travelers.
           </h1>
           
           {/* Subtitle */}
-          <p className="text-lg text-navy mb-8 leading-relaxed max-w-4xl mx-auto">
+          <p className="text-lg text-navy mb-4 leading-relaxed max-w-4xl mx-auto">
             You're early — and that's exactly the point. SplitStay is just opening up. The first few travelers shape what this becomes. Want to be one of them?
           </p>
           
           {/* User Path Selection Cards */}
-          <div className="w-full mb-8 max-w-6xl mx-auto">
+          <div className="w-full mb-4 max-w-6xl mx-auto">
             <div className="grid md:grid-cols-2 gap-6 px-4">
               
               {/* Host Card */}
