@@ -3,6 +3,10 @@ import { X, Plus } from "lucide-react";
 import splitstayLogo from "@assets/Splitstay Logo Transparent.png";
 import HowItWorks from "./components/HowItWorks";
 import Dashboard from "./pages/dashboard-new";
+import DashboardTrips from "./pages/dashboard-trips";
+import CreateTrip from "./pages/create-trip";
+import TripDetails from "./pages/trip-details";
+import Chat from "./pages/chat";
 
 function CreateProfile() {
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
@@ -983,7 +987,23 @@ function App() {
   }
   
   if (currentPath === '/dashboard') {
-    return <Dashboard />;
+    return <DashboardTrips />;
+  }
+  
+  if (currentPath === '/create-trip') {
+    return <CreateTrip />;
+  }
+  
+  if (currentPath.startsWith('/trip/')) {
+    return <TripDetails />;
+  }
+  
+  if (currentPath.startsWith('/chat/')) {
+    return <Chat />;
+  }
+  
+  if (currentPath === '/profile-setup') {
+    return <CreateProfile />;
   }
 
   return <CreateProfile />;

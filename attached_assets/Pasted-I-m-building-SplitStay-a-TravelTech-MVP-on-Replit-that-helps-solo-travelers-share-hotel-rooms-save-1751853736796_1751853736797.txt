@@ -1,0 +1,73 @@
+I’m building SplitStay, a TravelTech MVP on Replit that helps solo travelers share hotel rooms, save money, and meet like-minded people.
+
+I already have a basic frontend built. Please generate a working **Dashboard page** with the following logic and features:
+
+---
+
+🔧 **Overall Goal:**
+Revamp the existing Dashboard to remove premature “Recommended Matches” and instead display real or sample trip posts from other users, to inspire the traveler and drive them to post their own.
+
+---
+
+🎯 **Key Components to Build:**
+
+1. **Welcome Section**
+- Header: “Welcome to SplitStay, traveler!”
+- Subtext: “Ready to discover your next travel adventure?”
+- CTA Button: “Plan Your First Trip” ➝ route to `/create-trip` page
+
+---
+
+2. **Explore Trips Section (replace “Recommended Matches”)**
+- Section title: “✈️ Explore Upcoming Trips Posted by Other Travelers”
+- Display trip cards (sample list if DB is empty)
+- Each trip card includes:
+  - Destination (city, country)
+  - Travel dates (formatted as July 15–20, 2025)
+  - Traveler name + country + languages
+  - Optional short trip note
+  - CTA buttons:
+    - `View Trip` ➝ route to `/trip/[tripId]`
+    - `Message` ➝ route to `/chat/[userId]`
+
+---
+
+3. **Search Filter (Optional at Top or Above List)**
+- Search by destination (text input)
+- Date picker (from - to)
+- Optional: Solo/Group toggle
+- When filters are used, only matching trips should show
+- If no matches found: show message "No trips found. Be the first to post a trip!"
+
+---
+
+4. **Sidebar / Profile Widget**
+- Profile Completion bar (% or dummy 50%)
+- Button: “Complete Your Profile” ➝ route to `/profile-setup`
+- Account verification notice: “Not Verified — Verify Now”
+- Button: “Invite a Friend”
+
+---
+
+5. **Routing Logic**
+- “Create My Profile” and “Skip for Now” on `/profile-setup` should both redirect to `/dashboard`, but if skipped, show a reminder card on dashboard to complete it.
+
+---
+
+📦 Tech Stack Preferences:
+- JavaScript/TypeScript frontend
+- React (if already used)
+- Use state management to store user info (dummy data OK)
+- Design can use Tailwind, Chakra, or simple CSS
+- Trips can be hardcoded for now if no DB is linked
+
+---
+
+💡 Please generate:
+- The full React component for this Dashboard
+- A dummy `trips.js` file with sample trip data
+- Clean, readable, componentized code (trip cards in separate component if possible)
+
+---
+
+Let me know if you need any more details. Once this is done, I’ll connect it to a backend. Thanks!

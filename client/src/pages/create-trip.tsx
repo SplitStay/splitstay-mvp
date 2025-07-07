@@ -1,85 +1,47 @@
-import React from "react";
-import { useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import logoImage from "@assets/Splitstay Logo Transparent_1751765053004.png";
+import { ArrowLeft, Plus } from "lucide-react";
 
-const CreateTrip: React.FC = () => {
-  const [_, navigate] = useLocation();
+export default function CreateTrip() {
+  const handleBack = () => {
+    window.history.back();
+  };
 
   return (
-    <div className="min-h-screen bg-cream py-8">
-      <div className="max-w-2xl mx-auto px-4">
-        
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/")}
-            className="flex items-center gap-2 text-navy hover:text-navy/80"
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 px-4 py-4">
+        <div className="max-w-3xl mx-auto flex items-center gap-4">
+          <button
+            onClick={handleBack}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
           >
-            <ArrowLeft size={20} />
-            Back to Home
-          </Button>
-          <img 
-            src={logoImage} 
-            alt="SplitStay Logo" 
-            className="h-16 w-auto"
-          />
+            <ArrowLeft className="w-5 h-5" />
+            Back
+          </button>
+          <h1 className="text-xl font-bold text-gray-900">Plan Your Trip</h1>
         </div>
+      </div>
 
-        {/* Main Content */}
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-navy mb-4">
-            Ready to Share Your Accommodation?
-          </h1>
-          <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-            Post your stay details and connect with verified travelers looking to split costs.
-          </p>
-
-          <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-            <h2 className="text-xl font-semibold text-navy mb-4">
-              What happens next?
-            </h2>
-            <div className="space-y-4 text-left">
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-navy rounded-full flex items-center justify-center text-white text-sm font-bold">
-                  1
-                </div>
-                <p className="text-gray-600">
-                  Share your accommodation details, dates, and preferences
-                </p>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-navy rounded-full flex items-center justify-center text-white text-sm font-bold">
-                  2
-                </div>
-                <p className="text-gray-600">
-                  Browse compatible travelers and send invitations
-                </p>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-navy rounded-full flex items-center justify-center text-white text-sm font-bold">
-                  3
-                </div>
-                <p className="text-gray-600">
-                  Connect, coordinate, and split the costs
-                </p>
-              </div>
-            </div>
+      {/* Content */}
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <div className="bg-white rounded-lg shadow-md p-8 text-center">
+          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Plus className="w-8 h-8 text-blue-600" />
           </div>
-
-          <Button 
-            onClick={() => navigate("/dashboard")}
-            size="lg"
-            className="bg-navy text-white hover:bg-navy/90 transition-colors duration-300 text-lg px-8 py-6 rounded-lg font-semibold"
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Create Your Trip Post
+          </h2>
+          <p className="text-gray-600 mb-6">
+            This feature is coming soon! You'll be able to create trip posts, set your travel dates, 
+            and connect with other travelers who want to share accommodations.
+          </p>
+          <button
+            onClick={handleBack}
+            className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
           >
-            Create My Trip
-          </Button>
+            Return to Dashboard
+          </button>
         </div>
       </div>
     </div>
   );
-};
-
-export default CreateTrip;
+}

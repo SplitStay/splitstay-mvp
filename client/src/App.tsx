@@ -12,6 +12,10 @@ import HowItWorks from "@/components/HowItWorks";
 import SignUp from "@/pages/signup";
 import Dashboard from "@/pages/dashboard";
 import DashboardNew from "@/pages/dashboard-new";
+import DashboardTrips from "@/pages/dashboard-trips";
+import CreateTrip from "@/pages/create-trip";
+import TripDetails from "@/pages/trip-details";
+import Chat from "@/pages/chat";
 import Profile from "@/pages/profile";
 import CreateProfile from "@/pages/create-profile";
 import TestSimple from "@/pages/test-simple";
@@ -62,19 +66,16 @@ function Router() {
         <Route path="/how-it-works" component={HowItWorks} />
         <Route path="/login" component={Login} />
         <Route path="/signup" component={SignUp} />
-        <Route path="/dashboard" component={DashboardNew} />
+        <Route path="/dashboard" component={DashboardTrips} />
         <Route path="/profile" component={Profile} />
         <Route path="/profile/edit" component={CreateProfile} />
         <Route path="/create-profile" component={CreateProfile} />
-        <Route path="/test" component={TestRoute} />
         <Route path="/create-trip" component={CreateTrip} />
-        <Route path="/browse-trips" component={BrowseTrips} />
-        <Route path="/find-roommate" component={FindRoommate} />
-        <Route path="/browse-profiles" component={BrowseProfiles} />
-        <Route path="/messages" component={Messages} />
-        <Route path="/leave-review/:id" component={LeaveReview} />
-        <Route path="/request-booking/:id" component={RequestBooking} />
-        <Route path="/request-sent/:id" component={RequestSent} />
+        <Route path="/trip/:tripId" component={TripDetails} />
+        <Route path="/chat/:userId" component={Chat} />
+        <Route path="/profile-setup" component={CreateProfile} />
+        <Route path="/test" component={TestRoute} />
+
         <Route path="/chat/:id" component={Chat} />
         <Route path="/booking-confirmation/:id" component={BookingConfirmation} />
         <Route path="/check-in/:id" component={CheckIn} />
