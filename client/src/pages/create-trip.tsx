@@ -127,15 +127,20 @@ export default function CreateTrip() {
     
     setIsSearchingDestinations(true);
     try {
-      // Use Nominatim OpenStreetMap geocoding API (free)
+      // Use Nominatim OpenStreetMap geocoding API with broader search
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=8&featuretype=city,town,village`
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=10&countrycodes=`
       );
       
       if (response.ok) {
         const data = await response.json();
+        console.log('API Response:', data); // Debug log
+        
         const cities = data
-          .filter((item: any) => item.display_name && (item.type === 'city' || item.type === 'town' || item.type === 'village' || item.class === 'place'))
+          .filter((item: any) => {
+            // Very permissive filtering - just need a display name
+            return item.display_name && item.display_name.length > 0;
+          })
           .map((item: any) => {
             // Extract city and country from display_name
             const parts = item.display_name.split(', ');
@@ -146,6 +151,7 @@ export default function CreateTrip() {
             }
             return item.display_name;
           })
+          .filter((city, index, self) => self.indexOf(city) === index) // Remove duplicates
           .slice(0, 8);
         
         setDestinationSuggestions(cities);
