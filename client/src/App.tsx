@@ -11,6 +11,7 @@ import Login from "@/pages/login";
 import HowItWorks from "@/components/HowItWorks";
 import SignUp from "@/pages/signup";
 import Dashboard from "@/pages/dashboard";
+import DashboardNew from "@/pages/dashboard-new";
 import Profile from "@/pages/profile";
 import CreateProfile from "@/pages/create-profile";
 import TestSimple from "@/pages/test-simple";
@@ -61,7 +62,7 @@ function Router() {
         <Route path="/how-it-works" component={HowItWorks} />
         <Route path="/login" component={Login} />
         <Route path="/signup" component={SignUp} />
-        <Route path="/dashboard" component={Dashboard} />
+        <Route path="/dashboard" component={DashboardNew} />
         <Route path="/profile" component={Profile} />
         <Route path="/profile/edit" component={CreateProfile} />
         <Route path="/create-profile" component={CreateProfile} />

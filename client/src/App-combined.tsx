@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { X, Plus } from "lucide-react";
 import splitstayLogo from "@assets/Splitstay Logo Transparent.png";
 import HowItWorks from "./components/HowItWorks";
+import Dashboard from "./pages/dashboard-new";
 
 function CreateProfile() {
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
@@ -125,8 +126,31 @@ function CreateProfile() {
       profileImage: profileImagePreview,
       travelPhotos
     };
-    console.log("Profile Data:", profileData);
-    alert("Profile created! Check console for data.");
+    
+    // Store profile completion status and user data
+    localStorage.setItem('profileCreated', 'true');
+    localStorage.setItem('user', JSON.stringify({
+      firstName: formData.fullName.split(' ')[0],
+      fullName: formData.fullName,
+      ...profileData
+    }));
+    
+    // Redirect to dashboard
+    window.history.pushState({}, '', '/dashboard');
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  };
+
+  const handleSkip = () => {
+    // Store that profile was skipped
+    localStorage.setItem('profileCreated', 'false');
+    localStorage.setItem('user', JSON.stringify({
+      firstName: 'traveler',
+      fullName: 'Guest User'
+    }));
+    
+    // Redirect to dashboard
+    window.history.pushState({}, '', '/dashboard');
+    window.dispatchEvent(new PopStateEvent('popstate'));
   };
 
   const isFormValid = formData.fullName && 
@@ -926,7 +950,7 @@ function CreateProfile() {
           
           <button 
             type="button"
-            onClick={() => alert("You can complete this later in your settings")}
+            onClick={handleSkip}
             className="px-5 py-2 text-sm font-semibold transition-colors text-gray-600 hover:text-gray-800"
             style={{ 
               fontFamily: 'system-ui, Inter, sans-serif'
@@ -956,6 +980,10 @@ function App() {
   // Route to different components based on path
   if (currentPath === '/how-it-works') {
     return <HowItWorks />;
+  }
+  
+  if (currentPath === '/dashboard') {
+    return <Dashboard />;
   }
 
   return <CreateProfile />;
