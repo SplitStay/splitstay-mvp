@@ -160,6 +160,35 @@ export default function CreateTrip() {
     return sharingKeywords.some(keyword => lowerUrl.includes(keyword));
   };
 
+  const checkRoomSharingCompatibilityFromDetails = (details: AccommodationDetails): boolean => {
+    if (!details) return false;
+    
+    // Check room type and description for sharing-friendly terms
+    const roomText = (details.roomType || '').toLowerCase();
+    const descriptionText = (details.description || '').toLowerCase();
+    const combinedText = `${roomText} ${descriptionText}`;
+    
+    const sharingKeywords = [
+      'twin', 'two beds', '2 beds', 'separate beds', 'twin beds',
+      'double room', 'triple', 'quad', 'family room', 'apartment', 'suite',
+      'bedroom', '2 bedroom', 'two bedroom', 'multiple rooms', 'multi-room',
+      'bunk', 'shared', 'hostel', 'dorm', 'twin room'
+    ];
+    
+    // Check if any sharing-friendly keywords are present
+    const hasShareableFeatures = sharingKeywords.some(keyword => 
+      combinedText.includes(keyword)
+    );
+    
+    // Also check if it's NOT a single bed room
+    const singleBedKeywords = ['single bed', 'single room', 'one bed', '1 bed'];
+    const isSingleBed = singleBedKeywords.some(keyword => 
+      combinedText.includes(keyword)
+    );
+    
+    return hasShareableFeatures && !isSingleBed;
+  };
+
   const isValidUrl = (url: string): boolean => {
     try {
       new URL(url);
@@ -192,6 +221,10 @@ export default function CreateTrip() {
         if (details.warnings && details.warnings.length > 0) {
           setExtractionWarnings(details.warnings);
         }
+
+        // Check room sharing compatibility based on the actual room details
+        const roomSharingCompatible = checkRoomSharingCompatibilityFromDetails(details);
+        setShowRoomSharingWarning(!roomSharingCompatible);
         
         // Update form data with enhanced extracted information
         setFormData(prev => ({
@@ -269,11 +302,8 @@ export default function CreateTrip() {
         platform: detectedPlatform
       }));
       
-      // Check room sharing compatibility and show warning if needed
+      // Fetch accommodation details and parse URL
       if (value.trim() && isValidUrl(value)) {
-        const isCompatible = checkRoomSharingCompatibility(value);
-        setShowRoomSharingWarning(!isCompatible);
-        
         fetchAccommodationDetails(value);
         parseBookingURL(value);
       } else {
