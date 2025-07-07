@@ -160,6 +160,35 @@ export default function CreateTrip() {
     }
   };
 
+  const parseBookingURL = async (url: string) => {
+    try {
+      const response = await fetch('/api/booking/parse-url', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url }),
+      });
+
+      if (response.ok) {
+        const bookingDetails = await response.json();
+        
+        // Auto-fill form fields with parsed data
+        setFormData(prev => ({
+          ...prev,
+          startDate: bookingDetails.checkin || prev.startDate,
+          endDate: bookingDetails.checkout || prev.endDate,
+          destination: bookingDetails.destination || prev.destination,
+          platform: bookingDetails.platform || prev.platform
+        }));
+      } else {
+        console.error('Failed to parse booking URL');
+      }
+    } catch (error) {
+      console.error('Error parsing booking URL:', error);
+    }
+  };
+
   const handleInputChange = (field: keyof TripFormData, value: string | string[]) => {
     setFormData(prev => ({
       ...prev,
@@ -176,6 +205,7 @@ export default function CreateTrip() {
       // Fetch accommodation details if it's a valid URL
       if (value.trim() && isValidUrl(value)) {
         fetchAccommodationDetails(value);
+        parseBookingURL(value);
       } else {
         setAccommodationDetails(null);
       }
