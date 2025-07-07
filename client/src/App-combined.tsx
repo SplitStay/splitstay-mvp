@@ -237,16 +237,16 @@ function CreateProfile() {
         <div className="w-full text-center">
           
           {/* Logo */}
-          <div className="mb-2 flex justify-center">
+          <div className="flex justify-center">
             <img 
               src={splitstayLogo} 
               alt="SplitStay Logo" 
-              className="h-64 md:h-80 mb-6"
+              className="h-48 md:h-64 mb-2"
             />
           </div>
           
           {/* Headline */}
-          <h1 className="text-3xl lg:text-4xl font-bold text-navy mb-4">
+          <h1 className="text-3xl lg:text-4xl font-bold text-navy mb-4 mt-2">
             Share your accommodation. Save money. Meet travelers.
           </h1>
           
