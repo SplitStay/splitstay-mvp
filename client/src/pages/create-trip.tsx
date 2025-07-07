@@ -32,6 +32,24 @@ interface AccommodationDetails {
   checkInDate?: string;
   checkOutDate?: string;
   amenities?: string[];
+  // Enhanced fields
+  hotel_name?: string;
+  image_url?: string;
+  price_per_night?: string;
+  currency?: string;
+  check_in?: string;
+  check_out?: string;
+  destination?: string;
+  extraction_status?: {
+    hotel_name: boolean;
+    image_url: boolean;
+    price_detected: boolean;
+    currency_detected: boolean;
+    dates_detected: boolean;
+    destination_detected: boolean;
+  };
+  warnings?: string[];
+  price_confidence?: 'high' | 'medium' | 'low';
 }
 
 export default function CreateTrip() {
@@ -46,6 +64,7 @@ export default function CreateTrip() {
   const [isBookingLinkProcessed, setIsBookingLinkProcessed] = useState(false);
   const [scrapingError, setScrapingError] = useState<string | null>(null);
   const [maxTripVibesSelected, setMaxTripVibesSelected] = useState(false);
+  const [extractionWarnings, setExtractionWarnings] = useState<string[]>([]);
   const [formData, setFormData] = useState<TripFormData>({
     accommodationLink: '',
     platform: '',
@@ -71,7 +90,16 @@ export default function CreateTrip() {
   ];
 
   const tripVibes = ['Chill', 'Cultural', 'Active', 'Social', 'Work-friendly', 'Spiritual / Wellness'];
-  const currencies = ['USD', 'EUR', 'GBP', 'PHP', 'THB', 'IDR', 'SGD', 'AUD', 'CAD', 'JPY'];
+  const currencies = [
+    'USD', 'EUR', 'GBP', 'PHP', 'THB', 'IDR', 'SGD', 'AUD', 'CAD', 'JPY', 
+    'INR', 'NGN', 'PKR', 'CHF', 'HKD', 'CNY', 'KRW', 'VND', 'MYR', 'BRL', 
+    'MXN', 'ZAR', 'SEK', 'NOK', 'DKK', 'PLN', 'CZK', 'HUF', 'BGN', 'RON', 
+    'HRK', 'RUB', 'TRY', 'ILS', 'AED', 'SAR', 'QAR', 'KWD', 'BHD', 'OMR', 
+    'JOD', 'EGP', 'MAD', 'TND', 'DZD', 'LYD', 'SDG', 'ETB', 'KES', 'UGX', 
+    'TZS', 'GHS', 'XOF', 'XAF', 'MGA', 'MUR', 'SCR', 'SZL', 'LSL', 'BWP', 
+    'NAD', 'ZWL', 'AOA', 'MZN', 'STD', 'CVE', 'GMD', 'GNF', 'LRD', 'SLL', 
+    'SLE', 'RWF', 'BIF', 'KMF', 'DJF', 'SOS', 'ERN'
+  ];
   const coTravelerOptions = [
     { value: 'open', label: 'Open to Anyone' },
     { value: 'same-gender', label: 'Same Gender' },
@@ -125,6 +153,7 @@ export default function CreateTrip() {
     setIsLoadingAccommodation(true);
     setAccommodationDetails(null);
     setScrapingError(null);
+    setExtractionWarnings([]);
     
     try {
       const response = await fetch('/api/accommodation/details', {
@@ -139,22 +168,29 @@ export default function CreateTrip() {
         const details = await response.json();
         setAccommodationDetails(details);
         
-        // Update form data with extracted information
+        // Set warnings if any
+        if (details.warnings && details.warnings.length > 0) {
+          setExtractionWarnings(details.warnings);
+        }
+        
+        // Update form data with enhanced extracted information
         setFormData(prev => ({
           ...prev,
-          accommodationImage: details.image,
+          // Enhanced fields first
+          accommodationImage: details.image_url || details.image,
           roomType: details.roomType,
           roomSize: details.roomSize,
           extractedPrice: details.price,
-          hotelName: details.title,
+          hotelName: details.hotel_name || details.title,
           amenities: details.amenities || [],
-          // Auto-fill destination if extracted from URL
-          destination: details.location || prev.destination,
-          // Auto-fill dates if found in URL parameters
-          startDate: details.checkInDate || prev.startDate,
-          endDate: details.checkOutDate || prev.endDate,
-          // Auto-fill cost if extracted
-          costPerNight: details.price?.replace(/[^0-9.]/g, '') || prev.costPerNight
+          // Auto-fill destination with enhanced extraction
+          destination: details.destination || details.location || prev.destination,
+          // Auto-fill dates with enhanced extraction
+          startDate: details.check_in || details.checkInDate || prev.startDate,
+          endDate: details.check_out || details.checkOutDate || prev.endDate,
+          // Auto-fill cost and currency with enhanced extraction
+          costPerNight: details.price_per_night || details.price?.replace(/[^0-9.]/g, '') || prev.costPerNight,
+          currency: details.currency || prev.currency
         }));
         
         setIsBookingLinkProcessed(true);
@@ -563,10 +599,10 @@ export default function CreateTrip() {
                 <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
                   <div className="flex gap-4">
                     {/* Room Image */}
-                    {accommodationDetails.image && (
+                    {(accommodationDetails.image_url || accommodationDetails.image) && (
                       <div className="flex-shrink-0">
                         <img 
-                          src={accommodationDetails.image} 
+                          src={accommodationDetails.image_url || accommodationDetails.image} 
                           alt="Room" 
                           className="w-16 h-16 rounded-lg object-cover shadow-sm"
                         />
@@ -575,15 +611,28 @@ export default function CreateTrip() {
                     
                     {/* Details */}
                     <div className="flex-1">
-                      {accommodationDetails.title && (
-                        <h4 className="font-semibold text-gray-900 mb-1">{accommodationDetails.title}</h4>
+                      {(accommodationDetails.hotel_name || accommodationDetails.title) && (
+                        <h4 className="font-semibold text-gray-900 mb-1">
+                          {accommodationDetails.hotel_name || accommodationDetails.title}
+                        </h4>
                       )}
                       <div className="space-y-1 text-sm text-gray-600">
                         {accommodationDetails.roomType && (
                           <p><span className="font-medium">Room:</span> {accommodationDetails.roomType}</p>
                         )}
-                        {accommodationDetails.price && (
-                          <p><span className="font-medium">Price:</span> {accommodationDetails.price}</p>
+                        {(accommodationDetails.price_per_night || accommodationDetails.price) && (
+                          <p>
+                            <span className="font-medium">Price:</span> 
+                            {accommodationDetails.currency && accommodationDetails.price_per_night ? 
+                              `${accommodationDetails.currency} ${accommodationDetails.price_per_night}` : 
+                              accommodationDetails.price
+                            }
+                            {accommodationDetails.price_confidence === 'high' && (
+                              <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">
+                                ✓ Auto-detected
+                              </span>
+                            )}
+                          </p>
                         )}
                         {accommodationDetails.roomSize && (
                           <p><span className="font-medium">Size:</span> {accommodationDetails.roomSize}</p>
@@ -591,6 +640,20 @@ export default function CreateTrip() {
                       </div>
                     </div>
                   </div>
+                  
+                  {/* Warnings Section */}
+                  {extractionWarnings.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-blue-200">
+                      <div className="space-y-1">
+                        {extractionWarnings.map((warning, index) => (
+                          <div key={index} className="flex items-center gap-2 text-sm text-amber-700">
+                            <span className="text-amber-500">⚠️</span>
+                            {warning}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -719,6 +782,23 @@ export default function CreateTrip() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
+                  
+                  {/* Price extraction status */}
+                  {accommodationDetails?.price_confidence === 'high' && formData.costPerNight && (
+                    <p className="text-xs text-green-600 mt-1">
+                      ✓ Price auto-detected from Booking.com – no conversion applied
+                    </p>
+                  )}
+                  {accommodationDetails?.price_confidence === 'medium' && formData.costPerNight && (
+                    <p className="text-xs text-amber-600 mt-1">
+                      ⚠️ Price detected but currency uncertain – please verify
+                    </p>
+                  )}
+                  {extractionWarnings.some(w => w.includes('Price not found')) && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      ⚠️ Price not auto-detected – please enter manually
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -734,6 +814,25 @@ export default function CreateTrip() {
                       <option key={currency} value={currency}>{currency}</option>
                     ))}
                   </select>
+                  
+                  {/* Currency extraction status */}
+                  {accommodationDetails?.currency && accommodationDetails.currency === formData.currency && (
+                    <p className="text-xs text-green-600 mt-1">
+                      ✓ Currency auto-detected from booking page
+                    </p>
+                  )}
+                  {extractionWarnings.some(w => w.includes('Unable to detect currency')) && (
+                    <p className="text-xs text-amber-600 mt-1">
+                      ⚠️ Unable to detect currency – please verify manually
+                    </p>
+                  )}
+                  
+                  {/* Fallback currency help */}
+                  {!accommodationDetails?.currency && formData.accommodationLink && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      What currency is the price displayed in?
+                    </p>
+                  )}
                 </div>
               </div>
 
