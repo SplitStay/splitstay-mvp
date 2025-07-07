@@ -67,7 +67,7 @@ export default function CreateTrip() {
     { name: 'Other', domains: [], icon: '🔗' }
   ];
 
-  const tripVibes = ['Chill', 'Cultural', 'Active', 'Social', 'Work-friendly'];
+  const tripVibes = ['Chill', 'Cultural', 'Active', 'Social', 'Work-friendly', 'Spiritual / Wellness'];
   const currencies = ['USD', 'EUR', 'GBP', 'PHP', 'THB', 'IDR', 'SGD', 'AUD', 'CAD', 'JPY'];
   const coTravelerOptions = [
     { value: 'open', label: 'Open to Anyone' },
