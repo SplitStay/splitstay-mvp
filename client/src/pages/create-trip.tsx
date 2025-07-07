@@ -59,12 +59,17 @@ export default function CreateTrip() {
     'Jakarta, Indonesia', 'Hong Kong, Hong Kong', 'Taipei, Taiwan',
     'London, United Kingdom', 'Paris, France', 'Barcelona, Spain', 'Berlin, Germany',
     'Amsterdam, Netherlands', 'Rome, Italy', 'Prague, Czech Republic', 'Vienna, Austria',
+    'Brussels, Belgium', 'Madrid, Spain', 'Lisbon, Portugal', 'Copenhagen, Denmark',
+    'Stockholm, Sweden', 'Oslo, Norway', 'Helsinki, Finland', 'Zurich, Switzerland',
+    'Milan, Italy', 'Munich, Germany', 'Budapest, Hungary', 'Warsaw, Poland',
     'New York, United States', 'Los Angeles, United States', 'San Francisco, United States',
     'Toronto, Canada', 'Vancouver, Canada', 'Sydney, Australia', 'Melbourne, Australia',
     'Dubai, UAE', 'Istanbul, Turkey', 'Cairo, Egypt', 'Mumbai, India', 'Delhi, India',
     'Bali, Indonesia', 'Phuket, Thailand', 'Boracay, Philippines', 'Jeju, South Korea',
     'Kyoto, Japan', 'Osaka, Japan', 'Chiang Mai, Thailand', 'Penang, Malaysia',
-    'Hanoi, Vietnam', 'Da Nang, Vietnam', 'Siem Reap, Cambodia', 'Yangon, Myanmar'
+    'Hanoi, Vietnam', 'Da Nang, Vietnam', 'Siem Reap, Cambodia', 'Yangon, Myanmar',
+    'Shanghai, China', 'Beijing, China', 'Guangzhou, China', 'Shenzhen, China',
+    'Moscow, Russia', 'St. Petersburg, Russia', 'Tel Aviv, Israel', 'Athens, Greece'
   ];
 
 
@@ -101,7 +106,7 @@ export default function CreateTrip() {
           dest.toLowerCase().includes(value.toLowerCase())
         ).slice(0, 8); // Show max 8 suggestions
         setDestinationSuggestions(filtered);
-        setShowDestinationSuggestions(true);
+        setShowDestinationSuggestions(filtered.length > 0);
       } else {
         setShowDestinationSuggestions(false);
       }
@@ -322,7 +327,7 @@ export default function CreateTrip() {
                   value={formData.destination}
                   onChange={(e) => handleInputChange('destination', e.target.value)}
                   onBlur={() => setTimeout(() => setShowDestinationSuggestions(false), 200)}
-                  placeholder="e.g. Tokyo, Japan"
+                  placeholder="Type any city, e.g. Brussels, Belgium"
                   className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
