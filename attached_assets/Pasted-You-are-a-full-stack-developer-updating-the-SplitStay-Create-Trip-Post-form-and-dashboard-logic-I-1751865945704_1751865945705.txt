@@ -1,0 +1,65 @@
+You are a full-stack developer updating the SplitStay "Create Trip Post" form and dashboard logic. Implement the following enhancements:
+
+---
+
+### 🔁 Form Logic & UX Enhancements
+
+1. **Move "Accommodation Link" to the top of the form**  
+   - Once a valid **Booking.com** link is detected, parse the URL to extract:
+     - 📍 Location (city, country)
+     - 📅 Dates (check-in, check-out)
+     - 🏨 Room Type
+     - 💰 Price per night (base rate or average)
+     - 🖼️ Main room image
+     - 📋 Room amenities
+   - Auto-fill these fields and **make them visible only after detection is successful**.
+
+2. **Display a Smart Accommodation Summary Card**  
+   - Show a card like in the screenshot with:
+     - Hotel name
+     - Room type and summary
+     - Room image (thumbnail)
+     - Price
+     - “More/Less” toggle for amenities
+
+3. **Add Radio Option: "Booking Status"**
+   - Prompt: _Have you already booked this room?_
+     - ⭕ Yes, already booked
+     - ⭕ Not yet booked (preferred option)
+   - If "Already booked" is selected:
+     - Show a yellow **informational message**:
+       > ⚠️ Heads up! If no match is found, you may be responsible for the full room cost. Check the platform for cancellation options.
+
+---
+
+### 💱 Currency & Cost Field Improvements
+
+4. Rename **"Estimated Cost per Night" → "Cost per Night"**.
+5. Add a **Currency selector** next to the cost field (e.g. USD, EUR, PHP, GBP).
+   - Default currency based on booking.com country if possible.
+
+---
+
+### 🏷️ Vibe Categories (Update from Trip Type)
+
+6. Replace "Trip Type" with **"Trip Vibe (Select up to 2)"** and update categories:
+   - Chill
+   - Cultural
+   - Active (e.g. hiking, surfing)
+   - Social
+   - Work-friendly
+
+---
+
+### 📱 Dashboard Logic Improvements
+
+7. On the main dashboard, show **recently posted trips** by other users (instead of recommended matches).
+   - Add filters for destination, date range, and vibe.
+
+---
+
+### 🧼 Clean UI Practice
+
+8. Keep non-critical sections (like Optional Details) collapsible or visually grouped.
+9. Ensure everything is fully **responsive and optimized for mobile**.
+

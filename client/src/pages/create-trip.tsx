@@ -2,21 +2,24 @@ import { useState } from "react";
 import { ArrowLeft, Plus, MapPin, Calendar, DollarSign, Users, Globe, Heart, Share2, Copy, MessageCircle, Loader2 } from "lucide-react";
 
 interface TripFormData {
+  accommodationLink: string;
+  platform: string;
   destination: string;
   startDate: string;
   endDate: string;
-  accommodationLink: string;
-  platform: string;
   description: string;
   costPerNight: string;
   currency: string;
   spotsAvailable: string;
   tripVibes: string[];
   preferredCoTraveler: string;
+  bookingStatus: 'booked' | 'not-booked';
   accommodationImage?: string;
   roomType?: string;
   roomSize?: string;
   extractedPrice?: string;
+  hotelName?: string;
+  amenities?: string[];
 }
 
 interface AccommodationDetails {
@@ -25,6 +28,10 @@ interface AccommodationDetails {
   price: string;
   roomSize: string;
   title: string;
+  location?: string;
+  checkInDate?: string;
+  checkOutDate?: string;
+  amenities?: string[];
 }
 
 export default function CreateTrip() {
@@ -37,17 +44,18 @@ export default function CreateTrip() {
   const [accommodationDetails, setAccommodationDetails] = useState<AccommodationDetails | null>(null);
   const [isLoadingAccommodation, setIsLoadingAccommodation] = useState(false);
   const [formData, setFormData] = useState<TripFormData>({
+    accommodationLink: '',
+    platform: '',
     destination: '',
     startDate: '',
     endDate: '',
-    accommodationLink: '',
-    platform: '',
     description: '',
     costPerNight: '',
     currency: 'USD',
     spotsAvailable: '1',
     tripVibes: [],
-    preferredCoTraveler: 'open'
+    preferredCoTraveler: 'open',
+    bookingStatus: 'not-booked'
   });
 
   const platforms = [
@@ -59,7 +67,7 @@ export default function CreateTrip() {
     { name: 'Other', domains: [], icon: '🔗' }
   ];
 
-  const tripVibes = ['Relax & Recharge', 'Explore & Discover', 'Social & Fun', 'Adventure & Activities', 'Remote Work Friendly'];
+  const tripVibes = ['Chill', 'Cultural', 'Active', 'Social', 'Work-friendly'];
   const currencies = ['USD', 'EUR', 'GBP', 'PHP', 'THB', 'IDR', 'SGD', 'AUD', 'CAD', 'JPY'];
   const coTravelerOptions = [
     { value: 'open', label: 'Open to Anyone' },
@@ -133,7 +141,16 @@ export default function CreateTrip() {
           accommodationImage: details.image,
           roomType: details.roomType,
           roomSize: details.roomSize,
-          extractedPrice: details.price
+          extractedPrice: details.price,
+          hotelName: details.title,
+          amenities: details.amenities || [],
+          // Auto-fill destination if extracted from URL
+          destination: details.location || prev.destination,
+          // Auto-fill dates if found in URL parameters
+          startDate: details.checkInDate || prev.startDate,
+          endDate: details.checkOutDate || prev.endDate,
+          // Auto-fill cost if extracted
+          costPerNight: details.price?.replace(/[^0-9.]/g, '') || prev.costPerNight
         }));
       }
     } catch (error) {
@@ -455,50 +472,124 @@ export default function CreateTrip() {
         <div className="bg-white rounded-lg shadow-md p-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Create Your Trip Post</h2>
           
-          {/* Required Fields */}
+          {/* Step 1: Accommodation Link */}
           <div className="space-y-6 mb-8">
-            <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Required Information</h3>
+            <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Step 1: Accommodation Link</h3>
             
-            {/* Destination */}
-            <div className="relative">
+            {/* Accommodation Link */}
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Destination (City, Country) *
+                Booking Link *
               </label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                {isSearchingDestinations && (
-                  <Loader2 className="absolute right-3 top-3 h-4 w-4 text-gray-400 animate-spin" />
-                )}
-                <input
-                  type="text"
-                  value={formData.destination}
-                  onChange={(e) => handleInputChange('destination', e.target.value)}
-                  onBlur={() => setTimeout(() => setShowDestinationSuggestions(false), 200)}
-                  placeholder="Type any city, e.g. Barcelona, Spain"
-                  className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-                
-                {/* Autocomplete Dropdown */}
-                {showDestinationSuggestions && destinationSuggestions.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                    {destinationSuggestions.map((destination, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() => handleDestinationSelect(destination)}
-                        className="w-full text-left px-4 py-2 hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
-                      >
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4 text-gray-400" />
-                          <span className="text-gray-900">{destination}</span>
-                        </div>
-                      </button>
-                    ))}
+              <input
+                type="url"
+                value={formData.accommodationLink}
+                onChange={(e) => handleInputChange('accommodationLink', e.target.value)}
+                placeholder="https://booking.com/hotel/..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+              
+              {/* Platform Detection */}
+              {formData.platform && (
+                <p className="text-sm text-gray-600 mt-1">
+                  Detected platform: {getPlatformIcon(formData.platform)} {formData.platform}
+                </p>
+              )}
+              
+              {/* Loading State */}
+              {isLoadingAccommodation && (
+                <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+                    <span className="text-sm text-blue-700">Analyzing accommodation details...</span>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
+              
+              {/* Smart Accommodation Summary Card */}
+              {accommodationDetails && (
+                <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
+                  <div className="flex gap-4">
+                    {/* Room Image */}
+                    {accommodationDetails.image && (
+                      <div className="flex-shrink-0">
+                        <img 
+                          src={accommodationDetails.image} 
+                          alt="Room" 
+                          className="w-16 h-16 rounded-lg object-cover shadow-sm"
+                        />
+                      </div>
+                    )}
+                    
+                    {/* Details */}
+                    <div className="flex-1">
+                      {accommodationDetails.title && (
+                        <h4 className="font-semibold text-gray-900 mb-1">{accommodationDetails.title}</h4>
+                      )}
+                      <div className="space-y-1 text-sm text-gray-600">
+                        {accommodationDetails.roomType && (
+                          <p><span className="font-medium">Room:</span> {accommodationDetails.roomType}</p>
+                        )}
+                        {accommodationDetails.price && (
+                          <p><span className="font-medium">Price:</span> {accommodationDetails.price}</p>
+                        )}
+                        {accommodationDetails.roomSize && (
+                          <p><span className="font-medium">Size:</span> {accommodationDetails.roomSize}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
+          </div>
+
+          {/* Step 2: Trip Details - Only show after accommodation detected */}
+          {(accommodationDetails || formData.destination) && (
+            <div className="space-y-6 mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Step 2: Trip Details</h3>
+              
+              {/* Destination */}
+              <div className="relative">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Destination (City, Country) *
+                </label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  {isSearchingDestinations && (
+                    <Loader2 className="absolute right-3 top-3 h-4 w-4 text-gray-400 animate-spin" />
+                  )}
+                  <input
+                    type="text"
+                    value={formData.destination}
+                    onChange={(e) => handleInputChange('destination', e.target.value)}
+                    onBlur={() => setTimeout(() => setShowDestinationSuggestions(false), 200)}
+                    placeholder="Type any city, e.g. Barcelona, Spain"
+                    className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                  
+                  {/* Autocomplete Dropdown */}
+                  {showDestinationSuggestions && destinationSuggestions.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                      {destinationSuggestions.map((destination, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => handleDestinationSelect(destination)}
+                          className="w-full text-left px-4 py-2 hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
+                        >
+                          <div className="flex items-center gap-2">
+                            <MapPin className="w-4 h-4 text-gray-400" />
+                            <span className="text-gray-900">{destination}</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
 
             {/* Dates */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -528,73 +619,54 @@ export default function CreateTrip() {
               </div>
             </div>
 
-            {/* Accommodation Link */}
+            {/* Booking Status */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Accommodation Link *
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Have you already booked this room? *
               </label>
-              <input
-                type="url"
-                value={formData.accommodationLink}
-                onChange={(e) => handleInputChange('accommodationLink', e.target.value)}
-                placeholder="https://booking.com/hotel/..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
+              <div className="space-y-2">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="bookingStatus"
+                    value="not-booked"
+                    checked={formData.bookingStatus === 'not-booked'}
+                    onChange={(e) => handleInputChange('bookingStatus', e.target.value)}
+                    className="mr-2"
+                  />
+                  <span>Not yet booked (preferred option)</span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="bookingStatus"
+                    value="booked"
+                    checked={formData.bookingStatus === 'booked'}
+                    onChange={(e) => handleInputChange('bookingStatus', e.target.value)}
+                    className="mr-2"
+                  />
+                  <span>Yes, already booked</span>
+                </label>
+              </div>
               
-              {/* Platform Detection */}
-              {formData.platform && (
-                <p className="text-sm text-gray-600 mt-1">
-                  Detected platform: {getPlatformIcon(formData.platform)} {formData.platform}
-                </p>
-              )}
-              
-              {/* Loading State */}
-              {isLoadingAccommodation && (
-                <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
-                    <span className="text-sm text-blue-700">Fetching accommodation details...</span>
-                  </div>
-                </div>
-              )}
-              
-              {/* Accommodation Details Preview */}
-              {accommodationDetails && (
-                <div className="mt-3 p-4 bg-gray-50 border border-gray-200 rounded-md">
-                  <h4 className="text-sm font-medium text-gray-700 mb-3">Accommodation Details</h4>
-                  <div className="flex gap-4">
-                    {/* Room Image */}
-                    {accommodationDetails.image && (
-                      <div className="flex-shrink-0">
-                        <img 
-                          src={accommodationDetails.image} 
-                          alt="Room" 
-                          className="w-20 h-20 rounded-md object-cover"
-                        />
-                      </div>
-                    )}
-                    
-                    {/* Details */}
-                    <div className="flex-1 space-y-1">
-                      {accommodationDetails.title && (
-                        <p className="text-sm font-medium text-gray-900">{accommodationDetails.title}</p>
-                      )}
-                      {accommodationDetails.roomType && (
-                        <p className="text-sm text-gray-600">Room Type: {accommodationDetails.roomType}</p>
-                      )}
-                      {accommodationDetails.roomSize && (
-                        <p className="text-sm text-gray-600">Size: {accommodationDetails.roomSize}</p>
-                      )}
-                      {accommodationDetails.price && (
-                        <p className="text-sm text-gray-600">Price: {accommodationDetails.price}</p>
-                      )}
-                    </div>
+              {/* Warning message for already booked */}
+              {formData.bookingStatus === 'booked' && (
+                <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                  <div className="flex items-start gap-2">
+                    <span className="text-yellow-600 mt-0.5">⚠️</span>
+                    <p className="text-sm text-yellow-800">
+                      <strong>Heads up!</strong> If no match is found, you may be responsible for the full room cost. Check the platform for cancellation options.
+                    </p>
                   </div>
                 </div>
               )}
             </div>
+          )}
 
+          {/* Step 3: Trip Details */}
+          <div className="space-y-6 mb-8">
+            <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Step 3: Trip Details</h3>
+            
             {/* Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -620,7 +692,7 @@ export default function CreateTrip() {
             <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Optional Details</h3>
             
             {/* Cost and Currency */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Cost per Night
@@ -669,10 +741,9 @@ export default function CreateTrip() {
             {/* Trip Vibe Categories */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Trip Vibe Categories
-                <span className="text-xs text-gray-500 ml-2">(Select 1-2 vibes)</span>
+                Trip Vibe (Select up to 2)
               </label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {tripVibes.map((vibe) => (
                   <button
                     key={vibe}
@@ -689,6 +760,7 @@ export default function CreateTrip() {
                 ))}
               </div>
             </div>
+          </div>
 
             {/* Preferred Co-traveler */}
             <div>
@@ -708,7 +780,6 @@ export default function CreateTrip() {
               </select>
             </div>
           </div>
-
           {/* Submit Button */}
           <div className="flex gap-4">
             <button
