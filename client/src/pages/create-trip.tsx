@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Plus, MapPin, Calendar, DollarSign, Users, Globe, Heart, Share2, Copy, MessageCircle } from "lucide-react";
+import { ArrowLeft, Plus, MapPin, Calendar, DollarSign, Users, Globe, Heart, Share2, Copy, MessageCircle, Loader2 } from "lucide-react";
 
 interface TripFormData {
   destination: string;
@@ -20,6 +20,8 @@ export default function CreateTrip() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showDestinationSuggestions, setShowDestinationSuggestions] = useState(false);
   const [destinationSuggestions, setDestinationSuggestions] = useState<string[]>([]);
+  const [isSearchingDestinations, setIsSearchingDestinations] = useState(false);
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
   const [formData, setFormData] = useState<TripFormData>({
     destination: '',
     startDate: '',
@@ -99,17 +101,66 @@ export default function CreateTrip() {
       }));
     }
 
-    // Handle destination search
+    // Handle destination search with debouncing
     if (field === 'destination' && typeof value === 'string') {
-      if (value.length > 1) {
-        const filtered = popularDestinations.filter(dest =>
-          dest.toLowerCase().includes(value.toLowerCase())
-        ).slice(0, 8); // Show max 8 suggestions
-        setDestinationSuggestions(filtered);
-        setShowDestinationSuggestions(filtered.length > 0);
+      // Clear previous timeout
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+      
+      if (value.length > 2) {
+        // Debounce the search to avoid too many API calls
+        const timeout = setTimeout(() => {
+          searchCities(value);
+        }, 500);
+        setSearchTimeout(timeout);
       } else {
         setShowDestinationSuggestions(false);
+        setDestinationSuggestions([]);
+        setIsSearchingDestinations(false);
       }
+    }
+  };
+
+  const searchCities = async (query: string) => {
+    if (query.length < 3) return;
+    
+    setIsSearchingDestinations(true);
+    try {
+      // Use Nominatim OpenStreetMap geocoding API (free)
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=8&featuretype=city,town,village`
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        const cities = data
+          .filter((item: any) => item.display_name && (item.type === 'city' || item.type === 'town' || item.type === 'village' || item.class === 'place'))
+          .map((item: any) => {
+            // Extract city and country from display_name
+            const parts = item.display_name.split(', ');
+            if (parts.length >= 2) {
+              const city = parts[0];
+              const country = parts[parts.length - 1];
+              return `${city}, ${country}`;
+            }
+            return item.display_name;
+          })
+          .slice(0, 8);
+        
+        setDestinationSuggestions(cities);
+        setShowDestinationSuggestions(cities.length > 0);
+      }
+    } catch (error) {
+      console.error('Error searching cities:', error);
+      // Fallback to local search if API fails
+      const filtered = popularDestinations.filter(dest =>
+        dest.toLowerCase().includes(query.toLowerCase())
+      ).slice(0, 8);
+      setDestinationSuggestions(filtered);
+      setShowDestinationSuggestions(filtered.length > 0);
+    } finally {
+      setIsSearchingDestinations(false);
     }
   };
 
@@ -322,13 +373,16 @@ export default function CreateTrip() {
               </label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                {isSearchingDestinations && (
+                  <Loader2 className="absolute right-3 top-3 h-4 w-4 text-gray-400 animate-spin" />
+                )}
                 <input
                   type="text"
                   value={formData.destination}
                   onChange={(e) => handleInputChange('destination', e.target.value)}
                   onBlur={() => setTimeout(() => setShowDestinationSuggestions(false), 200)}
-                  placeholder="Type any city, e.g. Brussels, Belgium"
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Type any city, e.g. Eindhoven, Netherlands"
+                  className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
                 
