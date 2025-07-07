@@ -296,6 +296,15 @@ function CreateProfile() {
             >
               Create My Profile
             </button>
+            <p className="mt-4 text-gray-600">
+              Already have a profile?{' '}
+              <button 
+                onClick={() => setShowForm(true)}
+                className="text-navy hover:text-navy/80 font-medium underline"
+              >
+                Log in
+              </button>
+            </p>
           </div>
           
           {/* Benefits Section */}
