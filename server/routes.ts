@@ -11,6 +11,134 @@ import {
   insertReviewSchema 
 } from "@shared/schema";
 import researchRoutes from "./research-routes";
+import * as cheerio from "cheerio";
+import fetch from "node-fetch";
+
+async function scrapeAccommodationDetails(url: string) {
+  const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36';
+  
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': userAgent,
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const html = await response.text();
+    const $ = cheerio.load(html);
+
+    // Try different selectors for different booking platforms
+    let image = '';
+    let title = '';
+    let roomType = '';
+    let price = '';
+    let roomSize = '';
+
+    // Booking.com selectors
+    if (url.includes('booking.com')) {
+      // Main image
+      image = $('img[data-testid="property-image"]').first().attr('src') || 
+              $('.gallery-image img').first().attr('src') || 
+              $('.bh-photo-grid img').first().attr('src') ||
+              $('[data-photo] img').first().attr('src') ||
+              $('.hp_hotel_img img').first().attr('src') || '';
+
+      // Title
+      title = $('[data-testid="property-name"]').text().trim() ||
+              $('.pp-header__title').text().trim() ||
+              $('.hotel_name_wrapper h1').text().trim() ||
+              $('h1').first().text().trim() || '';
+
+      // Room type
+      roomType = $('[data-testid="room-name"]').first().text().trim() ||
+                 $('.room-name').first().text().trim() ||
+                 $('.room-type').first().text().trim() ||
+                 $('.hprt-table-cell-roomtype').first().text().trim() || '';
+
+      // Price
+      price = $('[data-testid="price-for-x-nights"]').text().trim() ||
+              $('.bui-price-display__value').first().text().trim() ||
+              $('.site_price').first().text().trim() ||
+              $('.price').first().text().trim() || '';
+
+      // Room size
+      roomSize = $('.bui-badge').filter((i, el) => $(el).text().includes('m²')).text().trim() ||
+                 $('.room-facilities').find('span:contains("m²")').text().trim() || '';
+    }
+
+    // Airbnb selectors
+    else if (url.includes('airbnb.com')) {
+      image = $('[data-testid="photo-viewer-media"] img').first().attr('src') ||
+              $('._12rgp2s img').first().attr('src') ||
+              $('[aria-label*="photo"] img').first().attr('src') || '';
+
+      title = $('[data-testid="property-title"]').text().trim() ||
+              $('._fecoyn4').text().trim() ||
+              $('h1').first().text().trim() || '';
+
+      roomType = $('[data-testid="property-type"]').text().trim() ||
+                 $('._8btd50').text().trim() || '';
+
+      price = $('[data-testid="price-breakdown"]').text().trim() ||
+              $('._155sga30').text().trim() ||
+              $('.price').first().text().trim() || '';
+    }
+
+    // Agoda selectors
+    else if (url.includes('agoda.com')) {
+      image = $('.PropertyPhotos img').first().attr('src') ||
+              $('[data-element-name="hotel-cover-image"] img').attr('src') ||
+              $('.gallery-image img').first().attr('src') || '';
+
+      title = $('[data-element-name="hotel-header-name"]').text().trim() ||
+              $('.HeaderTitle').text().trim() ||
+              $('h1').first().text().trim() || '';
+
+      roomType = $('.MasterRoom').first().text().trim() ||
+                 $('.room-type-name').first().text().trim() || '';
+
+      price = $('.Price-value').first().text().trim() ||
+              $('.original-price').first().text().trim() || '';
+    }
+
+    // Generic fallbacks
+    if (!image) {
+      image = $('meta[property="og:image"]').attr('content') ||
+              $('img').filter((i, el) => {
+                const src = $(el).attr('src') || '';
+                const alt = $(el).attr('alt') || '';
+                return src.includes('hotel') || src.includes('room') || 
+                       alt.includes('hotel') || alt.includes('room');
+              }).first().attr('src') || '';
+    }
+
+    if (!title) {
+      title = $('meta[property="og:title"]').attr('content') ||
+              $('title').text().trim() || '';
+    }
+
+    return {
+      image: image.startsWith('//') ? 'https:' + image : image,
+      title: title.replace(/\s+/g, ' ').trim(),
+      roomType: roomType.replace(/\s+/g, ' ').trim(),
+      price: price.replace(/\s+/g, ' ').trim(),
+      roomSize: roomSize.replace(/\s+/g, ' ').trim(),
+    };
+
+  } catch (error) {
+    console.error('Scraping error:', error);
+    throw new Error('Failed to scrape accommodation details');
+  }
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
@@ -323,6 +451,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       res.status(500).json({ message: "Login failed" });
+    }
+  });
+
+  // Accommodation Details Scraping
+  apiRouter.post("/accommodation/details", async (req, res) => {
+    try {
+      const { url } = req.body;
+      
+      if (!url) {
+        return res.status(400).json({ message: "URL is required" });
+      }
+      
+      const details = await scrapeAccommodationDetails(url);
+      res.json(details);
+    } catch (error) {
+      console.error('Error scraping accommodation details:', error);
+      res.status(500).json({ message: "Failed to fetch accommodation details" });
     }
   });
 

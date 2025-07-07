@@ -13,6 +13,18 @@ interface TripFormData {
   spotsAvailable: string;
   tripVibes: string[];
   preferredCoTraveler: string;
+  accommodationImage?: string;
+  roomType?: string;
+  roomSize?: string;
+  extractedPrice?: string;
+}
+
+interface AccommodationDetails {
+  image: string;
+  roomType: string;
+  price: string;
+  roomSize: string;
+  title: string;
 }
 
 export default function CreateTrip() {
@@ -22,6 +34,8 @@ export default function CreateTrip() {
   const [destinationSuggestions, setDestinationSuggestions] = useState<string[]>([]);
   const [isSearchingDestinations, setIsSearchingDestinations] = useState(false);
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [accommodationDetails, setAccommodationDetails] = useState<AccommodationDetails | null>(null);
+  const [isLoadingAccommodation, setIsLoadingAccommodation] = useState(false);
   const [formData, setFormData] = useState<TripFormData>({
     destination: '',
     startDate: '',
@@ -87,6 +101,48 @@ export default function CreateTrip() {
     return platform ? platform.name : 'Other';
   };
 
+  const isValidUrl = (url: string): boolean => {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const fetchAccommodationDetails = async (url: string) => {
+    setIsLoadingAccommodation(true);
+    setAccommodationDetails(null);
+    
+    try {
+      const response = await fetch('/api/accommodation/details', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url }),
+      });
+
+      if (response.ok) {
+        const details = await response.json();
+        setAccommodationDetails(details);
+        
+        // Update form data with extracted information
+        setFormData(prev => ({
+          ...prev,
+          accommodationImage: details.image,
+          roomType: details.roomType,
+          roomSize: details.roomSize,
+          extractedPrice: details.price
+        }));
+      }
+    } catch (error) {
+      console.error('Error fetching accommodation details:', error);
+    } finally {
+      setIsLoadingAccommodation(false);
+    }
+  };
+
   const handleInputChange = (field: keyof TripFormData, value: string | string[]) => {
     setFormData(prev => ({
       ...prev,
@@ -99,6 +155,13 @@ export default function CreateTrip() {
         ...prev,
         platform: detectedPlatform
       }));
+      
+      // Fetch accommodation details if it's a valid URL
+      if (value.trim() && isValidUrl(value)) {
+        fetchAccommodationDetails(value);
+      } else {
+        setAccommodationDetails(null);
+      }
     }
 
     // Handle destination search with debouncing
@@ -478,10 +541,57 @@ export default function CreateTrip() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
+              
+              {/* Platform Detection */}
               {formData.platform && (
                 <p className="text-sm text-gray-600 mt-1">
                   Detected platform: {getPlatformIcon(formData.platform)} {formData.platform}
                 </p>
+              )}
+              
+              {/* Loading State */}
+              {isLoadingAccommodation && (
+                <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+                    <span className="text-sm text-blue-700">Fetching accommodation details...</span>
+                  </div>
+                </div>
+              )}
+              
+              {/* Accommodation Details Preview */}
+              {accommodationDetails && (
+                <div className="mt-3 p-4 bg-gray-50 border border-gray-200 rounded-md">
+                  <h4 className="text-sm font-medium text-gray-700 mb-3">Accommodation Details</h4>
+                  <div className="flex gap-4">
+                    {/* Room Image */}
+                    {accommodationDetails.image && (
+                      <div className="flex-shrink-0">
+                        <img 
+                          src={accommodationDetails.image} 
+                          alt="Room" 
+                          className="w-20 h-20 rounded-md object-cover"
+                        />
+                      </div>
+                    )}
+                    
+                    {/* Details */}
+                    <div className="flex-1 space-y-1">
+                      {accommodationDetails.title && (
+                        <p className="text-sm font-medium text-gray-900">{accommodationDetails.title}</p>
+                      )}
+                      {accommodationDetails.roomType && (
+                        <p className="text-sm text-gray-600">Room Type: {accommodationDetails.roomType}</p>
+                      )}
+                      {accommodationDetails.roomSize && (
+                        <p className="text-sm text-gray-600">Size: {accommodationDetails.roomSize}</p>
+                      )}
+                      {accommodationDetails.price && (
+                        <p className="text-sm text-gray-600">Price: {accommodationDetails.price}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
 
