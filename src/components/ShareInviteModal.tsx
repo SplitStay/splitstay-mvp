@@ -1,0 +1,165 @@
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { useUser } from '@/hooks/useUser';
+import type { Tables } from '@/types/database.types';
+
+interface ShareInviteModalProps {
+  open: boolean;
+  onClose: () => void;
+  message?: string;
+  shareUrl?: string;
+}
+
+const generatePersonalizedMessage = (user: Tables<'user'> | undefined): string => {
+  if (!user) {
+    return "Hey! I just created my profile on SplitStay — maybe we should try it sometime. Why don't you create yours as well?";
+  }
+
+  const name = user.name || user.fullName || "I";
+  const location = user.location;
+  const languages = user.languages as string[] | null;
+  const travelTraits = user.travelTraits as string[] | null;
+  const bio = user.bio;
+
+  let message = `Hey! ${name === "I" ? "I" : name} just joined SplitStay`;
+  
+  if (location) {
+    message += ` from ${location}`;
+  }
+  
+  message += "! ";
+
+  if (travelTraits && travelTraits.length > 0) {
+    const trait = travelTraits[0];
+    message += ` I'm ${trait.toLowerCase()} when I travel and`;
+  }
+
+  if (languages && languages.length > 1) {
+    message += ` I speak ${languages.slice(0, 2).join(" and ")} so`;
+  }
+
+  message += " I'm excited to find travel buddies who share similar vibes.";
+
+  if (bio && bio.length > 0) {
+    const shortBio = bio.length > 50 ? bio.substring(0, 50) + "..." : bio;
+    message += ` About me: ${shortBio}`;
+  }
+
+  message += " Want to split hotel costs and make travel more affordable? Join me on SplitStay!";
+
+  return message;
+};
+
+const ShareInviteModal: React.FC<ShareInviteModalProps> = ({
+  open,
+  onClose,
+  message,
+  shareUrl,
+}) => {
+  const [copied, setCopied] = useState(false);
+  const { data: user } = useUser();
+
+  if (!open) return null;
+
+  const personalizedMessage = message || generatePersonalizedMessage(user);
+  const fullMessage = `${personalizedMessage}\n${shareUrl || window.location.origin}`;
+
+  const handleShare = async () => {
+    if (typeof navigator.share === 'function') {
+      try {
+        await navigator.share({
+          title: 'Join me on SplitStay!',
+          text: fullMessage,
+        });
+        onClose();
+      } catch {
+        // User cancelled or error
+      }
+    }
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(fullMessage);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard error
+    }
+  };
+
+  // Platform-specific share URLs
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(fullMessage)}`;
+  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl || window.location.origin)}&quote=${encodeURIComponent(personalizedMessage)}`;
+  const handleInstagramShare = async () => {
+    await navigator.clipboard.writeText(fullMessage);
+    alert('Message copied! Open Instagram and paste it in a DM or Story.');
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <motion.div
+        initial={{ opacity: 0, y: 40, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 40, scale: 0.95 }}
+        transition={{ duration: 0.3 }}
+        className="bg-white rounded-2xl p-8 shadow-xl w-full max-w-md mx-4"
+      >
+        <h2 className="text-2xl font-bold text-blue-700 mb-4 text-center">
+          Share Your Profile & Invite Friends
+        </h2>
+        <p className="text-gray-600 mb-4 text-center">
+          Invite your friends to join SplitStay! Sharing is optional, but helps us grow.
+        </p>
+        <textarea
+          className="w-full p-3 border border-gray-300 rounded-lg mb-4 text-gray-800 resize-none"
+          rows={4}
+          value={fullMessage}
+          readOnly
+        />
+        <div className="flex flex-col gap-3 mb-4">
+          {typeof navigator.share === 'function' && (
+            <button
+              onClick={handleShare}
+              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            >
+              Share via Device...
+            </button>
+          )}
+          <button
+            onClick={() => window.open(whatsappUrl, '_blank')}
+            className="w-full bg-green-500 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-600 transition-colors"
+          >
+            Share on WhatsApp
+          </button>
+          <button
+            onClick={() => window.open(facebookUrl, '_blank')}
+            className="w-full bg-blue-800 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-900 transition-colors"
+          >
+            Share on Facebook
+          </button>
+          <button
+            onClick={handleInstagramShare}
+            className="w-full bg-pink-500 text-white py-3 px-4 rounded-lg font-medium hover:bg-pink-600 transition-colors"
+          >
+            Share on Instagram (Copy to Clipboard)
+          </button>
+          <button
+            onClick={handleCopy}
+            className="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+          >
+            {copied ? 'Copied!' : 'Copy Message'}
+          </button>
+        </div>
+        <button
+          onClick={onClose}
+          className="w-full text-gray-500 hover:text-blue-600 transition-colors text-sm underline"
+        >
+          Skip
+        </button>
+      </motion.div>
+    </div>
+  );
+};
+
+export default ShareInviteModal;

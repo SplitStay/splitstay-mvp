@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
+}
+
+/* Line clamp utility for trip notes */
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+:root {
+  --background: 39 29% 95%;  /* #F5F1EB */
+  --foreground: 240 10% 3.9%;
+  --muted: 240 4.8% 95.9%;
+  --muted-foreground: 240 3.8% 46.1%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 3.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 3.9%;
+  --border: 240 5.9% 90%;
+  --input: 240 5.9% 90%;
+  --primary: 225 55% 15%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 160 51% 39%;
+  --secondary-foreground: 0 0% 98%;
+  --accent: 47 89% 63%;
+  --accent-foreground: 240 5.9% 10%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --ring: 240 5% 64.9%;
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --primary: 225 55% 15%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 160 51% 39%;
+  --secondary-foreground: 0 0% 98%;
+  --accent: 47 89% 63%;
+  --accent-foreground: 240 5.9% 10%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --ring: 240 4.9% 83.9%;
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+.app-container {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background-color: #F5F1EB;
+  position: relative;
+}
+
+.screen-height {
+  min-height: calc(100vh - 2rem);
+}
+
+/* Custom button styles */
+.navy-button {
+  background-color: #001F3F; 
+  color: white;
+  width: 100%;
+  padding: 1.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+.navy-button:hover {
+  background-color: #00295A;
+  color: #FFD700; /* Dark yellow color on hover */
+}
+
+.text-navy {
+  color: #1e2a78;
+}
+
+.bg-navy {
+  background-color: #1e2a78;
+}
+
+.bg-navy-dark {
+  background-color: #1a2466;
+}
+
+.border-navy {
+  border-color: #1e2a78;
+}
+
+.hover\:bg-navy-dark:hover {
+  background-color: #1a2466;
+}
+
+.hover\:text-navy:hover {
+  color: #1e2a78;
+}
+
+.bg-cream {
+  background-color: #f5f1eb;
+}
