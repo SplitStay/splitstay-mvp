@@ -72,9 +72,8 @@ const HomePage: React.FC = () => {
           <img 
             src={logoImage} 
             alt="SplitStay Logo" 
-            className="h-32 w-auto mx-auto mb-4"
+            className="h-40 w-auto mx-auto mb-4"
           />
-          <h1 className="text-3xl font-bold text-navy">SplitStay</h1>
         </div>
         
         {/* Headline */}
