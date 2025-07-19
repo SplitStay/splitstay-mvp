@@ -28,6 +28,27 @@ export const useUser = (): UseQueryResult<Tables<'user'>, Error> => {
   })
 }
 
+export const useUserById = (userId: string): UseQueryResult<Tables<'user'>, Error> => {
+  return useQuery<Tables<'user'>, Error>({
+    queryKey: ['user', userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('user')
+        .select('*')
+        .eq('id', userId)
+        .single()
+
+      if (error) {
+        throw error
+      }
+
+      return data
+    },
+    retry: false,
+    enabled: !!userId,
+  })
+}
+
 export const useUpdateUser = () => {
   const queryClient = useQueryClient()
 

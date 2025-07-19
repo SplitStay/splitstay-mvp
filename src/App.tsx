@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { HomePage, LoginPage, SignupPage, ForgotPasswordPage, ResetPasswordPage, DashboardPage, TermsPage, PrivacyPage, HowItWorks } from './pages'
 import PostTripPage from './pages/PostTripPage'
 import CreateProfilePage from './pages/CreateProfilePage'
+import ProfilePage from './pages/ProfilePage'
 import { motion } from 'framer-motion'
 
 const queryClient = new QueryClient({
@@ -101,6 +102,10 @@ function AppRoutes() {
             <CreateProfilePage />
           </PrivateRoute>
         } 
+      />
+      <Route 
+        path="/profile/:id" 
+        element={<ProfilePage />} 
       />
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/privacy" element={<PrivacyPage />} />

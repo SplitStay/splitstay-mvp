@@ -21,31 +21,15 @@ const generatePersonalizedMessage = (user: Tables<'user'> | undefined): string =
   const travelTraits = user.travelTraits as string[] | null;
   const bio = user.bio;
 
-  let message = `Hey! ${name === "I" ? "I" : name} just joined SplitStay`;
+  let message = `Hey! ! just joined SplitStay !`;
+
   
-  if (location) {
-    message += ` from ${location}`;
-  }
-  
-  message += "! ";
-
-  if (travelTraits && travelTraits.length > 0) {
-    const trait = travelTraits[0];
-    message += ` I'm ${trait.toLowerCase()} when I travel and`;
-  }
-
-  if (languages && languages.length > 1) {
-    message += ` I speak ${languages.slice(0, 2).join(" and ")} so`;
-  }
-
-  message += " I'm excited to find travel buddies who share similar vibes.";
-
-  if (bio && bio.length > 0) {
-    const shortBio = bio.length > 50 ? bio.substring(0, 50) + "..." : bio;
-    message += ` About me: ${shortBio}`;
-  }
-
   message += " Want to split hotel costs and make travel more affordable? Join me on SplitStay!";
+
+  // Use Vite environment variable for the base URL
+  const baseUrl = import.meta.env.VITE_APP_URL;
+
+  message += ` Checkout my profile on ${baseUrl}/profile/${user?.id} and create your own !`;
 
   return message;
 };
@@ -62,7 +46,7 @@ const ShareInviteModal: React.FC<ShareInviteModalProps> = ({
   if (!open) return null;
 
   const personalizedMessage = message || generatePersonalizedMessage(user);
-  const fullMessage = `${personalizedMessage}\n${shareUrl || window.location.origin}`;
+  const fullMessage = personalizedMessage;
 
   const handleShare = async () => {
     if (typeof navigator.share === 'function') {

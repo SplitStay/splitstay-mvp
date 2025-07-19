@@ -23,6 +23,11 @@ export default function CreateProfilePage() {
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
+  const [customCountry, setCustomCountry] = useState("");
+  const [travelPhotos, setTravelPhotos] = useState<(string | null)[]>([null, null, null]);
+  const [travelPhotosPreviews, setTravelPhotosPreviews] = useState<(string | null)[]>([null, null, null]);
+  const [uploadingPhotoIndex, setUploadingPhotoIndex] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     fullName: "",
     bio: "",
@@ -49,18 +54,16 @@ export default function CreateProfilePage() {
   }, [user, loading, navigate]);
 
   // Function to upload image to Supabase storage
-  const uploadImageToStorage = async (file: File): Promise<string | null> => {
+  const uploadImageToStorage = async (file: File, bucket: string = 'userimages'): Promise<string | null> => {
     try {
-      setIsUploading(true);
-      
       // Generate unique filename
       const fileExt = file.name.split('.').pop();
       const fileName = `${user?.id}_${Date.now()}.${fileExt}`;
-      const filePath = `userimages/${fileName}`;
+      const filePath = `${bucket}/${fileName}`;
 
       // Upload file to Supabase storage
       const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('userimages')
+        .from(bucket)
         .upload(filePath, file, {
           cacheControl: '3600',
           upsert: false
@@ -73,7 +76,7 @@ export default function CreateProfilePage() {
 
       // Get public URL
       const { data: urlData } = supabase.storage
-        .from('avatars')
+        .from(bucket)
         .getPublicUrl(filePath);
 
       return urlData.publicUrl;
@@ -81,8 +84,6 @@ export default function CreateProfilePage() {
       console.error('Error uploading image:', error);
       toast.error('Failed to upload image. Please try again.');
       return null;
-    } finally {
-      setIsUploading(false);
     }
   };
 
@@ -110,6 +111,8 @@ export default function CreateProfilePage() {
         yearOfBirth: formData.yearOfBirth ? parseInt(formData.yearOfBirth) : null,
         languages: selectedLanguages.length > 0 ? selectedLanguages : null,
         travelTraits: selectedTraits.length > 0 ? selectedTraits : null,
+        countriesTraveled: selectedCountries.length > 0 ? selectedCountries : null,
+        travelPhotos: travelPhotos.filter(photo => photo !== null).length > 0 ? travelPhotos.filter(photo => photo !== null) : null,
         imageUrl: profileImageUrl || null, // Use the storage URL instead of base64 preview
         profileCreated: true, // Set this to true after successful submission
       });
@@ -144,6 +147,8 @@ export default function CreateProfilePage() {
       return;
     }
 
+    setIsUploading(true);
+
     // Create preview
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -152,11 +157,68 @@ export default function CreateProfilePage() {
     reader.readAsDataURL(file);
 
     // Upload to Supabase storage
-    const uploadedUrl = await uploadImageToStorage(file);
+    const uploadedUrl = await uploadImageToStorage(file, 'userimages');
     if (uploadedUrl) {
       setProfileImageUrl(uploadedUrl);
       toast.success('Image uploaded successfully!');
     }
+    
+    setIsUploading(false);
+  };
+
+  const handleTravelPhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Get the index from the input id
+    const inputId = event.target.id;
+    const index = parseInt(inputId.split('-')[2]);
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select a valid image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size must be less than 5MB');
+      return;
+    }
+
+    setUploadingPhotoIndex(index);
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const newPreviews = [...travelPhotosPreviews];
+      newPreviews[index] = reader.result as string;
+      setTravelPhotosPreviews(newPreviews);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload to Supabase storage
+    const uploadedUrl = await uploadImageToStorage(file, 'travel-photos');
+    if (uploadedUrl) {
+      const newPhotos = [...travelPhotos];
+      newPhotos[index] = uploadedUrl;
+      setTravelPhotos(newPhotos);
+      toast.success('Travel photo uploaded successfully!');
+    }
+    
+    setUploadingPhotoIndex(null);
+    
+    // Reset the input
+    event.target.value = '';
+  };
+
+  const removeTravelPhoto = (index: number) => {
+    const newPhotos = [...travelPhotos];
+    const newPreviews = [...travelPhotosPreviews];
+    newPhotos[index] = null;
+    newPreviews[index] = null;
+    setTravelPhotos(newPhotos);
+    setTravelPhotosPreviews(newPreviews);
   };
 
   const handleLanguageToggle = (language: string) => {
@@ -179,6 +241,33 @@ export default function CreateProfilePage() {
       setSelectedTraits(prev => prev.filter(t => t !== trait));
     } else if (selectedTraits.length < 5) {
       setSelectedTraits(prev => [...prev, trait]);
+    }
+  };
+
+  const handleCountryToggle = (country: string) => {
+    setSelectedCountries(prev => 
+      prev.includes(country) 
+        ? prev.filter(c => c !== country)
+        : [...prev, country]
+    );
+  };
+
+  const handleAddCustomCountry = () => {
+    if (customCountry.trim() && !selectedCountries.includes(customCountry.trim())) {
+      setSelectedCountries(prev => [...prev, customCountry.trim()]);
+      setCustomCountry("");
+    }
+  };
+
+  const handleLanguageDropdownChange = (language: string) => {
+    if (language && !selectedLanguages.includes(language)) {
+      setSelectedLanguages(prev => [...prev, language]);
+    }
+  };
+
+  const handleCountryDropdownChange = (country: string) => {
+    if (country && !selectedCountries.includes(country)) {
+      setSelectedCountries(prev => [...prev, country]);
     }
   };
 
@@ -205,9 +294,21 @@ export default function CreateProfilePage() {
                       formData.monthOfBirth && 
                       formData.yearOfBirth;
 
-  const languageOptions = [
-    "English", "Spanish", "French", "German", "Italian", "Portuguese", 
-    "Dutch", "Japanese", "Korean", "Chinese", "Arabic", "Russian", "Hindi"
+  // Popular languages to show as clickable badges
+  const popularLanguages = [
+    "English", "Spanish", "French", "German", "Dutch", "Italian", "Portuguese",
+    "Chinese (Mandarin)", "Japanese", "Korean"
+  ];
+
+  // All languages for the dropdown
+  const allLanguages = [
+    "English", "Spanish", "French", "German", "Italian", "Portuguese", "Chinese (Mandarin)", 
+    "Japanese", "Korean", "Arabic", "Russian", "Hindi", "Dutch", "Swedish", "Norwegian", 
+    "Danish", "Finnish", "Polish", "Czech", "Hungarian", "Romanian", "Bulgarian", "Croatian", 
+    "Serbian", "Greek", "Turkish", "Hebrew", "Thai", "Vietnamese", "Indonesian", "Malay", 
+    "Tagalog", "Swahili", "Yoruba", "Zulu", "Afrikaans", "Amharic", "Bengali", "Gujarati", 
+    "Punjabi", "Tamil", "Telugu", "Urdu", "Persian (Farsi)", "Pashto", "Kurdish", "Uzbek", 
+    "Kazakh", "Mongolian", "Tibetan", "Burmese", "Khmer", "Lao", "Sinhala", "Nepali"
   ];
 
   const traitOptions = [
@@ -215,6 +316,31 @@ export default function CreateProfilePage() {
     "Foodie", "Fitness Enthusiast", "Culture Lover", "Nature Lover", 
     "Tech Savvy", "Minimalist", "Photographer", "Music Lover", "Budget Traveler",
     "Luxury Traveler", "Backpacker", "City Explorer", "Beach Lover", "Mountain Hiker"
+  ];
+
+  // Popular countries to show as clickable badges
+  const popularCountries = [
+    "United States", "France", "Spain", "Japan", "Thailand", "Netherlands", 
+    "Germany", "Italy", "United Kingdom", "Australia"
+  ];
+
+  // All countries for the dropdown
+  const allCountries = [
+    "United States", "France", "Spain", "Thailand", "Japan", "United Kingdom", "Germany", 
+    "Italy", "Australia", "Canada", "Netherlands", "Switzerland", "Greece", "Portugal", 
+    "South Korea", "Singapore", "New Zealand", "Sweden", "Norway", "Denmark", "Belgium", 
+    "Austria", "Ireland", "Czech Republic", "Croatia", "Mexico", "Brazil", "Argentina", 
+    "Chile", "Peru", "Colombia", "Costa Rica", "India", "China", "Indonesia", "Malaysia", 
+    "Philippines", "Vietnam", "Turkey", "Egypt", "Morocco", "South Africa", "Kenya", 
+    "Israel", "Jordan", "Russia", "Poland", "Hungary", "Romania", "Bulgaria", "Serbia", 
+    "Bosnia and Herzegovina", "Slovenia", "Slovakia", "Estonia", "Latvia", "Lithuania", 
+    "Finland", "Iceland", "Luxembourg", "Ukraine", "Belarus", "Georgia", "Armenia", 
+    "Azerbaijan", "Kazakhstan", "Uzbek", "Mongolia", "Pakistan", "Bangladesh", "Sri Lanka", 
+    "Nepal", "Myanmar", "Cambodia", "Laos", "North Korea", "Taiwan", "Hong Kong", "Macau",
+    "Afghanistan", "Albania", "Algeria", "Bahrain", "Bolivia", "Cuba", "Dominican Republic", 
+    "Ecuador", "Ethiopia", "Ghana", "Guatemala", "Honduras", "Iran", "Iraq", "Jamaica", 
+    "Kuwait", "Lebanon", "Libya", "Nicaragua", "Nigeria", "Panama", "Qatar", "Saudi Arabia", 
+    "Tunisia", "United Arab Emirates", "Uruguay", "Venezuela", "Yemen", "Zimbabwe"
   ];
 
   // Generate date options
@@ -465,7 +591,7 @@ export default function CreateProfilePage() {
                   Languages you speak
                 </Label>
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {languageOptions.map((language) => (
+                  {popularLanguages.map((language) => (
                     <Badge
                       key={language}
                       variant={selectedLanguages.includes(language) ? "default" : "outline"}
@@ -481,22 +607,17 @@ export default function CreateProfilePage() {
                   ))}
                 </div>
                 
-                <div className="flex gap-2">
-                  <Input
-                    value={customLanguage}
-                    onChange={(e) => setCustomLanguage(e.target.value)}
-                    placeholder="Add another language"
-                    className="flex-1"
-                  />
-                  <Button
-                    type="button"
-                    onClick={handleAddCustomLanguage}
-                    variant="outline"
-                    size="sm"
-                    className="px-3"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
+                <div className="mb-3">
+                  <Select value="" onValueChange={(value) => handleLanguageDropdownChange(value)}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="More languages..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {allLanguages.filter(language => !selectedLanguages.includes(language)).map((language) => (
+                        <SelectItem key={language} value={language}>{language}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 
                 {selectedLanguages.length > 0 && (
@@ -565,13 +686,128 @@ export default function CreateProfilePage() {
                 )}
               </div>
 
+              {/* Countries visited or lived in */}
+              <div>
+                <Label className="text-base font-medium text-gray-700 mb-3 block">
+                  Countries visited or lived in
+                </Label>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {popularCountries.map((country) => (
+                    <Badge
+                      key={country}
+                      variant={selectedCountries.includes(country) ? "default" : "outline"}
+                      className={`cursor-pointer px-3 py-1 transition-colors ${
+                        selectedCountries.includes(country)
+                          ? "bg-navy text-white hover:bg-navy/90"
+                          : "hover:bg-gray-100"
+                      }`}
+                      onClick={() => handleCountryToggle(country)}
+                    >
+                      {country}
+                    </Badge>
+                  ))}
+                </div>
+                
+                <div className="mb-3">
+                  <Select value="" onValueChange={(value) => handleCountryDropdownChange(value)}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="More countries..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {allCountries.filter(country => !selectedCountries.includes(country)).map((country) => (
+                        <SelectItem key={country} value={country}>{country}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {selectedCountries.length > 0 && (
+                  <div className="mt-3">
+                    <p className="text-sm text-gray-600 mb-2">Selected countries:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {selectedCountries.map((country) => (
+                        <Badge key={country} variant="secondary" className="pr-1">
+                          {country}
+                          <button
+                            type="button"
+                            onClick={() => handleCountryToggle(country)}
+                            className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Top 3 Travel Photos */}
+              <div>
+                <Label className="text-base font-medium text-gray-700 mb-3 block">
+                  Top 3 Travel Photos <span className="text-gray-400">(optional)</span>
+                </Label>
+                <p className="text-sm text-gray-600 mb-4">Share your travel background</p>
+                
+                {/* Photo upload area */}
+                <div className="grid grid-cols-3 gap-4">
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <div key={index} className="aspect-square">
+                      {travelPhotosPreviews[index] ? (
+                        <div className="relative w-full h-full">
+                          <img
+                            src={travelPhotosPreviews[index]}
+                            alt={`Travel photo ${index + 1}`}
+                            className="w-full h-full object-cover rounded-lg border-2 border-gray-200"
+                          />
+                          {uploadingPhotoIndex === index && (
+                            <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center">
+                              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                            </div>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => removeTravelPhoto(index)}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors"
+                            disabled={uploadingPhotoIndex === index}
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ) : (
+                        <label
+                          htmlFor={`travel-photo-${index}`}
+                          className={`w-full h-full border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-gray-400 transition-colors ${
+                            uploadingPhotoIndex === index ? 'cursor-not-allowed opacity-50' : ''
+                          }`}
+                        >
+                          {uploadingPhotoIndex === index ? (
+                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-400"></div>
+                          ) : (
+                            <Plus className="w-8 h-8 text-gray-400" />
+                          )}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleTravelPhotoUpload}
+                            className="hidden"
+                            id={`travel-photo-${index}`}
+                            disabled={uploadingPhotoIndex === index}
+                          />
+                        </label>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <div className="flex flex-col gap-3 pt-4">
                 <Button 
                   onClick={handleStep2Submit}
-                  disabled={isLoading || isUploading}
+                  disabled={isLoading || isUploading || uploadingPhotoIndex !== null}
                   className="w-full bg-navy text-white hover:bg-navy/90 py-6 text-lg font-semibold disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                 >
-                  {isUploading ? "Uploading Image..." : isLoading ? "Creating Profile..." : "Create My Profile"}
+                  {uploadingPhotoIndex !== null ? "Uploading Photos..." : isUploading ? "Uploading Image..." : isLoading ? "Creating Profile..." : "Create My Profile"}
                 </Button>
               </div>
             </div>

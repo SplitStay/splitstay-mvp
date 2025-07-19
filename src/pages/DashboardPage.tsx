@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useUser, useUpdateUser } from '@/hooks/useUser'
-import { MapPin, Star, Clock, LogOut } from 'lucide-react'
+import { MapPin, Star, Clock, LogOut, User } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import LocationModal from './LocationModal'
 import ShareInviteModal from '@/components/ShareInviteModal'
@@ -85,6 +85,13 @@ export const DashboardPage = () => {
               SplitStay
             </div>
             <div className="flex gap-2">
+              <button
+                onClick={() => navigate(`/profile/${user?.id}`)}
+                className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition-colors"
+              >
+                <User className="w-4 h-4" />
+                Show Profile
+              </button>
               <button
                 onClick={handleSignOut}
                 className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-full hover:bg-red-700 transition-colors"

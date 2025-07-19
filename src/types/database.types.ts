@@ -296,6 +296,7 @@ export type Database = {
       user: {
         Row: {
           bio: string | null
+          countriesTraveled: Json | null
           createdAt: string
           dayOfBirth: number | null
           email: string
@@ -310,12 +311,14 @@ export type Database = {
           profileCreated: boolean | null
           profilePicture: string | null
           shareModalShown: boolean | null
+          travelPhotos: Json | null
           travelTraits: Json | null
           updatedAt: string
           yearOfBirth: number | null
         }
         Insert: {
           bio?: string | null
+          countriesTraveled?: Json | null
           createdAt?: string
           dayOfBirth?: number | null
           email: string
@@ -330,12 +333,14 @@ export type Database = {
           profileCreated?: boolean | null
           profilePicture?: string | null
           shareModalShown?: boolean | null
+          travelPhotos?: Json | null
           travelTraits?: Json | null
           updatedAt?: string
           yearOfBirth?: number | null
         }
         Update: {
           bio?: string | null
+          countriesTraveled?: Json | null
           createdAt?: string
           dayOfBirth?: number | null
           email?: string
@@ -350,6 +355,7 @@ export type Database = {
           profileCreated?: boolean | null
           profilePicture?: string | null
           shareModalShown?: boolean | null
+          travelPhotos?: Json | null
           travelTraits?: Json | null
           updatedAt?: string
           yearOfBirth?: number | null
