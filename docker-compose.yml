@@ -1,0 +1,34 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: splitstay-postgres
+    environment:
+      POSTGRES_DB: splitstay
+      POSTGRES_USER: splitstay_user
+      POSTGRES_PASSWORD: splitstay_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U splitstay_user -d splitstay"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  app:
+    build: .
+    container_name: splitstay-app
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://splitstay_user:splitstay_password@postgres:5432/splitstay
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./public:/app/public
+
+volumes:
+  postgres_data:
