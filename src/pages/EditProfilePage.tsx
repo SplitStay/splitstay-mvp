@@ -473,6 +473,21 @@ export default function EditProfilePage() {
     }
   };
 
+  // Helper function to check if personalized link is valid (empty is allowed, but if provided must be available)
+  const isPersonalizedLinkValid = () => {
+    // If no personalized link is provided, it's valid (optional field)
+    if (!personalizedLinkInput.trim()) return true;
+    
+    // If there's a format error, it's invalid
+    if (personalizedLinkError) return false;
+    
+    // If we're still checking availability, consider it invalid for now
+    if (checkingAvailability) return false;
+    
+    // If available is explicitly true, it's valid
+    return personalizedLinkAvailable === true;
+  };
+
   const isFormValid = formData.fullName && 
                       formData.birthPlace &&
                       formData.dayOfBirth && 
@@ -480,7 +495,8 @@ export default function EditProfilePage() {
                       formData.yearOfBirth &&
                       formData.gender &&
                       profileImagePreview &&
-                      selectedLanguages.length > 0;
+                      selectedLanguages.length > 0 &&
+                      isPersonalizedLinkValid();
 
   const dayOptions = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
   const monthOptions = [
@@ -521,7 +537,9 @@ export default function EditProfilePage() {
     "Ecuador", "Ethiopia", "Ghana", "Guatemala", "Honduras", "Iran", "Iraq", "Jamaica", 
     "Kuwait", "Lebanon", "Libya", "Nicaragua", "Nigeria", "Panama", "Qatar", "Saudi Arabia", 
     "Tunisia", "United Arab Emirates", "Uruguay", "Venezuela", "Yemen", "Zimbabwe"
-  ];
+  ].sort((a, b) => a.localeCompare(b));
+
+  console.log("countryOptions", countryOptions);
 
   // Show loading state while checking authentication
   if (loading) {
@@ -935,31 +953,8 @@ export default function EditProfilePage() {
                     onClick={() => setShowLanguageModal(true)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:border-blue-300 hover:bg-blue-50 transition-all text-left"
                   >
-                    🔍 Search & add more languages...
+                    🔍 Search & add more languages{selectedLanguages.length > 0 ? ` (${selectedLanguages.length} selected)` : ''}...
                   </button>
-                  
-                  {/* Selected Languages Display */}
-                  {selectedLanguages.length > 0 && (
-                    <div className="mb-4">
-                      <div className="flex flex-wrap gap-2">
-                        {selectedLanguages.map((language) => (
-                          <span 
-                            key={language} 
-                            className="inline-flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
-                          >
-                            {language}
-                            <button
-                              type="button"
-                              onClick={() => handleLanguageToggle(language)}
-                              className="ml-2 hover:bg-blue-200 rounded-full p-1"
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
 
                 {/* Languages You're Learning */}
@@ -978,8 +973,8 @@ export default function EditProfilePage() {
                         disabled={selectedLearningLanguages.includes(language)}
                         className={`px-2.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
                           selectedLearningLanguages.includes(language)
-                            ? "bg-orange-100 text-orange-800 cursor-not-allowed"
-                            : "bg-gray-100 text-gray-700 hover:bg-orange-100 hover:text-orange-700 hover:shadow-md"
+                            ? "bg-blue-600 text-white cursor-not-allowed shadow-md"
+                            : "bg-gray-100 text-gray-700 hover:bg-blue-100 hover:text-blue-700 hover:shadow-md"
                         }`}
                       >
                         {language}
@@ -991,32 +986,10 @@ export default function EditProfilePage() {
                   <button
                     type="button"
                     onClick={() => setShowLearningLanguageModal(true)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:border-orange-300 hover:bg-orange-50 transition-all text-left mb-3"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:border-blue-300 hover:bg-blue-50 transition-all text-left mb-3"
                   >
-                    🔍 Search & add more languages...
+                    🔍 Search & add more languages{selectedLearningLanguages.length > 0 ? ` (Learning - ${selectedLearningLanguages.length} selected)` : ' (Learning)'}...
                   </button>
-                  
-                  {selectedLearningLanguages.length > 0 && (
-                    <div className="mb-3">
-                      <div className="flex flex-wrap gap-1">
-                        {selectedLearningLanguages.map((language) => (
-                          <span 
-                            key={language} 
-                            className="inline-flex items-center bg-orange-100 text-orange-800 px-2 py-0.5 rounded text-xs"
-                          >
-                            {language}
-                            <button
-                              type="button"
-                              onClick={() => handleLearningLanguageToggle(language)}
-                              className="ml-1 hover:bg-orange-200 rounded-full p-0.5"
-                            >
-                              <X className="w-2 h-2" />
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
@@ -1049,14 +1022,11 @@ export default function EditProfilePage() {
                       disabled={!selectedTraits.includes(trait) && selectedTraits.length >= 5}
                       className={`px-2 py-1 rounded-full text-xs font-medium transition-all duration-200 ${
                         selectedTraits.includes(trait)
-                          ? "text-white shadow-md"
+                          ? "bg-blue-600 text-white shadow-md cursor-not-allowed"
                           : selectedTraits.length >= 5
                           ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                           : "bg-gray-100 text-gray-700 hover:bg-blue-100 hover:text-blue-700 hover:shadow-md"
                       }`}
-                      style={{ 
-                        backgroundColor: selectedTraits.includes(trait) ? '#1e2a78' : undefined 
-                      }}
                     >
                       {trait}
                     </button>
@@ -1067,32 +1037,10 @@ export default function EditProfilePage() {
                 <button
                   type="button"
                   onClick={() => setShowTraitModal(true)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:border-purple-300 hover:bg-purple-50 transition-all text-left mb-3"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:border-blue-300 hover:bg-blue-50 transition-all text-left mb-3"
                 >
-                  🔍 Search & add more traits...
+                  🔍 Search & add more traits{selectedTraits.length > 0 ? ` (${selectedTraits.length} selected)` : ''}...
                 </button>
-                
-                {selectedTraits.length > 0 && (
-                  <div className="mb-2">
-                    <div className="flex flex-wrap gap-1">
-                      {selectedTraits.map((trait) => (
-                        <span 
-                          key={trait} 
-                          className="inline-flex items-center bg-purple-100 text-purple-800 px-2 py-0.5 rounded text-xs"
-                        >
-                          {trait}
-                          <button
-                            type="button"
-                            onClick={() => handleTraitToggle(trait)}
-                            className="ml-1 hover:bg-purple-200 rounded-full p-0.5"
-                          >
-                            <X className="w-2 h-2" />
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* Most influential country */}
@@ -1220,17 +1168,23 @@ export default function EditProfilePage() {
             />
             <div className="max-h-60 overflow-y-auto">
               {allLanguages.filter(lang => 
-                lang.toLowerCase().includes(languageSearchTerm.toLowerCase()) &&
-                !selectedLanguages.includes(lang)
+                lang.toLowerCase().includes(languageSearchTerm.toLowerCase())
               ).map(language => (
                 <button
                   key={language}
                   onClick={() => {
-                    handleLanguageDropdownChange(language);
-                    setLanguageSearchTerm('');
-                    setShowLanguageModal(false);
+                    if (!selectedLanguages.includes(language)) {
+                      handleLanguageDropdownChange(language);
+                      setLanguageSearchTerm('');
+                      setShowLanguageModal(false);
+                    }
                   }}
-                  className="w-full text-left px-3 py-2 hover:bg-blue-50 rounded"
+                  disabled={selectedLanguages.includes(language)}
+                  className={`w-full text-left px-3 py-2 rounded transition-all ${
+                    selectedLanguages.includes(language)
+                      ? "bg-blue-600 text-white cursor-not-allowed"
+                      : "hover:bg-blue-50"
+                  }`}
                 >
                   {language}
                 </button>
@@ -1257,21 +1211,27 @@ export default function EditProfilePage() {
               placeholder="Search languages..."
               value={learningLanguageSearchTerm}
               onChange={(e) => setLearningLanguageSearchTerm(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-orange-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500"
             />
             <div className="max-h-60 overflow-y-auto">
               {allLanguages.filter(lang => 
-                lang.toLowerCase().includes(learningLanguageSearchTerm.toLowerCase()) &&
-                !selectedLearningLanguages.includes(lang)
+                lang.toLowerCase().includes(learningLanguageSearchTerm.toLowerCase())
               ).map(language => (
                 <button
                   key={language}
                   onClick={() => {
-                    handleLearningLanguageDropdownChange(language);
-                    setLearningLanguageSearchTerm('');
-                    setShowLearningLanguageModal(false);
+                    if (!selectedLearningLanguages.includes(language)) {
+                      handleLearningLanguageDropdownChange(language);
+                      setLearningLanguageSearchTerm('');
+                      setShowLearningLanguageModal(false);
+                    }
                   }}
-                  className="w-full text-left px-3 py-2 hover:bg-orange-50 rounded"
+                  disabled={selectedLearningLanguages.includes(language)}
+                  className={`w-full text-left px-3 py-2 rounded transition-all ${
+                    selectedLearningLanguages.includes(language)
+                      ? "bg-blue-600 text-white cursor-not-allowed"
+                      : "hover:bg-blue-50"
+                  }`}
                 >
                   {language}
                 </button>
@@ -1298,24 +1258,29 @@ export default function EditProfilePage() {
               placeholder="Search traits..."
               value={traitSearchTerm}
               onChange={(e) => setTraitSearchTerm(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-purple-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500"
             />
             <div className="max-h-60 overflow-y-auto">
               {allTraits.filter(trait => 
-                trait.toLowerCase().includes(traitSearchTerm.toLowerCase()) &&
-                !selectedTraits.includes(trait) &&
-                selectedTraits.length < 5
+                trait.toLowerCase().includes(traitSearchTerm.toLowerCase())
               ).map(trait => (
                 <button
                   key={trait}
                   onClick={() => {
-                    if (selectedTraits.length < 5) {
+                    if (!selectedTraits.includes(trait) && selectedTraits.length < 5) {
                       handleTraitToggle(trait);
                       setTraitSearchTerm('');
                       setShowTraitModal(false);
                     }
                   }}
-                  className="w-full text-left px-3 py-2 hover:bg-purple-50 rounded"
+                  disabled={selectedTraits.includes(trait) || (!selectedTraits.includes(trait) && selectedTraits.length >= 5)}
+                  className={`w-full text-left px-3 py-2 rounded transition-all ${
+                    selectedTraits.includes(trait)
+                      ? "bg-blue-600 text-white cursor-not-allowed"
+                      : selectedTraits.length >= 5
+                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                      : "hover:bg-blue-50"
+                  }`}
                 >
                   {trait}
                 </button>
@@ -1333,14 +1298,25 @@ export default function EditProfilePage() {
       {/* Compact Sticky Footer */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg z-10">
         <div className="max-w-[1600px] mx-auto flex flex-col sm:flex-row gap-3 justify-center">
+          {/* Enhanced visual feedback for duplicate link error */}
+          {!isPersonalizedLinkValid() && personalizedLinkInput.trim() && (
+            <div className="flex items-center justify-center gap-2 text-red-600 text-sm font-medium bg-red-50 px-4 py-2 rounded-lg border border-red-200">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              {checkingAvailability ? "Checking link availability..." : 
+               personalizedLinkError ? personalizedLinkError : "Profile URL issue detected"}
+            </div>
+          )}
+          
           <button 
             type="submit"
             onClick={handleSubmit}
             disabled={!isFormValid || isLoading}
             className={`px-5 py-2 text-sm font-semibold rounded transition-all duration-300 ${
               isFormValid && !isLoading
-                ? "text-white shadow-md hover:shadow-lg"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                ? "text-white shadow-md hover:shadow-lg transform hover:scale-105"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed opacity-60"
             }`}
             style={{ 
               fontFamily: 'system-ui, Inter, sans-serif',

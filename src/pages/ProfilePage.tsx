@@ -646,7 +646,7 @@ export default function ProfilePage() {
             {/* Enhanced Content Sections */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Personal Info */}
-              {(user.birthPlace || user.gender) && (
+              {(user.birthPlace || user.gender || user.currentPlace) && (
                 <motion.div variants={itemVariants}>
                   <Card className="bg-white/95 backdrop-blur-2xl border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-500 group overflow-hidden relative">
                     <div className="absolute inset-0 bg-navy/3 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -674,6 +674,14 @@ export default function ProfilePage() {
                             <User className="w-5 h-5 text-navy" />
                             <span className="text-gray-700">
                               <span className="font-medium">Gender:</span> {user.gender}
+                            </span>
+                          </div>
+                        )}
+                        {user.currentPlace && (
+                          <div className="flex items-center gap-3">
+                            <Globe className="w-5 h-5 text-navy" />
+                            <span className="text-gray-700">
+                              <span className="font-medium">Place I call home:</span> {user.currentPlace}
                             </span>
                           </div>
                         )}
@@ -815,16 +823,6 @@ export default function ProfilePage() {
                     </motion.div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {user.currentPlace && (
-                        <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
-                          <div className="flex items-center gap-3 mb-3">
-                            <Globe className="w-5 h-5 text-navy" />
-                            <h4 className="font-bold text-navy">Country I Call Home</h4>
-                          </div>
-                          <p className="text-gray-700">{user.currentPlace}</p>
-                        </div>
-                      )}
-                      
                       {user.mostInfluencedCountry && (
                         <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
                           <div className="flex items-center gap-3 mb-3">

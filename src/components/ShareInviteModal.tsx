@@ -15,19 +15,13 @@ const generatePersonalizedMessage = (user: Tables<'user'> | undefined): string =
     return "Hey! I just created my profile on SplitStay — maybe we should try it sometime. Why don't you create yours as well?";
   }
 
-  // Extract user data (currently using minimal info for the message)
-
-  let message = `Hey! I just joined SplitStay !`;
-
   
-  message += " Want to split hotel costs and make travel more affordable? Join me on SplitStay!";
-
   // Use Vite environment variable for the base URL
   const baseUrl = import.meta.env.VITE_APP_URL;
   
   // Use customized URL if available, otherwise use ID
   const profileIdentifier = user?.personalizedLink || user?.id;
-  message += ` Checkout my profile on ${baseUrl}/profile/${profileIdentifier} and create your own !`;
+  const message = `Just joined SplitStay — it helps you connect with like-minded travelers to share accommodations and save on costs. Here’s my profile — feel free to create yours too! \n${baseUrl}/profile/${profileIdentifier}`;
 
   return message;
 };
