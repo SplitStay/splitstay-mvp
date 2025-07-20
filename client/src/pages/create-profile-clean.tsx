@@ -114,8 +114,8 @@ export default function CreateProfileClean() {
   if (currentStep === 1) {
     return (
       <TooltipProvider>
-        <div className="min-h-screen bg-gray-50 p-6">
-          <div className="max-w-[1200px] mx-auto">
+        <div className="min-h-screen bg-gray-50 p-8">
+          <div className="max-w-[1400px] mx-auto">
             
             {/* Header */}
             <div className="text-center mb-12">
@@ -129,15 +129,15 @@ export default function CreateProfileClean() {
 
             <form onSubmit={handleStep1Submit}>
               <Card className="bg-white shadow-lg rounded-2xl overflow-hidden">
-                <div className="p-10">
-                  <div className="grid lg:grid-cols-2 gap-16">
+                <div className="p-16">
+                  <div className="grid lg:grid-cols-2 gap-24">
                     
                     {/* Left Column */}
-                    <div className="space-y-8">
+                    <div className="space-y-10">
                       
                       {/* Profile Photo Upload */}
                       <div>
-                        <Label className="text-lg font-semibold text-gray-900 block mb-4">
+                        <Label className="text-xl font-semibold text-gray-900 block mb-6">
                           Upload Photo
                         </Label>
                         <div className="flex justify-center">
@@ -180,7 +180,7 @@ export default function CreateProfileClean() {
 
                       {/* Gender Toggle */}
                       <div>
-                        <Label className="text-lg font-semibold text-gray-900 block mb-4">Gender</Label>
+                        <Label className="text-xl font-semibold text-gray-900 block mb-6">Gender</Label>
                         <div className="flex border-2 border-gray-200 rounded-xl p-1 bg-gray-50">
                           <button
                             type="button"
@@ -209,7 +209,7 @@ export default function CreateProfileClean() {
 
                       {/* Name */}
                       <div>
-                        <Label htmlFor="fullName" className="text-lg font-semibold text-gray-900 block mb-4">
+                        <Label htmlFor="fullName" className="text-xl font-semibold text-gray-900 block mb-6">
                           What's your name?
                         </Label>
                         <Input
@@ -224,7 +224,7 @@ export default function CreateProfileClean() {
 
                       {/* What Makes You Alive */}
                       <div>
-                        <Label htmlFor="whatMakesYouAlive" className="text-lg font-semibold text-gray-900 block mb-4">
+                        <Label htmlFor="whatMakesYouAlive" className="text-xl font-semibold text-gray-900 block mb-6">
                           What makes you feel alive?
                         </Label>
                         <Textarea
@@ -239,7 +239,7 @@ export default function CreateProfileClean() {
 
                       {/* Date of Birth */}
                       <div>
-                        <Label className="text-lg font-semibold text-gray-900 block mb-4">
+                        <Label className="text-xl font-semibold text-gray-900 block mb-6">
                           Date of Birth
                         </Label>
                         <div className="flex gap-4 mb-2">
@@ -281,11 +281,11 @@ export default function CreateProfileClean() {
                     </div>
 
                     {/* Right Column */}
-                    <div className="space-y-8">
+                    <div className="space-y-10">
                       
                       {/* Birthplace */}
                       <div>
-                        <Label htmlFor="birthplace" className="text-lg font-semibold text-gray-900 block mb-4">
+                        <Label htmlFor="birthplace" className="text-xl font-semibold text-gray-900 block mb-6">
                           Where were you born?
                         </Label>
                         <Input
@@ -300,7 +300,7 @@ export default function CreateProfileClean() {
 
                       {/* Current Home */}
                       <div>
-                        <Label htmlFor="currentHome" className="text-lg font-semibold text-gray-900 block mb-4">
+                        <Label htmlFor="currentHome" className="text-xl font-semibold text-gray-900 block mb-6">
                           Where do you currently call home?
                         </Label>
                         <Input
@@ -315,11 +315,11 @@ export default function CreateProfileClean() {
 
                       {/* Languages */}
                       <div>
-                        <Label className="text-lg font-semibold text-gray-900 block mb-4">
+                        <Label className="text-xl font-semibold text-gray-900 block mb-6">
                           Languages You Speak
                         </Label>
                         
-                        <div className="space-y-4">
+                        <div className="space-y-6">
                           {/* Selected Languages */}
                           {formData.languages.length > 0 && (
                             <div className="flex flex-wrap gap-3">
@@ -401,7 +401,7 @@ export default function CreateProfileClean() {
                   </div>
                   
                   {/* Continue Button */}
-                  <div className="flex justify-center mt-12">
+                  <div className="flex justify-center mt-16">
                     <Button 
                       type="submit" 
                       className="px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-3"
