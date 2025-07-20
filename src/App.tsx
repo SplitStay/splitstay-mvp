@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { HomePage, LoginPage, SignupPage, ForgotPasswordPage, ResetPasswordPage, DashboardPage, TermsPage, PrivacyPage, HowItWorks } from './pages'
 import PostTripPage from './pages/PostTripPage'
 import CreateProfilePage from './pages/CreateProfilePage'
+import EditProfilePage from './pages/EditProfilePage'
 import ProfilePage from './pages/ProfilePage'
 import { motion } from 'framer-motion'
 
@@ -100,6 +101,14 @@ function AppRoutes() {
         element={
           <PrivateRoute>
             <CreateProfilePage />
+          </PrivateRoute>
+        } 
+      />
+      <Route 
+        path="/edit-profile" 
+        element={
+          <PrivateRoute>
+            <EditProfilePage />
           </PrivateRoute>
         } 
       />

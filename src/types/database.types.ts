@@ -313,6 +313,7 @@ export type Database = {
           mostInfluencedCountryDescription: string | null
           mostInfluencedExperience: string | null
           name: string | null
+          personalizedLink: string | null
           profileCreated: boolean | null
           profilePicture: string | null
           shareModalShown: boolean | null
@@ -340,6 +341,7 @@ export type Database = {
           mostInfluencedCountryDescription?: string | null
           mostInfluencedExperience?: string | null
           name?: string | null
+          personalizedLink?: string | null
           profileCreated?: boolean | null
           profilePicture?: string | null
           shareModalShown?: boolean | null
@@ -367,6 +369,7 @@ export type Database = {
           mostInfluencedCountryDescription?: string | null
           mostInfluencedExperience?: string | null
           name?: string | null
+          personalizedLink?: string | null
           profileCreated?: boolean | null
           profilePicture?: string | null
           shareModalShown?: boolean | null

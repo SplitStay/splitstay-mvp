@@ -1,30 +1,173 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, MapPin, Calendar, Languages, Star, Camera, LogOut, Globe, Sparkles, UserPlus, Share2, User, Heart, BookOpen } from 'lucide-react'
+import { ArrowLeft, MapPin, Calendar, Languages, Star, Camera, LogOut, Globe, Sparkles, UserPlus, Share2, User, Heart, BookOpen, Edit, Copy, Check, X } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import { useUser, useUserById } from '@/hooks/useUser'
+import { useUser, useUserByIdOrCustomUrl, useUpdateUser } from '@/hooks/useUser'
 import { useAuth } from '@/contexts/AuthContext'
 import { useNavigate, useParams } from 'react-router-dom'
 import ShareInviteModal from '@/components/ShareInviteModal'
+import { supabase } from '@/lib/supabase'
+import toast from 'react-hot-toast'
 
 export default function ProfilePage() {
   const { id } = useParams<{ id: string }>()
   const { user: authUser, signOut } = useAuth()
   const { data: currentUser } = useUser()
-  const { data: profileUser, isLoading, error } = useUserById(id || '')
+  const { data: profileUser, isLoading, error } = useUserByIdOrCustomUrl(id || '')
   const navigate = useNavigate()
   const [isShareModalOpen, setIsShareModalOpen] = useState(false)
+  
+  // Inline edit state for customized URL
+  const [isEditingUrl, setIsEditingUrl] = useState(false)
+  const [editUrlValue, setEditUrlValue] = useState('')
+  const [editUrlError, setEditUrlError] = useState('')
+  const [isCheckingAvailability, setIsCheckingAvailability] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const [isUpdating, setIsUpdating] = useState(false)
+  
+  const updateUserMutation = useUpdateUser()
 
   // Determine if this is the current user's own profile
-  const isOwnProfile = authUser?.id === id
+  const isOwnProfile = authUser?.id === id || (profileUser && authUser?.id === profileUser.id)
   
   // Use appropriate user data
   const user = isOwnProfile ? currentUser : profileUser
 
+  console.log("user", user)
+
   const handleSignOut = async () => {
     await signOut()
   }
+
+  // Utility functions for URL validation and editing
+  const validatePersonalizedLink = (value: string): string => {
+    if (!value) return '';
+    if (value.length < 3) return 'URL must be at least 3 characters long';
+    if (value.length > 30) return 'URL must be less than 30 characters';
+    if (!/^[a-zA-Z0-9]+$/.test(value)) return 'URL can only contain letters and numbers';
+    return '';
+  };
+
+  const checkLinkAvailability = async (link: string): Promise<boolean> => {
+    console.log("link", link)
+    if (!link || validatePersonalizedLink(link)) return false;
+    
+    // If it's the same as current link, it's available
+    if (link.toLowerCase() === (user?.personalizedLink || '').toLowerCase()) return true;
+    
+    try {
+      const { data, error } = await supabase
+        .from('user')
+        .select('id')
+        .ilike('personalizedLink', link)
+        .limit(1);
+
+      console.log("link data", data)
+      
+      if (error) {
+        console.error('Error checking link availability:', error);
+        return false;
+      }
+      
+      return data.length === 0;
+    } catch (error) {
+      console.error('Error checking link availability:', error);
+      return false;
+    }
+  };
+
+  const handleStartEdit = () => {
+    setIsEditingUrl(true);
+    setEditUrlValue(user?.personalizedLink || '');
+    setEditUrlError('');
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditingUrl(false);
+    setEditUrlValue('');
+    setEditUrlError('');
+    setIsCheckingAvailability(false);
+  };
+
+  const handleSaveUrl = async () => {
+    if (!user || !authUser) return;
+    
+    const cleanValue = editUrlValue.trim();
+    const formatError = validatePersonalizedLink(cleanValue);
+    
+    if (formatError) {
+      setEditUrlError(formatError);
+      return;
+    }
+    
+    if (cleanValue && !(await checkLinkAvailability(cleanValue))) {
+      setEditUrlError('This URL is already taken');
+      return;
+    }
+    
+    setIsUpdating(true);
+    try {
+      await updateUserMutation.mutateAsync({
+        personalizedLink: cleanValue || null,
+      });
+      
+      setIsEditingUrl(false);
+      setEditUrlValue('');
+      setEditUrlError('');
+      toast.success('Profile URL updated successfully!');
+    } catch (error) {
+      toast.error('Failed to update profile URL');
+      console.error('Error updating profile URL:', error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleUrlChange = async (value: string) => {
+    const cleanValue = value.trim();
+    setEditUrlValue(cleanValue);
+    
+    const formatError = validatePersonalizedLink(cleanValue);
+    setEditUrlError(formatError);
+    
+    if (formatError || !cleanValue) {
+      setIsCheckingAvailability(false);
+      return;
+    }
+    
+    if (cleanValue.toLowerCase() === (user?.personalizedLink || '').toLowerCase()) {
+      setEditUrlError('');
+      return;
+    }
+    
+    setIsCheckingAvailability(true);
+    setTimeout(async () => {
+      const isAvailable = await checkLinkAvailability(cleanValue);
+      setIsCheckingAvailability(false);
+      if (!isAvailable) {
+        setEditUrlError('This URL is already taken');
+      } else {
+        setEditUrlError('');
+      }
+    }, 500);
+  };
+
+  const handleCopyUrl = async () => {
+    const urlToCopy = user?.personalizedLink 
+      ? `https://www.splitstay.travel/profile/${user.personalizedLink}`
+      : `${window.location.origin}/profile/${user?.id}`;
+    
+    try {
+      await navigator.clipboard.writeText(urlToCopy);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      toast.success('Profile URL copied to clipboard!');
+    } catch (error) {
+      toast.error('Failed to copy URL');
+      console.error('Error copying URL:', error);
+    }
+  };
 
 
   const handleCreateProfile = () => {
@@ -129,7 +272,7 @@ export default function ProfilePage() {
             transition={{ duration: 2, repeat: Infinity }}
             className="text-2xl font-bold text-navy"
           >
-            Loading your adventure...
+            Loading Traveller Profile...
           </motion.h2>
         </motion.div>
       </div>
@@ -357,12 +500,133 @@ export default function ProfilePage() {
                       </motion.p>
                     )}
 
-                    {/* Share My Profile Button - Only show for own profile */}
+                    {/* Customized Profile URL Section - Only show for own profile */}
                     {isOwnProfile && (
                       <motion.div 
                         variants={itemVariants}
-                        className="mt-6"
+                        className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm max-w-3xl"
                       >
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-lg font-semibold text-navy">Profile URL</h4>
+                          {!isEditingUrl && (
+                            <button
+                              onClick={handleStartEdit}
+                              className="flex items-center gap-2 text-sm text-navy hover:text-navy/80 transition-colors"
+                            >
+                              <Edit className="w-4 h-4" />
+                              Edit
+                            </button>
+                          )}
+                        </div>
+                        
+                        {isEditingUrl ? (
+                          <div className="space-y-3">
+                            <div className="flex items-center">
+                              <span className="text-sm text-gray-500 bg-gray-50 px-3 py-2 rounded-l-lg border border-r-0 border-gray-300">
+                                splitstay.travel/profile/
+                              </span>
+                              <input
+                                type="text"
+                                value={editUrlValue}
+                                onChange={(e) => handleUrlChange(e.target.value)}
+                                placeholder="yourname"
+                                className={`flex-1 px-3 py-2 border rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm ${
+                                  editUrlError ? 'border-red-300' : 'border-gray-300'
+                                }`}
+                                disabled={isUpdating}
+                              />
+                            </div>
+                            
+                            {(editUrlError || isCheckingAvailability) && (
+                              <div className="text-xs">
+                                {isCheckingAvailability && (
+                                  <div className="flex items-center text-blue-600">
+                                    <div className="animate-spin rounded-full h-3 w-3 border-b border-blue-600 mr-2"></div>
+                                    Checking availability...
+                                  </div>
+                                )}
+                                {editUrlError && (
+                                  <p className="text-red-600">{editUrlError}</p>
+                                )}
+                              </div>
+                            )}
+                            
+                            <div className="flex gap-2">
+                              <button
+                                onClick={handleSaveUrl}
+                                disabled={!!editUrlError || isCheckingAvailability || isUpdating}
+                                className="flex items-center gap-2 bg-navy text-white px-4 py-2 rounded-lg hover:bg-navy/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                              >
+                                {isUpdating ? (
+                                  <>
+                                    <div className="animate-spin rounded-full h-3 w-3 border-b border-white"></div>
+                                    Saving...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Check className="w-4 h-4" />
+                                    Save
+                                  </>
+                                )}
+                              </button>
+                              <button
+                                onClick={handleCancelEdit}
+                                disabled={isUpdating}
+                                className="flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 text-sm"
+                              >
+                                <X className="w-4 h-4" />
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-3">
+                            <div className="flex-1 text-sm">
+                              {user.personalizedLink ? (
+                                <div className="bg-gray-50 px-3 py-2 rounded-lg border border-gray-200">
+                                  <span className="text-gray-600">https://www.splitstay.travel/profile/</span>
+                                  <span className="font-medium text-navy">{user.personalizedLink}</span>
+                                </div>
+                              ) : (
+                                <div className="text-gray-500 italic">
+                                  No customized URL set. Click edit to create one.
+                                </div>
+                              )}
+                            </div>
+                            
+                            {user.personalizedLink && (
+                              <button
+                                onClick={handleCopyUrl}
+                                className="flex items-center gap-2 text-gray-600 hover:text-navy transition-colors p-2 hover:bg-gray-100 rounded-lg"
+                                title="Copy profile URL"
+                              >
+                                {copied ? (
+                                  <Check className="w-4 h-4 text-green-600" />
+                                ) : (
+                                  <Copy className="w-4 h-4" />
+                                )}
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </motion.div>
+                    )}
+
+                    {/* Edit and Share Profile Buttons - Only show for own profile */}
+                    {isOwnProfile && (
+                      <motion.div 
+                        variants={itemVariants}
+                        className="mt-6 flex flex-wrap gap-3"
+                      >
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => navigate('/edit-profile')}
+                          className="flex items-center gap-3 bg-navy text-white px-6 py-3 rounded-full hover:bg-navy/90 transition-all duration-300 shadow-lg hover:shadow-xl font-medium"
+                        >
+                          <Edit className="w-4 h-4" />
+                          <span>Edit Profile</span>
+                        </motion.button>
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
@@ -664,7 +928,7 @@ export default function ProfilePage() {
         <ShareInviteModal 
           open={isShareModalOpen}
           onClose={() => setIsShareModalOpen(false)}
-          shareUrl={`${window.location.origin}/profile/${user?.id}`}
+          shareUrl={`${window.location.origin}/profile/${user?.personalizedLink || user?.id}`}
         />
       </div>
   )

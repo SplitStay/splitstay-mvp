@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { locationIQService } from "@/lib/locationiq";
 import toast from "react-hot-toast";
 
-export default function CreateProfilePage() {
+export default function EditProfilePage() {
   const navigate = useNavigate();
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [selectedLearningLanguages, setSelectedLearningLanguages] = useState<string[]>([]);
@@ -51,11 +51,11 @@ export default function CreateProfilePage() {
   const [personalizedLinkError, setPersonalizedLinkError] = useState('');
   const [personalizedLinkAvailable, setPersonalizedLinkAvailable] = useState<boolean | null>(null);
   const [checkingAvailability, setCheckingAvailability] = useState(false);
+  const [originalPersonalizedLink, setOriginalPersonalizedLink] = useState('');
 
   const { user, loading } = useAuth();
-  const { refetch: refetchUser } = useUser();
+  const { data: userData, refetch: refetchUser } = useUser();
   const updateUserMutation = useUpdateUser();
-
 
   // Complete language list for search functionality
   const allLanguages = [
@@ -103,6 +103,9 @@ export default function CreateProfilePage() {
   const checkLinkAvailability = async (link: string): Promise<boolean> => {
     if (!link || validatePersonalizedLink(link)) return false;
     
+    // If it's the same as the original link, it's available (user keeping their existing link)
+    if (link.toLowerCase() === originalPersonalizedLink.toLowerCase()) return true;
+    
     try {
       const { data, error } = await supabase
         .from('user')
@@ -137,6 +140,13 @@ export default function CreateProfilePage() {
       return;
     }
     
+    // If it's the same as original, it's available
+    if (cleanValue.toLowerCase() === originalPersonalizedLink.toLowerCase()) {
+      setPersonalizedLinkAvailable(true);
+      setPersonalizedLinkError('');
+      return;
+    }
+    
     // Check availability with debouncing
     setCheckingAvailability(true);
     setPersonalizedLinkAvailable(null);
@@ -158,6 +168,64 @@ export default function CreateProfilePage() {
     }, 500);
     setSearchTimeout(timeout);
   };
+
+  // Pre-fill form data when userData is available
+  useEffect(() => {
+    if (userData) {
+      setFormData({
+        fullName: userData.name || "",
+        birthPlace: userData.birthPlace || "",
+        currentPlace: userData.currentPlace || "",
+        bio: userData.bio || "",
+        dayOfBirth: userData.dayOfBirth ? userData.dayOfBirth.toString() : "",
+        monthOfBirth: userData.monthOfBirth ? userData.monthOfBirth.toString() : "",
+        yearOfBirth: userData.yearOfBirth ? userData.yearOfBirth.toString() : "",
+        gender: userData.gender || "",
+        mostInfluencedCountry: userData.mostInfluencedCountry || "",
+        mostInfluencedCountryDescription: userData.mostInfluencedCountryDescription || "",
+        mostInfluencedExperience: userData.mostInfluencedExperience || "",
+        personalizedLink: userData.personalizedLink || ""
+      });
+
+      // Set location inputs
+      setBirthLocationInput(userData.birthPlace || '');
+      setCurrentHomeInput(userData.currentPlace || '');
+
+      // Set personalized link inputs
+      const personalizedLink = userData.personalizedLink || '';
+      setPersonalizedLinkInput(personalizedLink);
+      setOriginalPersonalizedLink(personalizedLink);
+      if (personalizedLink) {
+        setPersonalizedLinkAvailable(true); // Current link is available since it's already theirs
+      }
+
+      // Set languages
+      if (userData.languages) {
+        setSelectedLanguages(userData.languages as string[]);
+      }
+
+      // Set learning languages
+      if (userData.learningLanguages) {
+        setSelectedLearningLanguages(userData.learningLanguages as string[]);
+      }
+
+      // Set travel traits
+      if (userData.travelTraits) {
+        setSelectedTraits(userData.travelTraits as string[]);
+      }
+
+      // Set profile image
+      if (userData.imageUrl) {
+        setProfileImagePreview(userData.imageUrl);
+        setProfileImageUrl(userData.imageUrl);
+      }
+
+      // Set travel photos
+      if (userData.travelPhotos) {
+        setTravelPhotos(userData.travelPhotos as string[]);
+      }
+    }
+  }, [userData]);
 
   // Redirect to home if user is not authenticated
   useEffect(() => {
@@ -305,7 +373,6 @@ export default function CreateProfilePage() {
     );
   };
 
-
   const handleLanguageDropdownChange = (language: string) => {
     if (language && !selectedLanguages.includes(language)) {
       setSelectedLanguages(prev => [...prev, language]);
@@ -362,7 +429,7 @@ export default function CreateProfilePage() {
     e.preventDefault();
     
     if (!user) {
-      toast.error("You must be logged in to create a profile");
+      toast.error("You must be logged in to update your profile");
       return;
     }
 
@@ -394,12 +461,12 @@ export default function CreateProfilePage() {
       // Refetch user data to ensure we have the latest information
       await refetchUser();
 
-      toast.success("Profile created successfully!");
+      toast.success("Profile updated successfully!");
 
-      // Navigate to dashboard after profile creation
-      navigate("/dashboard");
+      // Navigate to profile page after update
+      navigate(`/profile/${user.id}`);
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to create profile. Please try again.";
+      const errorMessage = error instanceof Error ? error.message : "Failed to update profile. Please try again.";
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
@@ -426,7 +493,6 @@ export default function CreateProfilePage() {
   ];
   const currentYear = new Date().getFullYear();
   const yearOptions = Array.from({ length: 82 }, (_, i) => (currentYear - 18 - i).toString());
-
 
   const traitOptions = [
     "Early Bird", "Night Owl", "Adventurous", "Relaxed", "Social", "Quiet", 
@@ -481,11 +547,11 @@ export default function CreateProfilePage() {
         {/* Mobile Layout - Stack vertically */}
         <div className="block md:hidden mb-4">
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate(`/profile/${user.id}`)}
             className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors cursor-pointer flex items-center gap-2 mb-3"
             style={{ color: '#4B4B4B', fontFamily: 'system-ui, Inter, sans-serif' }}
           >
-            ← Back to Home
+            ← Back to Profile
           </button>
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-2" style={{ color: '#1e2a78' }}>
@@ -501,11 +567,11 @@ export default function CreateProfilePage() {
         <div className="hidden md:block">
           <div className="relative mb-2">
             <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate(`/profile/${user.id}`)}
               className="absolute left-0 top-0 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors cursor-pointer flex items-center gap-2"
               style={{ color: '#4B4B4B', fontFamily: 'system-ui, Inter, sans-serif' }}
             >
-              ← Back to Home
+              ← Back to Profile
             </button>
             <div className="text-center">
               <h1 className="text-3xl font-bold" style={{ color: '#1e2a78' }}>
@@ -1281,9 +1347,8 @@ export default function CreateProfilePage() {
               backgroundColor: (isFormValid && !isLoading) ? '#1e2a78' : '#d1d5db'
             }}
           >
-            {isLoading ? "Creating Profile..." : "Create My Profile"}
+            {isLoading ? "Updating Profile..." : "Update My Profile"}
           </button>
-
         </div>
       </div>
     </div>

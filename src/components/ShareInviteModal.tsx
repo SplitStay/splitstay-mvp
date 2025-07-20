@@ -15,11 +15,7 @@ const generatePersonalizedMessage = (user: Tables<'user'> | undefined): string =
     return "Hey! I just created my profile on SplitStay — maybe we should try it sometime. Why don't you create yours as well?";
   }
 
-  const name = user.name || user.fullName || "I";
-  const location = user.location;
-  const languages = user.languages as string[] | null;
-  const travelTraits = user.travelTraits as string[] | null;
-  const bio = user.bio;
+  // Extract user data (currently using minimal info for the message)
 
   let message = `Hey! I just joined SplitStay !`;
 
@@ -28,8 +24,10 @@ const generatePersonalizedMessage = (user: Tables<'user'> | undefined): string =
 
   // Use Vite environment variable for the base URL
   const baseUrl = import.meta.env.VITE_APP_URL;
-
-  message += ` Checkout my profile on ${baseUrl}/profile/${user?.id} and create your own !`;
+  
+  // Use customized URL if available, otherwise use ID
+  const profileIdentifier = user?.personalizedLink || user?.id;
+  message += ` Checkout my profile on ${baseUrl}/profile/${profileIdentifier} and create your own !`;
 
   return message;
 };

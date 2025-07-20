@@ -49,6 +49,64 @@ export const useUserById = (userId: string): UseQueryResult<Tables<'user'>, Erro
   })
 }
 
+export const useUserByCustomUrl = (customUrl: string): UseQueryResult<Tables<'user'>, Error> => {
+  return useQuery<Tables<'user'>, Error>({
+    queryKey: ['user', 'customUrl', customUrl],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('user')
+        .select('*')
+        .ilike('personalizedLink', customUrl)
+        .single()
+
+      if (error) {
+        throw error
+      }
+
+      return data
+    },
+    retry: false,
+    enabled: !!customUrl,
+  })
+}
+
+export const useUserByIdOrCustomUrl = (identifier: string): UseQueryResult<Tables<'user'>, Error> => {
+  return useQuery<Tables<'user'>, Error>({
+    queryKey: ['user', 'identifier', identifier],
+    queryFn: async () => {
+      if (!identifier) {
+        throw new Error('No identifier provided')
+      }
+
+      // First try to fetch by customized URL (case-insensitive)
+      const { data: customUrlData, error: customUrlError } = await supabase
+        .from('user')
+        .select('*')
+        .ilike('personalizedLink', identifier)
+        .single()
+
+      if (customUrlData && !customUrlError) {
+        return customUrlData
+      }
+
+      // If not found by custom URL, try by ID
+      const { data: idData, error: idError } = await supabase
+        .from('user')
+        .select('*')
+        .eq('id', identifier)
+        .single()
+
+      if (idError) {
+        throw idError
+      }
+
+      return idData
+    },
+    retry: false,
+    enabled: !!identifier,
+  })
+}
+
 export const useUpdateUser = () => {
   const queryClient = useQueryClient()
 
