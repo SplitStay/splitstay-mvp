@@ -533,19 +533,19 @@ function CreateProfile() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="max-w-[1300px] mx-auto px-8 pb-16">
-        {/* 2-column layout: 50/50 split */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <form onSubmit={handleSubmit} className="max-w-[1400px] mx-auto px-6 pb-16">
+        {/* 3-column layout: responsive grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           
-          {/* LEFT COLUMN — Personal Basics */}
-          <div className="bg-white rounded-lg shadow-lg p-8">
+          {/* COLUMN 1 — Personal Info */}
+          <div className="bg-white rounded-lg shadow-lg p-6 h-fit">
             <div className="mb-6">
-              <h2 className="text-xl font-bold" style={{ color: '#1e2a78' }}>
-                🪪 Tell us about you
+              <h2 className="text-lg font-bold text-center" style={{ color: '#1e2a78' }}>
+                Personal Info
               </h2>
             </div>
             
-            <div className="space-y-6">
+            <div className="space-y-5">
               {/* Profile Photo Upload */}
               <div className="text-center">
                 <div className="flex flex-col items-center">
@@ -554,19 +554,19 @@ function CreateProfile() {
                       <img
                         src={profileImagePreview}
                         alt="Profile preview"
-                        className="w-32 h-32 rounded-full object-cover border-4 border-gray-200 shadow-md"
+                        className="w-24 h-24 rounded-full object-cover border-4 border-gray-200 shadow-md"
                       />
                       <button
                         type="button"
                         onClick={() => setProfileImagePreview(null)}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-all duration-200 shadow-lg"
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-all duration-200 shadow-lg"
                       >
-                        <X className="w-4 h-4" />
+                        <X className="w-3 h-3" />
                       </button>
                     </div>
                   ) : (
-                    <div className="w-32 h-32 rounded-full bg-gray-50 border-2 border-dashed border-gray-300 flex items-center justify-center hover:border-gray-400 transition-colors">
-                      <svg className="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                    <div className="w-24 h-24 rounded-full bg-gray-50 border-2 border-dashed border-gray-300 flex items-center justify-center hover:border-gray-400 transition-colors">
+                      <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                       </svg>
                     </div>
@@ -580,7 +580,7 @@ function CreateProfile() {
                   />
                   <label
                     htmlFor="profile-image-upload"
-                    className="cursor-pointer text-white px-6 py-2 rounded-lg text-sm font-medium mt-4 shadow-md hover:shadow-lg transition-all duration-200"
+                    className="cursor-pointer text-white px-4 py-1.5 rounded-lg text-xs font-medium mt-3 shadow-md hover:shadow-lg transition-all duration-200"
                     style={{ backgroundColor: '#1e2a78' }}
                   >
                     {profileImagePreview ? "Change Photo" : "Upload Photo"}
@@ -589,19 +589,19 @@ function CreateProfile() {
               </div>
 
               {/* Gender Selection */}
-              <div className="text-center">
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  What is your gender?
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Gender
                 </label>
                 <div className="flex justify-center">
                   <div className="bg-gray-100 p-1 rounded-full inline-flex">
                     <button
                       type="button"
                       onClick={() => setFormData(prev => ({...prev, gender: "male"}))}
-                      className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 transform ${
+                      className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
                         formData.gender === "male" 
-                          ? "text-white shadow-lg scale-105" 
-                          : "text-gray-600 hover:text-gray-800 hover:bg-gray-200 hover:scale-105 hover:shadow-md"
+                          ? "text-white shadow-md" 
+                          : "text-gray-600 hover:text-gray-800 hover:bg-gray-200"
                       }`}
                       style={{ 
                         backgroundColor: formData.gender === "male" ? '#1e2a78' : 'transparent'
@@ -612,10 +612,10 @@ function CreateProfile() {
                     <button
                       type="button"
                       onClick={() => setFormData(prev => ({...prev, gender: "female"}))}
-                      className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 transform ${
+                      className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
                         formData.gender === "female" 
-                          ? "text-white shadow-lg scale-105" 
-                          : "text-gray-600 hover:text-gray-800 hover:bg-gray-200 hover:scale-105 hover:shadow-md"
+                          ? "text-white shadow-md" 
+                          : "text-gray-600 hover:text-gray-800 hover:bg-gray-200"
                       }`}
                       style={{ 
                         backgroundColor: formData.gender === "female" ? '#1e2a78' : 'transparent'
@@ -629,7 +629,7 @@ function CreateProfile() {
 
               {/* How do you want to be called */}
               <div>
-                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-3">
+                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
                   How do you want to be called? <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -638,22 +638,75 @@ function CreateProfile() {
                   value={formData.fullName}
                   onChange={(e) => setFormData(prev => ({...prev, fullName: e.target.value}))}
                   placeholder="e.g. Jane"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  autoFocus
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   required
                 />
               </div>
 
+              {/* Date of Birth */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Date of Birth <span className="text-red-500">*</span>
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  <select
+                    value={formData.dayOfBirth}
+                    onChange={(e) => setFormData(prev => ({...prev, dayOfBirth: e.target.value}))}
+                    className="w-full px-2 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                    required
+                  >
+                    <option value="">Day</option>
+                    {dayOptions.map((day) => (
+                      <option key={day} value={day}>{day}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={formData.monthOfBirth}
+                    onChange={(e) => setFormData(prev => ({...prev, monthOfBirth: e.target.value}))}
+                    className="w-full px-2 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                    required
+                  >
+                    <option value="">Month</option>
+                    {monthOptions.map((month) => (
+                      <option key={month.value} value={month.value}>{month.label}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={formData.yearOfBirth}
+                    onChange={(e) => setFormData(prev => ({...prev, yearOfBirth: e.target.value}))}
+                    className="w-full px-2 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                    required
+                  >
+                    <option value="">Year</option>
+                    {yearOptions.map((year) => (
+                      <option key={year} value={year}>{year}</option>
+                    ))}
+                  </select>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Must be 18+</p>
+              </div>
+            </div>
+          </div>
+
+          {/* COLUMN 2 — Location & Language */}
+          <div className="bg-white rounded-lg shadow-lg p-6 h-fit">
+            <div className="mb-6">
+              <h2 className="text-lg font-bold text-center" style={{ color: '#1e2a78' }}>
+                Location & Language
+              </h2>
+            </div>
+            
+            <div className="space-y-5">
               {/* Where were you born */}
               <div>
-                <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-3">
+                <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-2">
                   Where were you born? <span className="text-red-500">*</span>
                 </label>
                 <select
                   id="country"
                   value={formData.country || ''}
                   onChange={(e) => setFormData(prev => ({...prev, country: e.target.value}))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   required
                 >
                   <option value="">Select your birth country</option>
@@ -665,14 +718,16 @@ function CreateProfile() {
 
               {/* Where do you currently call home */}
               <div>
-                <label htmlFor="currentHome" className="block text-sm font-medium text-gray-700 mb-3">
-                  Where do you currently call home? <span className="text-gray-400">(optional)</span>
+                <label htmlFor="currentHome" className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                  Where do you currently call home? 
+                  <span className="text-gray-400 ml-1">(optional)</span>
+                  <span className="ml-1 text-xs cursor-help" title="Your current residence">ℹ️</span>
                 </label>
                 <select
                   id="currentHome"
                   value={formData.currentHome || ''}
                   onChange={(e) => setFormData(prev => ({...prev, currentHome: e.target.value}))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 >
                   <option value="">Select your current home</option>
                   {countryOptions.map((country) => (
@@ -681,70 +736,9 @@ function CreateProfile() {
                 </select>
               </div>
 
-              {/* What makes you feel alive */}
-              <div>
-                <label htmlFor="bio" className="block text-sm font-medium text-gray-700 mb-3">
-                  What makes you feel alive? <span className="text-gray-400">(optional)</span>
-                </label>
-                <p className="text-xs text-gray-500 mb-2">Share moments, passions, or travel rituals</p>
-                <textarea
-                  id="bio"
-                  value={formData.bio}
-                  onChange={(e) => setFormData(prev => ({...prev, bio: e.target.value}))}
-                  placeholder="e.g. chasing sunsets, street food tours, spontaneous hikes..."
-                  rows={3}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
-                />
-              </div>
-
-
-
-              {/* Date of Birth */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Date of Birth <span className="text-red-500">*</span>
-                </label>
-                <div className="grid grid-cols-3 gap-3">
-                  <select
-                    value={formData.dayOfBirth}
-                    onChange={(e) => setFormData(prev => ({...prev, dayOfBirth: e.target.value}))}
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    required
-                  >
-                    <option value="">Day</option>
-                    {dayOptions.map((day) => (
-                      <option key={day} value={day}>{day}</option>
-                    ))}
-                  </select>
-                  <select
-                    value={formData.monthOfBirth}
-                    onChange={(e) => setFormData(prev => ({...prev, monthOfBirth: e.target.value}))}
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    required
-                  >
-                    <option value="">Month</option>
-                    {monthOptions.map((month) => (
-                      <option key={month.value} value={month.value}>{month.label}</option>
-                    ))}
-                  </select>
-                  <select
-                    value={formData.yearOfBirth}
-                    onChange={(e) => setFormData(prev => ({...prev, yearOfBirth: e.target.value}))}
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    required
-                  >
-                    <option value="">Year</option>
-                    {yearOptions.map((year) => (
-                      <option key={year} value={year}>{year}</option>
-                    ))}
-                  </select>
-                </div>
-                <p className="text-xs text-gray-500 mt-2">Must be 18+</p>
-              </div>
-
               {/* Languages Section */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Languages you speak <span className="text-red-500">*</span>
                 </label>
                 
@@ -866,49 +860,44 @@ function CreateProfile() {
             </div>
           </div>
 
-          {/* RIGHT COLUMN — Travel Style */}
-          <div className="bg-white rounded-lg shadow-lg p-8">
+          {/* COLUMN 3 — Travel Preferences */}
+          <div className="bg-white rounded-lg shadow-lg p-6 h-fit">
             <div className="mb-6">
-              <h2 className="text-xl font-bold" style={{ color: '#1e2a78' }}>
-                🌍 Build your traveler profile
+              <h2 className="text-lg font-bold text-center" style={{ color: '#1e2a78' }}>
+                Travel Preferences
               </h2>
             </div>
 
-            <div className="space-y-8">
-              {/* Section: Tell us how you travel */}
+            <div className="space-y-5">
+              {/* Travel Traits Section */}
               <div>
-                <h3 className="text-lg font-semibold mb-4" style={{ color: '#1e2a78' }}>
-                  🧭 Tell us how you travel
-                </h3>
-                
-                {/* Travel Traits Section */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-4">
-                    Travel traits <span className="text-gray-400">(select up to 5)</span>
-                  </label>
-                  {/* Modern pill-style trait buttons */}
-                  <div className="flex flex-wrap gap-3 mb-4">
-                    {traitOptions.map((trait) => (
-                      <button
-                        key={trait}
-                        type="button"
-                        onClick={() => handleTraitToggle(trait)}
-                        disabled={!selectedTraits.includes(trait) && selectedTraits.length >= 5}
-                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                          selectedTraits.includes(trait)
-                            ? "text-white shadow-md scale-105"
-                            : selectedTraits.length >= 5
-                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                            : "bg-gray-100 text-gray-700 hover:bg-blue-100 hover:text-blue-700 hover:shadow-md hover:scale-105"
-                        }`}
-                        style={{ 
-                          backgroundColor: selectedTraits.includes(trait) ? '#1e2a78' : undefined 
-                        }}
-                      >
-                        {trait}
-                      </button>
-                    ))}
-                  </div>
+                <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                  Travel traits 
+                  <span className="text-gray-400 ml-1">(select up to 5)</span>
+                  <span className="ml-1 text-xs cursor-help" title="These traits help us find compatible roommates">ℹ️</span>
+                </label>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {traitOptions.map((trait) => (
+                    <button
+                      key={trait}
+                      type="button"
+                      onClick={() => handleTraitToggle(trait)}
+                      disabled={!selectedTraits.includes(trait) && selectedTraits.length >= 5}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+                        selectedTraits.includes(trait)
+                          ? "text-white shadow-md"
+                          : selectedTraits.length >= 5
+                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                          : "bg-gray-100 text-gray-700 hover:bg-blue-100 hover:text-blue-700 hover:shadow-md"
+                      }`}
+                      style={{ 
+                        backgroundColor: selectedTraits.includes(trait) ? '#1e2a78' : undefined 
+                      }}
+                    >
+                      {trait}
+                    </button>
+                  ))}
+                </div>
                 {selectedTraits.length > 0 && (
                   <div className="mb-2">
                     <div className="flex flex-wrap gap-1">
@@ -931,77 +920,50 @@ function CreateProfile() {
                   </div>
                 )}
               </div>
-            </div>
 
-              {/* Section: Share your most meaningful travel experiences */}
+              {/* Most influential country */}
               <div>
-                <h3 className="text-lg font-semibold mb-4" style={{ color: '#1e2a78' }}>
-                  📖 Share your most meaningful travel experiences
-                </h3>
-                
-                <div className="space-y-6">
-                  {/* Prompt 1: Most influential country */}
-                  <div>
-                    <label htmlFor="influential_country" className="block text-sm font-medium text-gray-700 mb-3">
-                      Which country has influenced you the most?
-                    </label>
-                    <select
-                      id="influential_country"
-                      value={formData.influential_country || ''}
-                      onChange={(e) => setFormData(prev => ({...prev, influential_country: e.target.value}))}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    >
-                      <option value="">Select a country</option>
-                      {countryOptions.map((country) => (
-                        <option key={country} value={country}>{country}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Follow-up: Why did this country impact you */}
-                  {formData.influential_country && (
-                    <div>
-                      <label htmlFor="country_impact_reason" className="block text-sm font-medium text-gray-700 mb-3">
-                        Why did this country impact you?
-                      </label>
-                      <textarea
-                        id="country_impact_reason"
-                        value={formData.country_impact_reason}
-                        onChange={(e) => setFormData(prev => ({...prev, country_impact_reason: e.target.value}))}
-                        placeholder="Share what made this place special to you..."
-                        rows={5}
-                        maxLength={250}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
-                      />
-                      <div className="text-xs text-gray-500 text-right mt-2">
-                        {formData.country_impact_reason.length}/250 characters
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Prompt 2: Most impactful travel experience */}
-                  <div>
-                    <label htmlFor="most_impactful_experience" className="block text-sm font-medium text-gray-700 mb-3">
-                      What travel experience has impacted you most deeply? <span className="text-gray-400">(optional)</span>
-                    </label>
-                    <textarea
-                      id="most_impactful_experience"
-                      value={formData.most_impactful_experience}
-                      onChange={(e) => setFormData(prev => ({...prev, most_impactful_experience: e.target.value}))}
-                      placeholder="Tell us about a moment, encounter, or journey that changed your perspective..."
-                      rows={4}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
-                    />
-                  </div>
-                </div>
+                <label htmlFor="influential_country" className="block text-sm font-medium text-gray-700 mb-2">
+                  Which country has influenced you the most?
+                </label>
+                <select
+                  id="influential_country"
+                  value={formData.influential_country || ''}
+                  onChange={(e) => setFormData(prev => ({...prev, influential_country: e.target.value}))}
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                >
+                  <option value="">Select a country</option>
+                  {countryOptions.map((country) => (
+                    <option key={country} value={country}>{country}</option>
+                  ))}
+                </select>
               </div>
 
-              {/* Section: Travel Photos */}
+              {/* Most impactful travel experience */}
               <div>
-                <h3 className="text-lg font-semibold mb-4" style={{ color: '#1e2a78' }}>
-                  📸 Top 3 Travel Photos
-                </h3>
-                <div className="flex gap-4">
+                <label htmlFor="most_impactful_experience" className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                  What travel experience has impacted you most deeply? 
+                  <span className="text-gray-400 ml-1">(optional)</span>
+                  <span className="ml-1 text-xs cursor-help" title="Share a meaningful travel moment">ℹ️</span>
+                </label>
+                <textarea
+                  id="most_impactful_experience"
+                  value={formData.most_impactful_experience}
+                  onChange={(e) => setFormData(prev => ({...prev, most_impactful_experience: e.target.value}))}
+                  placeholder="Tell us about a moment, encounter, or journey that changed your perspective..."
+                  rows={3}
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                />
+              </div>
+
+              {/* Top 3 Travel Photos */}
+              <div>
+                <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                  Top 3 Travel Photos 
+                  <span className="text-gray-400 ml-1">(optional)</span>
+                  <span className="ml-1 text-xs cursor-help" title="Share your favorite travel memories">ℹ️</span>
+                </label>
+                <div className="grid grid-cols-3 gap-2">
                   {[0, 1, 2].map((index) => (
                     <div key={index} className="relative">
                       {travelPhotos[index] ? (
@@ -1009,14 +971,14 @@ function CreateProfile() {
                           <img
                             src={travelPhotos[index]}
                             alt={`Travel photo ${index + 1}`}
-                            className="w-24 h-24 object-cover rounded-lg border-2 border-gray-200 shadow-sm"
+                            className="w-16 h-16 object-cover rounded-lg border-2 border-gray-200 shadow-sm"
                           />
                           <button
                             type="button"
                             onClick={() => removeTravelPhoto(index)}
-                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors text-xs"
+                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center hover:bg-red-600 transition-colors text-xs"
                           >
-                            <X className="w-3 h-3" />
+                            <X className="w-2 h-2" />
                           </button>
                         </>
                       ) : (
@@ -1030,9 +992,9 @@ function CreateProfile() {
                           />
                           <label
                             htmlFor={`travel-photo-${index}`}
-                            className="cursor-pointer w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center hover:border-gray-400 transition-colors"
+                            className="cursor-pointer w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center hover:border-gray-400 transition-colors"
                           >
-                            <Plus className="w-4 h-4 text-gray-400" />
+                            <Plus className="w-3 h-3 text-gray-400" />
                           </label>
                         </>
                       )}
