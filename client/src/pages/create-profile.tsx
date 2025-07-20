@@ -10,7 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { X, Plus } from "lucide-react";
 
+// Enhanced onboarding flow with gender, locations, and travel experiences
 export default function CreateProfile() {
+  console.log("🚀 NEW Enhanced CreateProfile component loaded!");
   const [, navigate] = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
