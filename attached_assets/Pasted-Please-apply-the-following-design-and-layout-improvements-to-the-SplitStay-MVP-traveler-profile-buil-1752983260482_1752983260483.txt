@@ -1,0 +1,66 @@
+Please apply the following design and layout improvements to the SplitStay MVP traveler profile builder screen, targeting desktop view. The goal is to fully use the screen width and prevent vertical scrolling, while ensuring the UI is clean, intuitive, and balanced.
+
+🔁 GENERAL LAYOUT (Desktop)
+Keep the three-column layout as it is — Personal Info, Location & Language, and Travel Preferences.
+
+Make sure each column uses full vertical height of the screen and that all components fit without scrolling.
+
+Slightly increase horizontal width of each column to use full screen width (ideal on 13-15" laptop screens).
+
+👤 PERSONAL INFO COLUMN
+Adjust Layout and Sizes:
+Move the "Gender" selection (Male, Female) under the "Gender" label, not under the Upload Photo.
+
+Increase size of the Upload Photo circle and button to visually match the width of the “Name” input field.
+
+Add some vertical padding/margin between each section so it fills the vertical space more gracefully.
+
+Enlarge the font sizes slightly for better visual hierarchy.
+
+🌍 LOCATION & LANGUAGE COLUMN
+Where were you born / Where do you currently call home:
+Change both to typeahead city + country selection. Example: typing "Bar" suggests “Barcelona, Spain”.
+
+Label 1: Where were you born?
+
+Label 2: Where do you currently call home? (optional)
+
+Languages you speak / are learning:
+Instead of separate "More Languages" blue links, display language chips (tags) to fill the horizontal space more efficiently.
+
+Place most common languages for solo travelers (e.g., English, Spanish, French, German, Italian, Dutch, Portuguese) at the top.
+
+Use a scrollable horizontal carousel/dropdown for selecting additional languages — this avoids vertical stacking and scrolling.
+
+Combine "Languages You Speak" and "Languages You're Learning" in one column block, but keep selections visibly separate for clarity.
+
+✈️ TRAVEL PREFERENCES COLUMN
+Travel Traits:
+Keep only 12 most common travel traits visible (e.g., Early Bird, Night Owl, Adventurous, Quiet, Foodie, Digital Nomad, Solo Traveler, etc.).
+
+Add + Show More Traits to toggle or expand the rest — do not show all by default to keep screen compact.
+
+Make the column slightly wider so travel traits wrap into fewer lines and make better use of space.
+
+Meaningful Travel Experiences:
+No changes needed to the questions here — spacing looks good.
+
+Optional improvement: Align travel story input field height with adjacent columns’ content height.
+
+Travel Photos:
+Ensure the “Top 3 Travel Photos” fits in the bottom part without pushing anything below the fold.
+
+Keep as-is, but adjust image containers to match visual width of the other inputs.
+
+✅ Final Check
+Ensure no vertical scroll is required in desktop view.
+
+Maintain responsive design: On mobile/tablet, columns should stack vertically in this order:
+
+Personal Info
+
+Location & Language
+
+Travel Preferences
+
+Use consistent padding, spacing, and alignment across all inputs for a premium user experience.

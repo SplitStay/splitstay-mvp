@@ -828,9 +828,9 @@ function CreateProfile() {
                       </div>
                     </div>
                   )}
-                </div>
+              </div>
 
-                {/* Languages You're Learning */}
+              {/* Languages You're Learning Section */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
                   Languages You're Learning <span className="text-gray-400">(optional)</span>
@@ -914,7 +914,6 @@ function CreateProfile() {
                     </div>
                   </div>
                 )}
-              </div>
               </div>
             </div>
           </div>
