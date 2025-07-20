@@ -39,6 +39,57 @@ function CreateProfile() {
     most_impactful_experience: ""
   });
 
+  // City data for autocomplete
+  const cities = [
+    "Barcelona, Spain", "Madrid, Spain", "Valencia, Spain", "Seville, Spain",
+    "Paris, France", "Lyon, France", "Marseille, France", "Nice, France",
+    "Berlin, Germany", "Munich, Germany", "Hamburg, Germany", "Frankfurt, Germany",
+    "Amsterdam, Netherlands", "Rotterdam, Netherlands", "Utrecht, Netherlands",
+    "London, United Kingdom", "Manchester, United Kingdom", "Edinburgh, United Kingdom",
+    "Rome, Italy", "Milan, Italy", "Florence, Italy", "Naples, Italy", "Venice, Italy",
+    "New York, United States", "Los Angeles, United States", "Chicago, United States",
+    "Tokyo, Japan", "Osaka, Japan", "Kyoto, Japan", "Yokohama, Japan",
+    "Sydney, Australia", "Melbourne, Australia", "Brisbane, Australia",
+    "Toronto, Canada", "Vancouver, Canada", "Montreal, Canada",
+    "Mexico City, Mexico", "Guadalajara, Mexico", "Cancun, Mexico",
+    "Bangkok, Thailand", "Chiang Mai, Thailand", "Phuket, Thailand",
+    "Singapore, Singapore", "Mumbai, India", "Delhi, India", "Bangalore, India",
+    "São Paulo, Brazil", "Rio de Janeiro, Brazil", "Salvador, Brazil",
+    "Buenos Aires, Argentina", "Bogotá, Colombia", "Lima, Peru",
+    "Dubai, United Arab Emirates", "Istanbul, Turkey", "Athens, Greece",
+    "Prague, Czech Republic", "Vienna, Austria", "Copenhagen, Denmark",
+    "Stockholm, Sweden", "Oslo, Norway", "Helsinki, Finland", "Warsaw, Poland"
+  ];
+
+  // Complete language list for search functionality
+  const allLanguages = [
+    "English", "Spanish", "French", "German", "Dutch", "Italian", "Portuguese", "Mandarin", 
+    "Japanese", "Korean", "Arabic", "Russian", "Hindi", "Bengali", "Thai", "Vietnamese", 
+    "Indonesian", "Malay", "Turkish", "Greek", "Hebrew", "Polish", "Czech", "Hungarian", 
+    "Romanian", "Bulgarian", "Croatian", "Serbian", "Swedish", "Norwegian", "Danish", 
+    "Finnish", "Estonian", "Latvian", "Lithuanian", "Slovenian", "Slovak", "Ukrainian", 
+    "Catalan", "Basque", "Galician", "Irish", "Welsh", "Scots Gaelic", "Icelandic", 
+    "Albanian", "Macedonian", "Maltese", "Luxembourgish", "Faroese", "Swahili", 
+    "Amharic", "Yoruba", "Igbo", "Hausa", "Zulu", "Afrikaans", "Tagalog", "Cebuano", 
+    "Ilocano", "Tamil", "Telugu", "Marathi", "Gujarati", "Kannada", "Malayalam", 
+    "Punjabi", "Urdu", "Nepali", "Sinhala", "Burmese", "Khmer", "Lao", "Mongolian", 
+    "Kazakh", "Uzbek", "Kyrgyz", "Tajik", "Turkmen", "Azerbaijani", "Armenian", "Georgian"
+  ];
+
+  // Additional state for enhanced features
+  const [birthLocationInput, setBirthLocationInput] = useState(formData.country || '');
+  const [currentHomeInput, setCurrentHomeInput] = useState(formData.currentHome || '');
+  const [birthSuggestions, setBirthSuggestions] = useState<string[]>([]);
+  const [homeSuggestions, setHomeSuggestions] = useState<string[]>([]);
+  const [showBirthSuggestions, setShowBirthSuggestions] = useState(false);
+  const [showHomeSuggestions, setShowHomeSuggestions] = useState(false);
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [languageSearchTerm, setLanguageSearchTerm] = useState('');
+  const [showLearningLanguageModal, setShowLearningLanguageModal] = useState(false);
+  const [learningLanguageSearchTerm, setLearningLanguageSearchTerm] = useState('');
+  const [showCustomTraitInput, setShowCustomTraitInput] = useState(false);
+  const [customTraitInput, setCustomTraitInput] = useState('');
+
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -86,6 +137,47 @@ function CreateProfile() {
     );
   };
 
+  // Handle autocomplete for birth location
+  const handleBirthLocationChange = (value: string) => {
+    setBirthLocationInput(value);
+    setFormData(prev => ({...prev, country: value}));
+    
+    if (value.length > 1) {
+      const filtered = cities.filter(city => 
+        city.toLowerCase().includes(value.toLowerCase())
+      ).slice(0, 5);
+      setBirthSuggestions(filtered);
+      setShowBirthSuggestions(true);
+    } else {
+      setShowBirthSuggestions(false);
+    }
+  };
+
+  // Handle autocomplete for current home
+  const handleCurrentHomeChange = (value: string) => {
+    setCurrentHomeInput(value);
+    setFormData(prev => ({...prev, currentHome: value}));
+    
+    if (value.length > 1) {
+      const filtered = cities.filter(city => 
+        city.toLowerCase().includes(value.toLowerCase())
+      ).slice(0, 5);
+      setHomeSuggestions(filtered);
+      setShowHomeSuggestions(true);
+    } else {
+      setShowHomeSuggestions(false);
+    }
+  };
+
+  // Add custom trait
+  const addCustomTrait = () => {
+    if (customTraitInput.trim() && selectedTraits.length < 5) {
+      setSelectedTraits(prev => [...prev, customTraitInput.trim()]);
+      setCustomTraitInput('');
+      setShowCustomTraitInput(false);
+    }
+  };
+
   const handleCountryDropdownChange = (country: string) => {
     if (country && !selectedCountries.includes(country)) {
       setSelectedCountries(prev => [...prev, country]);
@@ -121,9 +213,6 @@ function CreateProfile() {
   
   // Additional languages in dropdown
   const additionalLanguages = ["Portuguese", "Chinese (Mandarin)", "Japanese", "Korean", "Arabic", "Russian", "Hindi", "Swahili", "Turkish", "Polish"];
-  
-  // All languages combined
-  const allLanguages = [...mainLanguages, ...additionalLanguages];
 
   // Popular countries for quick selection  
   const popularCountries = ["United States", "France", "Spain", "Japan", "Thailand", "Netherlands", "Germany", "Italy", "United Kingdom", "Australia"];
@@ -542,22 +631,22 @@ function CreateProfile() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="w-full max-w-[1600px] mx-auto px-6 h-[calc(100vh-100px)] overflow-hidden">
+      <form onSubmit={handleSubmit} className="w-full max-w-[1600px] mx-auto px-6 h-[calc(100vh-140px)] overflow-hidden">
         {/* 3-column layout: optimized full width responsive grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
           
           {/* COLUMN 1 — Personal Info */}
-          <div className="bg-white rounded-lg shadow-lg p-8 h-full overflow-y-auto">
-            <div className="mb-8">
-              <h2 className="text-xl font-bold text-center" style={{ color: '#1e2a78' }}>
+          <div className="bg-white rounded-lg shadow-lg p-6 h-full flex flex-col">
+            <div className="mb-4">
+              <h2 className="text-lg font-bold text-center" style={{ color: '#1e2a78' }}>
                 Personal Info
               </h2>
             </div>
             
-            <div className="space-y-8">
+            <div className="flex-1 space-y-5">
               {/* Profile Photo Upload */}
               <div className="text-center">
-                <label className="block text-base font-medium text-gray-700 mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-3">
                   Upload Photo <span className="text-red-500">*</span>
                 </label>
                 <div className="flex flex-col items-center">
@@ -566,19 +655,19 @@ function CreateProfile() {
                       <img
                         src={profileImagePreview}
                         alt="Profile preview"
-                        className="w-32 h-32 rounded-full object-cover border-4 border-gray-200 shadow-lg"
+                        className="w-28 h-28 rounded-full object-cover border-4 border-gray-200 shadow-lg"
                       />
                       <button
                         type="button"
                         onClick={() => setProfileImagePreview(null)}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-all duration-200 shadow-lg"
+                        className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-all duration-200 shadow-lg"
                       >
-                        <X className="w-4 h-4" />
+                        <X className="w-3 h-3" />
                       </button>
                     </div>
                   ) : (
-                    <div className="w-32 h-32 rounded-full bg-gray-50 border-2 border-dashed border-gray-300 flex items-center justify-center hover:border-gray-400 transition-colors cursor-pointer">
-                      <svg className="w-10 h-10 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                    <div className="w-28 h-28 rounded-full bg-gray-50 border-2 border-dashed border-gray-300 flex items-center justify-center hover:border-gray-400 transition-colors cursor-pointer">
+                      <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                       </svg>
                     </div>
@@ -592,7 +681,7 @@ function CreateProfile() {
                   />
                   <label
                     htmlFor="profile-image-upload"
-                    className="cursor-pointer text-white px-6 py-2.5 rounded-lg text-sm font-medium mt-4 shadow-md hover:shadow-lg transition-all duration-200"
+                    className="cursor-pointer text-white px-4 py-2 rounded-lg text-sm font-medium mt-3 shadow-md hover:shadow-lg transition-all duration-200"
                     style={{ backgroundColor: '#1e2a78' }}
                   >
                     {profileImagePreview ? "Change Photo" : "Upload Photo"}
@@ -708,37 +797,77 @@ function CreateProfile() {
             
             <div className="space-y-8">
               {/* Where were you born */}
-              <div>
-                <label htmlFor="country" className="block text-base font-medium text-gray-700 mb-4">
+              <div className="relative">
+                <label htmlFor="country" className="block text-base font-medium text-gray-700 mb-3">
                   Where were you born? <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="country"
                   type="text"
-                  value={formData.country || ''}
-                  onChange={(e) => setFormData(prev => ({...prev, country: e.target.value}))}
-                  placeholder="e.g. Barcelona, Spain"
-                  className="w-full px-4 py-3.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base"
+                  value={birthLocationInput}
+                  onChange={(e) => handleBirthLocationChange(e.target.value)}
+                  onFocus={() => setShowBirthSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowBirthSuggestions(false), 200)}
+                  placeholder="Start typing... e.g. Barcelona"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base"
                   required
                 />
-                <p className="text-sm text-gray-500 mt-2">Type your city and country</p>
+                {showBirthSuggestions && birthSuggestions.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {birthSuggestions.map((city, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => {
+                          setBirthLocationInput(city);
+                          setFormData(prev => ({...prev, country: city}));
+                          setShowBirthSuggestions(false);
+                        }}
+                        className="w-full px-4 py-3 text-left hover:bg-blue-50 border-b border-gray-100 last:border-b-0 transition-colors"
+                      >
+                        <span className="font-medium text-gray-900">{city.split(', ')[0]}</span>
+                        <span className="text-gray-600 ml-1">, {city.split(', ')[1]}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Where do you currently call home */}
-              <div>
-                <label htmlFor="currentHome" className="flex items-center text-base font-medium text-gray-700 mb-4">
+              <div className="relative">
+                <label htmlFor="currentHome" className="flex items-center text-base font-medium text-gray-700 mb-3">
                   Where do you currently call home? 
                   <span className="text-gray-400 ml-2">(optional)</span>
-                  <span className="ml-1 text-xs cursor-help" title="Your current residence">ℹ️</span>
                 </label>
                 <input
                   id="currentHome"
                   type="text"
-                  value={formData.currentHome || ''}
-                  onChange={(e) => setFormData(prev => ({...prev, currentHome: e.target.value}))}
-                  placeholder="e.g. Amsterdam, Netherlands"
-                  className="w-full px-4 py-3.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base"
+                  value={currentHomeInput}
+                  onChange={(e) => handleCurrentHomeChange(e.target.value)}
+                  onFocus={() => setShowHomeSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowHomeSuggestions(false), 200)}
+                  placeholder="Start typing... e.g. Amsterdam"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base"
                 />
+                {showHomeSuggestions && homeSuggestions.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {homeSuggestions.map((city, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => {
+                          setCurrentHomeInput(city);
+                          setFormData(prev => ({...prev, currentHome: city}));
+                          setShowHomeSuggestions(false);
+                        }}
+                        className="w-full px-4 py-3 text-left hover:bg-blue-50 border-b border-gray-100 last:border-b-0 transition-colors"
+                      >
+                        <span className="font-medium text-gray-900">{city.split(', ')[0]}</span>
+                        <span className="text-gray-600 ml-1">, {city.split(', ')[1]}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Combined Languages Section */}
@@ -768,43 +897,14 @@ function CreateProfile() {
                     ))}
                   </div>
                   
-                  {/* More Languages Toggle */}
-                  {!showMoreLanguages ? (
-                    <button
-                      type="button"
-                      onClick={() => setShowMoreLanguages(true)}
-                      className="text-blue-600 hover:text-blue-800 text-sm font-medium mb-4"
-                    >
-                      + More languages...
-                    </button>
-                  ) : (
-                    <div className="mb-4">
-                      <div className="grid grid-cols-2 gap-2 mb-2">
-                        {additionalLanguages.map((language) => (
-                          <button
-                            key={language}
-                            type="button"
-                            onClick={() => handleLanguageDropdownChange(language)}
-                            disabled={selectedLanguages.includes(language)}
-                            className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                              selectedLanguages.includes(language)
-                                ? "bg-blue-600 text-white shadow-md"
-                                : "bg-white border border-gray-200 text-gray-700 hover:border-blue-300 hover:bg-blue-50"
-                            }`}
-                          >
-                            {language}
-                          </button>
-                        ))}
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setShowMoreLanguages(false)}
-                        className="text-gray-600 hover:text-gray-800 text-sm"
-                      >
-                        - Show less
-                      </button>
-                    </div>
-                  )}
+                  {/* Searchable Language Picker */}
+                  <button
+                    type="button"
+                    onClick={() => setShowLanguageModal(true)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:border-blue-300 hover:bg-blue-50 transition-all text-left"
+                  >
+                    🔍 Search & add more languages...
+                  </button>
                   
                   {/* Selected Languages Display */}
                   {selectedLanguages.length > 0 && (
@@ -1110,6 +1210,89 @@ function CreateProfile() {
           </div>
         </div>
       </form>
+
+      {/* Language Search Modals */}
+      {showLanguageModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-96 max-h-96 overflow-hidden">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Add Languages You Speak</h3>
+              <button
+                onClick={() => setShowLanguageModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <input
+              type="text"
+              placeholder="Search languages..."
+              value={languageSearchTerm}
+              onChange={(e) => setLanguageSearchTerm(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500"
+            />
+            <div className="max-h-60 overflow-y-auto">
+              {allLanguages.filter(lang => 
+                lang.toLowerCase().includes(languageSearchTerm.toLowerCase()) &&
+                !selectedLanguages.includes(lang)
+              ).map(language => (
+                <button
+                  key={language}
+                  onClick={() => {
+                    handleLanguageDropdownChange(language);
+                    setLanguageSearchTerm('');
+                    setShowLanguageModal(false);
+                  }}
+                  className="w-full text-left px-3 py-2 hover:bg-blue-50 rounded"
+                >
+                  {language}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showLearningLanguageModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-96 max-h-96 overflow-hidden">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Add Learning Languages</h3>
+              <button
+                onClick={() => setShowLearningLanguageModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <input
+              type="text"
+              placeholder="Search languages..."
+              value={learningLanguageSearchTerm}
+              onChange={(e) => setLearningLanguageSearchTerm(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-orange-500"
+            />
+            <div className="max-h-60 overflow-y-auto">
+              {allLanguages.filter(lang => 
+                lang.toLowerCase().includes(learningLanguageSearchTerm.toLowerCase()) &&
+                !selectedLearningLanguages.includes(lang)
+              ).map(language => (
+                <button
+                  key={language}
+                  onClick={() => {
+                    handleLearningLanguageDropdownChange(language);
+                    setLearningLanguageSearchTerm('');
+                    setShowLearningLanguageModal(false);
+                  }}
+                  className="w-full text-left px-3 py-2 hover:bg-orange-50 rounded"
+                >
+                  {language}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Compact Sticky Footer */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg z-10">

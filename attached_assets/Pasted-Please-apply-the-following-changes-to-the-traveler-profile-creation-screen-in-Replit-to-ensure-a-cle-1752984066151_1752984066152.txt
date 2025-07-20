@@ -1,0 +1,81 @@
+Please apply the following changes to the traveler profile creation screen in Replit to ensure a clean, responsive, and scroll-free experience at 100% browser zoom on standard laptop screens (e.g., 13"–15").
+
+🔲 LAYOUT & SCROLLING (All 3 Columns)
+Ensure the entire column content fits within screen height (e.g., 768–800px vertical) at 100% browser zoom.
+
+Avoid internal scrolling inside each column. Instead, optimize vertical spacing and layout distribution.
+
+Consider using flexbox or grid with vh units to evenly distribute space and enable scroll-free display of all key inputs.
+
+👤 PERSONAL INFO COLUMN
+Fix layout so that “How do you want to be called?”, Date of Birth, and buttons are visible without scrolling.
+
+Ensure the Upload Photo circle and Upload Photo button are:
+
+Centered
+
+Slightly larger to better fill white space
+
+Aligned with the rest of the inputs
+
+Maintain spacing and hierarchy, but reduce vertical padding/margins where needed to compress content.
+
+🌍 LOCATION & LANGUAGE COLUMN
+1. Autocomplete for Location Inputs:
+Replace static text inputs for:
+
+Where were you born?
+
+Where do you currently call home?
+
+Integrate autocomplete input with a city + country database.
+
+Example: typing Bar shows Barcelona, Spain, Barranquilla, Colombia, etc.
+
+Continue to refine based on input (Mad shows Madrid, etc.)
+
+Must return both city + country as one selectable item.
+
+2. Language Selection Improvements:
+For both Languages you speak and Languages you're learning:
+
+Keep 6 default languages displayed as pills (English, Spanish, French, German, Dutch, Italian)
+
+Replace "+ More languages" link with a scrollable searchable dropdown:
+
+Opens a language picker modal or floating dropdown
+
+Users can type to search, then select a language to add
+
+Example: typing Hin shows Hindi, Hindustani
+
+Upon selection, new language is added as a pill below the initial 6
+
+Ensure both sections work independently but use same component logic
+
+✈️ TRAVEL PREFERENCES COLUMN
+✅ Keep current layout for Travel Traits — it looks great!
+
++ Show More Traits should:
+
+Expand to show full list of remaining traits (30+ total max)
+
+Add option + Add Your Own Trait
+
+Clicking it reveals a small text input field
+
+Custom trait is added as a selectable pill just like preset ones
+
+Limit max selectable traits to 5 in total, even with custom ones.
+
+🖼️ TRAVEL PHOTOS
+No change in layout — just make sure 3 photo upload boxes stay fully visible at 100% zoom.
+
+Confirm alignment with other columns.
+
+✅ Final Touches
+Ensure consistent spacing, margins, and responsive scaling
+
+No vertical scrolling in any of the 3 columns on desktop at 100% zoom
+
+Maintain responsiveness for mobile and tablet views (where stacking is expected)
