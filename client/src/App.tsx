@@ -18,6 +18,7 @@ import TripDetails from "@/pages/trip-details";
 import Chat from "@/pages/chat";
 import Profile from "@/pages/profile";
 import CreateProfile from "@/pages/create-profile";
+import DebugProfile from "@/pages/debug-profile";
 import TestSimple from "@/pages/test-simple";
 import TestRoute from "@/pages/test-route";
 import SimpleTest from "@/pages/simple-test";
@@ -71,6 +72,7 @@ function Router() {
         <Route path="/profile/edit" component={CreateProfile} />
         <Route path="/create-profile" component={CreateProfile} />
         <Route path="/new-profile" component={CreateProfile} />
+        <Route path="/debug-profile" component={DebugProfile} />
         <Route path="/create-trip" component={CreateTrip} />
         <Route path="/trip/:tripId" component={TripDetails} />
         <Route path="/chat/:userId" component={Chat} />
