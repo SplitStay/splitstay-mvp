@@ -24,6 +24,7 @@ function CreateProfile() {
   const [formData, setFormData] = useState({
     fullName: "",
     country: "",
+    currentHome: "",
     bio: "",
     dayOfBirth: "",
     monthOfBirth: "",
@@ -642,6 +643,24 @@ function CreateProfile() {
                   required
                 >
                   <option value="">Select your country</option>
+                  {countryOptions.map((country) => (
+                    <option key={country} value={country}>{country}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Where do you currently call home? */}
+              <div>
+                <label htmlFor="currentHome" className="block text-sm font-medium text-gray-700 mb-2">
+                  Where do you currently call home? <span className="text-gray-400">(optional)</span>
+                </label>
+                <select
+                  id="currentHome"
+                  value={formData.currentHome || ''}
+                  onChange={(e) => setFormData(prev => ({...prev, currentHome: e.target.value}))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+                >
+                  <option value="">Select your current home</option>
                   {countryOptions.map((country) => (
                     <option key={country} value={country}>{country}</option>
                   ))}
