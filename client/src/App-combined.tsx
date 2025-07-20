@@ -893,7 +893,7 @@ function CreateProfile() {
                         value={formData.country_impact_reason}
                         onChange={(e) => setFormData(prev => ({...prev, country_impact_reason: e.target.value}))}
                         placeholder="Share what made this place special to you..."
-                        rows={3}
+                        rows={5}
                         maxLength={250}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
                       />
