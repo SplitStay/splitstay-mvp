@@ -272,7 +272,7 @@ export default function ProfilePage() {
             transition={{ duration: 2, repeat: Infinity }}
             className="text-2xl font-bold text-navy"
           >
-            Loading Traveller Profile...
+            Loading Traveler Profile...
           </motion.h2>
         </motion.div>
       </div>
@@ -648,9 +648,9 @@ export default function ProfilePage() {
               {/* Personal Info */}
               {(user.birthPlace || user.gender || user.currentPlace) && (
                 <motion.div variants={itemVariants}>
-                  <Card className="bg-white/95 backdrop-blur-2xl border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-500 group overflow-hidden relative">
+                  <Card className="bg-white/95 backdrop-blur-2xl border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-500 group overflow-hidden relative h-full">
                     <div className="absolute inset-0 bg-navy/3 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <CardContent className="p-8 relative z-10">
+                    <CardContent className="p-8 relative z-10 h-full flex flex-col">
                       <motion.div 
                         whileHover={{ scale: 1.1, rotate: 10 }}
                         className="flex items-center gap-4 mb-6"
@@ -660,7 +660,7 @@ export default function ProfilePage() {
                         </div>
                         <h3 className="text-2xl font-bold text-navy">Personal Info</h3>
                       </motion.div>
-                      <div className="space-y-4">
+                      <div className="space-y-4 flex-1">
                         {user.birthPlace && (
                           <div className="flex items-center gap-3">
                             <MapPin className="w-5 h-5 text-navy" />
@@ -694,9 +694,9 @@ export default function ProfilePage() {
               {/* Languages */}
               {user.languages && user.languages.length > 0 && (
                 <motion.div variants={itemVariants}>
-                  <Card className="bg-white/95 backdrop-blur-2xl border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-500 group overflow-hidden relative">
+                  <Card className="bg-white/95 backdrop-blur-2xl border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-500 group overflow-hidden relative h-full">
                     <div className="absolute inset-0 bg-navy/3 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <CardContent className="p-8 relative z-10">
+                    <CardContent className="p-8 relative z-10 h-full flex flex-col">
                       <motion.div 
                         whileHover={{ scale: 1.1, rotate: 10 }}
                         className="flex items-center gap-4 mb-6"
@@ -706,7 +706,7 @@ export default function ProfilePage() {
                         </div>
                         <h3 className="text-2xl font-bold text-navy">Languages I Speak</h3>
                       </motion.div>
-                      <div className="flex flex-wrap gap-3">
+                      <div className="flex flex-wrap gap-3 flex-1">
                         {(user.languages as string[]).map((language, index) => (
                           <motion.div
                             key={language}
@@ -822,7 +822,7 @@ export default function ProfilePage() {
                       </div>
                     </motion.div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-6">
                       {user.mostInfluencedCountry && (
                         <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
                           <div className="flex items-center gap-3 mb-3">
@@ -837,7 +837,7 @@ export default function ProfilePage() {
                       )}
                       
                       {user.mostInfluencedExperience && (
-                        <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm md:col-span-2">
+                        <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
                           <div className="flex items-center gap-3 mb-3">
                             <Sparkles className="w-5 h-5 text-navy" />
                             <h4 className="font-bold text-navy">Most Influential Experience</h4>
