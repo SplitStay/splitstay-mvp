@@ -23,7 +23,8 @@ export default function CreateProfile() {
     dayOfBirth: "",
     monthOfBirth: "",
     yearOfBirth: "",
-    travelReason: ""
+    travelReason: "",
+    gender: ""
   });
 
   // Check user path from URL
@@ -173,6 +174,39 @@ export default function CreateProfile() {
                       </Label>
                       <button type="button" className="text-sm text-gray-500 hover:text-gray-700 underline">
                         Add later
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Gender Selection */}
+                <div className="text-center">
+                  <Label className="text-base font-medium text-gray-700 mb-4 block">
+                    What is your gender?
+                  </Label>
+                  <div className="flex justify-center">
+                    <div className="bg-gray-100 p-1 rounded-full inline-flex">
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({...prev, gender: "male"}))}
+                        className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                          formData.gender === "male" 
+                            ? "bg-blue-900 text-white shadow-md" 
+                            : "text-gray-600 hover:text-gray-800"
+                        }`}
+                      >
+                        Male
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({...prev, gender: "female"}))}
+                        className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                          formData.gender === "female" 
+                            ? "bg-blue-900 text-white shadow-md" 
+                            : "text-gray-600 hover:text-gray-800"
+                        }`}
+                      >
+                        Female
                       </button>
                     </div>
                   </div>
