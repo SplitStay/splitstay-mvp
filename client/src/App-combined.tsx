@@ -160,6 +160,57 @@ function CreateProfile() {
     "Kazakh", "Uzbek", "Kyrgyz", "Tajik", "Turkmen", "Azerbaijani", "Armenian", "Georgian"
   ];
 
+  // Comprehensive travel traits database for search functionality
+  const allTraits = [
+    // Core personality traits
+    "Adventurous", "Relaxed", "Social", "Quiet", "Early Bird", "Night Owl", "Spontaneous", "Planner",
+    "Minimalist", "Culture Lover", "Foodie", "Nature Lover", "Tech Savvy", "Fitness Enthusiast",
+    
+    // Activity preferences
+    "Beach Lover", "Mountain Explorer", "City Explorer", "Art Enthusiast", "History Buff", "Photography Lover",
+    "Music Lover", "Dancer", "Swimmer", "Hiker", "Runner", "Cyclist", "Yoga Practitioner", "Meditation Enthusiast",
+    
+    // Travel styles
+    "Budget Traveler", "Luxury Traveler", "Backpacker", "Digital Nomad", "Solo Traveler", "Group Traveler",
+    "Road Tripper", "Train Enthusiast", "Flight Lover", "Cruise Enthusiast", "Camping Lover", "Hostel Hopper",
+    
+    // Interests and hobbies
+    "Bookworm", "Gamer", "Musician", "Artist", "Writer", "Photographer", "Blogger", "Vlogger",
+    "Language Learner", "Cooking Enthusiast", "Wine Lover", "Coffee Connoisseur", "Tea Lover", "Craft Beer Fan",
+    
+    // Social and lifestyle
+    "Extrovert", "Introvert", "Party Lover", "Peaceful", "Organized", "Flexible", "Independent", "Team Player",
+    "Creative", "Analytical", "Optimistic", "Realistic", "Curious", "Open-minded", "Traditional", "Modern",
+    
+    // Special interests
+    "Architecture Lover", "Design Enthusiast", "Fashion Forward", "Vintage Collector", "Antique Hunter",
+    "Local Markets Fan", "Street Food Explorer", "Fine Dining Lover", "Vegetarian", "Vegan", "Pescatarian",
+    
+    // Activity levels
+    "High Energy", "Moderate Pace", "Slow Traveler", "Marathon Runner", "Gym Enthusiast", "Outdoor Athlete",
+    "Indoor Activities", "Weather Flexible", "Sun Seeker", "Snow Lover", "Rain Dancer", "Wind Surfer",
+    
+    // Communication styles
+    "Chatty", "Good Listener", "Storyteller", "Joke Teller", "Deep Conversations", "Light Hearted",
+    "Multilingual", "Sign Language", "Non-verbal Communicator", "Patient Teacher", "Eager Learner",
+    
+    // Practical traits
+    "Early Riser", "Night Owl", "Heavy Sleeper", "Light Sleeper", "Snorer", "Non-snorer",
+    "Clean", "Organized", "Tidy", "Casual", "Respectful", "Considerate", "Helpful", "Sharing",
+    
+    // Cultural and spiritual
+    "Spiritual", "Religious", "Secular", "Philosophical", "Environmental Conscious", "Sustainable Traveler",
+    "Local Culture Immersion", "Traditional Practices", "Modern Lifestyle", "Urban Explorer", "Rural Explorer",
+    
+    // Entertainment preferences
+    "Movie Buff", "TV Series Fan", "Documentary Lover", "Comedy Fan", "Drama Enthusiast", "Horror Fan",
+    "Sci-Fi Lover", "Fantasy Reader", "Non-fiction Reader", "Podcast Listener", "Music Festival Goer",
+    
+    // Lifestyle choices
+    "Non-smoker", "Occasional Smoker", "Non-drinker", "Social Drinker", "Wine Enthusiast", "Beer Lover",
+    "Cocktail Enthusiast", "Health Conscious", "Fitness Focused", "Wellness Oriented", "Mental Health Aware"
+  ];
+
   // Additional state for enhanced features
   const [birthLocationInput, setBirthLocationInput] = useState(formData.country || '');
   const [currentHomeInput, setCurrentHomeInput] = useState(formData.currentHome || '');
@@ -173,6 +224,8 @@ function CreateProfile() {
   const [learningLanguageSearchTerm, setLearningLanguageSearchTerm] = useState('');
   const [showCustomTraitInput, setShowCustomTraitInput] = useState(false);
   const [customTraitInput, setCustomTraitInput] = useState('');
+  const [showTraitModal, setShowTraitModal] = useState(false);
+  const [traitSearchTerm, setTraitSearchTerm] = useState('');
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -1172,48 +1225,14 @@ function CreateProfile() {
                   ))}
                 </div>
                 
-                {/* Show More Traits */}
-                {!showMoreTraits ? (
-                  <button
-                    type="button"
-                    onClick={() => setShowMoreTraits(true)}
-                    className="text-blue-600 hover:text-blue-800 text-sm font-medium mb-3"
-                  >
-                    + Show More Traits
-                  </button>
-                ) : (
-                  <div className="mb-3">
-                    <div className="grid grid-cols-3 gap-1 mb-2">
-                      {traitOptions.slice(12).map((trait) => (
-                        <button
-                          key={trait}
-                          type="button"
-                          onClick={() => handleTraitToggle(trait)}
-                          disabled={!selectedTraits.includes(trait) && selectedTraits.length >= 5}
-                          className={`px-2 py-1 rounded-full text-xs font-medium transition-all duration-200 ${
-                            selectedTraits.includes(trait)
-                              ? "text-white shadow-md"
-                              : selectedTraits.length >= 5
-                              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                              : "bg-gray-100 text-gray-700 hover:bg-blue-100 hover:text-blue-700 hover:shadow-md"
-                          }`}
-                          style={{ 
-                            backgroundColor: selectedTraits.includes(trait) ? '#1e2a78' : undefined 
-                          }}
-                        >
-                          {trait}
-                        </button>
-                      ))}
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setShowMoreTraits(false)}
-                      className="text-gray-600 hover:text-gray-800 text-sm"
-                    >
-                      - Show less
-                    </button>
-                  </div>
-                )}
+                {/* Searchable Trait Picker */}
+                <button
+                  type="button"
+                  onClick={() => setShowTraitModal(true)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:border-purple-300 hover:bg-purple-50 transition-all text-left mb-3"
+                >
+                  🔍 Search & add more traits...
+                </button>
                 {selectedTraits.length > 0 && (
                   <div className="mb-2">
                     <div className="flex flex-wrap gap-1">
@@ -1402,6 +1421,55 @@ function CreateProfile() {
                 </button>
               ))}
             </div>
+          </div>
+        </div>
+      )}
+
+      {showTraitModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-96 max-h-96 overflow-hidden">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Add Travel Traits</h3>
+              <button
+                onClick={() => setShowTraitModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <input
+              type="text"
+              placeholder="Search traits..."
+              value={traitSearchTerm}
+              onChange={(e) => setTraitSearchTerm(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-purple-500"
+            />
+            <div className="max-h-60 overflow-y-auto">
+              {allTraits.filter(trait => 
+                trait.toLowerCase().includes(traitSearchTerm.toLowerCase()) &&
+                !selectedTraits.includes(trait) &&
+                selectedTraits.length < 5
+              ).map(trait => (
+                <button
+                  key={trait}
+                  onClick={() => {
+                    if (selectedTraits.length < 5) {
+                      handleTraitToggle(trait);
+                      setTraitSearchTerm('');
+                      setShowTraitModal(false);
+                    }
+                  }}
+                  className="w-full text-left px-3 py-2 hover:bg-purple-50 rounded"
+                >
+                  {trait}
+                </button>
+              ))}
+            </div>
+            {selectedTraits.length >= 5 && (
+              <p className="text-sm text-gray-500 mt-2">
+                Maximum 5 traits selected. Remove one to add more.
+              </p>
+            )}
           </div>
         </div>
       )}
