@@ -12,7 +12,7 @@ export const ResetPasswordPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
-  const [isValidSession, setIsValidSession] = useState(false)
+  const [isValidSession, setIsValidSession] = useState(true)
 
   const { updatePassword } = useAuth()
 
