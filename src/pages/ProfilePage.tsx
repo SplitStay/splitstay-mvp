@@ -60,7 +60,7 @@ export default function ProfilePage() {
       const { data, error } = await supabase
         .from('user')
         .select('id')
-        .ilike('personalizedLink', link)
+        .eq('personalizedLink', link)
         .limit(1);
 
       console.log("link data", data)
@@ -485,10 +485,6 @@ export default function ProfilePage() {
                           <span className="font-medium">{user.location}</span>
                         </div>
                       )}
-                      <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200 shadow-sm">
-                        <Globe className="w-5 h-5 text-navy" />
-                        <span className="font-medium">Adventurer</span>
-                      </div>
                     </motion.div>
 
                     {user.bio && (
@@ -616,7 +612,7 @@ export default function ProfilePage() {
                     {isOwnProfile && (
                       <motion.div 
                         variants={itemVariants}
-                        className="mt-6 flex flex-wrap gap-3"
+                        className="mt-6 flex flex-wrap gap-3 justify-center lg:justify-start"
                       >
                         <motion.button
                           whileHover={{ scale: 1.05 }}

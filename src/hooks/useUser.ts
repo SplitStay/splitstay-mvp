@@ -82,7 +82,7 @@ export const useUserByIdOrCustomUrl = (identifier: string): UseQueryResult<Table
       const { data: customUrlData, error: customUrlError } = await supabase
         .from('user')
         .select('*')
-        .ilike('personalizedLink', identifier)
+        .eq('personalizedLink', identifier)
         .single()
 
       if (customUrlData && !customUrlError) {

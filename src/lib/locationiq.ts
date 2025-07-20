@@ -61,12 +61,6 @@ class LocationIQService {
   private formatCityName(place: LocationIQPlace): string {
     const city = place.display_place || place.address.name;
     const country = place.address.country;
-    const state = place.address.state;
-    
-    // Format: "City, Country" or "City, State, Country"
-    if (state && state !== country) {
-      return `${city}, ${state}, ${country}`;
-    }
     return `${city}, ${country}`;
   }
 
@@ -136,7 +130,6 @@ class LocationIQService {
           'accept': 'application/json',
         },
         signal: this.abortController.signal,
-        timeout: 5000, // 5 second timeout
       });
 
       if (!response.ok) {
@@ -160,6 +153,8 @@ class LocationIQService {
         .map(place => this.formatCityName(place))
         .filter((city, index, arr) => arr.indexOf(city) === index) // Remove duplicates
         .slice(0, 8); // Limit to 8 results
+
+      console.log("cities", cities);
 
       // Cache the results
       this.cache.set(cacheKey, {

@@ -107,7 +107,7 @@ export default function CreateProfilePage() {
       const { data, error } = await supabase
         .from('user')
         .select('id')
-        .ilike('personalizedLink', link)
+        .eq('personalizedLink', link)
         .limit(1);
       
       if (error) {
@@ -141,11 +141,6 @@ export default function CreateProfilePage() {
     setCheckingAvailability(true);
     setPersonalizedLinkAvailable(null);
     
-    // Clear previous timeout
-    if (searchTimeout) {
-      clearTimeout(searchTimeout);
-    }
-    
     const timeout = setTimeout(async () => {
       const isAvailable = await checkLinkAvailability(cleanValue);
       setPersonalizedLinkAvailable(isAvailable);
@@ -156,7 +151,6 @@ export default function CreateProfilePage() {
         setPersonalizedLinkError('');
       }
     }, 500);
-    setSearchTimeout(timeout);
   };
 
   // Redirect to home if user is not authenticated
@@ -200,12 +194,21 @@ export default function CreateProfilePage() {
     }
   };
 
-  // Debounce timer for API calls
-  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
+  // Helper function to determine if character count should trigger autocomplete
+  const shouldTriggerAutocomplete = (length: number): boolean => {
+    if (length === 1 || length === 3 || length === 6 || length === 9) {
+      return true;
+    }
+    // After 9, trigger every 3 characters: 12, 15, 18, 21, etc.
+    if (length > 9 && (length - 9) % 3 === 0) {
+      return true;
+    }
+    return false;
+  };
 
   // LocationIQ API autocomplete function
   const searchCities = async (query: string): Promise<string[]> => {
-    if (query.length < 2) return [];
+    if (query.length < 1) return [];
     
     try {
       const results = await locationIQService.searchCities(query);
@@ -221,21 +224,15 @@ export default function CreateProfilePage() {
     setBirthLocationInput(value);
     setFormData(prev => ({...prev, birthPlace: value}));
     
-    // Clear previous timeout
-    if (searchTimeout) {
-      clearTimeout(searchTimeout);
-    }
-    
-    if (value.length > 1) {
-      // Debounce API calls
-      const timeout = setTimeout(async () => {
-        const suggestions = await searchCities(value);
-        setBirthSuggestions(suggestions);
-        setShowBirthSuggestions(true);
-      }, 300);
-      setSearchTimeout(timeout);
-    } else {
+    // Trigger autocomplete immediately at specific character counts
+    if (shouldTriggerAutocomplete(value.length)) {
+      const suggestions = await searchCities(value);
+      setBirthSuggestions(suggestions);
+      setShowBirthSuggestions(true);
+    } else if (value.length === 0) {
+      // Hide suggestions when input is empty
       setShowBirthSuggestions(false);
+      setBirthSuggestions([]);
     }
   };
 
@@ -244,21 +241,15 @@ export default function CreateProfilePage() {
     setCurrentHomeInput(value);
     setFormData(prev => ({...prev, currentPlace: value}));
     
-    // Clear previous timeout
-    if (searchTimeout) {
-      clearTimeout(searchTimeout);
-    }
-    
-    if (value.length > 1) {
-      // Debounce API calls
-      const timeout = setTimeout(async () => {
-        const suggestions = await searchCities(value);
-        setHomeSuggestions(suggestions);
-        setShowHomeSuggestions(true);
-      }, 300);
-      setSearchTimeout(timeout);
-    } else {
+    // Trigger autocomplete immediately at specific character counts
+    if (shouldTriggerAutocomplete(value.length)) {
+      const suggestions = await searchCities(value);
+      setHomeSuggestions(suggestions);
+      setShowHomeSuggestions(true);
+    } else if (value.length === 0) {
+      // Hide suggestions when input is empty
       setShowHomeSuggestions(false);
+      setHomeSuggestions([]);
     }
   };
 
@@ -306,17 +297,6 @@ export default function CreateProfilePage() {
   };
 
 
-  const handleLanguageDropdownChange = (language: string) => {
-    if (language && !selectedLanguages.includes(language)) {
-      setSelectedLanguages(prev => [...prev, language]);
-    }
-  };
-
-  const handleLearningLanguageDropdownChange = (language: string) => {
-    if (language && !selectedLearningLanguages.includes(language)) {
-      setSelectedLearningLanguages(prev => [...prev, language]);
-    }
-  };
 
   const handleLearningLanguageToggle = (language: string) => {
     setSelectedLearningLanguages(prev => 
@@ -327,11 +307,11 @@ export default function CreateProfilePage() {
   };
 
   const handleTraitToggle = (trait: string) => {
-    if (selectedTraits.includes(trait)) {
-      setSelectedTraits(prev => prev.filter(t => t !== trait));
-    } else if (selectedTraits.length < 5) {
-      setSelectedTraits(prev => [...prev, trait]);
-    }
+    setSelectedTraits(prev => 
+      prev.includes(trait) 
+        ? prev.filter(t => t !== trait)
+        : [...prev, trait]
+    );
   };
 
   // Main languages for quick selection (display by default)
@@ -472,8 +452,6 @@ export default function CreateProfilePage() {
     "Kuwait", "Lebanon", "Libya", "Nicaragua", "Nigeria", "Panama", "Qatar", "Saudi Arabia", 
     "Tunisia", "United Arab Emirates", "Uruguay", "Venezuela", "Yemen", "Zimbabwe"
   ].sort((a, b) => a.localeCompare(b));
-
-  console.log("countryOptions", countryOptions);
 
   // Show loading state while checking authentication
   if (loading) {
@@ -868,11 +846,10 @@ export default function CreateProfilePage() {
                       <button
                         key={language}
                         type="button"
-                        onClick={() => handleLanguageDropdownChange(language)}
-                        disabled={selectedLanguages.includes(language)}
+                        onClick={() => handleLanguageToggle(language)}
                         className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                           selectedLanguages.includes(language)
-                            ? "bg-blue-600 text-white shadow-md"
+                            ? "bg-blue-600 text-white shadow-md cursor-pointer"
                             : "bg-white border border-gray-200 text-gray-700 hover:border-blue-300 hover:bg-blue-50"
                         }`}
                       >
@@ -887,7 +864,7 @@ export default function CreateProfilePage() {
                     onClick={() => setShowLanguageModal(true)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:border-blue-300 hover:bg-blue-50 transition-all text-left"
                   >
-                    🔍 Search & add more languages{selectedLanguages.length > 0 ? ` (${selectedLanguages.length} selected)` : ''}...
+                    {selectedLanguages.length > 0 ? selectedLanguages.join(', ') + ', add more...' : 'Add languages...'}
                   </button>
                   
                 </div>
@@ -904,11 +881,10 @@ export default function CreateProfilePage() {
                       <button
                         key={language}
                         type="button"
-                        onClick={() => handleLearningLanguageDropdownChange(language)}
-                        disabled={selectedLearningLanguages.includes(language)}
+                        onClick={() => handleLearningLanguageToggle(language)}
                         className={`px-2.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
                           selectedLearningLanguages.includes(language)
-                            ? "bg-blue-600 text-white cursor-not-allowed shadow-md"
+                            ? "bg-blue-600 text-white cursor-pointer shadow-md"
                             : "bg-gray-100 text-gray-700 hover:bg-blue-100 hover:text-blue-700 hover:shadow-md"
                         }`}
                       >
@@ -923,7 +899,7 @@ export default function CreateProfilePage() {
                     onClick={() => setShowLearningLanguageModal(true)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:border-orange-300 hover:bg-orange-50 transition-all text-left mb-3"
                   >
-                    🔍 Search & add more languages{selectedLearningLanguages.length > 0 ? ` (Learning - ${selectedLearningLanguages.length} selected)` : ' (Learning)'}...
+                    {selectedLearningLanguages.length > 0 ? selectedLearningLanguages.join(', ') + ', add more...' : 'Add learning languages...'}
                   </button>
                 </div>
               </div>
@@ -943,7 +919,6 @@ export default function CreateProfilePage() {
               <div>
                 <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
                   Travel traits 
-                  <span className="text-gray-400 ml-1">(select up to 5)</span>
                   <span className="ml-1 text-xs cursor-help" title="These traits help us find compatible roommates">ℹ️</span>
                 </label>
                 
@@ -954,12 +929,9 @@ export default function CreateProfilePage() {
                       key={trait}
                       type="button"
                       onClick={() => handleTraitToggle(trait)}
-                      disabled={!selectedTraits.includes(trait) && selectedTraits.length >= 5}
                       className={`px-2 py-1 rounded-full text-xs font-medium transition-all duration-200 ${
                         selectedTraits.includes(trait)
-                          ? "bg-blue-600 text-white shadow-md cursor-not-allowed"
-                          : selectedTraits.length >= 5
-                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                          ? "bg-blue-600 text-white shadow-md cursor-pointer"
                           : "bg-gray-100 text-gray-700 hover:bg-blue-100 hover:text-blue-700 hover:shadow-md"
                       }`}
                     >
@@ -974,7 +946,7 @@ export default function CreateProfilePage() {
                   onClick={() => setShowTraitModal(true)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:border-purple-300 hover:bg-purple-50 transition-all text-left mb-3"
                 >
-                  🔍 Search & add more traits{selectedTraits.length > 0 ? ` (${selectedTraits.length} selected)` : ''}...
+                  {selectedTraits.length > 0 ? selectedTraits.join(', ') + ', add more...' : 'Add traits...'}
                 </button>
               </div>
 
@@ -1102,22 +1074,28 @@ export default function CreateProfilePage() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500"
             />
             <div className="max-h-60 overflow-y-auto">
-              {allLanguages.filter(lang => 
-                lang.toLowerCase().includes(languageSearchTerm.toLowerCase())
-              ).map(language => (
+              {allLanguages
+                .filter(lang => 
+                  lang.toLowerCase().includes(languageSearchTerm.toLowerCase())
+                )
+                .sort((a, b) => {
+                  const aSelected = selectedLanguages.includes(a);
+                  const bSelected = selectedLanguages.includes(b);
+                  if (aSelected && !bSelected) return -1;
+                  if (!aSelected && bSelected) return 1;
+                  return 0;
+                })
+                .map(language => (
                 <button
                   key={language}
                   onClick={() => {
-                    if (!selectedLanguages.includes(language)) {
-                      handleLanguageDropdownChange(language);
-                      setLanguageSearchTerm('');
-                      setShowLanguageModal(false);
-                    }
+                    handleLanguageToggle(language);
+                    setLanguageSearchTerm('');
+                    setShowLanguageModal(false);
                   }}
-                  disabled={selectedLanguages.includes(language)}
                   className={`w-full text-left px-3 py-2 rounded transition-all ${
                     selectedLanguages.includes(language)
-                      ? "bg-blue-600 text-white cursor-not-allowed"
+                      ? "bg-blue-600 text-white cursor-pointer"
                       : "hover:bg-blue-50"
                   }`}
                 >
@@ -1149,22 +1127,28 @@ export default function CreateProfilePage() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500"
             />
             <div className="max-h-60 overflow-y-auto">
-              {allLanguages.filter(lang => 
-                lang.toLowerCase().includes(learningLanguageSearchTerm.toLowerCase())
-              ).map(language => (
+              {allLanguages
+                .filter(lang => 
+                  lang.toLowerCase().includes(learningLanguageSearchTerm.toLowerCase())
+                )
+                .sort((a, b) => {
+                  const aSelected = selectedLearningLanguages.includes(a);
+                  const bSelected = selectedLearningLanguages.includes(b);
+                  if (aSelected && !bSelected) return -1;
+                  if (!aSelected && bSelected) return 1;
+                  return 0;
+                })
+                .map(language => (
                 <button
                   key={language}
                   onClick={() => {
-                    if (!selectedLearningLanguages.includes(language)) {
-                      handleLearningLanguageDropdownChange(language);
-                      setLearningLanguageSearchTerm('');
-                      setShowLearningLanguageModal(false);
-                    }
+                    handleLearningLanguageToggle(language);
+                    setLearningLanguageSearchTerm('');
+                    setShowLearningLanguageModal(false);
                   }}
-                  disabled={selectedLearningLanguages.includes(language)}
                   className={`w-full text-left px-3 py-2 rounded transition-all ${
                     selectedLearningLanguages.includes(language)
-                      ? "bg-blue-600 text-white cursor-not-allowed"
+                      ? "bg-blue-600 text-white cursor-pointer"
                       : "hover:bg-blue-50"
                   }`}
                 >
@@ -1196,24 +1180,28 @@ export default function CreateProfilePage() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500"
             />
             <div className="max-h-60 overflow-y-auto">
-              {allTraits.filter(trait => 
-                trait.toLowerCase().includes(traitSearchTerm.toLowerCase())
-              ).map(trait => (
+              {allTraits
+                .filter(trait => 
+                  trait.toLowerCase().includes(traitSearchTerm.toLowerCase())
+                )
+                .sort((a, b) => {
+                  const aSelected = selectedTraits.includes(a);
+                  const bSelected = selectedTraits.includes(b);
+                  if (aSelected && !bSelected) return -1;
+                  if (!aSelected && bSelected) return 1;
+                  return 0;
+                })
+                .map(trait => (
                 <button
                   key={trait}
                   onClick={() => {
-                    if (!selectedTraits.includes(trait) && selectedTraits.length < 5) {
-                      handleTraitToggle(trait);
-                      setTraitSearchTerm('');
-                      setShowTraitModal(false);
-                    }
+                    handleTraitToggle(trait);
+                    setTraitSearchTerm('');
+                    setShowTraitModal(false);
                   }}
-                  disabled={selectedTraits.includes(trait) || (!selectedTraits.includes(trait) && selectedTraits.length >= 5)}
                   className={`w-full text-left px-3 py-2 rounded transition-all ${
                     selectedTraits.includes(trait)
-                      ? "bg-blue-600 text-white cursor-not-allowed"
-                      : selectedTraits.length >= 5
-                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                      ? "bg-blue-600 text-white cursor-pointer"
                       : "hover:bg-blue-50"
                   }`}
                 >
@@ -1221,11 +1209,6 @@ export default function CreateProfilePage() {
                 </button>
               ))}
             </div>
-            {selectedTraits.length >= 5 && (
-              <p className="text-sm text-gray-500 mt-2">
-                Maximum 5 traits selected. Remove one to add more.
-              </p>
-            )}
           </div>
         </div>
       )}

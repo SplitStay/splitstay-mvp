@@ -227,12 +227,6 @@ function HowItWorks() {
                 Create Your Profile
                 <ArrowRight className="ml-2 w-5 h-5" />
               </button>
-              <button
-                onClick={() => navigate("/")}
-                className="inline-flex items-center px-8 py-3 border-2 border-navy text-navy rounded-lg hover:bg-navy hover:text-white transition-colors font-medium"
-              >
-                Learn More
-              </button>
             </div>
           </div>
         </div>
