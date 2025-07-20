@@ -1,0 +1,36 @@
+Final layout optimization for the “Build Your Traveler Profile” screen:
+
+✅ Objective: At 100% browser zoom on standard desktop resolutions (e.g. 1920x1080), ensure **no internal scrollbars appear in any of the three columns** (Personal Info, Location & Language, Travel Preferences). All elements should be visible above the fold without scrolling inside the columns.
+
+🛠️ Key Adjustments Required:
+
+1. **Remove internal scrollbars** from each of the three profile columns.
+   - Instead, enable responsive vertical spacing so the full content fits naturally on standard desktop screens without clipping.
+   - If overflow is unavoidable, enable page-level scroll, not column-level scroll.
+
+2. **Responsive Layout Tuning:**
+   - Slightly reduce vertical padding/margins and component heights (e.g. Upload Photo, button spacing).
+   - Optimize font size and layout density while preserving readability.
+
+3. **Column Height Sync:**
+   - Align the height of all three columns visually for cleaner layout balance.
+   - Make sure “Create My Profile” and “Skip for Now” buttons are aligned across all screen sizes.
+
+4. **Component Resizing Suggestions:**
+   - Expand the “Upload Photo” button width to match the “e.g. Jane” input field.
+   - Center-align and slightly enlarge the circular avatar placeholder.
+   - Reduce vertical whitespace in the Personal Info section, especially between gender buttons and text fields.
+
+5. **Mobile Responsiveness:**
+   - On mobile or narrow screens, stack the three sections vertically in the correct order: Personal Info → Location & Language → Travel Preferences.
+   - Ensure dropdowns and modals remain full-width and tap-friendly.
+
+📸 Visual Reference:
+Please use the attached screenshots to visually compare the intended outcome. The layout shown in the last screenshot still shows internal scroll — this should be eliminated.
+
+Once implemented, please confirm that all three columns are:
+- Fully visible without scrolling (on 100% zoom desktop)
+- Visually balanced
+- Clean and intuitive both on desktop and mobile
+
+Let me know if you need to test on specific screen sizes or if you'd like a responsive preview walkthrough.

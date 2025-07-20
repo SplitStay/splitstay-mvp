@@ -825,22 +825,22 @@ function CreateProfile() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="w-full max-w-[1600px] mx-auto px-6 h-[calc(100vh-140px)] overflow-hidden">
+      <form onSubmit={handleSubmit} className="w-full max-w-[1600px] mx-auto px-6 pb-20">
         {/* 3-column layout: optimized full width responsive grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           
           {/* COLUMN 1 — Personal Info */}
-          <div className="bg-white rounded-lg shadow-lg p-6 h-full flex flex-col">
-            <div className="mb-4">
+          <div className="bg-white rounded-lg shadow-lg p-5">
+            <div className="mb-3">
               <h2 className="text-lg font-bold text-center" style={{ color: '#1e2a78' }}>
                 Personal Info
               </h2>
             </div>
             
-            <div className="flex-1 space-y-5">
+            <div className="space-y-4">
               {/* Profile Photo Upload */}
               <div className="text-center">
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Upload Photo <span className="text-red-500">*</span>
                 </label>
                 <div className="flex flex-col items-center">
@@ -849,7 +849,7 @@ function CreateProfile() {
                       <img
                         src={profileImagePreview}
                         alt="Profile preview"
-                        className="w-28 h-28 rounded-full object-cover border-4 border-gray-200 shadow-lg"
+                        className="w-24 h-24 rounded-full object-cover border-4 border-gray-200 shadow-lg"
                       />
                       <button
                         type="button"
@@ -860,8 +860,8 @@ function CreateProfile() {
                       </button>
                     </div>
                   ) : (
-                    <div className="w-28 h-28 rounded-full bg-gray-50 border-2 border-dashed border-gray-300 flex items-center justify-center hover:border-gray-400 transition-colors cursor-pointer">
-                      <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                    <div className="w-24 h-24 rounded-full bg-gray-50 border-2 border-dashed border-gray-300 flex items-center justify-center hover:border-gray-400 transition-colors cursor-pointer">
+                      <svg className="w-7 h-7 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                       </svg>
                     </div>
@@ -875,7 +875,7 @@ function CreateProfile() {
                   />
                   <label
                     htmlFor="profile-image-upload"
-                    className="cursor-pointer text-white px-4 py-2 rounded-lg text-sm font-medium mt-3 shadow-md hover:shadow-lg transition-all duration-200"
+                    className="cursor-pointer text-white px-4 py-2 rounded-lg text-sm font-medium mt-2 shadow-md hover:shadow-lg transition-all duration-200 w-full max-w-[140px]"
                     style={{ backgroundColor: '#1e2a78' }}
                   >
                     {profileImagePreview ? "Change Photo" : "Upload Photo"}
@@ -885,14 +885,14 @@ function CreateProfile() {
 
               {/* Gender Selection */}
               <div>
-                <label className="block text-base font-medium text-gray-700 mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-3">
                   Gender <span className="text-red-500">*</span>
                 </label>
-                <div className="flex gap-4">
+                <div className="flex gap-3">
                   <button
                     type="button"
                     onClick={() => setFormData(prev => ({...prev, gender: "male"}))}
-                    className={`flex-1 px-6 py-3 rounded-lg text-base font-medium transition-all duration-200 ${
+                    className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                       formData.gender === "male" 
                         ? "text-white shadow-lg" 
                         : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-md"
@@ -982,17 +982,17 @@ function CreateProfile() {
           </div>
 
           {/* COLUMN 2 — Location & Language */}
-          <div className="bg-white rounded-lg shadow-lg p-8 h-full overflow-y-auto">
-            <div className="mb-8">
-              <h2 className="text-xl font-bold text-center" style={{ color: '#1e2a78' }}>
+          <div className="bg-white rounded-lg shadow-lg p-5">
+            <div className="mb-3">
+              <h2 className="text-lg font-bold text-center" style={{ color: '#1e2a78' }}>
                 Location & Language
               </h2>
             </div>
             
-            <div className="space-y-8">
+            <div className="space-y-4">
               {/* Where were you born */}
               <div className="relative">
-                <label htmlFor="country" className="block text-base font-medium text-gray-700 mb-3">
+                <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-2">
                   Where were you born? <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -1003,7 +1003,7 @@ function CreateProfile() {
                   onFocus={() => setShowBirthSuggestions(true)}
                   onBlur={() => setTimeout(() => setShowBirthSuggestions(false), 200)}
                   placeholder="Start typing... e.g. Barcelona"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
                   required
                 />
                 {showBirthSuggestions && birthSuggestions.length > 0 && (
@@ -1029,7 +1029,7 @@ function CreateProfile() {
 
               {/* Where do you currently call home */}
               <div className="relative">
-                <label htmlFor="currentHome" className="flex items-center text-base font-medium text-gray-700 mb-3">
+                <label htmlFor="currentHome" className="flex items-center text-sm font-medium text-gray-700 mb-2">
                   Where do you currently call home? 
                   <span className="text-gray-400 ml-2">(optional)</span>
                 </label>
@@ -1041,7 +1041,7 @@ function CreateProfile() {
                   onFocus={() => setShowHomeSuggestions(true)}
                   onBlur={() => setTimeout(() => setShowHomeSuggestions(false), 200)}
                   placeholder="Start typing... e.g. Amsterdam"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
                 />
                 {showHomeSuggestions && homeSuggestions.length > 0 && (
                   <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
@@ -1065,10 +1065,10 @@ function CreateProfile() {
               </div>
 
               {/* Combined Languages Section */}
-              <div className="bg-gray-50 p-6 rounded-lg">
+              <div className="bg-gray-50 p-4 rounded-lg">
                 {/* Languages You Speak */}
-                <div className="mb-6">
-                  <label className="block text-base font-medium text-gray-700 mb-4">
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
                     Languages you speak <span className="text-red-500">*</span>
                   </label>
                   
@@ -1131,14 +1131,14 @@ function CreateProfile() {
                 </label>
                 
                 {/* Main Languages Quick Selection */}
-                <div className="flex flex-wrap gap-2 mb-4">
+                <div className="flex flex-wrap gap-1.5 mb-3">
                   {mainLanguages.map((language) => (
                     <button
                       key={language}
                       type="button"
                       onClick={() => handleLearningLanguageDropdownChange(language)}
                       disabled={selectedLearningLanguages.includes(language)}
-                      className={`px-3 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                      className={`px-2.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
                         selectedLearningLanguages.includes(language)
                           ? "bg-orange-100 text-orange-800 cursor-not-allowed"
                           : "bg-gray-100 text-gray-700 hover:bg-orange-100 hover:text-orange-700 hover:shadow-md"
@@ -1185,14 +1185,14 @@ function CreateProfile() {
           </div>
 
           {/* COLUMN 3 — Travel Preferences */}
-          <div className="bg-white rounded-lg shadow-lg p-6 h-full overflow-y-auto">
-            <div className="mb-6">
+          <div className="bg-white rounded-lg shadow-lg p-5">
+            <div className="mb-3">
               <h2 className="text-lg font-bold text-center" style={{ color: '#1e2a78' }}>
                 Travel Preferences
               </h2>
             </div>
 
-            <div className="space-y-5">
+            <div className="space-y-4">
               {/* Travel Traits Section */}
               <div>
                 <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
@@ -1286,8 +1286,8 @@ function CreateProfile() {
                   value={formData.most_impactful_experience}
                   onChange={(e) => setFormData(prev => ({...prev, most_impactful_experience: e.target.value}))}
                   placeholder="Tell us about a moment, encounter, or journey that changed your perspective..."
-                  rows={3}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                  rows={2}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none text-sm"
                 />
               </div>
 
@@ -1306,7 +1306,7 @@ function CreateProfile() {
                           <img
                             src={travelPhotos[index]}
                             alt={`Travel photo ${index + 1}`}
-                            className="w-16 h-16 object-cover rounded-lg border-2 border-gray-200 shadow-sm"
+                            className="w-14 h-14 object-cover rounded-lg border-2 border-gray-200 shadow-sm"
                           />
                           <button
                             type="button"
@@ -1327,7 +1327,7 @@ function CreateProfile() {
                           />
                           <label
                             htmlFor={`travel-photo-${index}`}
-                            className="cursor-pointer w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center hover:border-gray-400 transition-colors"
+                            className="cursor-pointer w-14 h-14 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center hover:border-gray-400 transition-colors"
                           >
                             <Plus className="w-3 h-3 text-gray-400" />
                           </label>
