@@ -1081,20 +1081,21 @@ export default function EditProfilePage() {
                   {[0, 1, 2].map((index) => (
                     <div key={index} className="relative">
                       {travelPhotos[index] ? (
-                        <>
-                          <img
-                            src={travelPhotos[index]}
-                            alt={`Travel photo ${index + 1}`}
-                            className="w-14 h-14 object-cover rounded-lg border-2 border-gray-200 shadow-sm"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeTravelPhoto(index)}
-                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center hover:bg-red-600 transition-colors text-xs"
-                          >
-                            <X className="w-2 h-2" />
-                          </button>
-                        </>
+                        <div className="relative">
+                        <button
+                        type="button"
+                        onClick={() => removeTravelPhoto(index)}
+                        className="absolute top-1 left-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center hover:bg-red-600 transition-colors text-xs"
+                        style={{ transform: "translate(-50%, -50%)" }}
+                        >
+                        <X className="w-2 h-2" />
+                        </button>
+                        <img
+                        src={travelPhotos[index]}
+                        alt={`Travel photo ${index + 1}`}
+                        className="w-14 h-14 object-cover rounded-lg border-2 border-gray-200 shadow-sm"
+                        />
+                        </div>
                       ) : (
                         <>
                           <input
