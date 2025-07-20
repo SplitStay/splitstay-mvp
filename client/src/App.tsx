@@ -70,6 +70,7 @@ function Router() {
         <Route path="/profile" component={Profile} />
         <Route path="/profile/edit" component={CreateProfile} />
         <Route path="/create-profile" component={CreateProfile} />
+        <Route path="/new-profile" component={CreateProfile} />
         <Route path="/create-trip" component={CreateTrip} />
         <Route path="/trip/:tripId" component={TripDetails} />
         <Route path="/chat/:userId" component={Chat} />

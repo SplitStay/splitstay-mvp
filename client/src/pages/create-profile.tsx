@@ -194,10 +194,10 @@ export default function CreateProfile() {
         <div className="max-w-[600px] mx-auto">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-navy mb-2">
-              Build your traveler profile
+              ✨ Enhanced Profile Creation - Step 1
             </h1>
             <p className="text-gray-600">
-              Tell us about yourself and where you're from
+              Gender, locations, and personal details
             </p>
           </div>
 
