@@ -583,10 +583,10 @@ function CreateProfile() {
                     <button
                       type="button"
                       onClick={() => setFormData(prev => ({...prev, gender: "male"}))}
-                      className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                      className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 transform ${
                         formData.gender === "male" 
-                          ? "text-white shadow-md" 
-                          : "text-gray-600 hover:text-gray-800"
+                          ? "text-white shadow-lg scale-105" 
+                          : "text-gray-600 hover:text-gray-800 hover:bg-gray-200 hover:scale-105 hover:shadow-md"
                       }`}
                       style={{ 
                         backgroundColor: formData.gender === "male" ? '#1e2a78' : 'transparent'
@@ -597,10 +597,10 @@ function CreateProfile() {
                     <button
                       type="button"
                       onClick={() => setFormData(prev => ({...prev, gender: "female"}))}
-                      className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                      className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 transform ${
                         formData.gender === "female" 
-                          ? "text-white shadow-md" 
-                          : "text-gray-600 hover:text-gray-800"
+                          ? "text-white shadow-lg scale-105" 
+                          : "text-gray-600 hover:text-gray-800 hover:bg-gray-200 hover:scale-105 hover:shadow-md"
                       }`}
                       style={{ 
                         backgroundColor: formData.gender === "female" ? '#1e2a78' : 'transparent'
