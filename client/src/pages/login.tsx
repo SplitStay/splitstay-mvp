@@ -198,7 +198,7 @@ const Login: React.FC = () => {
           <p className="text-gray-600">
             Don't have an account?{" "}
             <button 
-              onClick={() => navigate("/?profile=true")}
+              onClick={() => navigate("/create-profile")}
               className="text-navy hover:text-navy/80 underline transition-colors duration-300"
             >
               Create one here
