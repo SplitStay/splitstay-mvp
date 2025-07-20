@@ -10,6 +10,7 @@ import Chat from "./pages/chat";
 
 function CreateProfile() {
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+  const [selectedLearningLanguages, setSelectedLearningLanguages] = useState<string[]>([]);
   const [selectedTraits, setSelectedTraits] = useState<string[]>([]);
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
   const [customLanguage, setCustomLanguage] = useState("");
@@ -66,6 +67,20 @@ function CreateProfile() {
       setSelectedLanguages(prev => [...prev, language]);
       setCustomLanguage("");
     }
+  };
+
+  const handleLearningLanguageDropdownChange = (language: string) => {
+    if (language && !selectedLearningLanguages.includes(language)) {
+      setSelectedLearningLanguages(prev => [...prev, language]);
+    }
+  };
+
+  const handleLearningLanguageToggle = (language: string) => {
+    setSelectedLearningLanguages(prev => 
+      prev.includes(language) 
+        ? prev.filter(l => l !== language)
+        : [...prev, language]
+    );
   };
 
   const handleCountryDropdownChange = (country: string) => {
@@ -778,6 +793,67 @@ function CreateProfile() {
                             type="button"
                             onClick={() => handleLanguageToggle(language)}
                             className="ml-1 hover:bg-blue-200 rounded-full p-0.5"
+                          >
+                            <X className="w-2 h-2" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Languages You're Learning Section */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Languages You're Learning <span className="text-gray-400">(optional)</span>
+                </label>
+                
+                {/* Popular Languages Quick Selection */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {popularLanguages.slice(0, 8).map((language) => (
+                    <button
+                      key={language}
+                      type="button"
+                      onClick={() => handleLearningLanguageDropdownChange(language)}
+                      disabled={selectedLearningLanguages.includes(language)}
+                      className={`px-3 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                        selectedLearningLanguages.includes(language)
+                          ? "bg-orange-100 text-orange-800 cursor-not-allowed"
+                          : "bg-gray-100 text-gray-700 hover:bg-orange-100 hover:text-orange-700 hover:shadow-md"
+                      }`}
+                    >
+                      {language}
+                    </button>
+                  ))}
+                </div>
+                
+                <div className="mb-3">
+                  <select
+                    value=""
+                    onChange={(e) => handleLearningLanguageDropdownChange(e.target.value)}
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  >
+                    <option value="">+ More languages...</option>
+                    {languageOptions.filter(language => !selectedLearningLanguages.includes(language)).map((language) => (
+                      <option key={language} value={language}>{language}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                {selectedLearningLanguages.length > 0 && (
+                  <div className="mb-3">
+                    <div className="flex flex-wrap gap-1">
+                      {selectedLearningLanguages.map((language) => (
+                        <span 
+                          key={language} 
+                          className="inline-flex items-center bg-orange-100 text-orange-800 px-2 py-0.5 rounded text-xs"
+                        >
+                          {language}
+                          <button
+                            type="button"
+                            onClick={() => handleLearningLanguageToggle(language)}
+                            className="ml-1 hover:bg-orange-200 rounded-full p-0.5"
                           >
                             <X className="w-2 h-2" />
                           </button>
