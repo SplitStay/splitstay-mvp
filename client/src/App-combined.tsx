@@ -1291,6 +1291,23 @@ function CreateProfile() {
                 </select>
               </div>
 
+              {/* How did this country influence you */}
+              <div>
+                <label htmlFor="country_influence_explanation" className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                  How did this country influence you? 
+                  <span className="text-gray-400 ml-1">(optional)</span>
+                  <span className="ml-1 text-xs cursor-help" title="Share how this country shaped your perspective">ℹ️</span>
+                </label>
+                <textarea
+                  id="country_influence_explanation"
+                  value={formData.country_influence_explanation || ''}
+                  onChange={(e) => setFormData(prev => ({...prev, country_influence_explanation: e.target.value}))}
+                  placeholder="Tell us about the culture, people, experiences, or values that shaped you..."
+                  rows={2}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none text-sm"
+                />
+              </div>
+
               {/* Most impactful travel experience */}
               <div>
                 <label htmlFor="most_impactful_experience" className="flex items-center text-sm font-medium text-gray-700 mb-2">
