@@ -17,6 +17,9 @@ function CreateProfile() {
   const [customCountry, setCustomCountry] = useState("");
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
   const [travelPhotos, setTravelPhotos] = useState<string[]>([]);
+  const [showMoreLanguages, setShowMoreLanguages] = useState(false);
+  const [showMoreLearningLanguages, setShowMoreLearningLanguages] = useState(false);
+  const [showMoreTraits, setShowMoreTraits] = useState(false);
   const [showForm, setShowForm] = useState(() => {
     // Check if URL has profile parameter to show form directly
     const urlParams = new URLSearchParams(window.location.search);
@@ -113,8 +116,14 @@ function CreateProfile() {
     }
   };
 
-  // Popular languages for quick selection
-  const popularLanguages = ["English", "Spanish", "French", "German", "Dutch", "Italian", "Portuguese", "Chinese (Mandarin)", "Japanese", "Korean"];
+  // Main languages for quick selection (display by default)
+  const mainLanguages = ["English", "Spanish", "French", "German", "Dutch", "Italian"];
+  
+  // Additional languages in dropdown
+  const additionalLanguages = ["Portuguese", "Chinese (Mandarin)", "Japanese", "Korean", "Arabic", "Russian", "Hindi", "Swahili", "Turkish", "Polish"];
+  
+  // All languages combined
+  const allLanguages = [...mainLanguages, ...additionalLanguages];
 
   // Popular countries for quick selection  
   const popularCountries = ["United States", "France", "Spain", "Japan", "Thailand", "Netherlands", "Germany", "Italy", "United Kingdom", "Australia"];
@@ -533,12 +542,12 @@ function CreateProfile() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="max-w-[1400px] mx-auto px-6 pb-16">
-        {/* 3-column layout: responsive grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <form onSubmit={handleSubmit} className="w-full max-w-[1440px] mx-auto px-4 h-[calc(100vh-120px)] overflow-hidden">
+        {/* 3-column layout: full width responsive grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
           
           {/* COLUMN 1 — Personal Info */}
-          <div className="bg-white rounded-lg shadow-lg p-6 h-fit">
+          <div className="bg-white rounded-lg shadow-lg p-6 h-full overflow-y-auto">
             <div className="mb-6">
               <h2 className="text-lg font-bold text-center" style={{ color: '#1e2a78' }}>
                 Personal Info
@@ -689,7 +698,7 @@ function CreateProfile() {
           </div>
 
           {/* COLUMN 2 — Location & Language */}
-          <div className="bg-white rounded-lg shadow-lg p-6 h-fit">
+          <div className="bg-white rounded-lg shadow-lg p-6 h-full overflow-y-auto">
             <div className="mb-6">
               <h2 className="text-lg font-bold text-center" style={{ color: '#1e2a78' }}>
                 Location & Language
@@ -742,9 +751,9 @@ function CreateProfile() {
                   Languages you speak <span className="text-red-500">*</span>
                 </label>
                 
-                {/* Popular Languages Quick Selection */}
+                {/* Main Languages Quick Selection */}
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {popularLanguages.map((language) => (
+                  {mainLanguages.map((language) => (
                     <button
                       key={language}
                       type="button"
@@ -760,6 +769,45 @@ function CreateProfile() {
                     </button>
                   ))}
                 </div>
+                
+                
+                {/* More Languages Dropdown */}
+                {!showMoreLanguages ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowMoreLanguages(true)}
+                    className="text-blue-600 hover:text-blue-800 text-sm font-medium mb-3"
+                  >
+                    + More languages...
+                  </button>
+                ) : (
+                  <div className="mb-3">
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {additionalLanguages.map((language) => (
+                        <button
+                          key={language}
+                          type="button"
+                          onClick={() => handleLanguageDropdownChange(language)}
+                          disabled={selectedLanguages.includes(language)}
+                          className={`px-3 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                            selectedLanguages.includes(language)
+                              ? "bg-green-100 text-green-800 cursor-not-allowed"
+                              : "bg-gray-100 text-gray-700 hover:bg-blue-100 hover:text-blue-700 hover:shadow-md"
+                          }`}
+                        >
+                          {language}
+                        </button>
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowMoreLanguages(false)}
+                      className="text-gray-600 hover:text-gray-800 text-sm"
+                    >
+                      - Show less
+                    </button>
+                  </div>
+                )}
                 
                 <div className="mb-3">
                   <select
@@ -803,9 +851,9 @@ function CreateProfile() {
                   Languages You're Learning <span className="text-gray-400">(optional)</span>
                 </label>
                 
-                {/* Popular Languages Quick Selection */}
+                {/* Main Languages Quick Selection */}
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {popularLanguages.slice(0, 8).map((language) => (
+                  {mainLanguages.map((language) => (
                     <button
                       key={language}
                       type="button"
@@ -822,18 +870,43 @@ function CreateProfile() {
                   ))}
                 </div>
                 
-                <div className="mb-3">
-                  <select
-                    value=""
-                    onChange={(e) => handleLearningLanguageDropdownChange(e.target.value)}
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                {/* More Learning Languages Dropdown */}
+                {!showMoreLearningLanguages ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowMoreLearningLanguages(true)}
+                    className="text-orange-600 hover:text-orange-800 text-sm font-medium mb-3"
                   >
-                    <option value="">+ More languages...</option>
-                    {languageOptions.filter(language => !selectedLearningLanguages.includes(language)).map((language) => (
-                      <option key={language} value={language}>{language}</option>
-                    ))}
-                  </select>
-                </div>
+                    + More languages...
+                  </button>
+                ) : (
+                  <div className="mb-3">
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {additionalLanguages.map((language) => (
+                        <button
+                          key={language}
+                          type="button"
+                          onClick={() => handleLearningLanguageDropdownChange(language)}
+                          disabled={selectedLearningLanguages.includes(language)}
+                          className={`px-3 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                            selectedLearningLanguages.includes(language)
+                              ? "bg-orange-100 text-orange-800 cursor-not-allowed"
+                              : "bg-gray-100 text-gray-700 hover:bg-orange-100 hover:text-orange-700 hover:shadow-md"
+                          }`}
+                        >
+                          {language}
+                        </button>
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowMoreLearningLanguages(false)}
+                      className="text-gray-600 hover:text-gray-800 text-sm"
+                    >
+                      - Show less
+                    </button>
+                  </div>
+                )}
                 
                 {selectedLearningLanguages.length > 0 && (
                   <div className="mb-3">
@@ -861,7 +934,7 @@ function CreateProfile() {
           </div>
 
           {/* COLUMN 3 — Travel Preferences */}
-          <div className="bg-white rounded-lg shadow-lg p-6 h-fit">
+          <div className="bg-white rounded-lg shadow-lg p-6 h-full overflow-y-auto">
             <div className="mb-6">
               <h2 className="text-lg font-bold text-center" style={{ color: '#1e2a78' }}>
                 Travel Preferences
@@ -876,14 +949,16 @@ function CreateProfile() {
                   <span className="text-gray-400 ml-1">(select up to 5)</span>
                   <span className="ml-1 text-xs cursor-help" title="These traits help us find compatible roommates">ℹ️</span>
                 </label>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {traitOptions.map((trait) => (
+                
+                {/* Top 2 rows of most common traits */}
+                <div className="grid grid-cols-3 gap-1 mb-3">
+                  {traitOptions.slice(0, 12).map((trait) => (
                     <button
                       key={trait}
                       type="button"
                       onClick={() => handleTraitToggle(trait)}
                       disabled={!selectedTraits.includes(trait) && selectedTraits.length >= 5}
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+                      className={`px-2 py-1 rounded-full text-xs font-medium transition-all duration-200 ${
                         selectedTraits.includes(trait)
                           ? "text-white shadow-md"
                           : selectedTraits.length >= 5
@@ -898,6 +973,49 @@ function CreateProfile() {
                     </button>
                   ))}
                 </div>
+                
+                {/* Show More Traits */}
+                {!showMoreTraits ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowMoreTraits(true)}
+                    className="text-blue-600 hover:text-blue-800 text-sm font-medium mb-3"
+                  >
+                    + Show More Traits
+                  </button>
+                ) : (
+                  <div className="mb-3">
+                    <div className="grid grid-cols-3 gap-1 mb-2">
+                      {traitOptions.slice(12).map((trait) => (
+                        <button
+                          key={trait}
+                          type="button"
+                          onClick={() => handleTraitToggle(trait)}
+                          disabled={!selectedTraits.includes(trait) && selectedTraits.length >= 5}
+                          className={`px-2 py-1 rounded-full text-xs font-medium transition-all duration-200 ${
+                            selectedTraits.includes(trait)
+                              ? "text-white shadow-md"
+                              : selectedTraits.length >= 5
+                              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                              : "bg-gray-100 text-gray-700 hover:bg-blue-100 hover:text-blue-700 hover:shadow-md"
+                          }`}
+                          style={{ 
+                            backgroundColor: selectedTraits.includes(trait) ? '#1e2a78' : undefined 
+                          }}
+                        >
+                          {trait}
+                        </button>
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowMoreTraits(false)}
+                      className="text-gray-600 hover:text-gray-800 text-sm"
+                    >
+                      - Show less
+                    </button>
+                  </div>
+                )}
                 {selectedTraits.length > 0 && (
                   <div className="mb-2">
                     <div className="flex flex-wrap gap-1">
@@ -1008,8 +1126,8 @@ function CreateProfile() {
       </form>
 
       {/* Compact Sticky Footer */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-2 shadow-lg">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row gap-2 justify-center">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg z-10">
+        <div className="max-w-[1440px] mx-auto flex flex-col sm:flex-row gap-2 justify-center">
           <button 
             type="submit"
             onClick={handleSubmit}
