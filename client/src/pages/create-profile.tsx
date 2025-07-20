@@ -23,7 +23,26 @@ export default function CreateProfile() {
     dayOfBirth: "",
     monthOfBirth: "",
     yearOfBirth: "",
-    travelReason: ""
+    travelReason: "",
+    gender: "",
+    birthplace: "",
+    currentHome: "",
+    influentialCountry: "",
+    countryImpactReason: "",
+    mostImpactfulExperience: ""
+  });
+  
+  // Additional state for travel photos and location search
+  const [travelPhotos, setTravelPhotos] = useState<string[]>([]);
+  const [locationSuggestions, setLocationSuggestions] = useState<string[]>([]);
+  const [showLocationSuggestions, setShowLocationSuggestions] = useState<{
+    birthplace: boolean;
+    currentHome: boolean;
+    influentialCountry: boolean;
+  }>({
+    birthplace: false,
+    currentHome: false,
+    influentialCountry: false
   });
 
   // Check user path from URL
@@ -79,11 +98,68 @@ export default function CreateProfile() {
     }
   };
 
-  // Form validation: only name and date required
+  // Location search function
+  const searchLocations = async (query: string, field: 'birthplace' | 'currentHome' | 'influentialCountry') => {
+    if (query.length < 2) {
+      setLocationSuggestions([]);
+      setShowLocationSuggestions(prev => ({ ...prev, [field]: false }));
+      return;
+    }
+
+    try {
+      // Use a simple list of countries and major cities for autocomplete
+      const locations = [
+        'United States', 'Canada', 'United Kingdom', 'Germany', 'France', 'Spain', 'Italy', 
+        'Netherlands', 'Australia', 'New Zealand', 'Japan', 'Singapore', 'Thailand', 
+        'Philippines', 'Malaysia', 'Indonesia', 'Vietnam', 'South Korea', 'India', 'China',
+        'Brazil', 'Argentina', 'Mexico', 'Colombia', 'Chile', 'South Africa', 'Egypt',
+        'New York', 'London', 'Paris', 'Tokyo', 'Sydney', 'Bangkok', 'Singapore', 'Berlin',
+        'Amsterdam', 'Barcelona', 'Rome', 'Vienna', 'Prague', 'Copenhagen', 'Stockholm'
+      ];
+      
+      const filtered = locations.filter(location => 
+        location.toLowerCase().includes(query.toLowerCase())
+      ).slice(0, 8);
+      
+      setLocationSuggestions(filtered);
+      setShowLocationSuggestions(prev => ({ ...prev, [field]: true }));
+    } catch (error) {
+      console.error('Error searching locations:', error);
+    }
+  };
+
+  // Handle travel photo upload
+  const handleTravelPhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    files.forEach(file => {
+      if (travelPhotos.length < 3) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setTravelPhotos(prev => [...prev, reader.result as string]);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  };
+
+  // Remove travel photo
+  const removeTravelPhoto = (index: number) => {
+    setTravelPhotos(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Handle input change with proper typing
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Form validation for each step
   const isStep1Valid = formData.fullName && 
                       formData.dayOfBirth && 
                       formData.monthOfBirth && 
-                      formData.yearOfBirth;
+                      formData.yearOfBirth &&
+                      formData.gender &&
+                      formData.birthplace &&
+                      formData.currentHome;
 
   const languageOptions = [
     "English", "Spanish", "French", "German", "Italian", "Portuguese", 
@@ -129,6 +205,27 @@ export default function CreateProfile() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleStep1Submit} className="space-y-6">
+                
+                {/* 1️⃣ Gender Section */}
+                <div className="space-y-3">
+                  <Label className="text-base font-medium text-gray-700">
+                    What is your gender? *
+                  </Label>
+                  <RadioGroup 
+                    value={formData.gender} 
+                    onValueChange={(value) => handleInputChange('gender', value)}
+                    className="space-y-2"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="male" id="male" />
+                      <Label htmlFor="male" className="font-normal cursor-pointer">Male</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="female" id="female" />
+                      <Label htmlFor="female" className="font-normal cursor-pointer">Female</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
                 {/* Profile Photo Upload - Optional */}
                 <div className="text-center">
                   <Label className="text-base font-medium text-gray-700 mb-3 block">
@@ -259,6 +356,83 @@ export default function CreateProfile() {
                   <p className="text-sm text-gray-500 mt-2">Must be at least 18 years old</p>
                 </div>
 
+                {/* 🌍 2️⃣ Location Questions */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium text-gray-800">🌍 Location</h3>
+                  
+                  {/* Where were you born? */}
+                  <div className="relative">
+                    <Label htmlFor="birthplace" className="text-base font-medium text-gray-700">
+                      Where were you born? *
+                    </Label>
+                    <Input
+                      id="birthplace"
+                      value={formData.birthplace}
+                      onChange={(e) => {
+                        handleInputChange('birthplace', e.target.value);
+                        searchLocations(e.target.value, 'birthplace');
+                      }}
+                      placeholder="e.g. New York, United States"
+                      className="mt-2 h-12"
+                      style={{ fontSize: '16px' }}
+                      required
+                    />
+                    {showLocationSuggestions.birthplace && locationSuggestions.length > 0 && (
+                      <div className="absolute z-10 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-60 overflow-y-auto">
+                        {locationSuggestions.map((location, index) => (
+                          <button
+                            key={index}
+                            type="button"
+                            className="w-full text-left px-4 py-2 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                            onClick={() => {
+                              handleInputChange('birthplace', location);
+                              setShowLocationSuggestions(prev => ({ ...prev, birthplace: false }));
+                            }}
+                          >
+                            {location}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Where do you currently call home? */}
+                  <div className="relative">
+                    <Label htmlFor="currentHome" className="text-base font-medium text-gray-700">
+                      Where do you currently call home? *
+                    </Label>
+                    <Input
+                      id="currentHome"
+                      value={formData.currentHome}
+                      onChange={(e) => {
+                        handleInputChange('currentHome', e.target.value);
+                        searchLocations(e.target.value, 'currentHome');
+                      }}
+                      placeholder="e.g. London, United Kingdom"
+                      className="mt-2 h-12"
+                      style={{ fontSize: '16px' }}
+                      required
+                    />
+                    {showLocationSuggestions.currentHome && locationSuggestions.length > 0 && (
+                      <div className="absolute z-10 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-60 overflow-y-auto">
+                        {locationSuggestions.map((location, index) => (
+                          <button
+                            key={index}
+                            type="button"
+                            className="w-full text-left px-4 py-2 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                            onClick={() => {
+                              handleInputChange('currentHome', location);
+                              setShowLocationSuggestions(prev => ({ ...prev, currentHome: false }));
+                            }}
+                          >
+                            {location}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
                 {/* Travel Reason */}
                 <div>
                   <Label className="text-base font-medium text-gray-700 mb-3 block">
@@ -300,16 +474,16 @@ export default function CreateProfile() {
     );
   }
 
-  // Step 2
+  // Step 2 - Travel Experiences
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       <div className="max-w-[600px] mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-navy mb-2">
-            Tell us how you travel
+            Share your travel story
           </h1>
           <p className="text-gray-600">
-            Help us match you with compatible travelers
+            Help us connect you with compatible travel companions
           </p>
         </div>
 
@@ -318,7 +492,131 @@ export default function CreateProfile() {
             <CardTitle className="text-xl text-navy">Step 2 of 2</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-6">
+            <div className="space-y-8">
+
+              {/* ✈️ Travel Experience Section */}
+              <div className="space-y-6">
+                <h3 className="text-lg font-medium text-gray-800">✈️ Travel Experience</h3>
+                
+                {/* Which country has been most influential in shaping who you are? */}
+                <div className="relative">
+                  <Label htmlFor="influentialCountry" className="text-base font-medium text-gray-700">
+                    Which country has been most influential in shaping who you are?
+                  </Label>
+                  <p className="text-sm text-gray-500 mb-2">This could be where you lived, studied, worked, or had a life-changing experience</p>
+                  <Input
+                    id="influentialCountry"
+                    value={formData.influentialCountry}
+                    onChange={(e) => {
+                      handleInputChange('influentialCountry', e.target.value);
+                      searchLocations(e.target.value, 'influentialCountry');
+                    }}
+                    placeholder="e.g. Japan, France, Brazil..."
+                    className="mt-2 h-12"
+                    style={{ fontSize: '16px' }}
+                  />
+                  {showLocationSuggestions.influentialCountry && locationSuggestions.length > 0 && (
+                    <div className="absolute z-10 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-60 overflow-y-auto">
+                      {locationSuggestions.map((location, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          className="w-full text-left px-4 py-2 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                          onClick={() => {
+                            handleInputChange('influentialCountry', location);
+                            setShowLocationSuggestions(prev => ({ ...prev, influentialCountry: false }));
+                          }}
+                        >
+                          {location}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* How did this country impact you? */}
+                <div>
+                  <Label htmlFor="countryImpactReason" className="text-base font-medium text-gray-700">
+                    How did this country impact you?
+                  </Label>
+                  <Textarea
+                    id="countryImpactReason"
+                    value={formData.countryImpactReason}
+                    onChange={(e) => handleInputChange('countryImpactReason', e.target.value)}
+                    placeholder="e.g. Living in Tokyo for 2 years taught me the beauty of mindfulness and attention to detail. I learned to appreciate slow mornings and the art of making perfect ramen..."
+                    rows={4}
+                    className="mt-2"
+                    style={{ fontSize: '16px' }}
+                  />
+                </div>
+
+                {/* What's been your most impactful travel experience? */}
+                <div>
+                  <Label htmlFor="mostImpactfulExperience" className="text-base font-medium text-gray-700">
+                    What's been your most impactful travel experience?
+                  </Label>
+                  <p className="text-sm text-gray-500 mb-2">Share a moment that changed your perspective, taught you something important, or created a lasting memory</p>
+                  <Textarea
+                    id="mostImpactfulExperience"
+                    value={formData.mostImpactfulExperience}
+                    onChange={(e) => handleInputChange('mostImpactfulExperience', e.target.value)}
+                    placeholder="e.g. Getting lost in the backstreets of Marrakech led me to a family dinner where I learned that kindness transcends language barriers. That night I realized travel is about human connections, not destinations..."
+                    rows={5}
+                    className="mt-2"
+                    style={{ fontSize: '16px' }}
+                  />
+                </div>
+              </div>
+
+              {/* 📸 Travel Photos Section */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-gray-800">📸 Travel Photos</h3>
+                <div>
+                  <Label className="text-base font-medium text-gray-700">
+                    Share up to 3 travel photos <span className="text-gray-400">(optional)</span>
+                  </Label>
+                  <p className="text-sm text-gray-500 mb-3">Help others see the world through your eyes</p>
+                  
+                  <div className="grid grid-cols-3 gap-4 mb-4">
+                    {travelPhotos.map((photo, index) => (
+                      <div key={index} className="relative aspect-square">
+                        <img
+                          src={photo}
+                          alt={`Travel photo ${index + 1}`}
+                          className="w-full h-full object-cover rounded-lg border-2 border-gray-200"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeTravelPhoto(index)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors text-xs"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                    
+                    {travelPhotos.length < 3 && (
+                      <div className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={handleTravelPhotoUpload}
+                          className="hidden"
+                          id="travel-photos-upload"
+                        />
+                        <Label
+                          htmlFor="travel-photos-upload"
+                          className="cursor-pointer text-center p-4"
+                        >
+                          <Plus className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                          <span className="text-sm text-gray-500">Add Photo</span>
+                        </Label>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
               {/* Languages */}
               <div>
                 <Label className="text-base font-medium text-gray-700 mb-3 block">
