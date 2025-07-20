@@ -1,0 +1,42 @@
+Redesign the current two-step traveler profile page with a more balanced, modern, desktop-friendly layout.
+
+GENERAL LAYOUT:
+- Use a clean 2-column layout on desktop (side-by-side, 50/50 width), responsive for mobile (stacked)
+- Apply max-width of 1300px and center the form content with generous horizontal padding (32px on each side)
+- Space out components using consistent vertical spacing (24px)
+
+LEFT COLUMN — Personal Basics:
+- Title: “🪪 Tell us about you” (use a bold section header with `text-xl` font)
+- Add profile photo upload at the top (centered inside a dotted-circle uploader)
+- Below that, show a **pill-style gender toggle** (Male / Female) — without emojis, but with hover and selected states
+- Field: “How do you want to be called?” (placeholder: e.g. Jane)
+- Field: “Where were you born?” (type-ahead input with country/city suggestions)
+- Field: “Where do you currently call home?” (type-ahead input with country/city suggestions)
+- Field: “What makes you feel alive?” (optional, helper text: "Share moments, passions, or travel rituals")
+- Field: “Date of Birth” — dropdowns for day, month, year, with helper text: “Must be 18+”
+- Field: “Languages you speak” — tag-style pills (multi-selectable), add hover and selected state, allow "+ Add more"
+
+RIGHT COLUMN — Travel Style:
+- Title: “🌍 Build your traveler profile” (bold `text-xl` header)
+- Section: “🧭 Tell us how you travel” — allow up to 5 travel trait tags with check-style toggle buttons (e.g. Nature Lover, Digital Nomad, History Buff, etc.)
+- Section: “📖 Share your most meaningful travel experiences”
+  - Prompt: “Which country has influenced you the most?” — dropdown with type-ahead and free-text fallback
+  - Prompt: “Why did this country impact you?” — text area (max 250 characters)
+  - Prompt: “What travel experience has impacted you most deeply?” — optional text area
+- Field: “Top 3 Travel Photos” — optional, with drag-and-drop support and thumbnail previews in grid
+
+OTHER STYLING:
+- Use consistent modern input styling — rounded corners, soft shadow, light gray border
+- For gender and trait selection, use pill buttons with light background, dark text, and selected state color (e.g. blue or green)
+- Main call-to-action at bottom: “Create My Profile” — large, full-width button with icon ➡️ and hover transition
+- Add a “Skip for Now” ghost button below the CTA
+- Add hoverable ℹ️ info icons on key fields (optional, for future enhancement)
+
+RESPONSIVENESS:
+- On tablet: stack columns with slight spacing
+- On mobile: single-column layout, full-width components, sticky CTA button at bottom
+
+ACCESSIBILITY:
+- All fields should have accessible labels
+- Use keyboard navigation and proper focus indicators
+

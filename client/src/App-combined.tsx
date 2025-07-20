@@ -518,44 +518,40 @@ function CreateProfile() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="max-w-[1350px] mx-auto px-4 pb-16">
-        {/* 12-column grid layout: 5 cols left, 7 cols right */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <form onSubmit={handleSubmit} className="max-w-[1300px] mx-auto px-8 pb-16">
+        {/* 2-column layout: 50/50 split */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           
-          {/* Step 1 - Left Panel (5 columns) */}
-          <div className="lg:col-span-5 bg-white rounded-lg shadow-lg p-5">
-            <div className="mb-4">
-              <h2 className="text-lg font-bold mb-1" style={{ color: '#1e2a78' }}>
-                👉 Tell us about you
+          {/* LEFT COLUMN — Personal Basics */}
+          <div className="bg-white rounded-lg shadow-lg p-8">
+            <div className="mb-6">
+              <h2 className="text-xl font-bold" style={{ color: '#1e2a78' }}>
+                🪪 Tell us about you
               </h2>
-              <p className="text-gray-600 text-xs">Let's start with the basics</p>
             </div>
             
-            <div className="space-y-4">
+            <div className="space-y-6">
               {/* Profile Photo Upload */}
               <div className="text-center">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Profile Photo <span className="text-red-500">*</span>
-                </label>
                 <div className="flex flex-col items-center">
                   {profileImagePreview ? (
                     <div className="relative">
                       <img
                         src={profileImagePreview}
                         alt="Profile preview"
-                        className="w-24 h-24 rounded-full object-cover border-2 border-gray-300"
+                        className="w-32 h-32 rounded-full object-cover border-4 border-gray-200 shadow-md"
                       />
                       <button
                         type="button"
                         onClick={() => setProfileImagePreview(null)}
-                        className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center hover:bg-red-600 transition-colors text-xs"
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-all duration-200 shadow-lg"
                       >
-                        <X className="w-2 h-2" />
+                        <X className="w-4 h-4" />
                       </button>
                     </div>
                   ) : (
-                    <div className="w-24 h-24 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center">
-                      <svg className="w-10 h-10 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                    <div className="w-32 h-32 rounded-full bg-gray-50 border-2 border-dashed border-gray-300 flex items-center justify-center hover:border-gray-400 transition-colors">
+                      <svg className="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                       </svg>
                     </div>
@@ -569,10 +565,10 @@ function CreateProfile() {
                   />
                   <label
                     htmlFor="profile-image-upload"
-                    className="cursor-pointer text-white px-4 py-2 rounded text-sm font-medium mt-3"
+                    className="cursor-pointer text-white px-6 py-2 rounded-lg text-sm font-medium mt-4 shadow-md hover:shadow-lg transition-all duration-200"
                     style={{ backgroundColor: '#1e2a78' }}
                   >
-                    Upload Photo
+                    {profileImagePreview ? "Change Photo" : "Upload Photo"}
                   </label>
                 </div>
               </div>
@@ -616,9 +612,9 @@ function CreateProfile() {
                 </div>
               </div>
 
-              {/* Name Input - Now directly under profile photo */}
+              {/* How do you want to be called */}
               <div>
-                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-3">
                   How do you want to be called? <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -627,41 +623,41 @@ function CreateProfile() {
                   value={formData.fullName}
                   onChange={(e) => setFormData(prev => ({...prev, fullName: e.target.value}))}
                   placeholder="e.g. Jane"
-                  className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   autoFocus
                   required
                 />
               </div>
 
-              {/* Where are you from? - New required field */}
+              {/* Where were you born */}
               <div>
-                <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-2">
-                  Where are you from? <span className="text-red-500">*</span>
+                <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-3">
+                  Where were you born? <span className="text-red-500">*</span>
                 </label>
                 <select
                   id="country"
                   value={formData.country || ''}
                   onChange={(e) => setFormData(prev => ({...prev, country: e.target.value}))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   required
                 >
-                  <option value="">Select your country</option>
+                  <option value="">Select your birth country</option>
                   {countryOptions.map((country) => (
                     <option key={country} value={country}>{country}</option>
                   ))}
                 </select>
               </div>
 
-              {/* Where do you currently call home? */}
+              {/* Where do you currently call home */}
               <div>
-                <label htmlFor="currentHome" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="currentHome" className="block text-sm font-medium text-gray-700 mb-3">
                   Where do you currently call home? <span className="text-gray-400">(optional)</span>
                 </label>
                 <select
                   id="currentHome"
                   value={formData.currentHome || ''}
                   onChange={(e) => setFormData(prev => ({...prev, currentHome: e.target.value}))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 >
                   <option value="">Select your current home</option>
                   {countryOptions.map((country) => (
@@ -672,16 +668,17 @@ function CreateProfile() {
 
               {/* What makes you feel alive */}
               <div>
-                <label htmlFor="bio" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="bio" className="block text-sm font-medium text-gray-700 mb-3">
                   What makes you feel alive? <span className="text-gray-400">(optional)</span>
                 </label>
+                <p className="text-xs text-gray-500 mb-2">Share moments, passions, or travel rituals</p>
                 <textarea
                   id="bio"
                   value={formData.bio}
                   onChange={(e) => setFormData(prev => ({...prev, bio: e.target.value}))}
                   placeholder="e.g. chasing sunsets, street food tours, spontaneous hikes..."
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded text-sm resize-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
                 />
               </div>
 
@@ -689,14 +686,14 @@ function CreateProfile() {
 
               {/* Date of Birth */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-3">
                   Date of Birth <span className="text-red-500">*</span>
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-3">
                   <select
                     value={formData.dayOfBirth}
                     onChange={(e) => setFormData(prev => ({...prev, dayOfBirth: e.target.value}))}
-                    className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     required
                   >
                     <option value="">Day</option>
@@ -707,7 +704,7 @@ function CreateProfile() {
                   <select
                     value={formData.monthOfBirth}
                     onChange={(e) => setFormData(prev => ({...prev, monthOfBirth: e.target.value}))}
-                    className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     required
                   >
                     <option value="">Month</option>
@@ -718,7 +715,7 @@ function CreateProfile() {
                   <select
                     value={formData.yearOfBirth}
                     onChange={(e) => setFormData(prev => ({...prev, yearOfBirth: e.target.value}))}
-                    className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     required
                   >
                     <option value="">Year</option>
@@ -727,27 +724,27 @@ function CreateProfile() {
                     ))}
                   </select>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">Must be 18+</p>
+                <p className="text-xs text-gray-500 mt-2">Must be 18+</p>
               </div>
 
-              {/* Languages Section - Moved from right column */}
+              {/* Languages Section */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-3">
                   Languages you speak <span className="text-red-500">*</span>
                 </label>
                 
                 {/* Popular Languages Quick Selection */}
-                <div className="flex flex-wrap gap-1.5 mb-3">
+                <div className="flex flex-wrap gap-2 mb-4">
                   {popularLanguages.map((language) => (
                     <button
                       key={language}
                       type="button"
                       onClick={() => handleLanguageDropdownChange(language)}
                       disabled={selectedLanguages.includes(language)}
-                      className={`px-2 py-0.5 rounded text-xs font-medium transition-colors h-6 ${
+                      className={`px-3 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                         selectedLanguages.includes(language)
-                          ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                          : "bg-gray-100 text-gray-700 hover:bg-blue-100 hover:text-blue-700"
+                          ? "bg-green-100 text-green-800 cursor-not-allowed"
+                          : "bg-gray-100 text-gray-700 hover:bg-blue-100 hover:text-blue-700 hover:shadow-md"
                       }`}
                     >
                       {language}
@@ -793,49 +790,49 @@ function CreateProfile() {
             </div>
           </div>
 
-          {/* Step 2 - Right Panel (7 columns) */}
-          <div className="lg:col-span-7 bg-white rounded-lg shadow-lg p-5">
-            
-            {/* Section 2: Tell us how you travel */}
-            <div className="mb-8">
-              <div className="mb-4">
-                <h2 className="text-lg font-bold mb-1" style={{ color: '#1e2a78' }}>
-                  👉 Tell us how you travel
-                </h2>
-                <p className="text-gray-600 text-xs">Help us match you with compatible travelers</p>
-              </div>
-              
-              {/* Travel Traits Section */}
+          {/* RIGHT COLUMN — Travel Style */}
+          <div className="bg-white rounded-lg shadow-lg p-8">
+            <div className="mb-6">
+              <h2 className="text-xl font-bold" style={{ color: '#1e2a78' }}>
+                🌍 Build your traveler profile
+              </h2>
+            </div>
+
+            <div className="space-y-8">
+              {/* Section: Tell us how you travel */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Travel traits <span className="text-gray-400">(select up to 5)</span>
-                  <span className="ml-1 text-xs text-gray-500 cursor-help" title="These traits help us find roommates who share your travel style">
-                    ℹ️
-                  </span>
-                </label>
-                {/* Compact inline tags - flex-wrapped */}
-                <div className="flex flex-wrap gap-1.5 mb-2">
-                  {traitOptions.map((trait) => (
-                    <button
-                      key={trait}
-                      type="button"
-                      onClick={() => handleTraitToggle(trait)}
-                      disabled={!selectedTraits.includes(trait) && selectedTraits.length >= 5}
-                      className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${
-                        selectedTraits.includes(trait)
-                          ? "text-white"
-                          : selectedTraits.length >= 5
-                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                      }`}
-                      style={{ 
-                        backgroundColor: selectedTraits.includes(trait) ? '#1e2a78' : undefined 
-                      }}
-                    >
-                      {trait}
-                    </button>
-                  ))}
-                </div>
+                <h3 className="text-lg font-semibold mb-4" style={{ color: '#1e2a78' }}>
+                  🧭 Tell us how you travel
+                </h3>
+                
+                {/* Travel Traits Section */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-4">
+                    Travel traits <span className="text-gray-400">(select up to 5)</span>
+                  </label>
+                  {/* Modern pill-style trait buttons */}
+                  <div className="flex flex-wrap gap-3 mb-4">
+                    {traitOptions.map((trait) => (
+                      <button
+                        key={trait}
+                        type="button"
+                        onClick={() => handleTraitToggle(trait)}
+                        disabled={!selectedTraits.includes(trait) && selectedTraits.length >= 5}
+                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                          selectedTraits.includes(trait)
+                            ? "text-white shadow-md scale-105"
+                            : selectedTraits.length >= 5
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : "bg-gray-100 text-gray-700 hover:bg-blue-100 hover:text-blue-700 hover:shadow-md hover:scale-105"
+                        }`}
+                        style={{ 
+                          backgroundColor: selectedTraits.includes(trait) ? '#1e2a78' : undefined 
+                        }}
+                      >
+                        {trait}
+                      </button>
+                    ))}
+                  </div>
                 {selectedTraits.length > 0 && (
                   <div className="mb-2">
                     <div className="flex flex-wrap gap-1">
@@ -860,78 +857,75 @@ function CreateProfile() {
               </div>
             </div>
 
-            {/* Section 3: Tell us about your travel experience */}
-            <div style={{marginTop: '24px'}}>
-              <div className="mb-4">
-                <h2 className="text-lg font-bold mb-1" style={{ color: '#1e2a78' }}>
-                  ✈️ Share your most meaningful travel experiences
-                </h2>
-                <p className="text-gray-600 text-xs">Tell us your travel story</p>
-              </div>
-              
-              <div className="space-y-4">
-
-              {/* Prompt 1: Most influential country */}
+              {/* Section: Share your most meaningful travel experiences */}
               <div>
-                <label htmlFor="influential_country" className="block text-sm font-medium text-gray-700 mb-2">
-                  Which country has influenced you the most?
-                </label>
-                <select
-                  id="influential_country"
-                  value={formData.influential_country || ''}
-                  onChange={(e) => setFormData(prev => ({...prev, influential_country: e.target.value}))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
-                >
-                  <option value="">Select a country</option>
-                  {countryOptions.map((country) => (
-                    <option key={country} value={country}>{country}</option>
-                  ))}
-                </select>
-              </div>
+                <h3 className="text-lg font-semibold mb-4" style={{ color: '#1e2a78' }}>
+                  📖 Share your most meaningful travel experiences
+                </h3>
+                
+                <div className="space-y-6">
+                  {/* Prompt 1: Most influential country */}
+                  <div>
+                    <label htmlFor="influential_country" className="block text-sm font-medium text-gray-700 mb-3">
+                      Which country has influenced you the most?
+                    </label>
+                    <select
+                      id="influential_country"
+                      value={formData.influential_country || ''}
+                      onChange={(e) => setFormData(prev => ({...prev, influential_country: e.target.value}))}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    >
+                      <option value="">Select a country</option>
+                      {countryOptions.map((country) => (
+                        <option key={country} value={country}>{country}</option>
+                      ))}
+                    </select>
+                  </div>
 
-              {/* Follow-up: Why did this country impact you */}
-              {formData.influential_country && (
-                <div>
-                  <label htmlFor="country_impact_reason" className="block text-sm font-medium text-gray-700 mb-2">
-                    Why did this country impact you?
-                  </label>
-                  <textarea
-                    id="country_impact_reason"
-                    value={formData.country_impact_reason}
-                    onChange={(e) => setFormData(prev => ({...prev, country_impact_reason: e.target.value}))}
-                    placeholder="Share what made this place special to you..."
-                    rows={3}
-                    maxLength={250}
-                    className="w-full px-3 py-2 border border-gray-300 rounded text-sm resize-none"
-                  />
-                  <div className="text-xs text-gray-500 text-right mt-1">
-                    {formData.country_impact_reason.length}/250 characters
+                  {/* Follow-up: Why did this country impact you */}
+                  {formData.influential_country && (
+                    <div>
+                      <label htmlFor="country_impact_reason" className="block text-sm font-medium text-gray-700 mb-3">
+                        Why did this country impact you?
+                      </label>
+                      <textarea
+                        id="country_impact_reason"
+                        value={formData.country_impact_reason}
+                        onChange={(e) => setFormData(prev => ({...prev, country_impact_reason: e.target.value}))}
+                        placeholder="Share what made this place special to you..."
+                        rows={3}
+                        maxLength={250}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                      />
+                      <div className="text-xs text-gray-500 text-right mt-2">
+                        {formData.country_impact_reason.length}/250 characters
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Prompt 2: Most impactful travel experience */}
+                  <div>
+                    <label htmlFor="most_impactful_experience" className="block text-sm font-medium text-gray-700 mb-3">
+                      What travel experience has impacted you most deeply? <span className="text-gray-400">(optional)</span>
+                    </label>
+                    <textarea
+                      id="most_impactful_experience"
+                      value={formData.most_impactful_experience}
+                      onChange={(e) => setFormData(prev => ({...prev, most_impactful_experience: e.target.value}))}
+                      placeholder="Tell us about a moment, encounter, or journey that changed your perspective..."
+                      rows={4}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                    />
                   </div>
                 </div>
-              )}
-
-              {/* Prompt 2: Most impactful travel experience */}
-              <div>
-                <label htmlFor="most_impactful_experience" className="block text-sm font-medium text-gray-700 mb-2">
-                  What travel experience has impacted you most deeply? <span className="text-gray-400">(optional)</span>
-                </label>
-                <textarea
-                  id="most_impactful_experience"
-                  value={formData.most_impactful_experience}
-                  onChange={(e) => setFormData(prev => ({...prev, most_impactful_experience: e.target.value}))}
-                  placeholder="Tell us about a moment, encounter, or journey that changed your perspective..."
-                  rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded text-sm resize-none"
-                />
               </div>
 
-              {/* Travel Photos Section - Moved from left column */}
+              {/* Section: Travel Photos */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Top 3 Travel Photos <span className="text-gray-400">(optional)</span>
-                </label>
-                <div className="flex space-x-3">
-                  {/* Always show 3 placeholders */}
+                <h3 className="text-lg font-semibold mb-4" style={{ color: '#1e2a78' }}>
+                  📸 Top 3 Travel Photos
+                </h3>
+                <div className="flex gap-4">
                   {[0, 1, 2].map((index) => (
                     <div key={index} className="relative">
                       {travelPhotos[index] ? (
@@ -939,7 +933,7 @@ function CreateProfile() {
                           <img
                             src={travelPhotos[index]}
                             alt={`Travel photo ${index + 1}`}
-                            className="w-32 h-32 object-cover rounded-lg border-2 border-gray-200 shadow-sm"
+                            className="w-24 h-24 object-cover rounded-lg border-2 border-gray-200 shadow-sm"
                           />
                           <button
                             type="button"
@@ -960,18 +954,15 @@ function CreateProfile() {
                           />
                           <label
                             htmlFor={`travel-photo-${index}`}
-                            className="cursor-pointer w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center hover:border-gray-400 transition-colors"
+                            className="cursor-pointer w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center hover:border-gray-400 transition-colors"
                           >
-                            <Plus className="w-6 h-6 text-gray-400" />
+                            <Plus className="w-4 h-4 text-gray-400" />
                           </label>
                         </>
                       )}
                     </div>
                   ))}
                 </div>
-              </div>
-
-
               </div>
             </div>
           </div>
