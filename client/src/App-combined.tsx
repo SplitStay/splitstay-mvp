@@ -27,7 +27,8 @@ function CreateProfile() {
     bio: "",
     dayOfBirth: "",
     monthOfBirth: "",
-    yearOfBirth: ""
+    yearOfBirth: "",
+    gender: ""
   });
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -569,6 +570,45 @@ function CreateProfile() {
                   >
                     Upload Photo
                   </label>
+                </div>
+              </div>
+
+              {/* Gender Selection */}
+              <div className="text-center">
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  What is your gender?
+                </label>
+                <div className="flex justify-center">
+                  <div className="bg-gray-100 p-1 rounded-full inline-flex">
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({...prev, gender: "male"}))}
+                      className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                        formData.gender === "male" 
+                          ? "text-white shadow-md" 
+                          : "text-gray-600 hover:text-gray-800"
+                      }`}
+                      style={{ 
+                        backgroundColor: formData.gender === "male" ? '#1e2a78' : 'transparent'
+                      }}
+                    >
+                      Male
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({...prev, gender: "female"}))}
+                      className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                        formData.gender === "female" 
+                          ? "text-white shadow-md" 
+                          : "text-gray-600 hover:text-gray-800"
+                      }`}
+                      style={{ 
+                        backgroundColor: formData.gender === "female" ? '#1e2a78' : 'transparent'
+                      }}
+                    >
+                      Female
+                    </button>
+                  </div>
                 </div>
               </div>
 
