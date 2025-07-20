@@ -358,12 +358,27 @@ export default function CreateProfilePage() {
 
   // Function to create display array for main languages grid
   const getLanguagesDisplayArray = (selectedLangs: string[]) => {
-    const displayArray = [...selectedLangs];
+    const displayArray = [];
     
-    // Fill remaining slots with unselected main languages
+    // Start with main languages in their fixed positions
     for (const lang of mainLanguages) {
-      if (!selectedLangs.includes(lang) && displayArray.length < 12) {
-        displayArray.push(lang);
+      displayArray.push(lang);
+    }
+    
+    // Add any selected languages that are not in main languages (from dropdown)
+    // These replace unselected main languages to maintain 12 slots
+    const selectedFromDropdown = selectedLangs.filter(lang => !mainLanguages.includes(lang));
+    let replaceIndex = 0;
+    
+    for (const dropdownLang of selectedFromDropdown) {
+      // Find the next unselected main language to replace
+      while (replaceIndex < displayArray.length && selectedLangs.includes(displayArray[replaceIndex])) {
+        replaceIndex++;
+      }
+      
+      if (replaceIndex < displayArray.length) {
+        displayArray[replaceIndex] = dropdownLang;
+        replaceIndex++;
       }
     }
     
@@ -372,12 +387,27 @@ export default function CreateProfilePage() {
 
   // Function to create display array for learning languages
   const getLearningLanguagesDisplayArray = (selectedLangs: string[]) => {
-    const displayArray = [...selectedLangs];
+    const displayArray = [];
     
-    // Fill remaining slots with unselected main languages
+    // Start with main languages in their fixed positions
     for (const lang of mainLanguages) {
-      if (!selectedLangs.includes(lang) && displayArray.length < 12) {
-        displayArray.push(lang);
+      displayArray.push(lang);
+    }
+    
+    // Add any selected languages that are not in main languages (from dropdown)
+    // These replace unselected main languages to maintain 12 slots
+    const selectedFromDropdown = selectedLangs.filter(lang => !mainLanguages.includes(lang));
+    let replaceIndex = 0;
+    
+    for (const dropdownLang of selectedFromDropdown) {
+      // Find the next unselected main language to replace
+      while (replaceIndex < displayArray.length && selectedLangs.includes(displayArray[replaceIndex])) {
+        replaceIndex++;
+      }
+      
+      if (replaceIndex < displayArray.length) {
+        displayArray[replaceIndex] = dropdownLang;
+        replaceIndex++;
       }
     }
     
@@ -386,12 +416,28 @@ export default function CreateProfilePage() {
 
   // Function to create display array for travel traits
   const getTraitsDisplayArray = (selectedTraits: string[]) => {
-    const displayArray = [...selectedTraits];
+    const displayArray = [];
+    const mainTraits = traitOptions.slice(0, 18); // First 18 main traits
     
-    // Fill remaining slots with unselected main traits
-    for (const trait of traitOptions.slice(0, 18)) {
-      if (!selectedTraits.includes(trait) && displayArray.length < 18) {
-        displayArray.push(trait);
+    // Start with main traits in their fixed positions
+    for (const trait of mainTraits) {
+      displayArray.push(trait);
+    }
+    
+    // Add any selected traits that are not in main traits (from dropdown)
+    // These replace unselected main traits to maintain 18 slots
+    const selectedFromDropdown = selectedTraits.filter(trait => !mainTraits.includes(trait));
+    let replaceIndex = 0;
+    
+    for (const dropdownTrait of selectedFromDropdown) {
+      // Find the next unselected main trait to replace
+      while (replaceIndex < displayArray.length && selectedTraits.includes(displayArray[replaceIndex])) {
+        replaceIndex++;
+      }
+      
+      if (replaceIndex < displayArray.length) {
+        displayArray[replaceIndex] = dropdownTrait;
+        replaceIndex++;
       }
     }
     
