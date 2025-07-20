@@ -936,6 +936,23 @@ function CreateProfile() {
                 />
               </div>
 
+              {/* What makes you feel alive */}
+              <div>
+                <label htmlFor="what_makes_alive" className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                  What makes you feel alive? 
+                  <span className="text-gray-400 ml-1">(optional)</span>
+                  <span className="ml-1 text-xs cursor-help" title="Share what energizes and excites you">ℹ️</span>
+                </label>
+                <textarea
+                  id="what_makes_alive"
+                  value={formData.what_makes_alive}
+                  onChange={(e) => setFormData(prev => ({...prev, what_makes_alive: e.target.value}))}
+                  placeholder="Travel, music, trying new foods, meeting people..."
+                  rows={2}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none text-sm"
+                />
+              </div>
+
               {/* Date of Birth */}
               <div>
                 <label className="block text-base font-medium text-gray-700 mb-4">
