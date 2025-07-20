@@ -39,26 +39,110 @@ function CreateProfile() {
     most_impactful_experience: ""
   });
 
-  // City data for autocomplete
+  // Comprehensive global cities database
   const cities = [
-    "Barcelona, Spain", "Madrid, Spain", "Valencia, Spain", "Seville, Spain",
-    "Paris, France", "Lyon, France", "Marseille, France", "Nice, France",
-    "Berlin, Germany", "Munich, Germany", "Hamburg, Germany", "Frankfurt, Germany",
-    "Amsterdam, Netherlands", "Rotterdam, Netherlands", "Utrecht, Netherlands",
-    "London, United Kingdom", "Manchester, United Kingdom", "Edinburgh, United Kingdom",
-    "Rome, Italy", "Milan, Italy", "Florence, Italy", "Naples, Italy", "Venice, Italy",
-    "New York, United States", "Los Angeles, United States", "Chicago, United States",
-    "Tokyo, Japan", "Osaka, Japan", "Kyoto, Japan", "Yokohama, Japan",
-    "Sydney, Australia", "Melbourne, Australia", "Brisbane, Australia",
-    "Toronto, Canada", "Vancouver, Canada", "Montreal, Canada",
-    "Mexico City, Mexico", "Guadalajara, Mexico", "Cancun, Mexico",
-    "Bangkok, Thailand", "Chiang Mai, Thailand", "Phuket, Thailand",
-    "Singapore, Singapore", "Mumbai, India", "Delhi, India", "Bangalore, India",
-    "São Paulo, Brazil", "Rio de Janeiro, Brazil", "Salvador, Brazil",
-    "Buenos Aires, Argentina", "Bogotá, Colombia", "Lima, Peru",
-    "Dubai, United Arab Emirates", "Istanbul, Turkey", "Athens, Greece",
-    "Prague, Czech Republic", "Vienna, Austria", "Copenhagen, Denmark",
-    "Stockholm, Sweden", "Oslo, Norway", "Helsinki, Finland", "Warsaw, Poland"
+    // Europe
+    "Lyon, France", "Toulouse, France", "Nice, France", "Nantes, France", "Strasbourg, France", "Montpellier, France", "Bordeaux, France", "Lille, France", "Rennes, France", "Reims, France", "Le Havre, France", "Saint-Étienne, France", "Toulon, France", "Grenoble, France", "Dijon, France", "Angers, France", "Nîmes, France", "Villeurbanne, France", "Le Mans, France", "Aix-en-Provence, France", "Clermont-Ferrand, France", "Brest, France", "Limoges, France", "Tours, France", "Amiens, France", "Perpignan, France", "Metz, France", "Besançon, France", "Boulogne-Billancourt, France", "Orléans, France", "Mulhouse, France", "Rouen, France", "Pau, France", "Caen, France", "La Rochelle, France", "Calais, France", "Cannes, France", "Paris, France", "Marseille, France",
+    
+    "Barcelona, Spain", "Madrid, Spain", "Valencia, Spain", "Seville, Spain", "Zaragoza, Spain", "Málaga, Spain", "Murcia, Spain", "Palma, Spain", "Las Palmas, Spain", "Bilbao, Spain", "Alicante, Spain", "Córdoba, Spain", "Valladolid, Spain", "Vigo, Spain", "Gijón, Spain", "Hospitalet de Llobregat, Spain", "Vitoria-Gasteiz, Spain", "A Coruña, Spain", "Granada, Spain", "Elche, Spain", "Oviedo, Spain", "Badalona, Spain", "Cartagena, Spain", "Terrassa, Spain", "Jerez de la Frontera, Spain", "Sabadell, Spain", "Móstoles, Spain", "Santa Cruz de Tenerife, Spain", "Pamplona, Spain", "Almería, Spain",
+    
+    "Berlin, Germany", "Hamburg, Germany", "Munich, Germany", "Cologne, Germany", "Frankfurt, Germany", "Stuttgart, Germany", "Düsseldorf, Germany", "Dortmund, Germany", "Essen, Germany", "Leipzig, Germany", "Bremen, Germany", "Dresden, Germany", "Hanover, Germany", "Nuremberg, Germany", "Duisburg, Germany", "Bochum, Germany", "Wuppertal, Germany", "Bielefeld, Germany", "Bonn, Germany", "Münster, Germany", "Karlsruhe, Germany", "Mannheim, Germany", "Augsburg, Germany", "Wiesbaden, Germany", "Gelsenkirchen, Germany", "Mönchengladbach, Germany", "Braunschweig, Germany", "Chemnitz, Germany", "Kiel, Germany", "Aachen, Germany",
+    
+    "Rome, Italy", "Milan, Italy", "Naples, Italy", "Turin, Italy", "Palermo, Italy", "Genoa, Italy", "Bologna, Italy", "Florence, Italy", "Bari, Italy", "Catania, Italy", "Venice, Italy", "Verona, Italy", "Messina, Italy", "Padua, Italy", "Trieste, Italy", "Taranto, Italy", "Brescia, Italy", "Prato, Italy", "Parma, Italy", "Reggio Calabria, Italy", "Modena, Italy", "Reggio Emilia, Italy", "Perugia, Italy", "Livorno, Italy", "Ravenna, Italy", "Cagliari, Italy", "Foggia, Italy", "Rimini, Italy", "Salerno, Italy", "Ferrara, Italy",
+    
+    "London, United Kingdom", "Birmingham, United Kingdom", "Leeds, United Kingdom", "Glasgow, United Kingdom", "Sheffield, United Kingdom", "Bradford, United Kingdom", "Liverpool, United Kingdom", "Edinburgh, United Kingdom", "Manchester, United Kingdom", "Bristol, United Kingdom", "Cardiff, Wales", "Leicester, United Kingdom", "Wakefield, United Kingdom", "Coventry, United Kingdom", "Nottingham, United Kingdom", "Newcastle upon Tyne, United Kingdom", "Belfast, Northern Ireland", "Brighton, United Kingdom", "Hull, United Kingdom", "Plymouth, United Kingdom", "Stoke-on-Trent, United Kingdom", "Wolverhampton, United Kingdom", "Derby, United Kingdom", "Southampton, United Kingdom", "Portsmouth, United Kingdom", "York, United Kingdom", "Dundee, Scotland", "Aberdeen, Scotland", "Cambridge, United Kingdom", "Oxford, United Kingdom",
+    
+    "Amsterdam, Netherlands", "Rotterdam, Netherlands", "The Hague, Netherlands", "Utrecht, Netherlands", "Eindhoven, Netherlands", "Tilburg, Netherlands", "Groningen, Netherlands", "Almere, Netherlands", "Breda, Netherlands", "Nijmegen, Netherlands", "Enschede, Netherlands", "Haarlem, Netherlands", "Arnhem, Netherlands", "Zaanstad, Netherlands", "Amersfoort, Netherlands", "Apeldoorn, Netherlands", "s-Hertogenbosch, Netherlands", "Hoofddorp, Netherlands", "Maastricht, Netherlands", "Leiden, Netherlands",
+    
+    "Brussels, Belgium", "Antwerp, Belgium", "Ghent, Belgium", "Charleroi, Belgium", "Liège, Belgium", "Bruges, Belgium", "Namur, Belgium", "Leuven, Belgium", "Mons, Belgium", "Aalst, Belgium",
+    
+    "Zurich, Switzerland", "Geneva, Switzerland", "Basel, Switzerland", "Lausanne, Switzerland", "Bern, Switzerland", "Winterthur, Switzerland", "Lucerne, Switzerland", "St. Gallen, Switzerland", "Lugano, Switzerland", "Biel/Bienne, Switzerland",
+    
+    "Vienna, Austria", "Graz, Austria", "Linz, Austria", "Salzburg, Austria", "Innsbruck, Austria", "Klagenfurt, Austria", "Villach, Austria", "Wels, Austria", "Sankt Pölten, Austria", "Dornbirn, Austria",
+    
+    "Prague, Czech Republic", "Brno, Czech Republic", "Ostrava, Czech Republic", "Plzen, Czech Republic", "Liberec, Czech Republic", "Olomouc, Czech Republic", "Ústí nad Labem, Czech Republic", "České Budějovice, Czech Republic", "Hradec Králové, Czech Republic", "Pardubice, Czech Republic",
+    
+    "Stockholm, Sweden", "Gothenburg, Sweden", "Malmö, Sweden", "Uppsala, Sweden", "Västerås, Sweden", "Örebro, Sweden", "Linköping, Sweden", "Helsingborg, Sweden", "Jönköping, Sweden", "Norrköping, Sweden",
+    
+    "Oslo, Norway", "Bergen, Norway", "Stavanger, Norway", "Trondheim, Norway", "Drammen, Norway", "Fredrikstad, Norway", "Kristiansand, Norway", "Sandnes, Norway", "Tromsø, Norway", "Sarpsborg, Norway",
+    
+    "Copenhagen, Denmark", "Aarhus, Denmark", "Odense, Denmark", "Aalborg, Denmark", "Esbjerg, Denmark", "Randers, Denmark", "Kolding, Denmark", "Horsens, Denmark", "Vejle, Denmark", "Roskilde, Denmark",
+    
+    "Helsinki, Finland", "Espoo, Finland", "Tampere, Finland", "Vantaa, Finland", "Oulu, Finland", "Turku, Finland", "Jyväskylä, Finland", "Lahti, Finland", "Kuopio, Finland", "Kouvola, Finland",
+    
+    "Warsaw, Poland", "Kraków, Poland", "Łódź, Poland", "Wrocław, Poland", "Poznań, Poland", "Gdańsk, Poland", "Szczecin, Poland", "Bydgoszcz, Poland", "Lublin, Poland", "Katowice, Poland",
+    
+    // Asia
+    "Tokyo, Japan", "Yokohama, Japan", "Osaka, Japan", "Nagoya, Japan", "Sapporo, Japan", "Fukuoka, Japan", "Kobe, Japan", "Kyoto, Japan", "Kawasaki, Japan", "Saitama, Japan", "Hiroshima, Japan", "Sendai, Japan", "Kitakyushu, Japan", "Chiba, Japan", "Sakai, Japan", "Niigata, Japan", "Hamamatsu, Japan", "Okayama, Japan", "Sagamihara, Japan", "Kumamoto, Japan",
+    
+    "Seoul, South Korea", "Busan, South Korea", "Incheon, South Korea", "Daegu, South Korea", "Daejeon, South Korea", "Gwangju, South Korea", "Suwon, South Korea", "Ulsan, South Korea", "Changwon, South Korea", "Goyang, South Korea",
+    
+    "Beijing, China", "Shanghai, China", "Guangzhou, China", "Shenzhen, China", "Tianjin, China", "Wuhan, China", "Dongguan, China", "Chengdu, China", "Nanjing, China", "Foshan, China", "Chongqing, China", "Xi'an, China", "Suzhou, China", "Hangzhou, China", "Qingdao, China",
+    
+    "Bangkok, Thailand", "Chiang Mai, Thailand", "Phuket, Thailand", "Pattaya, Thailand", "Hat Yai, Thailand", "Udon Thani, Thailand", "Nakhon Ratchasima, Thailand", "Khon Kaen, Thailand", "Ubon Ratchathani, Thailand", "Songkhla, Thailand",
+    
+    "Ho Chi Minh City, Vietnam", "Hanoi, Vietnam", "Da Nang, Vietnam", "Hai Phong, Vietnam", "Can Tho, Vietnam", "Bien Hoa, Vietnam", "Hue, Vietnam", "Nha Trang, Vietnam", "Buon Ma Thuot, Vietnam", "Vung Tau, Vietnam",
+    
+    "Jakarta, Indonesia", "Surabaya, Indonesia", "Bandung, Indonesia", "Bekasi, Indonesia", "Medan, Indonesia", "Tangerang, Indonesia", "Depok, Indonesia", "Semarang, Indonesia", "Palembang, Indonesia", "Makassar, Indonesia",
+    
+    "Manila, Philippines", "Quezon City, Philippines", "Davao, Philippines", "Caloocan, Philippines", "Cebu City, Philippines", "Zamboanga, Philippines", "Taguig, Philippines", "Antipolo, Philippines", "Pasig, Philippines", "Cagayan de Oro, Philippines",
+    
+    "Kuala Lumpur, Malaysia", "George Town, Malaysia", "Ipoh, Malaysia", "Shah Alam, Malaysia", "Petaling Jaya, Malaysia", "Johor Bahru, Malaysia", "Subang Jaya, Malaysia", "Kuching, Malaysia", "Kota Kinabalu, Malaysia", "Seremban, Malaysia",
+    
+    "Singapore, Singapore",
+    
+    "Mumbai, India", "Delhi, India", "Bangalore, India", "Hyderabad, India", "Chennai, India", "Kolkata, India", "Pune, India", "Ahmedabad, India", "Surat, India", "Jaipur, India", "Lucknow, India", "Kanpur, India", "Nagpur, India", "Indore, India", "Thane, India", "Bhopal, India", "Visakhapatnam, India", "Pimpri-Chinchwad, India", "Patna, India", "Vadodara, India",
+    
+    // North America
+    "New York, United States", "Los Angeles, United States", "Chicago, United States", "Houston, United States", "Phoenix, United States", "Philadelphia, United States", "San Antonio, United States", "San Diego, United States", "Dallas, United States", "San Jose, United States", "Austin, United States", "Jacksonville, United States", "Fort Worth, United States", "Columbus, United States", "Charlotte, United States", "San Francisco, United States", "Indianapolis, United States", "Seattle, United States", "Denver, United States", "Washington, United States", "Boston, United States", "El Paso, United States", "Nashville, United States", "Detroit, United States", "Oklahoma City, United States", "Portland, United States", "Las Vegas, United States", "Memphis, United States", "Louisville, United States", "Baltimore, United States", "Milwaukee, United States", "Albuquerque, United States", "Tucson, United States", "Fresno, United States", "Sacramento, United States", "Mesa, United States", "Kansas City, United States", "Atlanta, United States", "Long Beach, United States", "Colorado Springs, United States", "Raleigh, United States", "Miami, United States", "Virginia Beach, United States", "Omaha, United States", "Oakland, United States", "Minneapolis, United States", "Tulsa, United States", "Arlington, United States", "Tampa, United States", "New Orleans, United States",
+    
+    "Toronto, Canada", "Montreal, Canada", "Calgary, Canada", "Ottawa, Canada", "Edmonton, Canada", "Mississauga, Canada", "Winnipeg, Canada", "Vancouver, Canada", "Brampton, Canada", "Hamilton, Canada", "Quebec City, Canada", "Surrey, Canada", "Laval, Canada", "Halifax, Canada", "London, Canada", "Markham, Canada", "Vaughan, Canada", "Gatineau, Canada", "Saskatoon, Canada", "Longueuil, Canada",
+    
+    "Mexico City, Mexico", "Guadalajara, Mexico", "Monterrey, Mexico", "Puebla, Mexico", "Tijuana, Mexico", "León, Mexico", "Juárez, Mexico", "Zapopan, Mexico", "Nezahualcóyotl, Mexico", "Chihuahua, Mexico", "Naucalpan, Mexico", "Mérida, Mexico", "Álvaro Obregón, Mexico", "San Luis Potosí, Mexico", "Aguascalientes, Mexico", "Hermosillo, Mexico", "Saltillo, Mexico", "Mexicali, Mexico", "Culiacán, Mexico", "Guadalupe, Mexico",
+    
+    // South America
+    "São Paulo, Brazil", "Rio de Janeiro, Brazil", "Brasília, Brazil", "Salvador, Brazil", "Fortaleza, Brazil", "Belo Horizonte, Brazil", "Manaus, Brazil", "Curitiba, Brazil", "Recife, Brazil", "Goiânia, Brazil", "Belém, Brazil", "Porto Alegre, Brazil", "Guarulhos, Brazil", "Campinas, Brazil", "São Luís, Brazil", "São Gonçalo, Brazil", "Maceió, Brazil", "Duque de Caxias, Brazil", "Natal, Brazil", "Teresina, Brazil",
+    
+    "Buenos Aires, Argentina", "Córdoba, Argentina", "Rosario, Argentina", "Mendoza, Argentina", "Tucumán, Argentina", "La Plata, Argentina", "Mar del Plata, Argentina", "Salta, Argentina", "Santa Fe, Argentina", "San Juan, Argentina",
+    
+    "Lima, Peru", "Arequipa, Peru", "Trujillo, Peru", "Chiclayo, Peru", "Huancayo, Peru", "Piura, Peru", "Iquitos, Peru", "Cusco, Peru", "Chimbote, Peru", "Tacna, Peru",
+    
+    "Bogotá, Colombia", "Medellín, Colombia", "Cali, Colombia", "Barranquilla, Colombia", "Cartagena, Colombia", "Cúcuta, Colombia", "Soledad, Colombia", "Ibagué, Colombia", "Bucaramanga, Colombia", "Soacha, Colombia",
+    
+    "Santiago, Chile", "Valparaíso, Chile", "Concepción, Chile", "La Serena, Chile", "Antofagasta, Chile", "Temuco, Chile", "Rancagua, Chile", "Talca, Chile", "Arica, Chile", "Chillán, Chile",
+    
+    "Caracas, Venezuela", "Maracaibo, Venezuela", "Valencia, Venezuela", "Barquisimeto, Venezuela", "Maracay, Venezuela", "Ciudad Guayana, Venezuela", "San Cristóbal, Venezuela", "Maturín, Venezuela", "Ciudad Bolívar, Venezuela", "Cumana, Venezuela",
+    
+    // Africa
+    "Lagos, Nigeria", "Kano, Nigeria", "Ibadan, Nigeria", "Kaduna, Nigeria", "Port Harcourt, Nigeria", "Benin City, Nigeria", "Maiduguri, Nigeria", "Zaria, Nigeria", "Aba, Nigeria", "Jos, Nigeria",
+    
+    "Cairo, Egypt", "Alexandria, Egypt", "Giza, Egypt", "Shubra El Kheima, Egypt", "Port Said, Egypt", "Suez, Egypt", "Luxor, Egypt", "al-Mansura, Egypt", "el-Mahalla el-Kubra, Egypt", "Tanta, Egypt",
+    
+    "Johannesburg, South Africa", "Cape Town, South Africa", "Durban, South Africa", "Soweto, South Africa", "Pretoria, South Africa", "Port Elizabeth, South Africa", "Pietermaritzburg, South Africa", "Benoni, South Africa", "Tembisa, South Africa", "East London, South Africa",
+    
+    "Casablanca, Morocco", "Rabat, Morocco", "Fez, Morocco", "Marrakech, Morocco", "Agadir, Morocco", "Tangier, Morocco", "Meknes, Morocco", "Oujda, Morocco", "Kenitra, Morocco", "Tetouan, Morocco",
+    
+    // Oceania
+    "Sydney, Australia", "Melbourne, Australia", "Brisbane, Australia", "Perth, Australia", "Adelaide, Australia", "Gold Coast, Australia", "Newcastle, Australia", "Canberra, Australia", "Sunshine Coast, Australia", "Wollongong, Australia", "Hobart, Australia", "Geelong, Australia", "Townsville, Australia", "Cairns, Australia", "Darwin, Australia",
+    
+    "Auckland, New Zealand", "Wellington, New Zealand", "Christchurch, New Zealand", "Hamilton, New Zealand", "Tauranga, New Zealand", "Napier-Hastings, New Zealand", "Dunedin, New Zealand", "Palmerston North, New Zealand", "Nelson, New Zealand", "Rotorua, New Zealand",
+    
+    // Middle East
+    "Dubai, United Arab Emirates", "Abu Dhabi, United Arab Emirates", "Sharjah, United Arab Emirates", "Al Ain, United Arab Emirates", "Ajman, United Arab Emirates", "Ras Al Khaimah, United Arab Emirates", "Fujairah, United Arab Emirates", "Umm Al Quwain, United Arab Emirates",
+    
+    "Istanbul, Turkey", "Ankara, Turkey", "Izmir, Turkey", "Bursa, Turkey", "Adana, Turkey", "Gaziantep, Turkey", "Konya, Turkey", "Antalya, Turkey", "Kayseri, Turkey", "Mersin, Turkey",
+    
+    "Riyadh, Saudi Arabia", "Jeddah, Saudi Arabia", "Mecca, Saudi Arabia", "Medina, Saudi Arabia", "Dammam, Saudi Arabia", "Khobar, Saudi Arabia", "Tabuk, Saudi Arabia", "Buraidah, Saudi Arabia", "Khamis Mushait, Saudi Arabia", "Hail, Saudi Arabia",
+    
+    "Tehran, Iran", "Mashhad, Iran", "Isfahan, Iran", "Karaj, Iran", "Shiraz, Iran", "Tabriz, Iran", "Qom, Iran", "Ahvaz, Iran", "Kermanshah, Iran", "Urmia, Iran",
+    
+    "Tel Aviv, Israel", "Jerusalem, Israel", "Haifa, Israel", "Rishon LeZion, Israel", "Petah Tikva, Israel", "Ashdod, Israel", "Netanya, Israel", "Beer Sheva, Israel", "Holon, Israel", "Bnei Brak, Israel",
+    
+    "Amman, Jordan", "Zarqa, Jordan", "Irbid, Jordan", "Russeifa, Jordan", "Quwaysima, Jordan", "Wadi as-Sir, Jordan", "Ajloun, Jordan", "Madaba, Jordan", "Aqaba, Jordan", "Jerash, Jordan",
+    
+    "Beirut, Lebanon", "Tripoli, Lebanon", "Sidon, Lebanon", "Tyre, Lebanon", "Nabatieh, Lebanon", "Jounieh, Lebanon", "Zahle, Lebanon", "Baalbek, Lebanon", "Byblos, Lebanon", "Anjar, Lebanon",
+    
+    "Athens, Greece", "Thessaloniki, Greece", "Patras, Greece", "Piraeus, Greece", "Larissa, Greece", "Heraklion, Greece", "Peristeri, Greece", "Kallithea, Greece", "Acharnes, Greece", "Kalamaria, Greece"
   ];
 
   // Complete language list for search functionality
