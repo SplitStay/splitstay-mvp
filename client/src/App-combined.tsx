@@ -29,7 +29,10 @@ function CreateProfile() {
     dayOfBirth: "",
     monthOfBirth: "",
     yearOfBirth: "",
-    gender: ""
+    gender: "",
+    influential_country: "",
+    country_impact_reason: "",
+    most_impactful_experience: ""
   });
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -861,81 +864,65 @@ function CreateProfile() {
             <div style={{marginTop: '24px'}}>
               <div className="mb-4">
                 <h2 className="text-lg font-bold mb-1" style={{ color: '#1e2a78' }}>
-                  👉 Tell us about your travel experience
+                  ✈️ Share your most meaningful travel experiences
                 </h2>
-                <p className="text-gray-600 text-xs">Share your travel background</p>
+                <p className="text-gray-600 text-xs">Tell us your travel story</p>
               </div>
               
               <div className="space-y-4">
 
-              {/* Countries Visited Section */}
+              {/* Prompt 1: Most influential country */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Countries visited or lived in 
-                  <span className="ml-1 text-xs text-gray-500 cursor-help" title="This helps us match you with travelers who share similar cultural experiences">
-                    ℹ️
-                  </span>
+                <label htmlFor="influential_country" className="block text-sm font-medium text-gray-700 mb-2">
+                  Which country has influenced you the most?
                 </label>
-                
-                {/* Popular Countries Quick Selection */}
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                  {popularCountries.map((country) => (
-                    <button
-                      key={country}
-                      type="button"
-                      onClick={() => handleCountryDropdownChange(country)}
-                      disabled={selectedCountries.includes(country)}
-                      className={`px-2 py-0.5 rounded text-xs font-medium transition-colors h-6 ${
-                        selectedCountries.includes(country)
-                          ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                          : "bg-gray-100 text-gray-700 hover:bg-green-100 hover:text-green-700"
-                      }`}
-                    >
-                      {country}
-                    </button>
+                <select
+                  id="influential_country"
+                  value={formData.influential_country || ''}
+                  onChange={(e) => setFormData(prev => ({...prev, influential_country: e.target.value}))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+                >
+                  <option value="">Select a country</option>
+                  {countryOptions.map((country) => (
+                    <option key={country} value={country}>{country}</option>
                   ))}
-                </div>
-                
-                <div className="mb-3">
-                  <select
-                    value=""
-                    onChange={(e) => handleCountryDropdownChange(e.target.value)}
-                    className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
-                  >
-                    <option value="">More countries...</option>
-                    <optgroup label="Popular Destinations">
-                      {countryOptions.slice(0, 20).filter(country => !selectedCountries.includes(country)).map((country) => (
-                        <option key={country} value={country}>{country}</option>
-                      ))}
-                    </optgroup>
-                    <optgroup label="All Countries">
-                      {countryOptions.slice(20).filter(country => !selectedCountries.includes(country)).map((country) => (
-                        <option key={country} value={country}>{country}</option>
-                      ))}
-                    </optgroup>
-                  </select>
-                </div>
-                {selectedCountries.length > 0 && (
-                  <div className="mb-2">
-                    <div className="flex flex-wrap gap-1">
-                      {selectedCountries.map((country) => (
-                        <span 
-                          key={country} 
-                          className="inline-flex items-center bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs"
-                        >
-                          {country}
-                          <button
-                            type="button"
-                            onClick={() => handleCountryToggle(country)}
-                            className="ml-1 hover:bg-green-200 rounded-full p-0.5"
-                          >
-                            <X className="w-2 h-2" />
-                          </button>
-                        </span>
-                      ))}
-                    </div>
+                </select>
+              </div>
+
+              {/* Follow-up: Why did this country impact you */}
+              {formData.influential_country && (
+                <div>
+                  <label htmlFor="country_impact_reason" className="block text-sm font-medium text-gray-700 mb-2">
+                    Why did this country impact you?
+                  </label>
+                  <textarea
+                    id="country_impact_reason"
+                    value={formData.country_impact_reason}
+                    onChange={(e) => setFormData(prev => ({...prev, country_impact_reason: e.target.value}))}
+                    placeholder="Share what made this place special to you..."
+                    rows={3}
+                    maxLength={250}
+                    className="w-full px-3 py-2 border border-gray-300 rounded text-sm resize-none"
+                  />
+                  <div className="text-xs text-gray-500 text-right mt-1">
+                    {formData.country_impact_reason.length}/250 characters
                   </div>
-                )}
+                </div>
+              )}
+
+              {/* Prompt 2: Most impactful travel experience */}
+              <div>
+                <label htmlFor="most_impactful_experience" className="block text-sm font-medium text-gray-700 mb-2">
+                  What travel experience has impacted you most deeply? <span className="text-gray-400">(optional)</span>
+                </label>
+                <textarea
+                  id="most_impactful_experience"
+                  value={formData.most_impactful_experience}
+                  onChange={(e) => setFormData(prev => ({...prev, most_impactful_experience: e.target.value}))}
+                  placeholder="Tell us about a moment, encounter, or journey that changed your perspective..."
+                  rows={4}
+                  className="w-full px-3 py-2 border border-gray-300 rounded text-sm resize-none"
+                />
               </div>
 
               {/* Travel Photos Section - Moved from left column */}
