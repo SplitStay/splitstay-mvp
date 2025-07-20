@@ -1,0 +1,79 @@
+You're designing the first step of a travel profile form for a web app (SplitStay). Your audience: solo travelers creating their public travel profile. Optimize for desktop, but keep it responsive.
+
+🔧 Functional Goals:
+2-column layout with plenty of spacing
+
+Clear hierarchy and legibility
+
+Clean inputs with smooth hover/focus states
+
+Remove emojis, use visual toggle buttons instead
+
+Avoid crammed "mobile form" feel on desktop
+
+Use soft shadows, consistent padding, and rounded corners for a polished, friendly feel
+
+✨ DESIGN STRUCTURE (Step 1: Basic Details)
+📍 Left Column:
+Container Width: ~50% on desktop
+
+Profile Photo Upload
+Large centered upload circle with subtle border
+Label: Upload Photo
+Optional: Add tooltip (hover): “This will be shown on your public traveler profile”
+
+Gender Selection (Custom Toggle)
+Use pill-style toggle buttons, left = Male, right = Female
+✅ Remove emojis — use clean typography with bold border
+Active option should be bold, highlighted with background color and border
+
+What’s your name?
+Input field
+Label: What's your name?
+Placeholder: e.g. Jane
+
+What makes you feel alive?
+Optional field
+Textarea with 2–3 lines max height
+Placeholder: e.g. chasing sunsets, street food tours, spontaneous hikes…
+
+Date of Birth
+3 dropdowns (Day / Month / Year)
+Show subtle red text: * Must be 18+
+Optional: Use flex display to horizontally align day/month/year
+
+🌍 Right Column:
+Container Width: ~50% on desktop
+
+Where were you born?
+Input with country/city type-ahead
+Placeholder: e.g. London, United Kingdom
+Autofill if geolocation is available
+
+Where do you currently call home?
+Input with country/city type-ahead
+Placeholder: e.g. Berlin, Germany
+
+Languages You Speak
+Use selectable chips
+Preload with common languages
+Allow multiselect
+Include “+ Add more…” option for rare languages
+Layout: Wrapping row of pills (not vertical list)
+
+🧩 General Design Notes:
+Use max-width: 1200px and center the form on the page
+
+Avoid vertical scrolling for Step 1 if possible
+
+Add light background color (#f9f9f9 or #fff) to form card with soft shadow
+
+Use 16–18px font size, 24px section headers
+
+Add 20–30px gutter spacing between left and right columns
+
+Use system fonts or modern sans-serif like Inter, Lato, or Poppins
+
+✅ Summary:
+Create a clean, web-optimized 2-column traveler profile form with generous spacing and a friendly look. Remove emojis, add visual hierarchy, and optimize components for desktop screens without making it feel like a mobile app stretched out.
+

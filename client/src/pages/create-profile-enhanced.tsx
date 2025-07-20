@@ -136,111 +136,116 @@ export default function CreateProfileEnhanced() {
   if (currentStep === 1) {
     return (
       <TooltipProvider>
-        <div className="min-h-screen bg-gray-50 p-4">
-          <div className="max-w-6xl mx-auto">
+        <div className="min-h-screen bg-gray-50 p-6">
+          <div className="max-w-[1200px] mx-auto">
             
             {/* Header */}
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-navy mb-2">
-                ✨ Step 1: Basic Details
+            <div className="text-center mb-12">
+              <h1 className="text-4xl font-bold text-gray-900 mb-3">
+                Step 1: Basic Details
               </h1>
-              <p className="text-gray-600">
+              <p className="text-lg text-gray-600">
                 Tell us about yourself and where you're from
               </p>
             </div>
 
             <form onSubmit={handleStep1Submit}>
-              <div className="grid lg:grid-cols-2 gap-8">
-                
-                {/* Left Column */}
-                <Card className="p-6">
-                  <div className="space-y-6">
+              <Card className="bg-white shadow-lg rounded-2xl overflow-hidden">
+                <div className="grid lg:grid-cols-2 gap-8 p-8">
+                  
+                  {/* Left Column */}
+                  <div className="space-y-8">
                     
                     {/* Profile Photo Upload */}
                     <div>
-                      <Label className="text-base font-semibold flex items-center gap-2">
-                        Profile Photo Upload 
-                        <span className="text-red-500">*</span>
+                      <Label className="text-lg font-semibold text-gray-900 block mb-4">
+                        Upload Photo
                       </Label>
-                      <div className="mt-2">
+                      <div className="flex justify-center">
                         {formData.profilePhoto ? (
-                          <div className="relative w-32 h-32 mx-auto">
+                          <div className="relative">
                             <img 
                               src={formData.profilePhoto} 
                               alt="Profile preview" 
-                              className="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
+                              className="w-40 h-40 rounded-full object-cover border-4 border-gray-200 shadow-md"
                             />
                             <button
                               type="button"
                               onClick={() => handleInputChange('profilePhoto', null)}
-                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 shadow-lg transition-colors"
                             >
-                              <X className="w-4 h-4" />
+                              <X className="w-5 h-5" />
                             </button>
                           </div>
                         ) : (
-                          <label className="flex flex-col items-center justify-center w-32 h-32 mx-auto border-2 border-dashed border-gray-300 rounded-full cursor-pointer hover:border-blue-500 transition-colors">
-                            <Upload className="w-6 h-6 text-gray-400 mb-2" />
-                            <span className="text-sm text-gray-500">Upload Photo</span>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={handleImageUpload}
-                              className="hidden"
-                            />
-                          </label>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <label className="flex flex-col items-center justify-center w-40 h-40 border-2 border-dashed border-gray-300 rounded-full cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 group">
+                                <Upload className="w-8 h-8 text-gray-400 group-hover:text-blue-500 mb-2 transition-colors" />
+                                <span className="text-base font-medium text-gray-500 group-hover:text-blue-600 transition-colors">Upload Photo</span>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={handleImageUpload}
+                                  className="hidden"
+                                />
+                              </label>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>This will be shown on your public traveler profile</p>
+                            </TooltipContent>
+                          </Tooltip>
                         )}
                       </div>
                     </div>
 
                     {/* Gender Toggle */}
                     <div>
-                      <Label className="text-base font-semibold">Gender</Label>
-                      <div className="mt-2 flex border rounded-lg p-1 bg-gray-100">
+                      <Label className="text-lg font-semibold text-gray-900 block mb-4">Gender</Label>
+                      <div className="flex border-2 border-gray-200 rounded-xl p-1.5 bg-gray-50">
                         <button
                           type="button"
                           onClick={() => handleInputChange('gender', 'male')}
-                          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                          className={`flex-1 py-3 px-6 rounded-lg text-base font-semibold transition-all duration-200 ${
                             formData.gender === 'male' 
-                              ? 'bg-blue-500 text-white shadow-sm' 
-                              : 'text-gray-600 hover:text-gray-800'
+                              ? 'bg-blue-600 text-white shadow-md border-2 border-blue-600' 
+                              : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
                           }`}
                         >
-                          ♂️ Male
+                          Male
                         </button>
                         <button
                           type="button"
                           onClick={() => handleInputChange('gender', 'female')}
-                          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                          className={`flex-1 py-3 px-6 rounded-lg text-base font-semibold transition-all duration-200 ${
                             formData.gender === 'female' 
-                              ? 'bg-pink-500 text-white shadow-sm' 
-                              : 'text-gray-600 hover:text-gray-800'
+                              ? 'bg-pink-600 text-white shadow-md border-2 border-pink-600' 
+                              : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
                           }`}
                         >
-                          ♀️ Female
+                          Female
                         </button>
                       </div>
                     </div>
 
                     {/* Name */}
                     <div>
-                      <Label htmlFor="fullName" className="text-base font-semibold flex items-center gap-2">
-                        What's your name? 
-                        <span className="text-red-500">*</span>
+                      <Label htmlFor="fullName" className="text-lg font-semibold text-gray-900 block mb-4">
+                        What's your name?
                       </Label>
                       <Input
                         id="fullName"
                         value={formData.fullName}
                         onChange={(e) => handleInputChange('fullName', e.target.value)}
                         placeholder="e.g. Jane"
-                        className="mt-2"
+                        className="h-12 text-base border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
                         required
                       />
                     </div>
 
                     {/* What Makes You Alive */}
                     <div>
-                      <Label htmlFor="whatMakesYouAlive" className="text-base font-semibold">
+                      <Label htmlFor="whatMakesYouAlive" className="text-lg font-semibold text-gray-900 block mb-4">
                         What makes you feel alive?
                       </Label>
                       <Textarea
@@ -248,21 +253,19 @@ export default function CreateProfileEnhanced() {
                         value={formData.whatMakesYouAlive}
                         onChange={(e) => handleInputChange('whatMakesYouAlive', e.target.value)}
                         placeholder="e.g. chasing sunsets, street food tours, spontaneous hikes…"
-                        className="mt-2 resize-none"
+                        className="resize-none text-base border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
                         rows={3}
                       />
                     </div>
 
                     {/* Date of Birth */}
                     <div>
-                      <Label className="text-base font-semibold flex items-center gap-2">
-                        Date of Birth 
-                        <span className="text-red-500">*</span>
-                        <span className="text-sm text-gray-500">(Must be 18+)</span>
+                      <Label className="text-lg font-semibold text-gray-900 block mb-4">
+                        Date of Birth
                       </Label>
-                      <div className="grid grid-cols-3 gap-3 mt-2">
+                      <div className="flex gap-4 mb-2">
                         <Select onValueChange={(value) => handleInputChange('dayOfBirth', value)}>
-                          <SelectTrigger>
+                          <SelectTrigger className="h-12 border-2 border-gray-200 rounded-xl focus:border-blue-500 text-base">
                             <SelectValue placeholder="Day" />
                           </SelectTrigger>
                           <SelectContent>
@@ -273,7 +276,7 @@ export default function CreateProfileEnhanced() {
                         </Select>
                         
                         <Select onValueChange={(value) => handleInputChange('monthOfBirth', value)}>
-                          <SelectTrigger>
+                          <SelectTrigger className="h-12 border-2 border-gray-200 rounded-xl focus:border-blue-500 text-base">
                             <SelectValue placeholder="Month" />
                           </SelectTrigger>
                           <SelectContent>
@@ -284,7 +287,7 @@ export default function CreateProfileEnhanced() {
                         </Select>
                         
                         <Select onValueChange={(value) => handleInputChange('yearOfBirth', value)}>
-                          <SelectTrigger>
+                          <SelectTrigger className="h-12 border-2 border-gray-200 rounded-xl focus:border-blue-500 text-base">
                             <SelectValue placeholder="Year" />
                           </SelectTrigger>
                           <SelectContent>
@@ -294,94 +297,66 @@ export default function CreateProfileEnhanced() {
                           </SelectContent>
                         </Select>
                       </div>
+                      <p className="text-sm text-red-600 font-medium">* Must be 18+</p>
                     </div>
                   </div>
-                </Card>
 
-                {/* Right Column */}
-                <Card className="p-6">
-                  <div className="space-y-6">
+                  {/* Right Column */}
+                  <div className="space-y-8">
                     
                     {/* Birthplace */}
                     <div>
-                      <Label htmlFor="birthplace" className="text-base font-semibold flex items-center gap-2">
-                        Where were you born? 
-                        <span className="text-red-500">*</span>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <Info className="w-4 h-4 text-gray-400" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>City, Country format helps us match you better</p>
-                          </TooltipContent>
-                        </Tooltip>
+                      <Label htmlFor="birthplace" className="text-lg font-semibold text-gray-900 block mb-4">
+                        Where were you born?
                       </Label>
                       <Input
                         id="birthplace"
                         value={formData.birthplace}
                         onChange={(e) => handleInputChange('birthplace', e.target.value)}
                         placeholder="e.g. London, United Kingdom"
-                        className="mt-2"
+                        className="h-12 text-base border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
                         required
                       />
                     </div>
 
                     {/* Current Home */}
                     <div>
-                      <Label htmlFor="currentHome" className="text-base font-semibold flex items-center gap-2">
-                        Where do you currently call home? 
-                        <span className="text-red-500">*</span>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <Info className="w-4 h-4 text-gray-400" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Your current city helps with local connections</p>
-                          </TooltipContent>
-                        </Tooltip>
+                      <Label htmlFor="currentHome" className="text-lg font-semibold text-gray-900 block mb-4">
+                        Where do you currently call home?
                       </Label>
                       <Input
                         id="currentHome"
                         value={formData.currentHome}
                         onChange={(e) => handleInputChange('currentHome', e.target.value)}
                         placeholder="e.g. Berlin, Germany"
-                        className="mt-2"
+                        className="h-12 text-base border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
                         required
                       />
                     </div>
 
                     {/* Languages */}
                     <div>
-                      <Label className="text-base font-semibold flex items-center gap-2">
-                        Languages You Speak 
-                        <span className="text-red-500">*</span>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <Info className="w-4 h-4 text-gray-400" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Language compatibility helps with better matching</p>
-                          </TooltipContent>
-                        </Tooltip>
+                      <Label className="text-lg font-semibold text-gray-900 block mb-4">
+                        Languages You Speak
                       </Label>
                       
-                      <div className="mt-2 space-y-3">
+                      <div className="space-y-4">
                         {/* Selected Languages */}
                         {formData.languages.length > 0 && (
-                          <div className="flex flex-wrap gap-2">
+                          <div className="flex flex-wrap gap-3">
                             {formData.languages.map((language) => (
                               <Badge
                                 key={language}
                                 variant="secondary"
-                                className="px-3 py-1 bg-blue-100 text-blue-800 hover:bg-blue-200"
+                                className="px-4 py-2 text-base bg-blue-100 text-blue-800 hover:bg-blue-200 rounded-full border border-blue-200"
                               >
                                 {language}
                                 <button
                                   type="button"
                                   onClick={() => handleLanguageToggle(language)}
-                                  className="ml-2 hover:text-blue-600"
+                                  className="ml-2 hover:text-blue-600 transition-colors"
                                 >
-                                  <X className="w-3 h-3" />
+                                  <X className="w-4 h-4" />
                                 </button>
                               </Badge>
                             ))}
@@ -389,16 +364,16 @@ export default function CreateProfileEnhanced() {
                         )}
                         
                         {/* Language Selection */}
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="flex flex-wrap gap-3">
                           {preloadedLanguages.map((language) => (
                             <button
                               key={language}
                               type="button"
                               onClick={() => handleLanguageToggle(language)}
-                              className={`p-2 text-sm border rounded-md text-left transition-colors ${
+                              className={`px-4 py-2 text-base border-2 rounded-full transition-all duration-200 ${
                                 formData.languages.includes(language)
-                                  ? 'border-blue-500 bg-blue-50 text-blue-700'
-                                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                                  ? 'border-blue-500 bg-blue-50 text-blue-700 font-semibold'
+                                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700'
                               }`}
                             >
                               {language}
@@ -411,27 +386,27 @@ export default function CreateProfileEnhanced() {
                           <button
                             type="button"
                             onClick={() => setShowAddLanguage(true)}
-                            className="text-blue-600 hover:text-blue-700 text-sm flex items-center gap-1"
+                            className="text-blue-600 hover:text-blue-700 text-base font-semibold flex items-center gap-2 transition-colors"
                           >
-                            <Plus className="w-4 h-4" />
+                            <Plus className="w-5 h-5" />
                             Add more…
                           </button>
                         ) : (
-                          <div className="flex gap-2">
+                          <div className="flex gap-3">
                             <Input
                               value={customLanguage}
                               onChange={(e) => setCustomLanguage(e.target.value)}
                               placeholder="Enter language"
-                              className="flex-1"
+                              className="flex-1 h-12 text-base border-2 border-gray-200 rounded-xl focus:border-blue-500"
                               onKeyPress={(e) => e.key === 'Enter' && addCustomLanguage()}
                             />
-                            <Button type="button" onClick={addCustomLanguage} size="sm">
+                            <Button type="button" onClick={addCustomLanguage} className="h-12 px-6 bg-blue-600 hover:bg-blue-700 rounded-xl">
                               Add
                             </Button>
                             <Button 
                               type="button" 
                               variant="outline" 
-                              size="sm" 
+                              className="h-12 px-6 border-2 border-gray-200 rounded-xl hover:bg-gray-50"
                               onClick={() => {
                                 setShowAddLanguage(false);
                                 setCustomLanguage("");
@@ -444,20 +419,20 @@ export default function CreateProfileEnhanced() {
                       </div>
                     </div>
                   </div>
-                </Card>
-              </div>
-
-              {/* Continue Button */}
-              <div className="flex justify-center mt-8">
-                <Button 
-                  type="submit" 
-                  className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center gap-2"
-                  disabled={!isStep1Valid()}
-                >
-                  Continue to Travel Experience
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </div>
+                </div>
+                
+                {/* Continue Button */}
+                <div className="flex justify-center mt-12">
+                  <Button 
+                    type="submit" 
+                    className="px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-3"
+                    disabled={!isStep1Valid()}
+                  >
+                    Continue to Travel Experience
+                    <ArrowRight className="w-5 h-5" />
+                  </Button>
+                </div>
+              </Card>
             </form>
           </div>
         </div>
