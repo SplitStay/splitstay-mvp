@@ -20,6 +20,7 @@ import Profile from "@/pages/profile";
 import CreateProfile from "@/pages/create-profile";
 import CreateProfileEnhanced from "@/pages/create-profile-enhanced";
 import CreateProfileClean from "@/pages/create-profile-clean";
+import CreateProfileWide from "@/pages/create-profile-wide";
 import DebugProfile from "@/pages/debug-profile";
 import TestSimple from "@/pages/test-simple";
 import TestRoute from "@/pages/test-route";
@@ -70,7 +71,7 @@ function Router() {
         <Route path="/dashboard" component={DashboardTrips} />
         <Route path="/profile" component={Profile} />
         <Route path="/profile/edit" component={CreateProfile} />
-        <Route path="/create-profile" component={CreateProfileClean} />
+        <Route path="/create-profile" component={CreateProfileWide} />
         <Route path="/new-profile" component={CreateProfile} />
         <Route path="/debug-profile" component={DebugProfile} />
         <Route path="/create-trip" component={CreateTrip} />

@@ -4,14 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { X, Upload, Plus, ArrowRight, Camera } from "lucide-react";
+import { X, Upload, Plus, ArrowRight } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface FormData {
-  // Step 1 - Basic Details
   profilePhoto: string | null;
   gender: string;
   fullName: string;
@@ -22,8 +20,6 @@ interface FormData {
   birthplace: string;
   currentHome: string;
   languages: string[];
-  
-  // Step 2 - Travel Experience
   influentialCountry: string;
   countryImpactReason: string;
   mostImpactfulExperience: string;
@@ -42,8 +38,8 @@ const months = [
 ];
 const years = Array.from({ length: 50 }, (_, i) => new Date().getFullYear() - 18 - i);
 
-export default function CreateProfileClean() {
-  console.log("🚀 Clean CreateProfile component loaded!");
+export default function CreateProfileWide() {
+  console.log("🚀 Wide CreateProfile component loaded!");
   const [, navigate] = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
   const [customLanguage, setCustomLanguage] = useState("");
@@ -110,75 +106,73 @@ export default function CreateProfileClean() {
            formData.birthplace && formData.currentHome && formData.languages.length > 0;
   };
 
-  // Step 1: Basic Details
-  if (currentStep === 1) {
-    return (
-      <TooltipProvider>
-        <div className="min-h-screen bg-gray-50 p-8">
-          <div className="max-w-[1400px] mx-auto">
-            
-            {/* Header */}
-            <div className="text-center mb-12">
-              <h1 className="text-4xl font-bold text-gray-900 mb-3">
-                Step 1: Basic Details
-              </h1>
-              <p className="text-lg text-gray-600">
-                Tell us about yourself and where you're from
-              </p>
-            </div>
+  return (
+    <TooltipProvider>
+      <div className="min-h-screen bg-gray-50 p-8">
+        <div className="max-w-[1400px] mx-auto">
+          
+          {/* Header */}
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-gray-900 mb-3">
+              Step 1: Basic Details
+            </h1>
+            <p className="text-lg text-gray-600">
+              Tell us about yourself and where you're from
+            </p>
+          </div>
 
-            <form onSubmit={handleStep1Submit}>
-              <div className="bg-white shadow-xl rounded-3xl p-20">
-                <div className="grid grid-cols-2 gap-32">
+          <form onSubmit={handleStep1Submit}>
+            <div className="bg-white shadow-xl rounded-3xl p-20">
+              <div className="grid grid-cols-2 gap-32">
+                
+                {/* Left Column */}
+                <div className="space-y-12">
                   
-                  {/* Left Column */}
-                  <div className="space-y-12">
-                      
-                      {/* Profile Photo Upload */}
-                      <div>
+                  {/* Profile Photo Upload */}
+                  <div>
                     <Label className="text-2xl font-bold text-gray-900 block mb-8">
                       Upload Photo
                     </Label>
-                        <div className="flex justify-center">
-                          {formData.profilePhoto ? (
-                            <div className="relative">
-                              <img 
-                                src={formData.profilePhoto} 
-                                alt="Profile preview" 
-                                className="w-48 h-48 rounded-full object-cover border-4 border-gray-200 shadow-lg"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => handleInputChange('profilePhoto', null)}
-                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 shadow-lg transition-colors"
-                              >
-                                <X className="w-5 h-5" />
-                              </button>
-                            </div>
-                          ) : (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <label className="flex flex-col items-center justify-center w-48 h-48 border-3 border-dashed border-gray-300 rounded-full cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 group">
-                                  <Upload className="w-12 h-12 text-gray-400 group-hover:text-blue-500 mb-3 transition-colors" />
-                                  <span className="text-lg font-semibold text-gray-500 group-hover:text-blue-600 transition-colors">Upload Photo</span>
-                                  <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleImageUpload}
-                                    className="hidden"
-                                  />
-                                </label>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>This will be shown on your public traveler profile</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          )}
+                    <div className="flex justify-center">
+                      {formData.profilePhoto ? (
+                        <div className="relative">
+                          <img 
+                            src={formData.profilePhoto} 
+                            alt="Profile preview" 
+                            className="w-48 h-48 rounded-full object-cover border-4 border-gray-200 shadow-lg"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleInputChange('profilePhoto', null)}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 shadow-lg transition-colors"
+                          >
+                            <X className="w-5 h-5" />
+                          </button>
                         </div>
-                      </div>
+                      ) : (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <label className="flex flex-col items-center justify-center w-48 h-48 border-3 border-dashed border-gray-300 rounded-full cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 group">
+                              <Upload className="w-12 h-12 text-gray-400 group-hover:text-blue-500 mb-3 transition-colors" />
+                              <span className="text-lg font-semibold text-gray-500 group-hover:text-blue-600 transition-colors">Upload Photo</span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                                className="hidden"
+                              />
+                            </label>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>This will be shown on your public traveler profile</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </div>
+                  </div>
 
-                      {/* Gender Toggle */}
-                      <div>
+                  {/* Gender Toggle */}
+                  <div>
                     <Label className="text-2xl font-bold text-gray-900 block mb-8">Gender</Label>
                     <div className="flex border-3 border-gray-200 rounded-2xl p-2 bg-gray-50 w-full">
                       <button
@@ -204,10 +198,10 @@ export default function CreateProfileClean() {
                         Female
                       </button>
                     </div>
-                      </div>
+                  </div>
 
-                      {/* Name */}
-                      <div>
+                  {/* Name */}
+                  <div>
                     <Label htmlFor="fullName" className="text-2xl font-bold text-gray-900 block mb-8">
                       What's your name?
                     </Label>
@@ -219,10 +213,10 @@ export default function CreateProfileClean() {
                       className="h-16 text-lg border-3 border-gray-200 rounded-2xl focus:border-blue-500 focus:ring-4 focus:ring-blue-200 transition-all duration-200 px-6"
                       required
                     />
-                      </div>
+                  </div>
 
-                      {/* What Makes You Alive */}
-                      <div>
+                  {/* What Makes You Alive */}
+                  <div>
                     <Label htmlFor="whatMakesYouAlive" className="text-2xl font-bold text-gray-900 block mb-8">
                       What makes you feel alive?
                     </Label>
@@ -234,10 +228,10 @@ export default function CreateProfileClean() {
                       className="resize-none text-lg border-3 border-gray-200 rounded-2xl focus:border-blue-500 focus:ring-4 focus:ring-blue-200 transition-all duration-200 p-6"
                       rows={4}
                     />
-                      </div>
+                  </div>
 
-                      {/* Date of Birth */}
-                      <div>
+                  {/* Date of Birth */}
+                  <div>
                     <Label className="text-2xl font-bold text-gray-900 block mb-8">
                       Date of Birth
                     </Label>
@@ -246,44 +240,44 @@ export default function CreateProfileClean() {
                         <SelectTrigger className="h-16 border-3 border-gray-200 rounded-2xl focus:border-blue-500 text-lg px-6">
                           <SelectValue placeholder="Day" />
                         </SelectTrigger>
-                            <SelectContent>
-                              {days.map(day => (
-                                <SelectItem key={day} value={day.toString()}>{day}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          
-                        <Select onValueChange={(value) => handleInputChange('monthOfBirth', value)}>
-                          <SelectTrigger className="h-16 border-3 border-gray-200 rounded-2xl focus:border-blue-500 text-lg px-6">
-                            <SelectValue placeholder="Month" />
-                          </SelectTrigger>
-                            <SelectContent>
-                              {months.map((month, index) => (
-                                <SelectItem key={month} value={(index + 1).toString()}>{month}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          
-                        <Select onValueChange={(value) => handleInputChange('yearOfBirth', value)}>
-                          <SelectTrigger className="h-16 border-3 border-gray-200 rounded-2xl focus:border-blue-500 text-lg px-6">
-                            <SelectValue placeholder="Year" />
-                          </SelectTrigger>
-                            <SelectContent>
-                              {years.map(year => (
-                                <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      <p className="text-base text-red-600 font-bold">* Must be 18+</p>
-                    </div>
-                  </div>
-
-                  {/* Right Column */}
-                  <div className="space-y-12">
+                        <SelectContent>
+                          {days.map(day => (
+                            <SelectItem key={day} value={day.toString()}>{day}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       
-                      {/* Birthplace */}
-                      <div>
+                      <Select onValueChange={(value) => handleInputChange('monthOfBirth', value)}>
+                        <SelectTrigger className="h-16 border-3 border-gray-200 rounded-2xl focus:border-blue-500 text-lg px-6">
+                          <SelectValue placeholder="Month" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {months.map((month, index) => (
+                            <SelectItem key={month} value={(index + 1).toString()}>{month}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      
+                      <Select onValueChange={(value) => handleInputChange('yearOfBirth', value)}>
+                        <SelectTrigger className="h-16 border-3 border-gray-200 rounded-2xl focus:border-blue-500 text-lg px-6">
+                          <SelectValue placeholder="Year" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {years.map(year => (
+                            <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <p className="text-base text-red-600 font-bold">* Must be 18+</p>
+                  </div>
+                </div>
+
+                {/* Right Column */}
+                <div className="space-y-12">
+                  
+                  {/* Birthplace */}
+                  <div>
                     <Label htmlFor="birthplace" className="text-2xl font-bold text-gray-900 block mb-8">
                       Where were you born?
                     </Label>
@@ -295,10 +289,10 @@ export default function CreateProfileClean() {
                       className="h-16 text-lg border-3 border-gray-200 rounded-2xl focus:border-blue-500 focus:ring-4 focus:ring-blue-200 transition-all duration-200 px-6"
                       required
                     />
-                      </div>
+                  </div>
 
-                      {/* Current Home */}
-                      <div>
+                  {/* Current Home */}
+                  <div>
                     <Label htmlFor="currentHome" className="text-2xl font-bold text-gray-900 block mb-8">
                       Where do you currently call home?
                     </Label>
@@ -310,10 +304,10 @@ export default function CreateProfileClean() {
                       className="h-16 text-lg border-3 border-gray-200 rounded-2xl focus:border-blue-500 focus:ring-4 focus:ring-blue-200 transition-all duration-200 px-6"
                       required
                     />
-                      </div>
+                  </div>
 
-                      {/* Languages */}
-                      <div>
+                  {/* Languages */}
+                  <div>
                     <Label className="text-2xl font-bold text-gray-900 block mb-8">
                       Languages You Speak
                     </Label>
@@ -397,26 +391,23 @@ export default function CreateProfileClean() {
                     </div>
                   </div>
                 </div>
-                
-                {/* Continue Button */}
-                <div className="flex justify-center mt-20">
-                  <Button 
-                    type="submit" 
-                    className="px-16 py-6 bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-200 flex items-center gap-4"
-                    disabled={!isStep1Valid()}
-                  >
-                    Continue to Travel Experience
-                    <ArrowRight className="w-6 h-6" />
-                  </Button>
-                </div>
               </div>
-            </form>
-          </div>
+              
+              {/* Continue Button */}
+              <div className="flex justify-center mt-20">
+                <Button 
+                  type="submit" 
+                  className="px-16 py-6 bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-200 flex items-center gap-4"
+                  disabled={!isStep1Valid()}
+                >
+                  Continue to Travel Experience
+                  <ArrowRight className="w-6 h-6" />
+                </Button>
+              </div>
+            </div>
+          </form>
         </div>
-      </TooltipProvider>
-    );
-  }
-
-  // Step 2 would go here (keeping it simple for now)
-  return <div>Step 2 placeholder</div>;
+      </div>
+    </TooltipProvider>
+  );
 }
