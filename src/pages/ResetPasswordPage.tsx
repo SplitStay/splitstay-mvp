@@ -14,18 +14,7 @@ export const ResetPasswordPage: React.FC = () => {
   const [error, setError] = useState('')
   const [isValidSession, setIsValidSession] = useState(false)
 
-  const { updatePassword, session } = useAuth()
-
-  useEffect(() => {
-    // Check if we have a valid session for password reset
-    if (session && session.user) {
-      setIsValidSession(true)
-    } else {
-      const errorMsg = 'Invalid or expired reset link. Please request a new password reset.'
-      setError(errorMsg)
-      toast.error(errorMsg)
-    }
-  }, [session])
+  const { updatePassword } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

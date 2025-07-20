@@ -289,33 +289,114 @@ export default function CreateProfilePage() {
   };
 
   const handleLanguageToggle = (language: string) => {
-    setSelectedLanguages(prev => 
-      prev.includes(language) 
-        ? prev.filter(l => l !== language)
-        : [...prev, language]
-    );
+    setSelectedLanguages(prev => {
+      if (prev.includes(language)) {
+        // Remove the language
+        return prev.filter(l => l !== language);
+      } else {
+        // Add the language - if selecting from dropdown, replace first unselected main language
+        const mainLanguagesCopy = [...mainLanguages];
+        const unselectedMainLang = mainLanguagesCopy.find(lang => !prev.includes(lang));
+        
+        if (unselectedMainLang && !mainLanguages.includes(language)) {
+          // Replace the first unselected main language with the new selection
+          return prev.filter(l => l !== unselectedMainLang).concat(language);
+        } else {
+          // Normal addition
+          return [...prev, language];
+        }
+      }
+    });
   };
 
 
 
   const handleLearningLanguageToggle = (language: string) => {
-    setSelectedLearningLanguages(prev => 
-      prev.includes(language) 
-        ? prev.filter(l => l !== language)
-        : [...prev, language]
-    );
+    setSelectedLearningLanguages(prev => {
+      if (prev.includes(language)) {
+        // Remove the language
+        return prev.filter(l => l !== language);
+      } else {
+        // Add the language - if selecting from dropdown, replace first unselected main language
+        const mainLanguagesCopy = [...mainLanguages];
+        const unselectedMainLang = mainLanguagesCopy.find(lang => !prev.includes(lang));
+        
+        if (unselectedMainLang && !mainLanguages.includes(language)) {
+          // Replace the first unselected main language with the new selection
+          return prev.filter(l => l !== unselectedMainLang).concat(language);
+        } else {
+          // Normal addition
+          return [...prev, language];
+        }
+      }
+    });
   };
 
   const handleTraitToggle = (trait: string) => {
-    setSelectedTraits(prev => 
-      prev.includes(trait) 
-        ? prev.filter(t => t !== trait)
-        : [...prev, trait]
-    );
+    setSelectedTraits(prev => {
+      if (prev.includes(trait)) {
+        // Remove the trait
+        return prev.filter(t => t !== trait);
+      } else {
+        // Add the trait - if selecting from dropdown, replace first unselected main trait
+        const mainTraitsCopy = [...traitOptions.slice(0, 18)]; // First 18 main traits
+        const unselectedMainTrait = mainTraitsCopy.find(tr => !prev.includes(tr));
+        
+        if (unselectedMainTrait && !traitOptions.slice(0, 18).includes(trait)) {
+          // Replace the first unselected main trait with the new selection
+          return prev.filter(t => t !== unselectedMainTrait).concat(trait);
+        } else {
+          // Normal addition
+          return [...prev, trait];
+        }
+      }
+    });
   };
 
-  // Main languages for quick selection (display by default)
-  const mainLanguages = ["English", "Spanish", "French", "German", "Dutch", "Italian"];
+  // Main languages for quick selection (display by default) - expanded to show more
+  const mainLanguages = ["English", "Spanish", "French", "German", "Dutch", "Italian", "Portuguese", "Mandarin", "Japanese", "Korean", "Arabic", "Russian"];
+
+  // Function to create display array for main languages grid
+  const getLanguagesDisplayArray = (selectedLangs: string[]) => {
+    const displayArray = [...selectedLangs];
+    
+    // Fill remaining slots with unselected main languages
+    for (const lang of mainLanguages) {
+      if (!selectedLangs.includes(lang) && displayArray.length < 12) {
+        displayArray.push(lang);
+      }
+    }
+    
+    return displayArray.slice(0, 12); // Always show exactly 12 slots
+  };
+
+  // Function to create display array for learning languages
+  const getLearningLanguagesDisplayArray = (selectedLangs: string[]) => {
+    const displayArray = [...selectedLangs];
+    
+    // Fill remaining slots with unselected main languages
+    for (const lang of mainLanguages) {
+      if (!selectedLangs.includes(lang) && displayArray.length < 12) {
+        displayArray.push(lang);
+      }
+    }
+    
+    return displayArray.slice(0, 12); // Always show exactly 12 slots
+  };
+
+  // Function to create display array for travel traits
+  const getTraitsDisplayArray = (selectedTraits: string[]) => {
+    const displayArray = [...selectedTraits];
+    
+    // Fill remaining slots with unselected main traits
+    for (const trait of traitOptions.slice(0, 18)) {
+      if (!selectedTraits.includes(trait) && displayArray.length < 18) {
+        displayArray.push(trait);
+      }
+    }
+    
+    return displayArray.slice(0, 18); // Always show exactly 18 slots
+  };
 
   const handleTravelPhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -842,7 +923,7 @@ export default function CreateProfilePage() {
                   
                   {/* Main Languages Grid */}
                   <div className="grid grid-cols-2 gap-2 mb-4">
-                    {mainLanguages.map((language) => (
+                    {getLanguagesDisplayArray(selectedLanguages).map((language) => (
                       <button
                         key={language}
                         type="button"
@@ -877,7 +958,7 @@ export default function CreateProfilePage() {
                   
                   {/* Main Languages Quick Selection */}
                   <div className="flex flex-wrap gap-1.5 mb-3">
-                    {mainLanguages.map((language) => (
+                    {getLearningLanguagesDisplayArray(selectedLearningLanguages).map((language) => (
                       <button
                         key={language}
                         type="button"
@@ -922,9 +1003,9 @@ export default function CreateProfilePage() {
                   <span className="ml-1 text-xs cursor-help" title="These traits help us find compatible roommates">ℹ️</span>
                 </label>
                 
-                {/* Top 2 rows of most common traits */}
+                {/* Expanded traits grid */}
                 <div className="grid grid-cols-3 gap-1 mb-3">
-                  {traitOptions.slice(0, 12).map((trait) => (
+                  {getTraitsDisplayArray(selectedTraits).map((trait) => (
                     <button
                       key={trait}
                       type="button"
@@ -1079,20 +1160,12 @@ export default function CreateProfilePage() {
                 .filter(lang => 
                   lang.toLowerCase().includes(languageSearchTerm.toLowerCase())
                 )
-                .sort((a, b) => {
-                  const aSelected = selectedLanguages.includes(a);
-                  const bSelected = selectedLanguages.includes(b);
-                  if (aSelected && !bSelected) return -1;
-                  if (!aSelected && bSelected) return 1;
-                  return 0;
-                })
                 .map(language => (
                 <button
                   key={language}
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault();
                     handleLanguageToggle(language);
-                    setLanguageSearchTerm('');
-                    setShowLanguageModal(false);
                   }}
                   className={`w-full text-left px-3 py-2 rounded transition-all ${
                     selectedLanguages.includes(language)
@@ -1132,20 +1205,12 @@ export default function CreateProfilePage() {
                 .filter(lang => 
                   lang.toLowerCase().includes(learningLanguageSearchTerm.toLowerCase())
                 )
-                .sort((a, b) => {
-                  const aSelected = selectedLearningLanguages.includes(a);
-                  const bSelected = selectedLearningLanguages.includes(b);
-                  if (aSelected && !bSelected) return -1;
-                  if (!aSelected && bSelected) return 1;
-                  return 0;
-                })
                 .map(language => (
                 <button
                   key={language}
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault();
                     handleLearningLanguageToggle(language);
-                    setLearningLanguageSearchTerm('');
-                    setShowLearningLanguageModal(false);
                   }}
                   className={`w-full text-left px-3 py-2 rounded transition-all ${
                     selectedLearningLanguages.includes(language)
@@ -1185,20 +1250,12 @@ export default function CreateProfilePage() {
                 .filter(trait => 
                   trait.toLowerCase().includes(traitSearchTerm.toLowerCase())
                 )
-                .sort((a, b) => {
-                  const aSelected = selectedTraits.includes(a);
-                  const bSelected = selectedTraits.includes(b);
-                  if (aSelected && !bSelected) return -1;
-                  if (!aSelected && bSelected) return 1;
-                  return 0;
-                })
                 .map(trait => (
                 <button
                   key={trait}
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault();
                     handleTraitToggle(trait);
-                    setTraitSearchTerm('');
-                    setShowTraitModal(false);
                   }}
                   className={`w-full text-left px-3 py-2 rounded transition-all ${
                     selectedTraits.includes(trait)

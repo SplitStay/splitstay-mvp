@@ -725,9 +725,9 @@ export default function ProfilePage() {
               {/* Learning Languages */}
               {user.learningLanguages && (user.learningLanguages as string[]).length > 0 && (
                 <motion.div variants={itemVariants}>
-                  <Card className="bg-white/95 backdrop-blur-2xl border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-500 group overflow-hidden relative">
+                  <Card className="bg-white/95 backdrop-blur-2xl border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-500 group overflow-hidden relative h-full">
                     <div className="absolute inset-0 bg-navy/3 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <CardContent className="p-8 relative z-10">
+                    <CardContent className="p-8 relative z-10 h-full flex flex-col">
                       <motion.div 
                         whileHover={{ scale: 1.1, rotate: -10 }}
                         className="flex items-center gap-4 mb-6"
@@ -737,7 +737,7 @@ export default function ProfilePage() {
                         </div>
                         <h3 className="text-2xl font-bold text-navy">Languages I'm Learning</h3>
                       </motion.div>
-                      <div className="flex flex-wrap gap-3">
+                      <div className="flex flex-wrap gap-3 flex-1 content-center">
                         {(user.learningLanguages as string[]).map((language, index) => (
                           <motion.div
                             key={language}
@@ -763,9 +763,9 @@ export default function ProfilePage() {
               {/* Travel Traits */}
               {user.travelTraits && user.travelTraits.length > 0 && (
                 <motion.div variants={itemVariants}>
-                  <Card className="bg-white/95 backdrop-blur-2xl border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-500 group overflow-hidden relative">
+                  <Card className="bg-white/95 backdrop-blur-2xl border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-500 group overflow-hidden relative h-full">
                     <div className="absolute inset-0 bg-navy/3 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <CardContent className="p-8 relative z-10">
+                    <CardContent className="p-8 relative z-10 h-full flex flex-col">
                       <motion.div 
                         whileHover={{ scale: 1.1, rotate: -10 }}
                         className="flex items-center gap-4 mb-6"
@@ -775,7 +775,7 @@ export default function ProfilePage() {
                         </div>
                         <h3 className="text-2xl font-bold text-navy">My Travel Style</h3>
                       </motion.div>
-                      <div className="flex flex-wrap gap-3">
+                      <div className="flex flex-wrap gap-3 flex-1 content-center">
                         {user.travelTraits.map((trait, index) => (
                           <motion.div
                             key={trait}
