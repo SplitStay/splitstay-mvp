@@ -221,33 +221,90 @@ function CreateProfile() {
     );
   };
 
-  // Handle autocomplete for birth location
-  const handleBirthLocationChange = (value: string) => {
+  // Debounce timer for API calls
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
+
+  // LocationIQ API autocomplete function
+  const searchCities = async (query: string): Promise<string[]> => {
+    if (query.length < 2) return [];
+    
+    try {
+      // Using LocationIQ free API (10,000 requests/day)
+      const apiKey = import.meta.env.VITE_LOCATIONIQ_API_KEY;
+      if (!apiKey) {
+        // Fallback to local database if no API key
+        return cities.filter(city => 
+          city.toLowerCase().includes(query.toLowerCase())
+        ).slice(0, 8);
+      }
+      
+      const response = await fetch(
+        `https://api.locationiq.com/v1/autocomplete.php?key=${apiKey}&q=${encodeURIComponent(query)}&tag=place:city,place:town,place:village&limit=8&format=json`
+      );
+      
+      if (!response.ok) {
+        // Fallback to local database if API fails
+        return cities.filter(city => 
+          city.toLowerCase().includes(query.toLowerCase())
+        ).slice(0, 8);
+      }
+      
+      const data = await response.json();
+      return data.map((item: any) => {
+        const name = item.display_name.split(',')[0];
+        const country = item.display_name.split(',').slice(-1)[0].trim();
+        return `${name}, ${country}`;
+      });
+    } catch (error) {
+      console.log('API search failed, using local database');
+      // Fallback to local database
+      return cities.filter(city => 
+        city.toLowerCase().includes(query.toLowerCase())
+      ).slice(0, 8);
+    }
+  };
+
+  // Handle autocomplete for birth location with API
+  const handleBirthLocationChange = async (value: string) => {
     setBirthLocationInput(value);
     setFormData(prev => ({...prev, country: value}));
     
+    // Clear previous timeout
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+    
     if (value.length > 1) {
-      const filtered = cities.filter(city => 
-        city.toLowerCase().includes(value.toLowerCase())
-      ).slice(0, 5);
-      setBirthSuggestions(filtered);
-      setShowBirthSuggestions(true);
+      // Debounce API calls
+      const timeout = setTimeout(async () => {
+        const suggestions = await searchCities(value);
+        setBirthSuggestions(suggestions);
+        setShowBirthSuggestions(true);
+      }, 300);
+      setSearchTimeout(timeout);
     } else {
       setShowBirthSuggestions(false);
     }
   };
 
-  // Handle autocomplete for current home
-  const handleCurrentHomeChange = (value: string) => {
+  // Handle autocomplete for current home with API
+  const handleCurrentHomeChange = async (value: string) => {
     setCurrentHomeInput(value);
     setFormData(prev => ({...prev, currentHome: value}));
     
+    // Clear previous timeout
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+    
     if (value.length > 1) {
-      const filtered = cities.filter(city => 
-        city.toLowerCase().includes(value.toLowerCase())
-      ).slice(0, 5);
-      setHomeSuggestions(filtered);
-      setShowHomeSuggestions(true);
+      // Debounce API calls
+      const timeout = setTimeout(async () => {
+        const suggestions = await searchCities(value);
+        setHomeSuggestions(suggestions);
+        setShowHomeSuggestions(true);
+      }, 300);
+      setSearchTimeout(timeout);
     } else {
       setShowHomeSuggestions(false);
     }
@@ -1039,43 +1096,14 @@ function CreateProfile() {
                   ))}
                 </div>
                 
-                {/* More Learning Languages Dropdown */}
-                {!showMoreLearningLanguages ? (
-                  <button
-                    type="button"
-                    onClick={() => setShowMoreLearningLanguages(true)}
-                    className="text-orange-600 hover:text-orange-800 text-sm font-medium mb-3"
-                  >
-                    + More languages...
-                  </button>
-                ) : (
-                  <div className="mb-3">
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {additionalLanguages.map((language) => (
-                        <button
-                          key={language}
-                          type="button"
-                          onClick={() => handleLearningLanguageDropdownChange(language)}
-                          disabled={selectedLearningLanguages.includes(language)}
-                          className={`px-3 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                            selectedLearningLanguages.includes(language)
-                              ? "bg-orange-100 text-orange-800 cursor-not-allowed"
-                              : "bg-gray-100 text-gray-700 hover:bg-orange-100 hover:text-orange-700 hover:shadow-md"
-                          }`}
-                        >
-                          {language}
-                        </button>
-                      ))}
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setShowMoreLearningLanguages(false)}
-                      className="text-gray-600 hover:text-gray-800 text-sm"
-                    >
-                      - Show less
-                    </button>
-                  </div>
-                )}
+                {/* Searchable Learning Language Picker */}
+                <button
+                  type="button"
+                  onClick={() => setShowLearningLanguageModal(true)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:border-orange-300 hover:bg-orange-50 transition-all text-left mb-3"
+                >
+                  🔍 Search & add more languages...
+                </button>
                 
                 {selectedLearningLanguages.length > 0 && (
                   <div className="mb-3">
