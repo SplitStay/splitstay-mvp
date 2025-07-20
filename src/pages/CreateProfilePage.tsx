@@ -1,50 +1,89 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { X, Plus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUser, useUpdateUser } from "@/hooks/useUser";
 import { supabase } from "@/lib/supabase";
+import { locationIQService } from "@/lib/locationiq";
 import toast from "react-hot-toast";
 
 export default function CreateProfilePage() {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(1);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+  const [selectedLearningLanguages, setSelectedLearningLanguages] = useState<string[]>([]);
   const [selectedTraits, setSelectedTraits] = useState<string[]>([]);
-  const [customLanguage, setCustomLanguage] = useState("");
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
+  const [travelPhotos, setTravelPhotos] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
-  const [customCountry, setCustomCountry] = useState("");
-  const [travelPhotos, setTravelPhotos] = useState<(string | null)[]>([null, null, null]);
-  const [travelPhotosPreviews, setTravelPhotosPreviews] = useState<(string | null)[]>([null, null, null]);
-  const [uploadingPhotoIndex, setUploadingPhotoIndex] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     fullName: "",
+    birthPlace: "",
+    currentPlace: "",
     bio: "",
-    location: "",
     dayOfBirth: "",
     monthOfBirth: "",
     yearOfBirth: "",
-    travelReason: ""
+    gender: "",
+    mostInfluencedCountry: "",
+    mostInfluencedCountryDescription: "",
+    mostInfluencedExperience: ""
   });
+
+  // Additional state for enhanced features
+  const [birthLocationInput, setBirthLocationInput] = useState(formData.birthPlace || '');
+  const [currentHomeInput, setCurrentHomeInput] = useState(formData.currentPlace || '');
+  const [birthSuggestions, setBirthSuggestions] = useState<string[]>([]);
+  const [homeSuggestions, setHomeSuggestions] = useState<string[]>([]);
+  const [showBirthSuggestions, setShowBirthSuggestions] = useState(false);
+  const [showHomeSuggestions, setShowHomeSuggestions] = useState(false);
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [languageSearchTerm, setLanguageSearchTerm] = useState('');
+  const [showLearningLanguageModal, setShowLearningLanguageModal] = useState(false);
+  const [learningLanguageSearchTerm, setLearningLanguageSearchTerm] = useState('');
+  const [showTraitModal, setShowTraitModal] = useState(false);
+  const [traitSearchTerm, setTraitSearchTerm] = useState('');
+  const [isUsingFallback, setIsUsingFallback] = useState(false);
 
   const { user, loading } = useAuth();
   const { refetch: refetchUser } = useUser();
   const updateUserMutation = useUpdateUser();
 
-  // Check user path from URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const userPath = urlParams.get('path');
+
+  // Complete language list for search functionality
+  const allLanguages = [
+    "English", "Spanish", "French", "German", "Dutch", "Italian", "Portuguese", "Mandarin", 
+    "Japanese", "Korean", "Arabic", "Russian", "Hindi", "Bengali", "Thai", "Vietnamese", 
+    "Indonesian", "Malay", "Turkish", "Greek", "Hebrew", "Polish", "Czech", "Hungarian", 
+    "Romanian", "Bulgarian", "Croatian", "Serbian", "Swedish", "Norwegian", "Danish", 
+    "Finnish", "Estonian", "Latvian", "Lithuanian", "Slovenian", "Slovak", "Ukrainian", 
+    "Catalan", "Basque", "Galician", "Irish", "Welsh", "Scots Gaelic", "Icelandic", 
+    "Albanian", "Macedonian", "Maltese", "Luxembourgish", "Faroese", "Swahili", 
+    "Amharic", "Yoruba", "Igbo", "Hausa", "Zulu", "Afrikaans", "Tagalog", "Cebuano", 
+    "Ilocano", "Tamil", "Telugu", "Marathi", "Gujarati", "Kannada", "Malayalam", 
+    "Punjabi", "Urdu", "Nepali", "Sinhala", "Burmese", "Khmer", "Lao", "Mongolian", 
+    "Kazakh", "Uzbek", "Kyrgyz", "Tajik", "Turkmen", "Azerbaijani", "Armenian", "Georgian"
+  ];
+
+  // Comprehensive travel traits database for search functionality
+  const allTraits = [
+    // Core personality traits
+    "Adventurous", "Relaxed", "Social", "Quiet", "Early Bird", "Night Owl", "Spontaneous", "Planner",
+    "Minimalist", "Culture Lover", "Foodie", "Nature Lover", "Tech Savvy", "Fitness Enthusiast",
+    
+    // Activity preferences
+    "Beach Lover", "Mountain Explorer", "City Explorer", "Art Enthusiast", "History Buff", "Photography Lover",
+    "Music Lover", "Dancer", "Swimmer", "Hiker", "Runner", "Cyclist", "Yoga Practitioner", "Meditation Enthusiast",
+    
+    // Travel styles
+    "Budget Traveler", "Luxury Traveler", "Backpacker", "Digital Nomad", "Solo Traveler", "Group Traveler",
+    "Road Tripper", "Train Enthusiast", "Flight Lover", "Cruise Enthusiast", "Camping Lover", "Hostel Hopper",
+    
+    // Additional traits
+    "Bookworm", "Gamer", "Musician", "Artist", "Writer", "Photographer", "Blogger", "Vlogger",
+    "Language Learner", "Cooking Enthusiast", "Wine Lover", "Coffee Connoisseur", "Tea Lover", "Craft Beer Fan"
+  ];
 
   // Redirect to home if user is not authenticated
   useEffect(() => {
@@ -62,7 +101,7 @@ export default function CreateProfilePage() {
       const filePath = `${bucket}/${fileName}`;
 
       // Upload file to Supabase storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from(bucket)
         .upload(filePath, file, {
           cacheControl: '3600',
@@ -80,54 +119,78 @@ export default function CreateProfilePage() {
         .getPublicUrl(filePath);
 
       return urlData.publicUrl;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error uploading image:', error);
       toast.error('Failed to upload image. Please try again.');
       return null;
     }
   };
 
-  const handleStep1Submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setCurrentStep(2);
-  };
+  // Debounce timer for API calls
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
 
-  const handleStep2Submit = async () => {
-    if (!user) {
-      toast.error("You must be logged in to create a profile");
-      return;
-    }
-
-    setIsLoading(true);
+  // LocationIQ API autocomplete function
+  const searchCities = async (query: string): Promise<string[]> => {
+    if (query.length < 2) return [];
     
     try {
-      // Update user profile with all the collected data
-      await updateUserMutation.mutateAsync({
-        fullName: formData.fullName,
-        bio: formData.bio || null,
-        location: formData.location || null,
-        dayOfBirth: formData.dayOfBirth ? parseInt(formData.dayOfBirth) : null,
-        monthOfBirth: formData.monthOfBirth ? parseInt(formData.monthOfBirth) : null,
-        yearOfBirth: formData.yearOfBirth ? parseInt(formData.yearOfBirth) : null,
-        languages: selectedLanguages.length > 0 ? selectedLanguages : null,
-        travelTraits: selectedTraits.length > 0 ? selectedTraits : null,
-        countriesTraveled: selectedCountries.length > 0 ? selectedCountries : null,
-        travelPhotos: travelPhotos.filter(photo => photo !== null).length > 0 ? travelPhotos.filter(photo => photo !== null) : null,
-        imageUrl: profileImageUrl || null, // Use the storage URL instead of base64 preview
-        profileCreated: true, // Set this to true after successful submission
-      });
+      const results = await locationIQService.searchCities(query);
+      
+      // Check if we're using fallback mode
+      const apiStatus = locationIQService.getApiStatus();
+      setIsUsingFallback(!apiStatus.isAvailable || !apiStatus.hasApiKey);
+      
+      return results;
+    } catch (error) {
+      console.error('LocationIQ search error:', error);
+      setIsUsingFallback(true);
+      return [];
+    }
+  };
 
-      // Refetch user data to ensure we have the latest information
-      await refetchUser();
+  // Handle autocomplete for birth location
+  const handleBirthLocationChange = async (value: string) => {
+    setBirthLocationInput(value);
+    setFormData(prev => ({...prev, birthPlace: value}));
+    
+    // Clear previous timeout
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+    
+    if (value.length > 1) {
+      // Debounce API calls
+      const timeout = setTimeout(async () => {
+        const suggestions = await searchCities(value);
+        setBirthSuggestions(suggestions);
+        setShowBirthSuggestions(true);
+      }, 300);
+      setSearchTimeout(timeout);
+    } else {
+      setShowBirthSuggestions(false);
+    }
+  };
 
-      toast.success("Profile created successfully!");
-
-      // Always navigate to dashboard after profile creation
-      navigate("/dashboard");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to create profile. Please try again.");
-    } finally {
-      setIsLoading(false);
+  // Handle autocomplete for current home
+  const handleCurrentHomeChange = async (value: string) => {
+    setCurrentHomeInput(value);
+    setFormData(prev => ({...prev, currentPlace: value}));
+    
+    // Clear previous timeout
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+    
+    if (value.length > 1) {
+      // Debounce API calls
+      const timeout = setTimeout(async () => {
+        const suggestions = await searchCities(value);
+        setHomeSuggestions(suggestions);
+        setShowHomeSuggestions(true);
+      }, 300);
+      setSearchTimeout(timeout);
+    } else {
+      setShowHomeSuggestions(false);
     }
   };
 
@@ -166,61 +229,6 @@ export default function CreateProfilePage() {
     setIsUploading(false);
   };
 
-  const handleTravelPhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Get the index from the input id
-    const inputId = event.target.id;
-    const index = parseInt(inputId.split('-')[2]);
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select a valid image file');
-      return;
-    }
-
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image size must be less than 5MB');
-      return;
-    }
-
-    setUploadingPhotoIndex(index);
-
-    // Create preview
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const newPreviews = [...travelPhotosPreviews];
-      newPreviews[index] = reader.result as string;
-      setTravelPhotosPreviews(newPreviews);
-    };
-    reader.readAsDataURL(file);
-
-    // Upload to Supabase storage
-    const uploadedUrl = await uploadImageToStorage(file, 'travel-photos');
-    if (uploadedUrl) {
-      const newPhotos = [...travelPhotos];
-      newPhotos[index] = uploadedUrl;
-      setTravelPhotos(newPhotos);
-      toast.success('Travel photo uploaded successfully!');
-    }
-    
-    setUploadingPhotoIndex(null);
-    
-    // Reset the input
-    event.target.value = '';
-  };
-
-  const removeTravelPhoto = (index: number) => {
-    const newPhotos = [...travelPhotos];
-    const newPreviews = [...travelPhotosPreviews];
-    newPhotos[index] = null;
-    newPreviews[index] = null;
-    setTravelPhotos(newPhotos);
-    setTravelPhotosPreviews(newPreviews);
-  };
-
   const handleLanguageToggle = (language: string) => {
     setSelectedLanguages(prev => 
       prev.includes(language) 
@@ -229,11 +237,25 @@ export default function CreateProfilePage() {
     );
   };
 
-  const handleAddCustomLanguage = () => {
-    if (customLanguage.trim() && !selectedLanguages.includes(customLanguage.trim())) {
-      setSelectedLanguages(prev => [...prev, customLanguage.trim()]);
-      setCustomLanguage("");
+
+  const handleLanguageDropdownChange = (language: string) => {
+    if (language && !selectedLanguages.includes(language)) {
+      setSelectedLanguages(prev => [...prev, language]);
     }
+  };
+
+  const handleLearningLanguageDropdownChange = (language: string) => {
+    if (language && !selectedLearningLanguages.includes(language)) {
+      setSelectedLearningLanguages(prev => [...prev, language]);
+    }
+  };
+
+  const handleLearningLanguageToggle = (language: string) => {
+    setSelectedLearningLanguages(prev => 
+      prev.includes(language) 
+        ? prev.filter(l => l !== language)
+        : [...prev, language]
+    );
   };
 
   const handleTraitToggle = (trait: string) => {
@@ -244,32 +266,132 @@ export default function CreateProfilePage() {
     }
   };
 
-  const handleCountryToggle = (country: string) => {
-    setSelectedCountries(prev => 
-      prev.includes(country) 
-        ? prev.filter(c => c !== country)
-        : [...prev, country]
-    );
-  };
+  // Main languages for quick selection (display by default)
+  const mainLanguages = ["English", "Spanish", "French", "German", "Dutch", "Italian"];
 
-  const handleAddCustomCountry = () => {
-    if (customCountry.trim() && !selectedCountries.includes(customCountry.trim())) {
-      setSelectedCountries(prev => [...prev, customCountry.trim()]);
-      setCustomCountry("");
+  const handleTravelPhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      const newPhotos: string[] = [];
+      Array.from(files).slice(0, 3 - travelPhotos.length).forEach(file => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          newPhotos.push(reader.result as string);
+          if (newPhotos.length === Math.min(files.length, 3 - travelPhotos.length)) {
+            setTravelPhotos(prev => [...prev, ...newPhotos].slice(0, 3));
+          }
+        };
+        reader.readAsDataURL(file);
+      });
     }
   };
 
-  const handleLanguageDropdownChange = (language: string) => {
-    if (language && !selectedLanguages.includes(language)) {
-      setSelectedLanguages(prev => [...prev, language]);
+  const removeTravelPhoto = (index: number) => {
+    setTravelPhotos(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!user) {
+      toast.error("You must be logged in to create a profile");
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      // Update user profile with all the collected data
+      await updateUserMutation.mutateAsync({
+        fullName: formData.fullName,
+        bio: formData.bio || null,
+        birthPlace: formData.birthPlace || null,
+        currentPlace: formData.currentPlace || null,
+        dayOfBirth: formData.dayOfBirth ? parseInt(formData.dayOfBirth) : null,
+        monthOfBirth: formData.monthOfBirth ? parseInt(formData.monthOfBirth) : null,
+        yearOfBirth: formData.yearOfBirth ? parseInt(formData.yearOfBirth) : null,
+        gender: formData.gender || null,
+        languages: selectedLanguages.length > 0 ? selectedLanguages : null,
+        learningLanguages: selectedLearningLanguages.length > 0 ? selectedLearningLanguages : null,
+        travelTraits: selectedTraits.length > 0 ? selectedTraits : null,
+        mostInfluencedCountry: formData.mostInfluencedCountry || null,
+        mostInfluencedCountryDescription: formData.mostInfluencedCountryDescription || null,
+        mostInfluencedExperience: formData.mostInfluencedExperience || null,
+        travelPhotos: travelPhotos.filter(photo => photo !== null).length > 0 ? travelPhotos.filter(photo => photo !== null) : null,
+        imageUrl: profileImageUrl || null,
+        profileCreated: true,
+      });
+
+      // Refetch user data to ensure we have the latest information
+      await refetchUser();
+
+      toast.success("Profile created successfully!");
+
+      // Navigate to dashboard after profile creation
+      navigate("/dashboard");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to create profile. Please try again.";
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleCountryDropdownChange = (country: string) => {
-    if (country && !selectedCountries.includes(country)) {
-      setSelectedCountries(prev => [...prev, country]);
-    }
+  const handleSkip = () => {
+    // Navigate to dashboard
+    navigate("/dashboard");
   };
+
+  const isFormValid = formData.fullName && 
+                      formData.birthPlace &&
+                      formData.dayOfBirth && 
+                      formData.monthOfBirth && 
+                      formData.yearOfBirth &&
+                      formData.gender &&
+                      profileImagePreview &&
+                      selectedLanguages.length > 0;
+
+  const dayOptions = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
+  const monthOptions = [
+    { value: "1", label: "January" }, { value: "2", label: "February" },
+    { value: "3", label: "March" }, { value: "4", label: "April" },
+    { value: "5", label: "May" }, { value: "6", label: "June" },
+    { value: "7", label: "July" }, { value: "8", label: "August" },
+    { value: "9", label: "September" }, { value: "10", label: "October" },
+    { value: "11", label: "November" }, { value: "12", label: "December" },
+  ];
+  const currentYear = new Date().getFullYear();
+  const yearOptions = Array.from({ length: 82 }, (_, i) => (currentYear - 18 - i).toString());
+
+
+  const traitOptions = [
+    "Early Bird", "Night Owl", "Adventurous", "Relaxed", "Social", "Quiet", 
+    "Foodie", "Fitness Enthusiast", "Culture Lover", "Nature Lover", 
+    "Tech Savvy", "Minimalist", "Photographer", "Music Lover", "Budget Traveler",
+    "Luxury Traveler", "Backpacker", "City Explorer", "Beach Lover", "Mountain Hiker",
+    "Art Enthusiast", "History Buff", "Spontaneous", "Planner", "Solo Traveler",
+    "Group Traveler", "Digital Nomad", "Weekend Warrior", "Long-term Traveler",
+    "Eco-conscious", "Local Experience Seeker", "Comfort Seeker", "Thrill Seeker"
+  ];
+
+  const countryOptions = [
+    // Popular travel destinations first
+    "United States", "France", "Spain", "Thailand", "Japan", "United Kingdom", "Germany", 
+    "Italy", "Australia", "Canada", "Netherlands", "Switzerland", "Greece", "Portugal", 
+    "South Korea", "Singapore", "New Zealand", "Sweden", "Norway", "Denmark", "Belgium", 
+    "Austria", "Ireland", "Czech Republic", "Croatia", "Mexico", "Brazil", "Argentina", 
+    "Chile", "Peru", "Colombia", "Costa Rica", "India", "China", "Indonesia", "Malaysia", 
+    "Philippines", "Vietnam", "Turkey", "Egypt", "Morocco", "South Africa", "Kenya", 
+    "Israel", "Jordan", "Russia", "Poland", "Hungary", "Romania", "Bulgaria", "Serbia", 
+    "Bosnia and Herzegovina", "Slovenia", "Slovakia", "Estonia", "Latvia", "Lithuania", 
+    "Finland", "Iceland", "Luxembourg", "Ukraine", "Belarus", "Georgia", "Armenia", 
+    "Azerbaijan", "Kazakhstan", "Uzbek", "Mongolia", "Pakistan", "Bangladesh", "Sri Lanka", 
+    "Nepal", "Myanmar", "Cambodia", "Laos", "North Korea", "Taiwan", "Hong Kong", "Macau",
+    "Afghanistan", "Albania", "Algeria", "Bahrain", "Bolivia", "Cuba", "Dominican Republic", 
+    "Ecuador", "Ethiopia", "Ghana", "Guatemala", "Honduras", "Iran", "Iraq", "Jamaica", 
+    "Kuwait", "Lebanon", "Libya", "Nicaragua", "Nigeria", "Panama", "Qatar", "Saudi Arabia", 
+    "Tunisia", "United Arab Emirates", "Uruguay", "Venezuela", "Yemen", "Zimbabwe"
+  ];
 
   // Show loading state while checking authentication
   if (loading) {
@@ -288,531 +410,774 @@ export default function CreateProfilePage() {
     return null;
   }
 
-  // Form validation: only name and date required
-  const isStep1Valid = formData.fullName && 
-                      formData.dayOfBirth && 
-                      formData.monthOfBirth && 
-                      formData.yearOfBirth;
-
-  // Popular languages to show as clickable badges
-  const popularLanguages = [
-    "English", "Spanish", "French", "German", "Dutch", "Italian", "Portuguese",
-    "Chinese (Mandarin)", "Japanese", "Korean"
-  ];
-
-  // All languages for the dropdown
-  const allLanguages = [
-    "English", "Spanish", "French", "German", "Italian", "Portuguese", "Chinese (Mandarin)", 
-    "Japanese", "Korean", "Arabic", "Russian", "Hindi", "Dutch", "Swedish", "Norwegian", 
-    "Danish", "Finnish", "Polish", "Czech", "Hungarian", "Romanian", "Bulgarian", "Croatian", 
-    "Serbian", "Greek", "Turkish", "Hebrew", "Thai", "Vietnamese", "Indonesian", "Malay", 
-    "Tagalog", "Swahili", "Yoruba", "Zulu", "Afrikaans", "Amharic", "Bengali", "Gujarati", 
-    "Punjabi", "Tamil", "Telugu", "Urdu", "Persian (Farsi)", "Pashto", "Kurdish", "Uzbek", 
-    "Kazakh", "Mongolian", "Tibetan", "Burmese", "Khmer", "Lao", "Sinhala", "Nepali"
-  ];
-
-  const traitOptions = [
-    "Early Bird", "Night Owl", "Adventurous", "Relaxed", "Social", "Quiet", 
-    "Foodie", "Fitness Enthusiast", "Culture Lover", "Nature Lover", 
-    "Tech Savvy", "Minimalist", "Photographer", "Music Lover", "Budget Traveler",
-    "Luxury Traveler", "Backpacker", "City Explorer", "Beach Lover", "Mountain Hiker"
-  ];
-
-  // Popular countries to show as clickable badges
-  const popularCountries = [
-    "United States", "France", "Spain", "Japan", "Thailand", "Netherlands", 
-    "Germany", "Italy", "United Kingdom", "Australia"
-  ];
-
-  // All countries for the dropdown
-  const allCountries = [
-    "United States", "France", "Spain", "Thailand", "Japan", "United Kingdom", "Germany", 
-    "Italy", "Australia", "Canada", "Netherlands", "Switzerland", "Greece", "Portugal", 
-    "South Korea", "Singapore", "New Zealand", "Sweden", "Norway", "Denmark", "Belgium", 
-    "Austria", "Ireland", "Czech Republic", "Croatia", "Mexico", "Brazil", "Argentina", 
-    "Chile", "Peru", "Colombia", "Costa Rica", "India", "China", "Indonesia", "Malaysia", 
-    "Philippines", "Vietnam", "Turkey", "Egypt", "Morocco", "South Africa", "Kenya", 
-    "Israel", "Jordan", "Russia", "Poland", "Hungary", "Romania", "Bulgaria", "Serbia", 
-    "Bosnia and Herzegovina", "Slovenia", "Slovakia", "Estonia", "Latvia", "Lithuania", 
-    "Finland", "Iceland", "Luxembourg", "Ukraine", "Belarus", "Georgia", "Armenia", 
-    "Azerbaijan", "Kazakhstan", "Uzbek", "Mongolia", "Pakistan", "Bangladesh", "Sri Lanka", 
-    "Nepal", "Myanmar", "Cambodia", "Laos", "North Korea", "Taiwan", "Hong Kong", "Macau",
-    "Afghanistan", "Albania", "Algeria", "Bahrain", "Bolivia", "Cuba", "Dominican Republic", 
-    "Ecuador", "Ethiopia", "Ghana", "Guatemala", "Honduras", "Iran", "Iraq", "Jamaica", 
-    "Kuwait", "Lebanon", "Libya", "Nicaragua", "Nigeria", "Panama", "Qatar", "Saudi Arabia", 
-    "Tunisia", "United Arab Emirates", "Uruguay", "Venezuela", "Yemen", "Zimbabwe"
-  ];
-
-  // Generate date options
-  const dayOptions = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
-  const monthOptions = [
-    { value: "1", label: "January" }, { value: "2", label: "February" },
-    { value: "3", label: "March" }, { value: "4", label: "April" },
-    { value: "5", label: "May" }, { value: "6", label: "June" },
-    { value: "7", label: "July" }, { value: "8", label: "August" },
-    { value: "9", label: "September" }, { value: "10", label: "October" },
-    { value: "11", label: "November" }, { value: "12", label: "December" },
-  ];
-  const currentYear = new Date().getFullYear();
-  const yearOptions = Array.from({ length: 100 }, (_, i) => (currentYear - i).toString());
-
-  if (currentStep === 1) {
-    return (
-      <div className="min-h-screen bg-background p-4">
-        <div className="max-w-[600px] mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-navy mb-2">
-              Build your traveler profile
+  return (
+    <div className="min-h-screen" style={{ backgroundColor: '#f5f5dc' }}>
+      {/* Header with Back Button */}
+      <div className="max-w-[1350px] mx-auto px-4 pt-3 pb-4">
+        {/* Mobile Layout - Stack vertically */}
+        <div className="block md:hidden mb-4">
+          <button
+            onClick={() => navigate('/')}
+            className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors cursor-pointer flex items-center gap-2 mb-3"
+            style={{ color: '#4B4B4B', fontFamily: 'system-ui, Inter, sans-serif' }}
+          >
+            ← Back to Home
+          </button>
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-2" style={{ color: '#1e2a78' }}>
+              ✨ Build your traveler profile
             </h1>
-            <p className="text-gray-600">
-              Let's start with the basics
+            <p className="text-gray-600 text-sm">
+              Tell us about yourself and how you travel
             </p>
           </div>
+        </div>
 
-          <Card className="shadow-md border-0 bg-white">
-            <CardHeader>
-              <CardTitle className="text-xl text-navy">Step 1 of 2</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleStep1Submit} className="space-y-6">
-                {/* Profile Photo Upload - Optional */}
-                <div className="text-center">
-                  <Label className="text-base font-medium text-gray-700 mb-3 block">
-                    Profile Photo
-                  </Label>
-                  <div className="flex flex-col items-center">
-                    {profileImagePreview ? (
-                      <div className="relative">
-                        <img
-                          src={profileImagePreview}
-                          alt="Profile preview"
-                          className="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
-                        />
-                        {isUploading && (
-                          <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-                          </div>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setProfileImagePreview(null);
-                            setProfileImageUrl(null);
-                          }}
-                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors"
-                          disabled={isUploading}
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="w-32 h-32 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center">
-                        {isUploading ? (
-                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-400"></div>
-                        ) : (
-                          <svg className="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                          </svg>
-                        )}
-                      </div>
-                    )}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                      id="profile-image-upload"
-                      disabled={isUploading}
-                    />
-                    <div className="flex items-center gap-3 mt-4">
-                      <Label
-                        htmlFor="profile-image-upload"
-                        className={`px-4 py-2 rounded-lg cursor-pointer transition-colors text-sm ${
-                          isUploading
-                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                            : "bg-navy text-white hover:bg-navy/90"
-                        }`}
-                      >
-                        {isUploading ? "Uploading..." : profileImagePreview ? "Change Photo" : "Upload Photo"}
-                      </Label>
-                      <button type="button" className="text-sm text-gray-500 hover:text-gray-700 underline">
-                        Add later
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Name - Required */}
-                <div>
-                  <Label htmlFor="fullName" className="text-base font-medium text-gray-700">
-                    How should travelers call you? <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="fullName"
-                    value={formData.fullName}
-                    onChange={(e) => setFormData(prev => ({...prev, fullName: e.target.value}))}
-                    placeholder="e.g. Jane"
-                    className="mt-2 h-12"
-                    style={{ fontSize: '16px' }}
-                    required
-                  />
-                </div>
-
-                {/* Bio - Optional */}
-                <div>
-                  <Label htmlFor="bio" className="text-base font-medium text-gray-700">
-                    What makes you feel alive? <span className="text-gray-400">(optional)</span>
-                  </Label>
-                  <Textarea
-                    id="bio"
-                    value={formData.bio}
-                    onChange={(e) => setFormData(prev => ({...prev, bio: e.target.value}))}
-                    placeholder="e.g. chasing sunsets, street food tours, spontaneous hikes…"
-                    rows={3}
-                    className="mt-2"
-                    style={{ fontSize: '16px' }}
-                  />
-                </div>
-
-                {/* Location - Optional */}
-                <div>
-                  <Label htmlFor="location" className="text-base font-medium text-gray-700">
-                    Where are you based? <span className="text-gray-400">(optional)</span>
-                  </Label>
-                  <Input
-                    id="location"
-                    value={formData.location}
-                    onChange={(e) => setFormData(prev => ({...prev, location: e.target.value}))}
-                    placeholder="e.g. New York, USA or London, UK"
-                    className="mt-2 h-12"
-                    style={{ fontSize: '16px' }}
-                  />
-                </div>
-
-                {/* Date of Birth - Required */}
-                <div>
-                  <Label className="text-base font-medium text-gray-700 mb-3 block">
-                    Date of Birth <span className="text-red-500">*</span>
-                  </Label>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div>
-                      <Label htmlFor="dayOfBirth" className="text-sm text-gray-600">Day</Label>
-                      <Select 
-                        defaultValue={formData.dayOfBirth} 
-                        onValueChange={(value) => setFormData(prev => ({...prev, dayOfBirth: value}))}
-                      >
-                        <SelectTrigger className="mt-1 h-10">
-                          <SelectValue placeholder={formData.dayOfBirth} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {dayOptions.map((day) => (
-                            <SelectItem key={day} value={day}>{day}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="monthOfBirth" className="text-sm text-gray-600">Month</Label>
-                      <Select 
-                        defaultValue={formData.monthOfBirth} 
-                        onValueChange={(value) => setFormData(prev => ({...prev, monthOfBirth: value}))}
-                      >
-                        <SelectTrigger className="mt-1 h-10">
-                          <SelectValue placeholder={monthOptions.find(m => m.value === formData.monthOfBirth)?.label} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {monthOptions.map((month) => (
-                            <SelectItem key={month.value} value={month.value}>{month.label}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="yearOfBirth" className="text-sm text-gray-600">Year</Label>
-                      <Select 
-                        defaultValue={formData.yearOfBirth} 
-                        onValueChange={(value) => setFormData(prev => ({...prev, yearOfBirth: value}))}
-                      >
-                        <SelectTrigger className="mt-1 h-10">
-                          <SelectValue placeholder={formData.yearOfBirth} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {yearOptions.map((year) => (
-                            <SelectItem key={year} value={year}>{year}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </div>
-
-                <Button 
-                  type="submit"
-                  disabled={!isStep1Valid || isLoading || isUploading}
-                  className={`w-full py-6 text-lg font-semibold transition-all duration-300 ${
-                    isStep1Valid && !isLoading && !isUploading
-                      ? "bg-navy text-white hover:bg-navy/90"
-                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  }`}
-                  style={{ fontSize: '16px' }}
-                >
-                  {isUploading ? "Uploading Image..." : isLoading ? "Loading..." : "Continue to Step 2"}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+        {/* Desktop Layout - Side by side */}
+        <div className="hidden md:block">
+          <div className="relative mb-2">
+            <button
+              onClick={() => navigate('/')}
+              className="absolute left-0 top-0 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors cursor-pointer flex items-center gap-2"
+              style={{ color: '#4B4B4B', fontFamily: 'system-ui, Inter, sans-serif' }}
+            >
+              ← Back to Home
+            </button>
+            <div className="text-center">
+              <h1 className="text-3xl font-bold" style={{ color: '#1e2a78' }}>
+                ✨ Build your traveler profile
+              </h1>
+            </div>
+          </div>
+          <div className="text-center">
+            <p className="text-gray-600 text-sm">
+              Tell us about yourself and how you travel
+            </p>
+          </div>
         </div>
       </div>
-    );
-  }
 
-  // Step 2
-  return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-[600px] mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-navy mb-2">
-            Tell us how you travel
-          </h1>
-          <p className="text-gray-600">
-            Help us match you with compatible travelers
-          </p>
-        </div>
-
-        <Card className="shadow-md border-0 bg-white">
-          <CardHeader>
-            <CardTitle className="text-xl text-navy">Step 2 of 2</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              {/* Languages */}
-              <div>
-                <Label className="text-base font-medium text-gray-700 mb-3 block">
-                  Languages you speak
-                </Label>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {popularLanguages.map((language) => (
-                    <Badge
-                      key={language}
-                      variant={selectedLanguages.includes(language) ? "default" : "outline"}
-                      className={`cursor-pointer px-3 py-1 transition-colors ${
-                        selectedLanguages.includes(language)
-                          ? "bg-navy text-white hover:bg-navy/90"
-                          : "hover:bg-gray-100"
-                      }`}
-                      onClick={() => handleLanguageToggle(language)}
-                    >
-                      {language}
-                    </Badge>
-                  ))}
-                </div>
-                
-                <div className="mb-3">
-                  <Select value="" onValueChange={(value) => handleLanguageDropdownChange(value)}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="More languages..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {allLanguages.filter(language => !selectedLanguages.includes(language)).map((language) => (
-                        <SelectItem key={language} value={language}>{language}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                {selectedLanguages.length > 0 && (
-                  <div className="mt-3">
-                    <p className="text-sm text-gray-600 mb-2">Selected languages:</p>
-                    <div className="flex flex-wrap gap-1">
-                      {selectedLanguages.map((language) => (
-                        <Badge key={language} variant="secondary" className="pr-1">
-                          {language}
-                          <button
-                            type="button"
-                            onClick={() => handleLanguageToggle(language)}
-                            className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </Badge>
-                      ))}
+      <form onSubmit={handleSubmit} className="w-full max-w-[1600px] mx-auto px-6 pb-20">
+        {/* 3-column layout: optimized full width responsive grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+          {/* COLUMN 1 — Personal Info */}
+          <div className="bg-white rounded-lg shadow-lg p-5">
+            <div className="mb-3">
+              <h2 className="text-lg font-bold text-center" style={{ color: '#1e2a78' }}>
+                Personal Info
+              </h2>
+            </div>
+            
+            <div className="space-y-4">
+              {/* Profile Photo Upload */}
+              <div className="text-center">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Upload Photo <span className="text-red-500">*</span>
+                </label>
+                <div className="flex flex-col items-center">
+                  {profileImagePreview ? (
+                    <div className="relative">
+                      <img
+                        src={profileImagePreview}
+                        alt="Profile preview"
+                        className="w-24 h-24 rounded-full object-cover border-4 border-gray-200 shadow-lg"
+                      />
+                      {isUploading && (
+                        <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProfileImagePreview(null);
+                          setProfileImageUrl(null);
+                        }}
+                        className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-all duration-200 shadow-lg"
+                        disabled={isUploading}
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
                     </div>
+                  ) : (
+                    <div className="w-24 h-24 rounded-full bg-gray-50 border-2 border-dashed border-gray-300 flex items-center justify-center hover:border-gray-400 transition-colors cursor-pointer">
+                      {isUploading ? (
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-400"></div>
+                      ) : (
+                        <svg className="w-7 h-7 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                      )}
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    id="profile-image-upload"
+                    disabled={isUploading}
+                  />
+                  <label
+                    htmlFor="profile-image-upload"
+                    className={`cursor-pointer text-white px-4 py-2 rounded-lg text-sm font-medium mt-2 shadow-md hover:shadow-lg transition-all duration-200 w-full max-w-[140px] text-center ${
+                      isUploading ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                    style={{ backgroundColor: '#1e2a78' }}
+                  >
+                    {isUploading ? "Uploading..." : profileImagePreview ? "Change Photo" : "Upload Photo"}
+                  </label>
+                </div>
+              </div>
+
+              {/* Gender Selection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Gender <span className="text-red-500">*</span>
+                </label>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({...prev, gender: "male"}))}
+                    className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      formData.gender === "male" 
+                        ? "text-white shadow-lg" 
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-md"
+                    }`}
+                    style={{ 
+                      backgroundColor: formData.gender === "male" ? '#1e2a78' : undefined
+                    }}
+                  >
+                    Male
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({...prev, gender: "female"}))}
+                    className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      formData.gender === "female" 
+                        ? "text-white shadow-lg" 
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-md"
+                    }`}
+                    style={{ 
+                      backgroundColor: formData.gender === "female" ? '#1e2a78' : undefined
+                    }}
+                  >
+                    Female
+                  </button>
+                </div>
+              </div>
+
+              {/* How do you want to be called */}
+              <div>
+                <label htmlFor="fullName" className="block text-base font-medium text-gray-700 mb-4">
+                  How do you want to be called? <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="fullName"
+                  type="text"
+                  value={formData.fullName}
+                  onChange={(e) => setFormData(prev => ({...prev, fullName: e.target.value}))}
+                  placeholder="e.g. Jane"
+                  className="w-full px-4 py-3.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base"
+                  required
+                />
+              </div>
+
+              {/* What makes you feel alive */}
+              <div>
+                <label htmlFor="bio" className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                  What makes you feel alive? 
+                  <span className="text-gray-400 ml-1">(optional)</span>
+                  <span className="ml-1 text-xs cursor-help" title="Share what energizes and excites you">ℹ️</span>
+                </label>
+                <textarea
+                  id="bio"
+                  value={formData.bio}
+                  onChange={(e) => setFormData(prev => ({...prev, bio: e.target.value}))}
+                  placeholder="Travel, music, trying new foods, meeting people..."
+                  rows={2}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none text-sm"
+                />
+              </div>
+
+              {/* Date of Birth */}
+              <div>
+                <label className="block text-base font-medium text-gray-700 mb-4">
+                  Date of Birth <span className="text-red-500">*</span>
+                </label>
+                <div className="grid grid-cols-3 gap-3">
+                  <select
+                    value={formData.dayOfBirth}
+                    onChange={(e) => setFormData(prev => ({...prev, dayOfBirth: e.target.value}))}
+                    className="w-full px-3 py-3.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base"
+                    required
+                  >
+                    <option value="">Day</option>
+                    {dayOptions.map((day) => (
+                      <option key={day} value={day}>{day}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={formData.monthOfBirth}
+                    onChange={(e) => setFormData(prev => ({...prev, monthOfBirth: e.target.value}))}
+                    className="w-full px-3 py-3.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base"
+                    required
+                  >
+                    <option value="">Month</option>
+                    {monthOptions.map((month) => (
+                      <option key={month.value} value={month.value}>{month.label}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={formData.yearOfBirth}
+                    onChange={(e) => setFormData(prev => ({...prev, yearOfBirth: e.target.value}))}
+                    className="w-full px-3 py-3.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base"
+                    required
+                  >
+                    <option value="">Year</option>
+                    {yearOptions.map((year) => (
+                      <option key={year} value={year}>{year}</option>
+                    ))}
+                  </select>
+                </div>
+                <p className="text-sm text-gray-500 mt-2">Must be 18+</p>
+              </div>
+            </div>
+          </div>
+
+          {/* COLUMN 2 — Location & Language */}
+          <div className="bg-white rounded-lg shadow-lg p-5">
+            <div className="mb-3">
+              <h2 className="text-lg font-bold text-center" style={{ color: '#1e2a78' }}>
+                Location & Language
+              </h2>
+            </div>
+            
+            <div className="space-y-4">
+              {/* Where were you born */}
+              <div className="relative">
+                <label htmlFor="birthPlace" className="block text-sm font-medium text-gray-700 mb-2">
+                  Where were you born? <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="birthPlace"
+                  type="text"
+                  value={birthLocationInput}
+                  onChange={(e) => handleBirthLocationChange(e.target.value)}
+                  onFocus={() => setShowBirthSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowBirthSuggestions(false), 200)}
+                  placeholder="Start typing... e.g. Barcelona"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                  required
+                />
+                {showBirthSuggestions && birthSuggestions.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {birthSuggestions.map((city, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => {
+                          setBirthLocationInput(city);
+                          setFormData(prev => ({...prev, birthPlace: city}));
+                          setShowBirthSuggestions(false);
+                        }}
+                        className="w-full px-4 py-3 text-left hover:bg-blue-50 border-b border-gray-100 last:border-b-0 transition-colors"
+                      >
+                        <span className="font-medium text-gray-900">{city.split(', ')[0]}</span>
+                        <span className="text-gray-600 ml-1">, {city.split(', ')[1]}</span>
+                      </button>
+                    ))}
                   </div>
                 )}
               </div>
 
-              {/* Travel Traits */}
+              {/* Where do you currently call home */}
+              <div className="relative">
+                <label htmlFor="currentPlace" className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                  Where do you currently call home? 
+                  <span className="text-gray-400 ml-2">(optional)</span>
+                </label>
+                <input
+                  id="currentPlace"
+                  type="text"
+                  value={currentHomeInput}
+                  onChange={(e) => handleCurrentHomeChange(e.target.value)}
+                  onFocus={() => setShowHomeSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowHomeSuggestions(false), 200)}
+                  placeholder="Start typing... e.g. Amsterdam"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                />
+                {showHomeSuggestions && homeSuggestions.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {homeSuggestions.map((city, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => {
+                          setCurrentHomeInput(city);
+                          setFormData(prev => ({...prev, currentPlace: city}));
+                          setShowHomeSuggestions(false);
+                        }}
+                        className="w-full px-4 py-3 text-left hover:bg-blue-50 border-b border-gray-100 last:border-b-0 transition-colors"
+                      >
+                        <span className="font-medium text-gray-900">{city.split(', ')[0]}</span>
+                        <span className="text-gray-600 ml-1">, {city.split(', ')[1]}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Combined Languages Section */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                {/* Languages You Speak */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Languages you speak <span className="text-red-500">*</span>
+                  </label>
+                  
+                  {/* Main Languages Grid */}
+                  <div className="grid grid-cols-2 gap-2 mb-4">
+                    {mainLanguages.map((language) => (
+                      <button
+                        key={language}
+                        type="button"
+                        onClick={() => handleLanguageDropdownChange(language)}
+                        disabled={selectedLanguages.includes(language)}
+                        className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                          selectedLanguages.includes(language)
+                            ? "bg-blue-600 text-white shadow-md"
+                            : "bg-white border border-gray-200 text-gray-700 hover:border-blue-300 hover:bg-blue-50"
+                        }`}
+                      >
+                        {language}
+                      </button>
+                    ))}
+                  </div>
+                  
+                  {/* Searchable Language Picker */}
+                  <button
+                    type="button"
+                    onClick={() => setShowLanguageModal(true)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:border-blue-300 hover:bg-blue-50 transition-all text-left"
+                  >
+                    🔍 Search & add more languages...
+                  </button>
+                  
+                  {/* Selected Languages Display */}
+                  {selectedLanguages.length > 0 && (
+                    <div className="mb-4">
+                      <div className="flex flex-wrap gap-2">
+                        {selectedLanguages.map((language) => (
+                          <span 
+                            key={language} 
+                            className="inline-flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
+                          >
+                            {language}
+                            <button
+                              type="button"
+                              onClick={() => handleLanguageToggle(language)}
+                              className="ml-2 hover:bg-blue-200 rounded-full p-1"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Languages You're Learning */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Languages You're Learning <span className="text-gray-400">(optional)</span>
+                  </label>
+                  
+                  {/* Main Languages Quick Selection */}
+                  <div className="flex flex-wrap gap-1.5 mb-3">
+                    {mainLanguages.map((language) => (
+                      <button
+                        key={language}
+                        type="button"
+                        onClick={() => handleLearningLanguageDropdownChange(language)}
+                        disabled={selectedLearningLanguages.includes(language)}
+                        className={`px-2.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+                          selectedLearningLanguages.includes(language)
+                            ? "bg-orange-100 text-orange-800 cursor-not-allowed"
+                            : "bg-gray-100 text-gray-700 hover:bg-orange-100 hover:text-orange-700 hover:shadow-md"
+                        }`}
+                      >
+                        {language}
+                      </button>
+                    ))}
+                  </div>
+                  
+                  {/* Searchable Learning Language Picker */}
+                  <button
+                    type="button"
+                    onClick={() => setShowLearningLanguageModal(true)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:border-orange-300 hover:bg-orange-50 transition-all text-left mb-3"
+                  >
+                    🔍 Search & add more languages...
+                  </button>
+                  
+                  {selectedLearningLanguages.length > 0 && (
+                    <div className="mb-3">
+                      <div className="flex flex-wrap gap-1">
+                        {selectedLearningLanguages.map((language) => (
+                          <span 
+                            key={language} 
+                            className="inline-flex items-center bg-orange-100 text-orange-800 px-2 py-0.5 rounded text-xs"
+                          >
+                            {language}
+                            <button
+                              type="button"
+                              onClick={() => handleLearningLanguageToggle(language)}
+                              className="ml-1 hover:bg-orange-200 rounded-full p-0.5"
+                            >
+                              <X className="w-2 h-2" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* COLUMN 3 — Travel Preferences */}
+          <div className="bg-white rounded-lg shadow-lg p-5">
+            <div className="mb-3">
+              <h2 className="text-lg font-bold text-center" style={{ color: '#1e2a78' }}>
+                Travel Preferences
+              </h2>
+            </div>
+
+            <div className="space-y-4">
+              {/* Travel Traits Section */}
               <div>
-                <Label className="text-base font-medium text-gray-700 mb-3 block">
-                  Travel traits (select up to 5)
-                </Label>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {traitOptions.map((trait) => (
-                    <Badge
+                <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                  Travel traits 
+                  <span className="text-gray-400 ml-1">(select up to 5)</span>
+                  <span className="ml-1 text-xs cursor-help" title="These traits help us find compatible roommates">ℹ️</span>
+                </label>
+                
+                {/* Top 2 rows of most common traits */}
+                <div className="grid grid-cols-3 gap-1 mb-3">
+                  {traitOptions.slice(0, 12).map((trait) => (
+                    <button
                       key={trait}
-                      variant={selectedTraits.includes(trait) ? "default" : "outline"}
-                      className={`cursor-pointer px-3 py-1 transition-colors ${
-                        selectedTraits.includes(trait)
-                          ? "bg-navy text-white hover:bg-navy/90"
-                          : selectedTraits.length >= 5
-                          ? "opacity-50 cursor-not-allowed"
-                          : "hover:bg-gray-100"
-                      }`}
+                      type="button"
                       onClick={() => handleTraitToggle(trait)}
+                      disabled={!selectedTraits.includes(trait) && selectedTraits.length >= 5}
+                      className={`px-2 py-1 rounded-full text-xs font-medium transition-all duration-200 ${
+                        selectedTraits.includes(trait)
+                          ? "text-white shadow-md"
+                          : selectedTraits.length >= 5
+                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                          : "bg-gray-100 text-gray-700 hover:bg-blue-100 hover:text-blue-700 hover:shadow-md"
+                      }`}
+                      style={{ 
+                        backgroundColor: selectedTraits.includes(trait) ? '#1e2a78' : undefined 
+                      }}
                     >
                       {trait}
-                    </Badge>
+                    </button>
                   ))}
                 </div>
                 
+                {/* Searchable Trait Picker */}
+                <button
+                  type="button"
+                  onClick={() => setShowTraitModal(true)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:border-purple-300 hover:bg-purple-50 transition-all text-left mb-3"
+                >
+                  🔍 Search & add more traits...
+                </button>
+                
                 {selectedTraits.length > 0 && (
-                  <div className="mt-3">
-                    <p className="text-sm text-gray-600 mb-2">Selected traits ({selectedTraits.length}/5):</p>
+                  <div className="mb-2">
                     <div className="flex flex-wrap gap-1">
                       {selectedTraits.map((trait) => (
-                        <Badge key={trait} variant="secondary" className="pr-1">
+                        <span 
+                          key={trait} 
+                          className="inline-flex items-center bg-purple-100 text-purple-800 px-2 py-0.5 rounded text-xs"
+                        >
                           {trait}
                           <button
                             type="button"
                             onClick={() => handleTraitToggle(trait)}
-                            className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                            className="ml-1 hover:bg-purple-200 rounded-full p-0.5"
                           >
-                            <X className="w-3 h-3" />
+                            <X className="w-2 h-2" />
                           </button>
-                        </Badge>
+                        </span>
                       ))}
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Countries visited or lived in */}
+              {/* Most influential country */}
               <div>
-                <Label className="text-base font-medium text-gray-700 mb-3 block">
-                  Countries visited or lived in
-                </Label>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {popularCountries.map((country) => (
-                    <Badge
-                      key={country}
-                      variant={selectedCountries.includes(country) ? "default" : "outline"}
-                      className={`cursor-pointer px-3 py-1 transition-colors ${
-                        selectedCountries.includes(country)
-                          ? "bg-navy text-white hover:bg-navy/90"
-                          : "hover:bg-gray-100"
-                      }`}
-                      onClick={() => handleCountryToggle(country)}
-                    >
-                      {country}
-                    </Badge>
+                <label htmlFor="mostInfluencedCountry" className="block text-sm font-medium text-gray-700 mb-2">
+                  Which country has influenced you the most?
+                </label>
+                <select
+                  id="mostInfluencedCountry"
+                  value={formData.mostInfluencedCountry || ''}
+                  onChange={(e) => setFormData(prev => ({...prev, mostInfluencedCountry: e.target.value}))}
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                >
+                  <option value="">Select a country</option>
+                  {countryOptions.map((country) => (
+                    <option key={country} value={country}>{country}</option>
                   ))}
-                </div>
-                
-                <div className="mb-3">
-                  <Select value="" onValueChange={(value) => handleCountryDropdownChange(value)}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="More countries..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {allCountries.filter(country => !selectedCountries.includes(country)).map((country) => (
-                        <SelectItem key={country} value={country}>{country}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                {selectedCountries.length > 0 && (
-                  <div className="mt-3">
-                    <p className="text-sm text-gray-600 mb-2">Selected countries:</p>
-                    <div className="flex flex-wrap gap-1">
-                      {selectedCountries.map((country) => (
-                        <Badge key={country} variant="secondary" className="pr-1">
-                          {country}
-                          <button
-                            type="button"
-                            onClick={() => handleCountryToggle(country)}
-                            className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                </select>
+              </div>
+
+              {/* How did this country influence you */}
+              <div>
+                <label htmlFor="mostInfluencedCountryDescription" className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                  How did this country influence you? 
+                  <span className="text-gray-400 ml-1">(optional)</span>
+                  <span className="ml-1 text-xs cursor-help" title="Share how this country shaped your perspective">ℹ️</span>
+                </label>
+                <textarea
+                  id="mostInfluencedCountryDescription"
+                  value={formData.mostInfluencedCountryDescription || ''}
+                  onChange={(e) => setFormData(prev => ({...prev, mostInfluencedCountryDescription: e.target.value}))}
+                  placeholder="Tell us about the culture, people, experiences, or values that shaped you..."
+                  rows={2}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none text-sm"
+                />
+              </div>
+
+              {/* Most impactful travel experience */}
+              <div>
+                <label htmlFor="mostInfluencedExperience" className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                  What travel experience has impacted you most deeply? 
+                  <span className="text-gray-400 ml-1">(optional)</span>
+                  <span className="ml-1 text-xs cursor-help" title="Share a meaningful travel moment">ℹ️</span>
+                </label>
+                <textarea
+                  id="mostInfluencedExperience"
+                  value={formData.mostInfluencedExperience}
+                  onChange={(e) => setFormData(prev => ({...prev, mostInfluencedExperience: e.target.value}))}
+                  placeholder="Tell us about a moment, encounter, or journey that changed your perspective..."
+                  rows={2}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none text-sm"
+                />
               </div>
 
               {/* Top 3 Travel Photos */}
               <div>
-                <Label className="text-base font-medium text-gray-700 mb-3 block">
-                  Top 3 Travel Photos <span className="text-gray-400">(optional)</span>
-                </Label>
-                <p className="text-sm text-gray-600 mb-4">Share your travel background</p>
-                
-                {/* Photo upload area */}
-                <div className="grid grid-cols-3 gap-4">
-                  {Array.from({ length: 3 }).map((_, index) => (
-                    <div key={index} className="aspect-square">
-                      {travelPhotosPreviews[index] ? (
-                        <div className="relative w-full h-full">
+                <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                  Top 3 Travel Photos 
+                  <span className="text-gray-400 ml-1">(optional)</span>
+                  <span className="ml-1 text-xs cursor-help" title="Share your favorite travel memories">ℹ️</span>
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[0, 1, 2].map((index) => (
+                    <div key={index} className="relative">
+                      {travelPhotos[index] ? (
+                        <>
                           <img
-                            src={travelPhotosPreviews[index]}
+                            src={travelPhotos[index]}
                             alt={`Travel photo ${index + 1}`}
-                            className="w-full h-full object-cover rounded-lg border-2 border-gray-200"
+                            className="w-14 h-14 object-cover rounded-lg border-2 border-gray-200 shadow-sm"
                           />
-                          {uploadingPhotoIndex === index && (
-                            <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center">
-                              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
-                            </div>
-                          )}
                           <button
                             type="button"
                             onClick={() => removeTravelPhoto(index)}
-                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors"
-                            disabled={uploadingPhotoIndex === index}
+                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center hover:bg-red-600 transition-colors text-xs"
                           >
-                            <X className="w-3 h-3" />
+                            <X className="w-2 h-2" />
                           </button>
-                        </div>
+                        </>
                       ) : (
-                        <label
-                          htmlFor={`travel-photo-${index}`}
-                          className={`w-full h-full border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-gray-400 transition-colors ${
-                            uploadingPhotoIndex === index ? 'cursor-not-allowed opacity-50' : ''
-                          }`}
-                        >
-                          {uploadingPhotoIndex === index ? (
-                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-400"></div>
-                          ) : (
-                            <Plus className="w-8 h-8 text-gray-400" />
-                          )}
+                        <>
                           <input
                             type="file"
                             accept="image/*"
                             onChange={handleTravelPhotoUpload}
                             className="hidden"
                             id={`travel-photo-${index}`}
-                            disabled={uploadingPhotoIndex === index}
                           />
-                        </label>
+                          <label
+                            htmlFor={`travel-photo-${index}`}
+                            className="cursor-pointer w-14 h-14 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center hover:border-gray-400 transition-colors"
+                          >
+                            <Plus className="w-3 h-3 text-gray-400" />
+                          </label>
+                        </>
                       )}
                     </div>
                   ))}
                 </div>
               </div>
-
-              <div className="flex flex-col gap-3 pt-4">
-                <Button 
-                  onClick={handleStep2Submit}
-                  disabled={isLoading || isUploading || uploadingPhotoIndex !== null}
-                  className="w-full bg-navy text-white hover:bg-navy/90 py-6 text-lg font-semibold disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-                >
-                  {uploadingPhotoIndex !== null ? "Uploading Photos..." : isUploading ? "Uploading Image..." : isLoading ? "Creating Profile..." : "Create My Profile"}
-                </Button>
-              </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+      </form>
+
+      {/* Language Search Modals */}
+      {showLanguageModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-96 max-h-96 overflow-hidden">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Add Languages You Speak</h3>
+              <button
+                onClick={() => setShowLanguageModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <input
+              type="text"
+              placeholder="Search languages..."
+              value={languageSearchTerm}
+              onChange={(e) => setLanguageSearchTerm(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500"
+            />
+            <div className="max-h-60 overflow-y-auto">
+              {allLanguages.filter(lang => 
+                lang.toLowerCase().includes(languageSearchTerm.toLowerCase()) &&
+                !selectedLanguages.includes(lang)
+              ).map(language => (
+                <button
+                  key={language}
+                  onClick={() => {
+                    handleLanguageDropdownChange(language);
+                    setLanguageSearchTerm('');
+                    setShowLanguageModal(false);
+                  }}
+                  className="w-full text-left px-3 py-2 hover:bg-blue-50 rounded"
+                >
+                  {language}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showLearningLanguageModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-96 max-h-96 overflow-hidden">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Add Learning Languages</h3>
+              <button
+                onClick={() => setShowLearningLanguageModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <input
+              type="text"
+              placeholder="Search languages..."
+              value={learningLanguageSearchTerm}
+              onChange={(e) => setLearningLanguageSearchTerm(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-orange-500"
+            />
+            <div className="max-h-60 overflow-y-auto">
+              {allLanguages.filter(lang => 
+                lang.toLowerCase().includes(learningLanguageSearchTerm.toLowerCase()) &&
+                !selectedLearningLanguages.includes(lang)
+              ).map(language => (
+                <button
+                  key={language}
+                  onClick={() => {
+                    handleLearningLanguageDropdownChange(language);
+                    setLearningLanguageSearchTerm('');
+                    setShowLearningLanguageModal(false);
+                  }}
+                  className="w-full text-left px-3 py-2 hover:bg-orange-50 rounded"
+                >
+                  {language}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showTraitModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-96 max-h-96 overflow-hidden">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Add Travel Traits</h3>
+              <button
+                onClick={() => setShowTraitModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <input
+              type="text"
+              placeholder="Search traits..."
+              value={traitSearchTerm}
+              onChange={(e) => setTraitSearchTerm(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-purple-500"
+            />
+            <div className="max-h-60 overflow-y-auto">
+              {allTraits.filter(trait => 
+                trait.toLowerCase().includes(traitSearchTerm.toLowerCase()) &&
+                !selectedTraits.includes(trait) &&
+                selectedTraits.length < 5
+              ).map(trait => (
+                <button
+                  key={trait}
+                  onClick={() => {
+                    if (selectedTraits.length < 5) {
+                      handleTraitToggle(trait);
+                      setTraitSearchTerm('');
+                      setShowTraitModal(false);
+                    }
+                  }}
+                  className="w-full text-left px-3 py-2 hover:bg-purple-50 rounded"
+                >
+                  {trait}
+                </button>
+              ))}
+            </div>
+            {selectedTraits.length >= 5 && (
+              <p className="text-sm text-gray-500 mt-2">
+                Maximum 5 traits selected. Remove one to add more.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Compact Sticky Footer */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg z-10">
+        <div className="max-w-[1600px] mx-auto flex flex-col sm:flex-row gap-3 justify-center">
+          <button 
+            type="submit"
+            onClick={handleSubmit}
+            disabled={!isFormValid || isLoading}
+            className={`px-5 py-2 text-sm font-semibold rounded transition-all duration-300 ${
+              isFormValid && !isLoading
+                ? "text-white shadow-md hover:shadow-lg"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }`}
+            style={{ 
+              fontFamily: 'system-ui, Inter, sans-serif',
+              backgroundColor: (isFormValid && !isLoading) ? '#1e2a78' : '#d1d5db'
+            }}
+          >
+            {isLoading ? "Creating Profile..." : "Create My Profile"}
+          </button>
+
+        </div>
       </div>
     </div>
   );

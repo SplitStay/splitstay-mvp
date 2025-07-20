@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, MapPin, Calendar, Languages, Star, Camera, LogOut, Globe, Sparkles, UserPlus, Share2 } from 'lucide-react'
+import { ArrowLeft, MapPin, Calendar, Languages, Star, Camera, LogOut, Globe, Sparkles, UserPlus, Share2, User, Heart, BookOpen } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { useUser, useUserById } from '@/hooks/useUser'
@@ -381,6 +381,44 @@ export default function ProfilePage() {
 
             {/* Enhanced Content Sections */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Personal Info */}
+              {(user.birthPlace || user.gender) && (
+                <motion.div variants={itemVariants}>
+                  <Card className="bg-white/95 backdrop-blur-2xl border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-500 group overflow-hidden relative">
+                    <div className="absolute inset-0 bg-navy/3 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <CardContent className="p-8 relative z-10">
+                      <motion.div 
+                        whileHover={{ scale: 1.1, rotate: 10 }}
+                        className="flex items-center gap-4 mb-6"
+                      >
+                        <div className="w-14 h-14 bg-navy rounded-2xl flex items-center justify-center shadow-lg">
+                          <User className="w-7 h-7 text-white" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-navy">Personal Info</h3>
+                      </motion.div>
+                      <div className="space-y-4">
+                        {user.birthPlace && (
+                          <div className="flex items-center gap-3">
+                            <MapPin className="w-5 h-5 text-navy" />
+                            <span className="text-gray-700">
+                              <span className="font-medium">Born in:</span> {user.birthPlace}
+                            </span>
+                          </div>
+                        )}
+                        {user.gender && (
+                          <div className="flex items-center gap-3">
+                            <User className="w-5 h-5 text-navy" />
+                            <span className="text-gray-700">
+                              <span className="font-medium">Gender:</span> {user.gender}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              )}
+
               {/* Languages */}
               {user.languages && user.languages.length > 0 && (
                 <motion.div variants={itemVariants}>
@@ -406,6 +444,44 @@ export default function ProfilePage() {
                             whileHover={{ scale: 1.1, y: -2 }}
                           >
                             <Badge className="bg-navy text-white hover:bg-navy-dark px-4 py-2 text-sm font-medium shadow-lg border-0">
+                              {language}
+                            </Badge>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              )}
+
+              {/* Learning Languages */}
+              {user.learningLanguages && (user.learningLanguages as string[]).length > 0 && (
+                <motion.div variants={itemVariants}>
+                  <Card className="bg-white/95 backdrop-blur-2xl border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-500 group overflow-hidden relative">
+                    <div className="absolute inset-0 bg-navy/3 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <CardContent className="p-8 relative z-10">
+                      <motion.div 
+                        whileHover={{ scale: 1.1, rotate: -10 }}
+                        className="flex items-center gap-4 mb-6"
+                      >
+                        <div className="w-14 h-14 bg-navy rounded-2xl flex items-center justify-center shadow-lg">
+                          <BookOpen className="w-7 h-7 text-white" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-navy">Languages I'm Learning</h3>
+                      </motion.div>
+                      <div className="flex flex-wrap gap-3">
+                        {(user.learningLanguages as string[]).map((language, index) => (
+                          <motion.div
+                            key={language}
+                            initial={{ opacity: 0, scale: 0 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: index * 0.1 }}
+                            whileHover={{ scale: 1.1, y: -2 }}
+                          >
+                            <Badge 
+                              variant="outline" 
+                              className="border-navy text-navy hover:bg-navy/10 px-4 py-2 text-sm font-medium bg-white/50"
+                            >
                               {language}
                             </Badge>
                           </motion.div>
@@ -455,46 +531,64 @@ export default function ProfilePage() {
               )}
             </div>
 
-            {/* Countries Traveled - Full Width */}
-            {user.countriesTraveled && user.countriesTraveled.length > 0 && (
+            {/* Cultural Influence Section - Full Width */}
+            {(user.currentPlace || user.mostInfluencedCountry || user.mostInfluencedCountryDescription || user.mostInfluencedExperience) && (
               <motion.div variants={itemVariants}>
                 <Card className="bg-white/95 backdrop-blur-2xl border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-500 group overflow-hidden relative">
                   <div className="absolute inset-0 bg-navy/3 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <CardContent className="p-8 relative z-10">
                     <motion.div 
                       whileHover={{ scale: 1.05 }}
-                      className="flex items-center gap-4 mb-6"
+                      className="flex items-center gap-4 mb-8"
                     >
                       <div className="w-14 h-14 bg-navy rounded-2xl flex items-center justify-center shadow-lg">
-                        <Globe className="w-7 h-7 text-white" />
+                        <Heart className="w-7 h-7 text-white" />
                       </div>
                       <div>
-                        <h3 className="text-2xl font-bold text-navy">Countries I've Explored</h3>
-                        <p className="text-gray-600">{user.countriesTraveled.length} destinations and counting!</p>
+                        <h3 className="text-2xl font-bold text-navy">Cultural Influence</h3>
+                        <p className="text-gray-600">Places and experiences that shaped me</p>
                       </div>
                     </motion.div>
-                    <div className="flex flex-wrap gap-3">
-                      {user.countriesTraveled.map((country, index) => (
-                        <motion.div
-                          key={country}
-                          initial={{ opacity: 0, scale: 0 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: index * 0.05 }}
-                          whileHover={{ scale: 1.1, y: -2 }}
-                        >
-                          <Badge 
-                            variant="outline" 
-                            className="border-navy text-navy hover:bg-navy/10 px-4 py-2 text-sm font-medium bg-white/50"
-                          >
-                            {country}
-                          </Badge>
-                        </motion.div>
-                      ))}
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {user.currentPlace && (
+                        <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+                          <div className="flex items-center gap-3 mb-3">
+                            <Globe className="w-5 h-5 text-navy" />
+                            <h4 className="font-bold text-navy">Country I Call Home</h4>
+                          </div>
+                          <p className="text-gray-700">{user.currentPlace}</p>
+                        </div>
+                      )}
+                      
+                      {user.mostInfluencedCountry && (
+                        <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm">
+                          <div className="flex items-center gap-3 mb-3">
+                            <Star className="w-5 h-5 text-navy" />
+                            <h4 className="font-bold text-navy">Most Influenced By</h4>
+                          </div>
+                          <p className="text-gray-700">{user.mostInfluencedCountry}</p>
+                          {user.mostInfluencedCountryDescription && (
+                            <p className="text-gray-600 text-sm mt-2 italic">"{user.mostInfluencedCountryDescription}"</p>
+                          )}
+                        </div>
+                      )}
+                      
+                      {user.mostInfluencedExperience && (
+                        <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-sm md:col-span-2">
+                          <div className="flex items-center gap-3 mb-3">
+                            <Sparkles className="w-5 h-5 text-navy" />
+                            <h4 className="font-bold text-navy">Most Influential Experience</h4>
+                          </div>
+                          <p className="text-gray-700 leading-relaxed">{user.mostInfluencedExperience}</p>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
               </motion.div>
             )}
+
 
             {/* Travel Photos - Enhanced Gallery */}
             {user.travelPhotos && user.travelPhotos.length > 0 && (
@@ -544,7 +638,7 @@ export default function ProfilePage() {
             )}
 
             {/* Enhanced Empty State */}
-            {!user.languages?.length && !user.travelTraits?.length && !user.countriesTraveled?.length && !user.travelPhotos?.length && (
+            {!user.languages?.length && !user.learningLanguages?.length && !user.travelTraits?.length && !user.travelPhotos?.length && !user.birthPlace && !user.gender && !user.currentPlace && !user.mostInfluencedCountry && !user.mostInfluencedExperience && (
               <motion.div variants={itemVariants}>
                 <Card className="bg-white/95 backdrop-blur-2xl border-gray-200 shadow-xl">
                   <CardContent className="p-12 text-center">

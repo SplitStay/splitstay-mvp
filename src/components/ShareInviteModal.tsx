@@ -21,7 +21,7 @@ const generatePersonalizedMessage = (user: Tables<'user'> | undefined): string =
   const travelTraits = user.travelTraits as string[] | null;
   const bio = user.bio;
 
-  let message = `Hey! ! just joined SplitStay !`;
+  let message = `Hey! I just joined SplitStay !`;
 
   
   message += " Want to split hotel costs and make travel more affordable? Join me on SplitStay!";

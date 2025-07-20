@@ -296,17 +296,22 @@ export type Database = {
       user: {
         Row: {
           bio: string | null
-          countriesTraveled: Json | null
+          birthPlace: string | null
           createdAt: string
+          currentPlace: string | null
           dayOfBirth: number | null
           email: string
           fullName: string | null
+          gender: string | null
           id: string
           imageUrl: string | null
           instagramUrl: string | null
           languages: Json | null
-          location: string | null
+          learningLanguages: Json | null
           monthOfBirth: number | null
+          mostInfluencedCountry: string | null
+          mostInfluencedCountryDescription: string | null
+          mostInfluencedExperience: string | null
           name: string | null
           profileCreated: boolean | null
           profilePicture: string | null
@@ -318,17 +323,22 @@ export type Database = {
         }
         Insert: {
           bio?: string | null
-          countriesTraveled?: Json | null
+          birthPlace?: string | null
           createdAt?: string
+          currentPlace?: string | null
           dayOfBirth?: number | null
           email: string
           fullName?: string | null
+          gender?: string | null
           id: string
           imageUrl?: string | null
           instagramUrl?: string | null
           languages?: Json | null
-          location?: string | null
+          learningLanguages?: Json | null
           monthOfBirth?: number | null
+          mostInfluencedCountry?: string | null
+          mostInfluencedCountryDescription?: string | null
+          mostInfluencedExperience?: string | null
           name?: string | null
           profileCreated?: boolean | null
           profilePicture?: string | null
@@ -340,17 +350,22 @@ export type Database = {
         }
         Update: {
           bio?: string | null
-          countriesTraveled?: Json | null
+          birthPlace?: string | null
           createdAt?: string
+          currentPlace?: string | null
           dayOfBirth?: number | null
           email?: string
           fullName?: string | null
+          gender?: string | null
           id?: string
           imageUrl?: string | null
           instagramUrl?: string | null
           languages?: Json | null
-          location?: string | null
+          learningLanguages?: Json | null
           monthOfBirth?: number | null
+          mostInfluencedCountry?: string | null
+          mostInfluencedCountryDescription?: string | null
+          mostInfluencedExperience?: string | null
           name?: string | null
           profileCreated?: boolean | null
           profilePicture?: string | null

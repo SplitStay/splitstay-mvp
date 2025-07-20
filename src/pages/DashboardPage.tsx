@@ -3,7 +3,6 @@ import { motion } from 'framer-motion'
 import { useUser, useUpdateUser } from '@/hooks/useUser'
 import { MapPin, Star, Clock, LogOut, User } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
-import LocationModal from './LocationModal'
 import ShareInviteModal from '@/components/ShareInviteModal'
 import { ProfileGuard } from '@/components/ProfileGuard'
 import { useNavigate } from 'react-router-dom'
@@ -11,7 +10,6 @@ import { useNavigate } from 'react-router-dom'
 export const DashboardPage = () => {
   const { data: user, isLoading, error } = useUser()
   const updateUser = useUpdateUser()
-  const [showLocationModal, setShowLocationModal] = useState(false)
   const [showShareModal, setShowShareModal] = useState(false)
   const { signOut } = useAuth()
   const navigate = useNavigate()
@@ -20,21 +18,9 @@ export const DashboardPage = () => {
     // Show share modal if profile was just created and share modal hasn't been shown yet
     if (user && user.profileCreated && !user.shareModalShown) {
       setShowShareModal(true)
-    } else if (user && (!user.location || user.location.trim() === '')) {
-      // Only show location modal if share modal doesn't need to be shown
-      setShowLocationModal(true)
     }
   }, [user])
 
-  const handleLocationSubmit = async (location: string) => {
-    try {
-      await updateUser.mutateAsync({ location })
-      setShowLocationModal(false)
-      setShowShareModal(true)
-    } catch (error) {
-      console.error('Failed to update location:', error)
-    }
-  }
 
   const handleShareModalClose = async () => {
     setShowShareModal(false)
@@ -176,7 +162,7 @@ export const DashboardPage = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <MapPin className="w-5 h-5" />
-                    <span>{user?.location || 'Location not set'}</span>
+                    <span>{user?.currentPlace || 'Location not set'}</span>
                   </div>
                 </motion.div>
               </div>
@@ -212,11 +198,6 @@ export const DashboardPage = () => {
         </div>
       </div>
 
-      <LocationModal
-        isOpen={showLocationModal}
-        onClose={() => setShowLocationModal(false)}
-        onSubmit={handleLocationSubmit}
-      />
       <ShareInviteModal
         open={showShareModal}
         onClose={handleShareModalClose}
