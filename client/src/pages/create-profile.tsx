@@ -190,14 +190,14 @@ export default function CreateProfile() {
 
   if (currentStep === 1) {
     return (
-      <div className="min-h-screen bg-gray-50 p-4">
+      <div className="min-h-screen bg-red-50 p-4">
         <div className="max-w-[600px] mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-navy mb-2">
-              Build your traveler profile
+          <div className="text-center mb-8 bg-red-200 p-4 rounded">
+            <h1 className="text-3xl font-bold text-red-800 mb-2">
+              🚀 NEW ENHANCED PROFILE FORM STEP 1
             </h1>
-            <p className="text-gray-600">
-              Let's start with the basics
+            <p className="text-red-600">
+              Gender, locations, and basic info
             </p>
           </div>
 
