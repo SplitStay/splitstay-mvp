@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client";
-import App from "./App";
+import App from "./App-combined";
 import "./index.css";
 import { HelmetProvider, Helmet } from "react-helmet-async";
 

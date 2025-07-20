@@ -152,7 +152,7 @@ const Dashboard: React.FC = () => {
                       <div className="bg-navy h-2 rounded-full w-1/2"></div>
                     </div>
                     <Button 
-                      onClick={() => navigate("/create-profile")}
+                      onClick={() => navigate("/?profile=true")}
                       className="w-full bg-navy text-white hover:bg-navy/90"
                     >
                       Complete Your Profile
@@ -223,7 +223,7 @@ const Dashboard: React.FC = () => {
                     <div className="flex items-center space-x-2">
                       <Button 
                         size="sm" 
-                        onClick={() => navigate("/create-profile")}
+                        onClick={() => navigate("/?profile=true")}
                         className="bg-orange-600 text-white hover:bg-orange-700"
                       >
                         Complete Profile

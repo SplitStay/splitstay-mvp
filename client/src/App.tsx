@@ -18,20 +18,18 @@ import TripDetails from "@/pages/trip-details";
 import Chat from "@/pages/chat";
 import Profile from "@/pages/profile";
 import CreateProfile from "@/pages/create-profile";
-import CreateProfileEnhanced from "@/pages/create-profile-enhanced";
-import CreateProfileClean from "@/pages/create-profile-clean";
-import CreateProfileWide from "@/pages/create-profile-wide";
-import DebugProfile from "@/pages/debug-profile";
 import TestSimple from "@/pages/test-simple";
 import TestRoute from "@/pages/test-route";
 import SimpleTest from "@/pages/simple-test";
 import CreateProfileSimple from "@/pages/create-profile-simple";
+import CreateTrip from "@/pages/create-trip";
 import BrowseTrips from "@/pages/browse-trips";
 import FindRoommate from "@/pages/find-roommate";
 import BrowseProfiles from "@/pages/browse-profiles-fixed";
 import LeaveReview from "@/pages/leave-review";
 import RequestBooking from "@/pages/request-booking";
 import RequestSent from "@/pages/request-sent";
+import Chat from "@/pages/chat";
 import Messages from "@/pages/messages-fixed";
 import BookingConfirmation from "@/pages/booking-confirmation";
 import CheckIn from "@/pages/check-in";
@@ -71,9 +69,7 @@ function Router() {
         <Route path="/dashboard" component={DashboardTrips} />
         <Route path="/profile" component={Profile} />
         <Route path="/profile/edit" component={CreateProfile} />
-        <Route path="/create-profile" component={CreateProfileWide} />
-        <Route path="/new-profile" component={CreateProfile} />
-        <Route path="/debug-profile" component={DebugProfile} />
+        <Route path="/create-profile" component={CreateProfile} />
         <Route path="/create-trip" component={CreateTrip} />
         <Route path="/trip/:tripId" component={TripDetails} />
         <Route path="/chat/:userId" component={Chat} />
