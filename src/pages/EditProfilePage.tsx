@@ -45,6 +45,8 @@ export default function EditProfilePage() {
   const [learningLanguageSearchTerm, setLearningLanguageSearchTerm] = useState('');
   const [showTraitModal, setShowTraitModal] = useState(false);
   const [traitSearchTerm, setTraitSearchTerm] = useState('');
+
+  console.log("Hello");
   
   // Personalized link state
   const [personalizedLinkInput, setPersonalizedLinkInput] = useState('');
