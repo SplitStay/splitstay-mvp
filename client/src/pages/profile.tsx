@@ -17,6 +17,8 @@ import emilyProfilePic from "../assets/emily-profile-2025.png";
 
 const Profile: React.FC = () => {
   const [_, navigate] = useLocation();
+
+  console.log("hello")
   
   // Mock user data - in a real app this would come from the API/database
   const [user] = useState({
