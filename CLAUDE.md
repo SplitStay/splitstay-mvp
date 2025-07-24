@@ -14,11 +14,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is a React 19 + TypeScript + Vite frontend application with Supabase backend integration.
 
 ### Tech Stack
-- **Frontend**: React 19, TypeScript, Vite, Framee Motion
-- **Styling**: Tailwind CSS v4 with shadcn/ui components + Framer Motion for Animations
+- **Frontend**: React 19, TypeScript, Vite, Framer Motion
+- **Styling**: Tailwind CSS with shadcn/ui components + Framer Motion for animations
 - **Backend**: Supabase (PostgreSQL database, auth, realtime)
 - **Build Tool**: Vite with SWC for fast refresh
 - **UI Library**: shadcn/ui (New York style variant)
+- **State Management**: TanStack Query (React Query) for server state
+- **Routing**: React Router DOM v7
+- **Forms**: React Select, React DatePicker
+- **Notifications**: React Hot Toast
 
 ### Database Schema
 The application uses Supabase with the following main entities:
@@ -36,9 +40,17 @@ Key relationships:
 - Requests link users to trips they want to join
 
 ### Project Structure
-- `src/App.tsx` - Main application component (currently boilerplate)
+- `src/App.tsx` - Main application component with routing and authentication
+- `src/main.tsx` - Application entry point with React Query setup
 - `src/types/database.types.ts` - Auto-generated Supabase TypeScript types
-- `src/lib/utils.ts` - Utility functions (currently just className merger)
+- `src/lib/` - Core utilities and configurations
+  - `supabase.ts` - Supabase client configuration
+  - `utils.ts` - Utility functions including className merger
+  - `locationiq.ts` - LocationIQ integration for location services
+- `src/contexts/AuthContext.tsx` - Authentication context provider
+- `src/hooks/useUser.ts` - User management hook
+- `src/pages/` - Application pages and page components
+- `src/components/` - Reusable components and UI elements
 - `supabase/config.toml` - Supabase local development configuration
 
 ### Key Configuration
@@ -47,12 +59,21 @@ Key relationships:
 - Supabase local development on port 54321
 - shadcn/ui components configured with Lucide icons
 - ESLint with React and TypeScript rules
+- Custom Tailwind theme with SplitStay brand colors (navy: #1A1E62, cream: #F5F1EB)
+
+### Application Features
+- **Authentication**: Complete auth flow with login, signup, password reset
+- **Profile Management**: User profile creation and editing with image uploads
+- **Trip Management**: Multi-step trip posting with destination, accommodation, and preferences
+- **Routing**: Protected routes with authentication guards
+- **Responsive Design**: Mobile-first approach with desktop enhancements
+- **Real-time Notifications**: Toast notifications for user feedback
 
 ### Development Notes
 - Uses Supabase local development environment
 - Database types are generated from Supabase schema
-- Currently appears to be in early development stage (still has Vite boilerplate)
-- No custom components or business logic implemented yet
+- Environment variables required: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
+- Custom authentication trigger syncs auth.users with public.user table
 
 On inserting a row in the database in the auth.users, this trigger is executed to insert the data in the public.user table:
 
@@ -120,5 +141,15 @@ Forms and UI components should be optimized for both mobile and desktop experien
 - Maintain existing mobile functionality while enhancing desktop experience
 - Keep forms visually balanced across all screen sizes
 
-**Important**
-Always use the database types as defined by supabase
+### Testing & Deployment
+- Run `npm run lint` to check code quality before committing
+- Build production version with `npm run build`
+- Preview production build locally with `npm run preview`
+- Development server runs with hot reload via `npm run dev --host`
+
+### Important Guidelines
+- Always use the database types as defined by Supabase
+- Follow the existing routing patterns with PublicRoute/PrivateRoute wrappers
+- Use the AuthContext for authentication state management
+- Implement responsive design following the mobile-first approach
+- Use React Query for server state management and caching

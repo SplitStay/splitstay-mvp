@@ -545,7 +545,7 @@ export default function EditProfilePage() {
     try {
       // Update user profile with all the collected data
       await updateUserMutation.mutateAsync({
-        fullName: formData.fullName,
+        name: formData.fullName,
         bio: formData.bio || null,
         birthPlace: formData.birthPlace || null,
         currentPlace: formData.currentPlace || null,
