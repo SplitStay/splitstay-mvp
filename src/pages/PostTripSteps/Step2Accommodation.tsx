@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Building2, Link, Hash } from 'lucide-react';
+import { AccommodationPreview } from '../../components/AccommodationPreview';
+import { iframelyService, type AccommodationPreview as AccommodationPreviewType } from '../../lib/iframely';
 
 interface Room {
   id: number;
@@ -34,6 +36,17 @@ const Step2Accommodation: React.FC<Props> = ({
     { id: 2, numberOfBeds: 1, bedType: 'Double Bed', ensuiteBathroom: false },
     { id: 3, numberOfBeds: 1, bedType: 'Double Bed', ensuiteBathroom: false }
   ]);
+  const [accommodationPreview, setAccommodationPreview] = useState<AccommodationPreviewType>({
+    title: '',
+    description: '',
+    image: '',
+    site: '',
+    author: '',
+    url: '',
+    favicon: '',
+    isLoading: false,
+    error: null,
+  });
 
   const accommodationTypes = [
     'Villa', 'Hotel', 'Apartment', 'House', 'Hostel', 'Resort', 'B&B', 'Guesthouse'
@@ -63,6 +76,41 @@ const Step2Accommodation: React.FC<Props> = ({
       setRooms(rooms.slice(0, numberOfRooms));
     }
   }, [numberOfRooms, rooms]);
+
+  // Debounced accommodation preview fetching
+  useEffect(() => {
+    if (!accommodationLink || accommodationLink.trim() === '') {
+      setAccommodationPreview({
+        title: '',
+        description: '',
+        image: '',
+        site: '',
+        author: '',
+        url: '',
+        favicon: '',
+        isLoading: false,
+        error: null,
+      });
+      return;
+    }
+
+    const timeoutId = setTimeout(async () => {
+      setAccommodationPreview(prev => ({ ...prev, isLoading: true, error: null }));
+      
+      try {
+        const preview = await iframelyService.getAccommodationPreview(accommodationLink);
+        setAccommodationPreview(preview);
+      } catch (error) {
+        setAccommodationPreview(prev => ({
+          ...prev,
+          isLoading: false,
+          error: error instanceof Error ? error.message : 'Failed to load preview'
+        }));
+      }
+    }, 1000); // 1 second debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [accommodationLink]);
 
   const updateRoom = (roomId: number, field: keyof Room, value: any) => {
     setRooms(rooms.map(room => 
@@ -113,14 +161,24 @@ const Step2Accommodation: React.FC<Props> = ({
           <Link className="inline w-5 h-5 mr-2 text-purple-600" />
           Accommodation Link <span className="text-red-500">*</span>
         </label>
+        <p className="text-sm text-gray-600 mb-3">
+          Paste a link from Booking.com, Airbnb, Hotels.com, or any accommodation booking site
+        </p>
         <input
           type="url"
           value={accommodationLink}
           onChange={(e) => setAccommodationLink(e.target.value)}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-lg"
-          placeholder="https://example.com/booking"
+          placeholder="https://booking.com/hotel/... or https://airbnb.com/rooms/..."
           required
         />
+        
+        {/* Accommodation Preview */}
+        {(accommodationPreview.isLoading || accommodationPreview.error || accommodationPreview.title) && (
+          <div className="mt-4">
+            <AccommodationPreview preview={accommodationPreview} />
+          </div>
+        )}
       </div>
 
       {/* Number of Rooms */}
