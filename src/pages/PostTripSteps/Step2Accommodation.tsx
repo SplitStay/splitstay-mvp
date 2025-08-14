@@ -1,6 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Home, FileText } from 'lucide-react';
+import { Building2, Link, Hash } from 'lucide-react';
+
+interface Room {
+  id: number;
+  numberOfBeds: number;
+  bedType: string;
+  ensuiteBathroom: boolean;
+}
 
 interface Props {
   trip: any;
@@ -19,49 +26,186 @@ const Step2Accommodation: React.FC<Props> = ({
   back,
   next,
 }) => {
+  const [accommodationType, setAccommodationType] = useState(trip.accommodationType || 'Villa');
+  const [accommodationLink, setAccommodationLink] = useState(trip.bookingUrl || '');
+  const [numberOfRooms, setNumberOfRooms] = useState(trip.numberOfRooms || 3);
+  const [rooms, setRooms] = useState<Room[]>(trip.rooms || [
+    { id: 1, numberOfBeds: 2, bedType: 'Double Bed', ensuiteBathroom: true },
+    { id: 2, numberOfBeds: 1, bedType: 'Double Bed', ensuiteBathroom: false },
+    { id: 3, numberOfBeds: 1, bedType: 'Double Bed', ensuiteBathroom: false }
+  ]);
+
+  const accommodationTypes = [
+    'Villa', 'Hotel', 'Apartment', 'House', 'Hostel', 'Resort', 'B&B', 'Guesthouse'
+  ];
+
+  const bedTypes = [
+    'Single Bed', 'Double Bed', 'Queen Bed', 'King Bed', 'Twin Bed', 'Sofa Bed', 'Bunk Bed'
+  ];
+
+  // Update rooms when numberOfRooms changes
+  useEffect(() => {
+    const currentRoomCount = rooms.length;
+    if (numberOfRooms > currentRoomCount) {
+      // Add new rooms
+      const newRooms = [...rooms];
+      for (let i = currentRoomCount; i < numberOfRooms; i++) {
+        newRooms.push({
+          id: i + 1,
+          numberOfBeds: 1,
+          bedType: 'Double Bed',
+          ensuiteBathroom: false
+        });
+      }
+      setRooms(newRooms);
+    } else if (numberOfRooms < currentRoomCount) {
+      // Remove excess rooms
+      setRooms(rooms.slice(0, numberOfRooms));
+    }
+  }, [numberOfRooms, rooms]);
+
+  const updateRoom = (roomId: number, field: keyof Room, value: any) => {
+    setRooms(rooms.map(room => 
+      room.id === roomId ? { ...room, [field]: value } : room
+    ));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setTrip({
+      ...trip,
+      accommodationType,
+      bookingUrl: accommodationLink,
+      numberOfRooms,
+      rooms
+    });
+    next();
+  };
   return (
     <motion.form
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      onSubmit={e => {
-        e.preventDefault();
-        next();
-      }}
+      onSubmit={handleSubmit}
       className="space-y-8 bg-white/90 rounded-2xl shadow-xl p-8"
     >
+      {/* Accommodation Type */}
       <div>
-        <label className="block text-lg font-semibold text-gray-800 mb-2">
-          <Home className="inline w-5 h-5 mr-2 text-blue-600" />
+        <label className="block text-lg font-semibold text-gray-800 mb-3">
+          <Building2 className="inline w-5 h-5 mr-2 text-teal-600" />
+          Accommodation Type <span className="text-red-500">*</span>
+        </label>
+        <select
+          value={accommodationType}
+          onChange={(e) => setAccommodationType(e.target.value)}
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-lg bg-white"
+          required
+        >
+          {accommodationTypes.map(type => (
+            <option key={type} value={type}>{type}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Accommodation Link */}
+      <div>
+        <label className="block text-lg font-semibold text-gray-800 mb-3">
+          <Link className="inline w-5 h-5 mr-2 text-purple-600" />
           Accommodation Link <span className="text-red-500">*</span>
         </label>
         <input
           type="url"
-          value={trip.bookingUrl || ''}
-          onChange={e => setTrip({ ...trip, bookingUrl: e.target.value })}
+          value={accommodationLink}
+          onChange={(e) => setAccommodationLink(e.target.value)}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-lg"
-          placeholder="Paste Booking.com or Airbnb link"
+          placeholder="https://example.com/booking"
           required
         />
       </div>
+
+      {/* Number of Rooms */}
       <div>
-        <label className="block text-lg font-semibold text-gray-800 mb-2">
-          <FileText className="inline w-5 h-5 mr-2 text-purple-600" />
-          Personal Note
+        <label className="block text-lg font-semibold text-gray-800 mb-3">
+          <Hash className="inline w-5 h-5 mr-2 text-green-600" />
+          Number of Rooms <span className="text-red-500">*</span>
         </label>
-        <textarea
-          value={personalNote}
-          onChange={e => setPersonalNote(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-lg"
-          placeholder="e.g. I'll be staying at XYZ Hotel, 2 minutes from the beach!"
-          rows={3}
+        <input
+          type="number"
+          min="1"
+          max="10"
+          value={numberOfRooms}
+          onChange={(e) => setNumberOfRooms(parseInt(e.target.value) || 1)}
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-lg"
+          required
         />
       </div>
+
+      {/* Room Configuration */}
+      <div className="space-y-6">
+        {rooms.map((room, index) => (
+          <div key={room.id} className="border border-gray-200 rounded-lg p-6 bg-gray-50">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Room {index + 1}
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              {/* Number of Beds */}
+              <div>
+                <label className="block text-base font-medium text-gray-700 mb-2">
+                  Number of Beds <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={room.numberOfBeds}
+                  onChange={(e) => updateRoom(room.id, 'numberOfBeds', parseInt(e.target.value) || 1)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+
+              {/* Bed Type */}
+              <div>
+                <label className="block text-base font-medium text-gray-700 mb-2">
+                  Bed Type <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={room.bedType}
+                  onChange={(e) => updateRoom(room.id, 'bedType', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
+                  required
+                >
+                  {bedTypes.map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Ensuite Bathroom */}
+            <div className="flex items-center justify-end gap-3">
+              <label htmlFor={`ensuite-${room.id}`} className="text-base font-medium text-gray-700">
+                Ensuite Bathroom
+              </label>
+              <input
+                type="checkbox"
+                id={`ensuite-${room.id}`}
+                checked={room.ensuiteBathroom}
+                onChange={(e) => updateRoom(room.id, 'ensuiteBathroom', e.target.checked)}
+                className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Navigation Buttons */}
       <div className="flex gap-4 mt-8">
         <button
           type="button"
           onClick={back}
-          className="w-1/2 bg-gray-100 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-200"
+          className="w-1/2 bg-gray-100 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors"
         >
           Back
         </button>

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import { motion } from 'framer-motion';
 import { MapPin } from 'lucide-react';
+import CityAutocomplete from '@/components/CityAutocomplete';
 import 'react-datepicker/dist/react-datepicker.css';
 
 interface Props {
@@ -10,37 +11,21 @@ interface Props {
   next: () => void;
 }
 
-interface PhotonFeature {
-  properties: {
-    label: string;
-    [key: string]: any;
-  };
-}
-
 const Step1Destination: React.FC<Props> = ({ trip, setTrip, next }) => {
   const [city, setCity] = useState(trip.location || '');
-  const [suggestions, setSuggestions] = useState<PhotonFeature[]>([]);
   const [startDate, setStartDate] = useState(trip.startDate ? new Date(trip.startDate) : null);
   const [endDate, setEndDate] = useState(trip.endDate ? new Date(trip.endDate) : null);
+  const [useEstimatedDates, setUseEstimatedDates] = useState(trip.useEstimatedDates || false);
+  const [estimatedMonth, setEstimatedMonth] = useState(trip.estimatedMonth || 'September');
+  const [estimatedYear, setEstimatedYear] = useState(trip.estimatedYear || '2025');
 
-  // Photon API autocomplete
-  useEffect(() => {
-    if (!city) {
-      setSuggestions([]);
-      return;
-    }
-    const controller = new AbortController();
-    fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(city)}&lang=en`, { signal: controller.signal })
-      .then(res => res.json())
-      .then((data: { features: PhotonFeature[] }) => setSuggestions(data.features || []))
-      .catch(() => {});
-    return () => controller.abort();
-  }, [city]);
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
 
-  const handleSelect = (feature: PhotonFeature) => {
-    setCity(feature.properties.label);
-    setSuggestions([]);
-  };
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 10 }, (_, i) => (currentYear + i).toString());
 
   return (
     <motion.form
@@ -49,12 +34,27 @@ const Step1Destination: React.FC<Props> = ({ trip, setTrip, next }) => {
       transition={{ duration: 0.5 }}
       onSubmit={e => {
         e.preventDefault();
-        setTrip({
-          ...trip,
-          location: city,
-          startDate: startDate?.toISOString() || '',
-          endDate: endDate?.toISOString() || '',
-        });
+        if (useEstimatedDates) {
+          setTrip({
+            ...trip,
+            location: city,
+            estimatedMonth,
+            estimatedYear,
+            useEstimatedDates: true,
+            startDate: '',
+            endDate: '',
+          });
+        } else {
+          setTrip({
+            ...trip,
+            location: city,
+            startDate: startDate?.toISOString() || '',
+            endDate: endDate?.toISOString() || '',
+            useEstimatedDates: false,
+            estimatedMonth: '',
+            estimatedYear: '',
+          });
+        }
         next();
       }}
       className="space-y-6 lg:space-y-8 bg-white/90 rounded-2xl shadow-xl p-6 lg:p-8"
@@ -77,63 +77,105 @@ const Step1Destination: React.FC<Props> = ({ trip, setTrip, next }) => {
           <MapPin className="inline w-5 h-5 mr-2 text-blue-600" />
           City & Country <span className="text-red-500">*</span>
         </label>
-        <div className="relative">
-          <input
-            type="text"
-            value={city}
-            onChange={e => setCity(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-lg"
-            placeholder="e.g. Paris, France"
-            required
-            autoComplete="off"
-          />
-          {suggestions.length > 0 && (
-            <ul className="absolute left-0 right-0 bg-white border border-gray-200 rounded-md shadow-lg z-10 mt-1 max-h-48 overflow-y-auto">
-              {suggestions.map((feature, idx) => {
-                const label = feature.properties.label;
-                if (!label) return null;
-                return (
-                  <li
-                    key={label + idx}
-                    className="px-4 py-2 cursor-pointer hover:bg-blue-50"
-                    onClick={() => handleSelect(feature)}
-                  >
-                    {label}
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </div>
+        <CityAutocomplete
+          value={city}
+          onChange={setCity}
+          placeholder="e.g. Paris, France"
+          required
+          className="[&>input]:text-lg [&>input]:py-3"
+        />
       </div>
-      <div className="flex gap-6">
-        <div className="flex-1">
-          <label className="block text-lg font-semibold text-gray-800 mb-2">
-            Start Date <span className="text-red-500">*</span>
-          </label>
-          <DatePicker
-            selected={startDate}
-            onChange={date => setStartDate(date)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg"
-            dateFormat="yyyy-MM-dd"
-            required
-            placeholderText="Select start date"
+      {/* Toggle Switch */}
+      <div className="flex items-center gap-3">
+        <div 
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 cursor-pointer ${
+            useEstimatedDates ? 'bg-blue-600' : 'bg-gray-300'
+          }`}
+          onClick={() => setUseEstimatedDates(!useEstimatedDates)}
+        >
+          <span
+            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
+              useEstimatedDates ? 'translate-x-6' : 'translate-x-1'
+            }`}
           />
         </div>
-        <div className="flex-1">
-          <label className="block text-lg font-semibold text-gray-800 mb-2">
-            End Date <span className="text-red-500">*</span>
-          </label>
-          <DatePicker
-            selected={endDate}
-            onChange={date => setEndDate(date)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg"
-            dateFormat="yyyy-MM-dd"
-            required
-            placeholderText="Select end date"
-          />
-        </div>
+        <span className="text-lg font-medium text-gray-800">
+          I don't know my exact dates yet
+        </span>
       </div>
+
+      {/* Conditional Date/Timeframe Section */}
+      {useEstimatedDates ? (
+        <div>
+          <label className="block text-lg font-semibold text-gray-800 mb-2">
+            Estimated Timeframe <span className="text-red-500">*</span>
+          </label>
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <select
+                value={estimatedMonth}
+                onChange={e => setEstimatedMonth(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              >
+                {months.map(month => (
+                  <option key={month} value={month}>{month}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex-1">
+              <select
+                value={estimatedYear}
+                onChange={e => setEstimatedYear(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              >
+                {years.map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="mt-3">
+            <button 
+              type="button"
+              className="text-blue-600 font-medium hover:underline"
+              onClick={() => setUseEstimatedDates(false)}
+            >
+              Or select specific dates
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="flex gap-6">
+          <div className="flex-1">
+            <label className="block text-lg font-semibold text-gray-800 mb-2">
+              Start Date <span className="text-red-500">*</span>
+            </label>
+            <DatePicker
+              selected={startDate}
+              onChange={date => setStartDate(date)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg"
+              dateFormat="yyyy-MM-dd"
+              required={!useEstimatedDates}
+              placeholderText="Select start date"
+            />
+          </div>
+          <div className="flex-1">
+            <label className="block text-lg font-semibold text-gray-800 mb-2">
+              End Date <span className="text-red-500">*</span>
+            </label>
+            <DatePicker
+              selected={endDate}
+              onChange={date => setEndDate(date)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg"
+              dateFormat="yyyy-MM-dd"
+              required={!useEstimatedDates}
+              placeholderText="Select end date"
+            />
+          </div>
+        </div>
+      )}
       <motion.button
         whileHover={{ scale: 1.03 }}
         type="submit"

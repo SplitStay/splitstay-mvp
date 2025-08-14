@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
-import { HomePage, LoginPage, SignupPage, ForgotPasswordPage, ResetPasswordPage, DashboardPage, TermsPage, PrivacyPage, HowItWorks } from './pages'
+import { HomePage, LoginPage, SignupPage, ForgotPasswordPage, ResetPasswordPage, DashboardPage, TermsPage, PrivacyPage, HowItWorks, FindPartnerPage } from './pages'
 import PostTripPage from './pages/PostTripPage'
 import CreateProfilePage from './pages/CreateProfilePage'
 import EditProfilePage from './pages/EditProfilePage'
@@ -124,6 +124,14 @@ function AppRoutes() {
         element={
           <PrivateRoute>
             <PostTripPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/find-partners"
+        element={
+          <PrivateRoute>
+            <FindPartnerPage />
           </PrivateRoute>
         }
       />

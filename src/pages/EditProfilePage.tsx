@@ -4,7 +4,7 @@ import { X, Plus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUser, useUpdateUser } from "@/hooks/useUser";
 import { supabase } from "@/lib/supabase";
-import { locationIQService } from "@/lib/locationiq";
+import CityAutocomplete from "@/components/CityAutocomplete";
 import toast from "react-hot-toast";
 
 export default function EditProfilePage() {
@@ -35,10 +35,7 @@ export default function EditProfilePage() {
   // Additional state for enhanced features
   const [birthLocationInput, setBirthLocationInput] = useState(formData.birthPlace || '');
   const [currentHomeInput, setCurrentHomeInput] = useState(formData.currentPlace || '');
-  const [birthSuggestions, setBirthSuggestions] = useState<string[]>([]);
-  const [homeSuggestions, setHomeSuggestions] = useState<string[]>([]);
-  const [showBirthSuggestions, setShowBirthSuggestions] = useState(false);
-  const [showHomeSuggestions, setShowHomeSuggestions] = useState(false);
+
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [languageSearchTerm, setLanguageSearchTerm] = useState('');
   const [showLearningLanguageModal, setShowLearningLanguageModal] = useState(false);
@@ -153,7 +150,7 @@ export default function EditProfilePage() {
     setCheckingAvailability(true);
     setPersonalizedLinkAvailable(null);
     
-    const timeout = setTimeout(async () => {
+    setTimeout(async () => {
       const isAvailable = await checkLinkAvailability(cleanValue);
       setPersonalizedLinkAvailable(isAvailable);
       setCheckingAvailability(false);
@@ -264,63 +261,16 @@ export default function EditProfilePage() {
     }
   };
 
-  // Helper function to determine if character count should trigger autocomplete
-  const shouldTriggerAutocomplete = (length: number): boolean => {
-    if (length === 1 || length === 3 || length === 6 || length === 9) {
-      return true;
-    }
-    // After 9, trigger every 3 characters: 12, 15, 18, 21, etc.
-    if (length > 9 && (length - 9) % 3 === 0) {
-      return true;
-    }
-    return false;
-  };
-
-  // LocationIQ API autocomplete function
-  const searchCities = async (query: string): Promise<string[]> => {
-    if (query.length < 1) return [];
-    
-    try {
-      const results = await locationIQService.searchCities(query);
-      return results;
-    } catch (error) {
-      console.error('LocationIQ search error:', error);
-      return [];
-    }
-  };
-
   // Handle autocomplete for birth location
-  const handleBirthLocationChange = async (value: string) => {
+  const handleBirthLocationChange = (value: string) => {
     setBirthLocationInput(value);
     setFormData(prev => ({...prev, birthPlace: value}));
-    
-    // Trigger autocomplete immediately at specific character counts
-    if (shouldTriggerAutocomplete(value.length)) {
-      const suggestions = await searchCities(value);
-      setBirthSuggestions(suggestions);
-      setShowBirthSuggestions(true);
-    } else if (value.length === 0) {
-      // Hide suggestions when input is empty
-      setShowBirthSuggestions(false);
-      setBirthSuggestions([]);
-    }
   };
 
   // Handle autocomplete for current home
-  const handleCurrentHomeChange = async (value: string) => {
+  const handleCurrentHomeChange = (value: string) => {
     setCurrentHomeInput(value);
     setFormData(prev => ({...prev, currentPlace: value}));
-    
-    // Trigger autocomplete immediately at specific character counts
-    if (shouldTriggerAutocomplete(value.length)) {
-      const suggestions = await searchCities(value);
-      setHomeSuggestions(suggestions);
-      setShowHomeSuggestions(true);
-    } else if (value.length === 0) {
-      // Hide suggestions when input is empty
-      setShowHomeSuggestions(false);
-      setHomeSuggestions([]);
-    }
   };
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -956,78 +906,23 @@ export default function EditProfilePage() {
             
             <div className="space-y-4">
               {/* Where were you born */}
-              <div className="relative">
-                <label htmlFor="birthPlace" className="block text-sm font-medium text-gray-700 mb-2">
-                  Where were you born? <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="birthPlace"
-                  type="text"
-                  value={birthLocationInput}
-                  onChange={(e) => handleBirthLocationChange(e.target.value)}
-                  onFocus={() => setShowBirthSuggestions(true)}
-                  onBlur={() => setTimeout(() => setShowBirthSuggestions(false), 200)}
-                  placeholder="Start typing... e.g. Barcelona"
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
-                  required
-                />
-                {showBirthSuggestions && birthSuggestions.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    {birthSuggestions.map((city, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() => {
-                          setBirthLocationInput(city);
-                          setFormData(prev => ({...prev, birthPlace: city}));
-                          setShowBirthSuggestions(false);
-                        }}
-                        className="w-full px-4 py-3 text-left hover:bg-blue-50 border-b border-gray-100 last:border-b-0 transition-colors"
-                      >
-                        <span className="font-medium text-gray-900">{city.split(', ')[0]}</span>
-                        <span className="text-gray-600 ml-1">, {city.split(', ')[1]}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <CityAutocomplete
+                value={birthLocationInput}
+                onChange={handleBirthLocationChange}
+                placeholder="Start typing... e.g. Barcelona"
+                label="Where were you born?"
+                required
+                className="[&>label]:text-sm [&>label]:font-medium [&>label]:text-gray-700 [&>label]:mb-2 [&>input]:px-3 [&>input]:py-2.5 [&>input]:text-sm"
+              />
 
               {/* Where do you currently call home */}
-              <div className="relative">
-                <label htmlFor="currentPlace" className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                  Where do you currently call home? 
-                  <span className="text-gray-400 ml-2">(optional)</span>
-                </label>
-                <input
-                  id="currentPlace"
-                  type="text"
-                  value={currentHomeInput}
-                  onChange={(e) => handleCurrentHomeChange(e.target.value)}
-                  onFocus={() => setShowHomeSuggestions(true)}
-                  onBlur={() => setTimeout(() => setShowHomeSuggestions(false), 200)}
-                  placeholder="Start typing... e.g. Amsterdam"
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
-                />
-                {showHomeSuggestions && homeSuggestions.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    {homeSuggestions.map((city, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() => {
-                          setCurrentHomeInput(city);
-                          setFormData(prev => ({...prev, currentPlace: city}));
-                          setShowHomeSuggestions(false);
-                        }}
-                        className="w-full px-4 py-3 text-left hover:bg-blue-50 border-b border-gray-100 last:border-b-0 transition-colors"
-                      >
-                        <span className="font-medium text-gray-900">{city.split(', ')[0]}</span>
-                        <span className="text-gray-600 ml-1">, {city.split(', ')[1]}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <CityAutocomplete
+                value={currentHomeInput}
+                onChange={handleCurrentHomeChange}
+                placeholder="Start typing... e.g. Amsterdam"
+                label="Where do you currently call home? (optional)"
+                className="[&>label]:text-sm [&>label]:font-medium [&>label]:text-gray-700 [&>label]:mb-2 [&>input]:px-3 [&>input]:py-2.5 [&>input]:text-sm"
+              />
 
               {/* Combined Languages Section */}
               <div className="bg-gray-50 p-4 rounded-lg">

@@ -80,7 +80,7 @@ export const DashboardPage = () => {
                 Add a Trip
               </button>
               <button
-                onClick={() => {/* TODO: Navigate to find partners */}}
+                onClick={() => navigate('/find-partners')}
                 className="flex items-center gap-2 bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-full transition-colors font-medium"
               >
                 <Users className="w-4 h-4" />

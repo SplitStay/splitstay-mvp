@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
+import CityAutocomplete from '@/components/CityAutocomplete';
 
 interface LocationModalProps {
   isOpen: boolean;
@@ -7,62 +8,16 @@ interface LocationModalProps {
   onSubmit: (location: string) => void;
 }
 
-interface PhotonFeature {
-  properties: {
-    label: string;
-    osm_id: string | number;
-    [key: string]: any;
-  };
-}
-
 const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose, onSubmit }) => {
   const [input, setInput] = useState('');
-  const [suggestions, setSuggestions] = useState<PhotonFeature[]>([]);
-  const [selected, setSelected] = useState<string>('');
-  const [loading, setLoading] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
-
-  useEffect(() => {
-    if (!input) {
-      setSuggestions([]);
-      return;
-    }
-    setLoading(true);
-    const controller = new AbortController();
-    fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(input)}&lang=en`, { signal: controller.signal })
-      .then(res => res.json())
-      .then((data: { features: PhotonFeature[] }) => {
-        setSuggestions(data.features || []);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-    return () => controller.abort();
-  }, [input]);
 
   if (!isOpen) return null;
 
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInput(e.target.value);
-    setSelected('');
-  };
-
-  const handleSelect = (feature: PhotonFeature) => {
-    const label =
-      feature.properties.label ||
-      feature.properties.name ||
-      feature.properties.city ||
-      feature.properties.state ||
-      feature.properties.country ||
-      '';
-    setInput(label);
-    setSelected(label);
-    setSuggestions([]);
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (selected || input) {
-      onSubmit(selected || input);
+    if (input) {
+      onSubmit(input);
     }
   };
 
@@ -79,46 +34,15 @@ const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose, onSubmit
           Please provide your location to access the dashboard.
         </p>
         <form onSubmit={handleSubmit} autoComplete="off">
-          <div className="mb-4 relative">
-            <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
-              Location
-            </label>
-            <input
-              type="text"
-              id="location"
+          <div className="mb-4">
+            <CityAutocomplete
               value={input}
-              onChange={handleInput}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={setInput}
               placeholder="Enter your location"
+              label="Location"
               required
-              autoComplete="off"
+              className="[&>label]:text-sm [&>label]:font-medium [&>label]:text-gray-700 [&>label]:mb-2 [&>input]:px-3 [&>input]:py-2"
             />
-            {loading && (
-              <div className="absolute right-3 top-3 text-gray-400 text-xs">Loading...</div>
-            )}
-            {suggestions.length > 0 && (
-              <ul className="absolute left-0 right-0 bg-white border border-gray-200 rounded-md shadow-lg z-10 mt-1 max-h-48 overflow-y-auto">
-                {suggestions.map((feature) => {
-                  const label =
-                    feature.properties.label ||
-                    feature.properties.name ||
-                    feature.properties.city ||
-                    feature.properties.state ||
-                    feature.properties.country ||
-                    '';
-                  if (!label) return null;
-                  return (
-                    <li
-                      key={feature.properties.osm_id + label}
-                      className="px-4 py-2 cursor-pointer hover:bg-blue-50"
-                      onClick={() => handleSelect(feature)}
-                    >
-                      {label}
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
           </div>
           <div className="mb-4">
             <label className="flex items-center gap-2 text-sm text-gray-700">
