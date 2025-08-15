@@ -47,6 +47,13 @@ const Step3Preferences: React.FC<Props> = ({
       transition={{ duration: 0.5 }}
       onSubmit={e => {
         e.preventDefault();
+        // Save trip preferences
+        setTrip({
+          ...trip,
+          matchWith,
+          vibe,
+          isPublic: trip.isPublic ?? true
+        });
         next();
       }}
       className="space-y-8 bg-white/90 rounded-2xl shadow-xl p-8"
@@ -119,13 +126,13 @@ const Step3Preferences: React.FC<Props> = ({
           Privacy <span className="text-red-500">*</span>
         </label>
         <select
-          value={trip.isPublic ?? 1}
-          onChange={e => setTrip({ ...trip, isPublic: Number(e.target.value) })}
+          value={trip.isPublic ?? true ? 'true' : 'false'}
+          onChange={e => setTrip({ ...trip, isPublic: e.target.value === 'true' })}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg"
           required
         >
-          <option value={1}>Public</option>
-          <option value={0}>Private</option>
+          <option value="true">Public</option>
+          <option value="false">Private</option>
         </select>
       </div>
       <div className="flex gap-4 mt-8">

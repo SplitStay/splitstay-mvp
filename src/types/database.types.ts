@@ -235,14 +235,20 @@ export type Database = {
           bookingUrl: string | null
           createdAt: string
           description: string
-          endDate: string
+          endDate: string | null
+          estimatedMonth: string | null
+          estimatedYear: string | null
+          flexible: boolean
           hostId: string | null
           id: string
-          isPublic: number
+          isPublic: boolean
           joineeId: string | null
           location: string
+          matchWith: string | null
           name: string
-          startDate: string
+          numberOfRooms: number | null
+          rooms: Json | null
+          startDate: string | null
           thumbnailUrl: string | null
           updatedAt: string
         }
@@ -250,14 +256,20 @@ export type Database = {
           bookingUrl?: string | null
           createdAt?: string
           description: string
-          endDate: string
+          endDate?: string | null
+          estimatedMonth?: string | null
+          estimatedYear?: string | null
+          flexible?: boolean
           hostId?: string | null
           id: string
-          isPublic?: number
+          isPublic?: boolean
           joineeId?: string | null
           location: string
+          matchWith?: string | null
           name: string
-          startDate: string
+          numberOfRooms?: number | null
+          rooms?: Json | null
+          startDate?: string | null
           thumbnailUrl?: string | null
           updatedAt?: string
         }
@@ -265,14 +277,20 @@ export type Database = {
           bookingUrl?: string | null
           createdAt?: string
           description?: string
-          endDate?: string
+          endDate?: string | null
+          estimatedMonth?: string | null
+          estimatedYear?: string | null
+          flexible?: boolean
           hostId?: string | null
           id?: string
-          isPublic?: number
+          isPublic?: boolean
           joineeId?: string | null
           location?: string
+          matchWith?: string | null
           name?: string
-          startDate?: string
+          numberOfRooms?: number | null
+          rooms?: Json | null
+          startDate?: string | null
           thumbnailUrl?: string | null
           updatedAt?: string
         }

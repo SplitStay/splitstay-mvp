@@ -15,7 +15,7 @@ const Step1Destination: React.FC<Props> = ({ trip, setTrip, next }) => {
   const [city, setCity] = useState(trip.location || '');
   const [startDate, setStartDate] = useState(trip.startDate ? new Date(trip.startDate) : null);
   const [endDate, setEndDate] = useState(trip.endDate ? new Date(trip.endDate) : null);
-  const [useEstimatedDates, setUseEstimatedDates] = useState(trip.useEstimatedDates || false);
+  const [flexible, setFlexible] = useState(trip.flexible || false);
   const [estimatedMonth, setEstimatedMonth] = useState(trip.estimatedMonth || 'September');
   const [estimatedYear, setEstimatedYear] = useState(trip.estimatedYear || '2025');
 
@@ -34,25 +34,25 @@ const Step1Destination: React.FC<Props> = ({ trip, setTrip, next }) => {
       transition={{ duration: 0.5 }}
       onSubmit={e => {
         e.preventDefault();
-        if (useEstimatedDates) {
+        if (flexible) {
           setTrip({
             ...trip,
             location: city,
+            flexible: true,
             estimatedMonth,
             estimatedYear,
-            useEstimatedDates: true,
-            startDate: '',
-            endDate: '',
+            startDate: null,
+            endDate: null,
           });
         } else {
           setTrip({
             ...trip,
             location: city,
-            startDate: startDate?.toISOString() || '',
-            endDate: endDate?.toISOString() || '',
-            useEstimatedDates: false,
-            estimatedMonth: '',
-            estimatedYear: '',
+            flexible: false,
+            startDate: startDate?.toISOString() || null,
+            endDate: endDate?.toISOString() || null,
+            estimatedMonth: null,
+            estimatedYear: null,
           });
         }
         next();
@@ -89,23 +89,23 @@ const Step1Destination: React.FC<Props> = ({ trip, setTrip, next }) => {
       <div className="flex items-center gap-3">
         <div 
           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 cursor-pointer ${
-            useEstimatedDates ? 'bg-blue-600' : 'bg-gray-300'
+            flexible ? 'bg-blue-600' : 'bg-gray-300'
           }`}
-          onClick={() => setUseEstimatedDates(!useEstimatedDates)}
+          onClick={() => setFlexible(!flexible)}
         >
           <span
             className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
-              useEstimatedDates ? 'translate-x-6' : 'translate-x-1'
+              flexible ? 'translate-x-6' : 'translate-x-1'
             }`}
           />
         </div>
         <span className="text-lg font-medium text-gray-800">
-          I don't know my exact dates yet
+          I'm flexible / Dates not confirmed yet
         </span>
       </div>
 
       {/* Conditional Date/Timeframe Section */}
-      {useEstimatedDates ? (
+      {flexible ? (
         <div>
           <label className="block text-lg font-semibold text-gray-800 mb-2">
             Estimated Timeframe <span className="text-red-500">*</span>
@@ -140,7 +140,7 @@ const Step1Destination: React.FC<Props> = ({ trip, setTrip, next }) => {
             <button 
               type="button"
               className="text-blue-600 font-medium hover:underline"
-              onClick={() => setUseEstimatedDates(false)}
+              onClick={() => setFlexible(false)}
             >
               Or select specific dates
             </button>
@@ -157,7 +157,7 @@ const Step1Destination: React.FC<Props> = ({ trip, setTrip, next }) => {
               onChange={date => setStartDate(date)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg"
               dateFormat="yyyy-MM-dd"
-              required={!useEstimatedDates}
+              required={!flexible}
               placeholderText="Select start date"
             />
           </div>
@@ -170,7 +170,7 @@ const Step1Destination: React.FC<Props> = ({ trip, setTrip, next }) => {
               onChange={date => setEndDate(date)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg"
               dateFormat="yyyy-MM-dd"
-              required={!useEstimatedDates}
+              required={!flexible}
               placeholderText="Select end date"
             />
           </div>

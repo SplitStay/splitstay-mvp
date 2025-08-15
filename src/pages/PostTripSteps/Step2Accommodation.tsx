@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Building2, Link, Hash } from 'lucide-react';
+import { Building2, Link, Hash, RefreshCw } from 'lucide-react';
 import { AccommodationPreview } from '../../components/AccommodationPreview';
 import { iframelyService, type AccommodationPreview as AccommodationPreviewType } from '../../lib/iframely';
+import { getAccommodationTypes, createDefaultRooms, BED_TYPES, type AccommodationType, type RoomConfiguration } from '../../lib/accommodationService';
 
-interface Room {
-  id: number;
-  numberOfBeds: number;
-  bedType: string;
-  ensuiteBathroom: boolean;
-}
+// Remove local Room interface - use RoomConfiguration from service
 
 interface Props {
   trip: any;
@@ -28,14 +24,13 @@ const Step2Accommodation: React.FC<Props> = ({
   back,
   next,
 }) => {
-  const [accommodationType, setAccommodationType] = useState(trip.accommodationType || 'Villa');
+  const [accommodationTypes, setAccommodationTypes] = useState<AccommodationType[]>([]);
+  const [accommodationTypeId, setAccommodationTypeId] = useState(trip.accommodationTypeId || '');
   const [accommodationLink, setAccommodationLink] = useState(trip.bookingUrl || '');
   const [numberOfRooms, setNumberOfRooms] = useState(trip.numberOfRooms || 3);
-  const [rooms, setRooms] = useState<Room[]>(trip.rooms || [
-    { id: 1, numberOfBeds: 2, bedType: 'Double Bed', ensuiteBathroom: true },
-    { id: 2, numberOfBeds: 1, bedType: 'Double Bed', ensuiteBathroom: false },
-    { id: 3, numberOfBeds: 1, bedType: 'Double Bed', ensuiteBathroom: false }
-  ]);
+  const [rooms, setRooms] = useState<RoomConfiguration[]>(
+    trip.rooms || createDefaultRooms(3)
+  );
   const [accommodationPreview, setAccommodationPreview] = useState<AccommodationPreviewType>({
     title: '',
     description: '',
@@ -48,34 +43,34 @@ const Step2Accommodation: React.FC<Props> = ({
     error: null,
   });
 
-  const accommodationTypes = [
-    'Villa', 'Hotel', 'Apartment', 'House', 'Hostel', 'Resort', 'B&B', 'Guesthouse'
-  ];
-
-  const bedTypes = [
-    'Single Bed', 'Double Bed', 'Queen Bed', 'King Bed', 'Twin Bed', 'Sofa Bed', 'Bunk Bed'
-  ];
+  // Load accommodation types from database
+  useEffect(() => {
+    const loadAccommodationTypes = async () => {
+      try {
+        const types = await getAccommodationTypes();
+        setAccommodationTypes(types);
+        // Set default if none selected
+        if (!accommodationTypeId && types.length > 0) {
+          setAccommodationTypeId(types[0].id);
+        }
+      } catch (error) {
+        console.error('Failed to load accommodation types:', error);
+        // Fallback to default types
+        setAccommodationTypes([
+          { id: 'villa', name: 'Villa', displayOrder: 1, createdAt: '', updatedAt: '' },
+          { id: 'hotel', name: 'Hotel', displayOrder: 2, createdAt: '', updatedAt: '' },
+        ]);
+      }
+    };
+    loadAccommodationTypes();
+  }, [accommodationTypeId]);
 
   // Update rooms when numberOfRooms changes
   useEffect(() => {
-    const currentRoomCount = rooms.length;
-    if (numberOfRooms > currentRoomCount) {
-      // Add new rooms
-      const newRooms = [...rooms];
-      for (let i = currentRoomCount; i < numberOfRooms; i++) {
-        newRooms.push({
-          id: i + 1,
-          numberOfBeds: 1,
-          bedType: 'Double Bed',
-          ensuiteBathroom: false
-        });
-      }
-      setRooms(newRooms);
-    } else if (numberOfRooms < currentRoomCount) {
-      // Remove excess rooms
-      setRooms(rooms.slice(0, numberOfRooms));
+    if (numberOfRooms !== rooms.length) {
+      setRooms(createDefaultRooms(numberOfRooms));
     }
-  }, [numberOfRooms, rooms]);
+  }, [numberOfRooms]);
 
   // Debounced accommodation preview fetching
   useEffect(() => {
@@ -112,7 +107,7 @@ const Step2Accommodation: React.FC<Props> = ({
     return () => clearTimeout(timeoutId);
   }, [accommodationLink]);
 
-  const updateRoom = (roomId: number, field: keyof Room, value: any) => {
+  const updateRoom = (roomId: number, field: keyof RoomConfiguration, value: any) => {
     setRooms(rooms.map(room => 
       room.id === roomId ? { ...room, [field]: value } : room
     ));
@@ -122,12 +117,31 @@ const Step2Accommodation: React.FC<Props> = ({
     e.preventDefault();
     setTrip({
       ...trip,
-      accommodationType,
+      accommodationTypeId,
       bookingUrl: accommodationLink,
       numberOfRooms,
       rooms
     });
     next();
+  };
+
+  const handleRefreshPreview = async () => {
+    if (!accommodationLink) return;
+    
+    // Clear cache and force refresh
+    iframelyService.clearCache();
+    setAccommodationPreview(prev => ({ ...prev, isLoading: true, error: null }));
+    
+    try {
+      const preview = await iframelyService.getAccommodationPreview(accommodationLink);
+      setAccommodationPreview(preview);
+    } catch (error) {
+      setAccommodationPreview(prev => ({
+        ...prev,
+        isLoading: false,
+        error: error instanceof Error ? error.message : 'Failed to load preview'
+      }));
+    }
   };
   return (
     <motion.form
@@ -144,13 +158,13 @@ const Step2Accommodation: React.FC<Props> = ({
           Accommodation Type <span className="text-red-500">*</span>
         </label>
         <select
-          value={accommodationType}
-          onChange={(e) => setAccommodationType(e.target.value)}
+          value={accommodationTypeId}
+          onChange={(e) => setAccommodationTypeId(e.target.value)}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-lg bg-white"
           required
         >
           {accommodationTypes.map(type => (
-            <option key={type} value={type}>{type}</option>
+            <option key={type.id} value={type.id}>{type.name}</option>
           ))}
         </select>
       </div>
@@ -176,7 +190,25 @@ const Step2Accommodation: React.FC<Props> = ({
         {/* Accommodation Preview */}
         {(accommodationPreview.isLoading || accommodationPreview.error || accommodationPreview.title) && (
           <div className="mt-4">
-            <AccommodationPreview preview={accommodationPreview} />
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-gray-700">Accommodation Preview</span>
+              {accommodationLink && (
+                <button
+                  type="button"
+                  onClick={handleRefreshPreview}
+                  className="flex items-center gap-1 px-2 py-1 text-xs text-blue-600 hover:text-blue-800 transition-colors"
+                  disabled={accommodationPreview.isLoading}
+                >
+                  <RefreshCw className={`w-3 h-3 ${accommodationPreview.isLoading ? 'animate-spin' : ''}`} />
+                  Refresh
+                </button>
+              )}
+            </div>
+            <AccommodationPreview 
+              preview={accommodationPreview} 
+              imageAspectRatio="wide"
+              className="max-w-lg"
+            />
           </div>
         )}
       </div>
@@ -234,7 +266,7 @@ const Step2Accommodation: React.FC<Props> = ({
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
                   required
                 >
-                  {bedTypes.map(type => (
+                  {BED_TYPES.map(type => (
                     <option key={type} value={type}>{type}</option>
                   ))}
                 </select>

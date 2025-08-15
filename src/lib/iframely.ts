@@ -41,27 +41,38 @@ export interface AccommodationPreview {
 
 class IframelyService {
   private readonly baseUrl = 'https://iframe.ly/api/iframely';
-  private readonly apiKey = import.meta.env.VITE_IFRAMELY_API_KEY;
+  private readonly apiKey = import.meta.env.VITE_IFRAMELY_API_KEY || 'e7ef2fd691282a8112c2ce56874a1d24';
   private cache = new Map<string, AccommodationPreview>();
+  
+  // Fallback services
+  private readonly linkPreviewApiKey = import.meta.env.VITE_LINK_PREVIEW_API_KEY;
+  private readonly linkPreviewUrl = 'https://api.linkpreview.net';
 
-  async getAccommodationPreview(url: string): Promise<AccommodationPreview> {
-    // Return cached result if available
-    if (this.cache.has(url)) {
-      return this.cache.get(url)!;
-    }
-
-    // Return loading state immediately
-    const loadingPreview: AccommodationPreview = {
-      title: '',
-      description: '',
+  private createBookingSiteFallback(url: string): AccommodationPreview {
+    const siteName = this.extractSiteName(url);
+    return {
+      title: `${siteName.charAt(0).toUpperCase() + siteName.slice(1)} Accommodation`,
+      description: `This accommodation is available on ${siteName}. Due to security measures, we cannot display a preview, but you can click the link below to view full details, photos, and booking information.`,
       image: '',
-      site: '',
+      site: siteName.charAt(0).toUpperCase() + siteName.slice(1),
       author: '',
       url,
-      favicon: '',
-      isLoading: true,
+      favicon: `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}`,
+      isLoading: false,
       error: null,
     };
+  }
+
+  async getAccommodationPreview(url: string, retryCount: number = 0): Promise<AccommodationPreview> {
+    // Return cached result if available (but not if it was a 202 processing state)
+    if (this.cache.has(url)) {
+      const cached = this.cache.get(url)!;
+      if (!cached.isLoading || retryCount === 0) {
+        return cached;
+      }
+    }
+
+    // We'll return loading state inline when needed
 
     try {
       if (!this.apiKey) {
@@ -83,9 +94,51 @@ class IframelyService {
         throw new Error('Please enter a valid accommodation URL');
       }
 
-      const response = await fetch(
-        `${this.baseUrl}?url=${encodeURIComponent(url)}&api_key=${this.apiKey}&iframe=1&omit_script=1`
-      );
+      // Try different parameters for booking.com
+      const isBookingCom = url.includes('booking.com');
+      const params = new URLSearchParams({
+        url: url,
+        key: this.apiKey,
+      });
+      
+      // For booking.com, try without iframe and omit_script parameters
+      if (!isBookingCom) {
+        params.append('iframe', '1');
+        params.append('omit_script', '1');
+      }
+
+      const response = await fetch(`${this.baseUrl}?${params.toString()}`);
+
+      // Handle 202 (Accepted) - Iframely is processing the URL
+      if (response.status === 202) {
+        const processingPreview = {
+          title: 'Processing accommodation...',
+          description: 'Iframely is processing this accommodation link. This usually takes a few seconds for complex booking sites.',
+          image: '',
+          site: this.extractSiteName(url),
+          author: '',
+          url,
+          favicon: '',
+          isLoading: true,
+          error: null,
+        };
+        
+        // Cache the processing state
+        this.cache.set(url, processingPreview);
+        
+        // Retry after 3 seconds, but only up to 3 times
+        if (retryCount < 3) {
+          setTimeout(async () => {
+            try {
+              await this.getAccommodationPreview(url, retryCount + 1);
+            } catch (error) {
+              // Ignore retry errors, user can manually refresh
+            }
+          }, 3000);
+        }
+        
+        return processingPreview;
+      }
 
       if (!response.ok) {
         throw new Error(`Failed to fetch preview: ${response.status}`);
@@ -93,13 +146,39 @@ class IframelyService {
 
       const data: IframelyResponse = await response.json();
 
+      // Debug logging can be enabled if needed
+      // console.log('Iframely response:', { status: response.status, hasData: !!data.meta });
+
+      // Handle errors from booking sites specially
       if (data.error) {
+        const isBookingSite = ['booking.com', 'hotels.com', 'expedia.com'].some(site => url.includes(site));
+        
+        if (isBookingSite) {
+          // Return fallback for booking sites instead of throwing error
+          const fallback = this.createBookingSiteFallback(url);
+          this.cache.set(url, fallback);
+          return fallback;
+        }
+        
         throw new Error(data.error);
       }
 
+      // Handle empty response or blocked content from booking sites
+      if (!data.meta && !data.links && !data.html) {
+        const isBookingSite = ['booking.com', 'hotels.com', 'expedia.com'].some(site => url.includes(site));
+        
+        if (isBookingSite) {
+          const fallback = this.createBookingSiteFallback(url);
+          this.cache.set(url, fallback);
+          return fallback;
+        }
+        
+        throw new Error('No preview data available for this URL. The site may be blocking preview generation.');
+      }
+
       const preview: AccommodationPreview = {
-        title: data.meta?.title || 'Accommodation',
-        description: this.truncateDescription(data.meta?.description || ''),
+        title: data.meta?.title || (url.includes('booking.com') ? 'Booking.com Property' : 'Accommodation'),
+        description: this.truncateDescription(data.meta?.description || (url.includes('booking.com') ? 'Hotel or accommodation from Booking.com. Click to view full details on the booking site.' : '')),
         image: this.getBestThumbnail(data.links?.thumbnail) || '',
         site: data.meta?.site || this.extractSiteName(url),
         author: data.meta?.author || '',

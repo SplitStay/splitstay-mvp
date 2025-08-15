@@ -8,26 +8,34 @@ import TripPreview from './PostTripSteps/TripPreview';
 import PostTripSuccessModal from './PostTripSteps/PostTripSuccessModal';
 import { ProfileGuard } from '@/components/ProfileGuard';
 import { supabase } from '@/lib/supabase';
-import type { TablesInsert } from '@/types/database.types';
+import { createTrip, type TripFormData } from '@/lib/tripService';
 import { motion } from 'framer-motion';
 import { useUser } from '@/hooks/useUser';
 
 type Step = 1 | 2 | 3 | 4;
 
-const defaultTrip: Partial<TablesInsert<'trip'>> = {
+const defaultTrip = {
   name: '',
   description: '',
   location: '',
-  startDate: '',
-  endDate: '',
+  flexible: false,
+  startDate: null as string | null,
+  endDate: null as string | null,
+  estimatedMonth: null as string | null,
+  estimatedYear: null as string | null,
+  accommodationTypeId: '',
   bookingUrl: '',
-  thumbnailUrl: '',
-  isPublic: 1,
+  numberOfRooms: 3,
+  rooms: [],
+  matchWith: 'anyone',
+  vibe: '',
+  isPublic: true,
+  thumbnailUrl: null as string | null,
 };
 
 const PostTripPage = () => {
   const [step, setStep] = useState<Step>(1);
-  const [trip, setTrip] = useState<Partial<TablesInsert<'trip'>>>(defaultTrip);
+  const [trip, setTrip] = useState(defaultTrip);
   const [personalNote, setPersonalNote] = useState('');
   const [languages, setLanguages] = useState<string[]>([]);
   const [matchWith, setMatchWith] = useState<'male' | 'female' | 'anyone'>('anyone');
@@ -48,24 +56,51 @@ const PostTripPage = () => {
       toast.error('User not loaded. Please try again.');
       return;
     }
+    
     setLoading(true);
-    const description = [trip.description, vibe, personalNote].filter(Boolean).join('\n\n');
-    const insertTrip: TablesInsert<'trip'> = {
-      ...trip,
-      description,
-      isPublic: trip.isPublic ?? 1,
-      hostId: user.id,
-    } as TablesInsert<'trip'>;
-    const { error } = await supabase.from('trip').insert([insertTrip]);
-    setLoading(false);
-    if (!error) {
+    
+    try {
+      // Prepare trip data for creation
+      const tripData: TripFormData = {
+        name: trip.name,
+        location: trip.location,
+        flexible: trip.flexible,
+        startDate: trip.startDate,
+        endDate: trip.endDate,
+        estimatedMonth: trip.estimatedMonth,
+        estimatedYear: trip.estimatedYear,
+        accommodationTypeId: trip.accommodationTypeId,
+        bookingUrl: trip.bookingUrl,
+        numberOfRooms: trip.numberOfRooms,
+        rooms: trip.rooms,
+        vibe: trip.vibe || vibe,
+        matchWith: trip.matchWith,
+        isPublic: trip.isPublic,
+        thumbnailUrl: trip.thumbnailUrl,
+      };
+
+      // Update user Instagram if provided
+      if (instagram) {
+        await supabase
+          .from('user')
+          .update({ instagramUrl: instagram })
+          .eq('id', user.id);
+      }
+
+      // Create the trip
+      await createTrip(tripData);
+      
       toast.success('Trip posted successfully!', {
         duration: 4000,
         icon: '✈️',
       });
       setShowSuccess(true);
-    } else {
-      toast.error('Failed to post trip: ' + error.message);
+      
+    } catch (error) {
+      console.error('Error creating trip:', error);
+      toast.error(`Failed to post trip: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setLoading(false);
     }
   };
 
