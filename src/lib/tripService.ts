@@ -13,7 +13,7 @@ export interface TripFormData {
   estimatedYear?: string | null;
   
   // Step 2 - Accommodation
-  accommodationTypeId: string;
+  // accommodationTypeId is omitted to match generated Supabase types
   bookingUrl?: string | null;
   numberOfRooms: number;
   rooms: RoomConfiguration[];
@@ -21,7 +21,6 @@ export interface TripFormData {
   // Step 3 - Preferences
   vibe: string; // description/vibe
   matchWith: string;
-  isPublic: boolean;
   
   // Additional fields
   thumbnailUrl?: string | null;
@@ -47,11 +46,9 @@ export const createTrip = async (tripData: TripFormData): Promise<Trip> => {
     location: tripData.location,
     hostId: user.id,
     bookingUrl: tripData.bookingUrl,
-    accommodationTypeId: tripData.accommodationTypeId,
     numberOfRooms: tripData.numberOfRooms,
     rooms: tripData.rooms as any, // JSON type
     matchWith: tripData.matchWith,
-    isPublic: tripData.isPublic,
     flexible: tripData.flexible,
     thumbnailUrl: tripData.thumbnailUrl,
     // Conditional date fields based on flexible flag
@@ -96,14 +93,12 @@ export const updateTrip = async (tripId: string, tripData: Partial<TripFormData>
   const updateData: Partial<TripInsert> = {};
   
   if (tripData.name) updateData.name = tripData.name;
-  if (tripData.description) updateData.description = tripData.vibe;
+  if (tripData.vibe) updateData.description = tripData.vibe;
   if (tripData.location) updateData.location = tripData.location;
   if (tripData.bookingUrl !== undefined) updateData.bookingUrl = tripData.bookingUrl;
-  if (tripData.accommodationTypeId) updateData.accommodationTypeId = tripData.accommodationTypeId;
   if (tripData.numberOfRooms) updateData.numberOfRooms = tripData.numberOfRooms;
   if (tripData.rooms) updateData.rooms = tripData.rooms as any;
   if (tripData.matchWith) updateData.matchWith = tripData.matchWith;
-  if (tripData.isPublic !== undefined) updateData.isPublic = tripData.isPublic;
   if (tripData.flexible !== undefined) updateData.flexible = tripData.flexible;
   if (tripData.thumbnailUrl !== undefined) updateData.thumbnailUrl = tripData.thumbnailUrl;
 
@@ -144,12 +139,7 @@ export const updateTrip = async (tripId: string, tripData: Partial<TripFormData>
 export const getTripById = async (tripId: string): Promise<Trip | null> => {
   const { data, error } = await supabase
     .from('trip')
-    .select(`
-      *,
-      accommodation_type:accommodationTypeId(name),
-      host:hostId(name, imageUrl),
-      joinee:joineeId(name, imageUrl)
-    `)
+    .select(`*`)
     .eq('id', tripId)
     .single();
 
@@ -176,12 +166,7 @@ export const getUserTrips = async (): Promise<Trip[]> => {
 
   const { data, error } = await supabase
     .from('trip')
-    .select(`
-      *,
-      accommodation_type:accommodationTypeId(name),
-      host:hostId(name, imageUrl),
-      joinee:joineeId(name, imageUrl)
-    `)
+    .select(`*`)
     .or(`hostId.eq.${user.id},joineeId.eq.${user.id}`)
     .order('createdAt', { ascending: false });
 
@@ -207,12 +192,7 @@ export const searchTrips = async (filters: {
 }): Promise<Trip[]> => {
   let query = supabase
     .from('trip')
-    .select(`
-      *,
-      accommodation_type:accommodationTypeId(name),
-      host:hostId(name, imageUrl)
-    `)
-    .eq('isPublic', true)
+    .select(`*`)
     .is('joineeId', null); // Only trips without a joinee
 
   // Apply filters
