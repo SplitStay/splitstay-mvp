@@ -48,7 +48,9 @@ export const TripDetailPage: React.FC = () => {
 
   const formatTripDates = (trip: Trip) => {
     if (trip.flexible) {
-      return `${trip.estimatedMonth} ${trip.estimatedYear}`
+      const month = (trip as any).estimatedmonth || trip.estimatedMonth;
+      const year = (trip as any).estimatedyear || trip.estimatedYear;
+      return month && year ? `${month} ${year}` : 'Dates TBD';
     } else if (trip.startDate && trip.endDate) {
       return `${new Date(trip.startDate).toLocaleDateString()} - ${new Date(trip.endDate).toLocaleDateString()}`
     }

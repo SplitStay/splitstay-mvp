@@ -5,7 +5,7 @@ import { Plus, Users, MessageCircle, User, LogOut, Calendar, Bell, Plane } from 
 import { useAuth } from '../contexts/AuthContext'
 import ShareInviteModal from '@/components/ShareInviteModal'
 import { ProfileGuard } from '@/components/ProfileGuard'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 
 export const DashboardPage = () => {
   const { data: user, isLoading, error } = useUser()
@@ -68,9 +68,9 @@ export const DashboardPage = () => {
         {/* Header */}
         <header className="px-6 py-4 bg-white border-b border-gray-200 sticky top-0 z-50">
           <div className="max-w-7xl mx-auto flex justify-between items-center">
-            <div className="text-2xl font-bold text-blue-600">
+            <Link to="/" className="text-2xl font-bold text-blue-600">
               SplitStay
-            </div>
+            </Link>
             <div className="flex gap-3">
               <button
                 onClick={() => navigate('/post-trip')}

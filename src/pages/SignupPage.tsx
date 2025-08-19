@@ -96,9 +96,9 @@ export const SignupPage: React.FC = () => {
               <ArrowLeft className="w-5 h-5" />
               Back to Home
             </Link>
-            <div className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <Link to="/" className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               SplitStay
-            </div>
+            </Link>
           </div>
 
           <div className="text-center mb-6 lg:mb-8">

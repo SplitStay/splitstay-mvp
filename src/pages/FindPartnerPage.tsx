@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, MapPin, Calendar, User, Building, Clock, Users, Globe, Flag, MapIcon, CalendarDays, Home, MessageCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { searchTrips, Trip } from '../lib/tripService';
 import { ChatService } from '../lib/chatService';
 import { useAuth } from '../contexts/AuthContext';
@@ -86,7 +86,9 @@ const FindPartnerPage = () => {
 
   const formatTripDates = (trip: Trip) => {
     if (trip.flexible) {
-      return `${trip.estimatedMonth} ${trip.estimatedYear}`;
+      const month = (trip as any).estimatedmonth || trip.estimatedMonth;
+      const year = (trip as any).estimatedyear || trip.estimatedYear;
+      return month && year ? `${month} ${year}` : 'Dates TBD';
     } else if (trip.startDate && trip.endDate) {
       return `${new Date(trip.startDate).toLocaleDateString()} - ${new Date(trip.endDate).toLocaleDateString()}`;
     }
@@ -107,9 +109,9 @@ const FindPartnerPage = () => {
       {/* Header */}
       <header className="px-6 py-4 bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="text-2xl font-bold text-blue-600">
+          <Link to="/" className="text-2xl font-bold text-blue-600">
             SplitStay
-          </div>
+          </Link>
           <button
             onClick={() => navigate('/dashboard')}
             className="flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-full transition-colors font-medium"

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, MessageCircle } from 'lucide-react'
+import { ArrowLeft, MessageCircle, AlertTriangle } from 'lucide-react'
 import { ConversationList } from '../components/chat/ConversationList'
 import { ChatWindow } from '../components/chat/ChatWindow'
 import { ChatService, ConversationWithUser, Message, Conversation } from '../lib/chatService'
@@ -158,10 +158,18 @@ export const MessagesPage: React.FC = () => {
     if (selectedChatId && selectedConversation) {
       return (
         <div className="h-screen bg-gray-50">
+          <div className="bg-orange-100 border-b border-orange-300 px-4 py-2">
+            <div className="flex items-center justify-center gap-2 text-orange-900">
+              <AlertTriangle className="w-4 h-4" />
+              <span className="text-sm font-semibold">Work in Progress</span>
+              <span className="text-sm">- Not all features may work properly</span>
+            </div>
+          </div>
+          
           <ChatWindow
             conversation={selectedConversation}
             onBack={handleBackToList}
-            className="h-full"
+            className="h-[calc(100vh-48px)]"
           />
         </div>
       )
@@ -169,6 +177,14 @@ export const MessagesPage: React.FC = () => {
 
     return (
       <div className="h-screen bg-gray-50">
+        <div className="bg-orange-100 border-b border-orange-300 px-4 py-2">
+          <div className="flex items-center justify-center gap-2 text-orange-900">
+            <AlertTriangle className="w-4 h-4" />
+            <span className="text-sm font-semibold">Work in Progress</span>
+            <span className="text-sm">- Not all features may work properly</span>
+          </div>
+        </div>
+        
         {/* Mobile Header */}
         <header className="px-4 py-3 bg-white border-b border-gray-200 sticky top-0 z-50">
           <div className="flex items-center justify-between">
@@ -201,6 +217,14 @@ export const MessagesPage: React.FC = () => {
   // Desktop view - show both list and chat
   return (
     <div className="h-screen bg-gray-50">
+      <div className="bg-orange-100 border-b border-orange-300 px-6 py-2">
+        <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 text-orange-900">
+          <AlertTriangle className="w-4 h-4" />
+          <span className="text-sm font-semibold">Work in Progress</span>
+          <span className="text-sm">- Not all features may work properly</span>
+        </div>
+      </div>
+      
       {/* Desktop Header */}
       <header className="px-6 py-4 bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -220,7 +244,7 @@ export const MessagesPage: React.FC = () => {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto h-[calc(100vh-80px)] flex">
+      <div className="max-w-7xl mx-auto h-[calc(100vh-128px)] flex">
         {/* Conversation List */}
         <div className="w-80 border-r border-gray-200 bg-white">
           <ConversationList

@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { useUser, useUserByIdOrCustomUrl, useUpdateUser } from '@/hooks/useUser'
 import { useAuth } from '@/contexts/AuthContext'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, Link } from 'react-router-dom'
 import ShareInviteModal from '@/components/ShareInviteModal'
 import { supabase } from '@/lib/supabase'
 import toast from 'react-hot-toast'
@@ -383,12 +383,14 @@ export default function ProfilePage() {
                 </span>
                 <span className="font-medium text-sm sm:hidden">Back</span>
               </motion.button>
-              <motion.div 
-                whileHover={{ scale: 1.05 }}
-                className="text-lg lg:text-2xl font-bold text-navy"
-              >
-                SplitStay
-              </motion.div>
+              <Link to="/">
+                <motion.div 
+                  whileHover={{ scale: 1.05 }}
+                  className="text-lg lg:text-2xl font-bold text-navy cursor-pointer"
+                >
+                  SplitStay
+                </motion.div>
+              </Link>
             </div>
             
             <div className="flex items-center gap-2 lg:gap-4">

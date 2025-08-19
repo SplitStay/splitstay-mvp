@@ -17,7 +17,9 @@ interface TripCardProps {
 export const TripCard: React.FC<TripCardProps> = ({ trip, onClick, className = '' }) => {
   const getDateDisplay = () => {
     if (trip.flexible) {
-      return `${trip.estimatedMonth} ${trip.estimatedYear}`;
+      const month = (trip as any).estimatedmonth || trip.estimatedMonth;
+      const year = (trip as any).estimatedyear || trip.estimatedYear;
+      return month && year ? `${month} ${year}` : 'Dates TBD';
     }
     
     if (trip.startDate && trip.endDate) {
