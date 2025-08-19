@@ -28,6 +28,7 @@ export const CityAutocomplete: React.FC<Props> = ({
   const [loading, setLoading] = useState(false)
   const [options, setOptions] = useState<CitySuggestion[]>([])
   const [activeIndex, setActiveIndex] = useState(-1)
+  const [lastSelectedValue, setLastSelectedValue] = useState('')
   const containerRef = useRef<HTMLDivElement>(null)
 
   // Debounced input
@@ -37,14 +38,27 @@ export const CityAutocomplete: React.FC<Props> = ({
     let mounted = true
     if (!debouncedValue || debouncedValue.length < 2) {
       setOptions([])
+      setOpen(false)
       return
     }
+    
+    // Only search if the value has changed from the last selected value
+    if (debouncedValue === lastSelectedValue) {
+      setOpen(false)
+      return
+    }
+    
     setLoading(true)
     searchCities(debouncedValue, { country, limit: 8 })
-      .then((res) => { if (mounted) setOptions(res) })
-      .finally(() => { if (mounted) setLoading(false); setOpen(true) })
+      .then((res) => { 
+        if (mounted) {
+          setOptions(res)
+          setOpen(true)
+        }
+      })
+      .finally(() => { if (mounted) setLoading(false) })
     return () => { mounted = false }
-  }, [debouncedValue, country])
+  }, [debouncedValue, country, lastSelectedValue])
 
   useEffect(() => {
     const onDocClick = (e: MouseEvent) => {
@@ -62,14 +76,15 @@ export const CityAutocomplete: React.FC<Props> = ({
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
       setActiveIndex((i) => Math.max(i - 1, 0))
-    } else if (e.key === 'Enter') {
-      if (activeIndex >= 0 && options[activeIndex]) {
-        const sel = options[activeIndex]
-        onChange(sel.placeName)
-        onSelect?.(sel)
-        setOpen(false)
-      }
-    } else if (e.key === 'Escape') {
+    } else       if (e.key === 'Enter') {
+        if (activeIndex >= 0 && options[activeIndex]) {
+          const sel = options[activeIndex]
+          onChange(sel.placeName)
+          onSelect?.(sel)
+          setLastSelectedValue(sel.placeName)
+          setOpen(false)
+        }
+      } else if (e.key === 'Escape') {
       setOpen(false)
     }
   }
@@ -84,7 +99,7 @@ export const CityAutocomplete: React.FC<Props> = ({
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        onFocus={() => value.length >= 2 && setOpen(true)}
+        onFocus={() => value.length >= 2 && value !== lastSelectedValue && setOpen(true)}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         aria-autocomplete="list"
@@ -103,7 +118,7 @@ export const CityAutocomplete: React.FC<Props> = ({
               aria-selected={idx === activeIndex}
               className={`px-4 py-2 cursor-pointer ${idx === activeIndex ? 'bg-blue-50' : 'hover:bg-blue-50'}`}
               onMouseEnter={() => setActiveIndex(idx)}
-              onMouseDown={(e) => { e.preventDefault(); onChange(opt.placeName); onSelect?.(opt); setOpen(false) }}
+              onMouseDown={(e) => { e.preventDefault(); onChange(opt.placeName); onSelect?.(opt); setLastSelectedValue(opt.placeName); setOpen(false) }}
             >
               {opt.placeName}
             </li>
