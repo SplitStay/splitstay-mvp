@@ -1,11 +1,15 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
+import { ChatService } from './lib/chatService'
+import { useEffect } from 'react'
 import { HomePage, LoginPage, SignupPage, ForgotPasswordPage, ResetPasswordPage, DashboardPage, TermsPage, PrivacyPage, HowItWorks, FindPartnerPage } from './pages'
 import PostTripPage from './pages/PostTripPage'
 import CreateProfilePage from './pages/CreateProfilePage'
 import EditProfilePage from './pages/EditProfilePage'
 import ProfilePage from './pages/ProfilePage'
+import { MessagesPage } from './pages/MessagesPage'
+import { TripDetailPage } from './pages/TripDetailPage'
 import { motion } from 'framer-motion'
 
 const queryClient = new QueryClient({
@@ -56,6 +60,35 @@ const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 }
 
 function AppRoutes() {
+  const { user } = useAuth()
+
+  useEffect(() => {
+    if (user?.id) {
+      ChatService.updateUserPresence(true)
+      
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible') {
+          ChatService.updateUserPresence(true)
+        } else {
+          ChatService.updateUserPresence(false)
+        }
+      }
+      
+      const handleBeforeUnload = () => {
+        ChatService.updateUserPresence(false)
+      }
+      
+      document.addEventListener('visibilitychange', handleVisibilityChange)
+      window.addEventListener('beforeunload', handleBeforeUnload)
+      
+      return () => {
+        document.removeEventListener('visibilitychange', handleVisibilityChange)
+        window.removeEventListener('beforeunload', handleBeforeUnload)
+        ChatService.updateUserPresence(false)
+      }
+    }
+  }, [user?.id])
+
   return (
     <Routes>
       <Route path="/" element={
@@ -132,6 +165,22 @@ function AppRoutes() {
         element={
           <PrivateRoute>
             <FindPartnerPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/messages"
+        element={
+          <PrivateRoute>
+            <MessagesPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/trip/:id"
+        element={
+          <PrivateRoute>
+            <TripDetailPage />
           </PrivateRoute>
         }
       />

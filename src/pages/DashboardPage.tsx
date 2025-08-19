@@ -87,7 +87,7 @@ export const DashboardPage = () => {
                 Find Partners
               </button>
               <button
-                onClick={() => {/* TODO: Navigate to messages */}}
+                onClick={() => navigate('/messages')}
                 className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full transition-colors font-medium"
               >
                 <MessageCircle className="w-4 h-4" />
@@ -201,9 +201,13 @@ export const DashboardPage = () => {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center justify-center w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full">
-                  0
-                </div>
+                {/* Requests count badge (hidden when 0) */}
+                {/* TODO: wire actual count from API when available */}
+                {false && (
+                  <div className="flex items-center justify-center w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full">
+                    0
+                  </div>
+                )}
               </div>
             </div>
             
