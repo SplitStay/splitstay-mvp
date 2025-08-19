@@ -73,13 +73,17 @@ const ShareInviteModal: React.FC<ShareInviteModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div 
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+      onClick={onClose}
+    >
       <motion.div
         initial={{ opacity: 0, y: 40, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 40, scale: 0.95 }}
         transition={{ duration: 0.3 }}
         className="bg-white rounded-2xl p-8 shadow-xl w-full max-w-md mx-4"
+        onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-2xl font-bold text-blue-700 mb-4 text-center">
           Share Your Profile & Invite Friends
