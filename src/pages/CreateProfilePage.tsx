@@ -95,7 +95,7 @@ export default function CreateProfilePage() {
 
       await refetchUser();
       toast.success("Profile created successfully!");
-      
+
       // Check for pending trip data and create trip
       const pendingTripData = localStorage.getItem('splitstay_pending_trip');
       if (pendingTripData) {

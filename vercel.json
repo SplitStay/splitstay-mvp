@@ -1,4 +1,18 @@
 {
-    "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
-  }
+  "rewrites": [
+    {
+      "source": "/auth/(.*)",
+      "destination": "https://dhqvohruecmttgfkfdeb.supabase.co/auth/$1"
+    },
+    {
+      "source": "/rest/(.*)", 
+      "destination": "https://dhqvohruecmttgfkfdeb.supabase.co/rest/$1"
+    },
+    {
+      "source": "/storage/(.*)",
+      "destination": "https://dhqvohruecmttgfkfdeb.supabase.co/storage/$1"
+    },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
   
