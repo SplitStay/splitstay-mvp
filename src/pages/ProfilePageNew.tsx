@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { MapPin, Calendar, Languages, Star, Globe, UserPlus, Share2, Edit, User, Heart, Sparkles, BookOpen, Camera, MessageCircle } from 'lucide-react'
+import { MapPin, Calendar, Languages, Star, Globe, UserPlus, Share2, Edit } from 'lucide-react'
 import { useUser, useUserByIdOrCustomUrl } from '@/hooks/useUser'
 import { useAuth } from '@/contexts/AuthContext'
 import { useNavigate, useParams, Link } from 'react-router-dom'
@@ -148,136 +148,78 @@ export default function ProfilePage() {
           {/* Profile Content */}
           <div className="p-8">
             <div className="grid md:grid-cols-2 gap-8">
-              {/* Basic Info */}
-              <div className="space-y-6">
-                {/* Age */}
-                {user.dayOfBirth && user.monthOfBirth && user.yearOfBirth && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                      <Calendar className="w-5 h-5 text-green-600" />
-                      Age
-                    </h3>
-                    <p className="text-gray-700">
-                      {new Date().getFullYear() - user.yearOfBirth} years old
-                    </p>
+              {/* Languages */}
+              {user.languages && user.languages.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <Languages className="w-5 h-5 text-blue-600" />
+                    Languages I Speak
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {(user.languages as string[]).map((language) => (
+                      <span
+                        key={language}
+                        className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
+                      >
+                        {language}
+                      </span>
+                    ))}
                   </div>
-                )}
+                </div>
+              )}
 
-                {/* Gender */}
-                {user.gender && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                      <User className="w-5 h-5 text-blue-600" />
-                      Gender
-                    </h3>
-                    <p className="text-gray-700 capitalize">{user.gender}</p>
+              {/* Learning Languages */}
+              {user.learningLanguages && user.learningLanguages.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <BookOpen className="w-5 h-5 text-orange-600" />
+                    Learning Languages
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {(user.learningLanguages as string[]).map((language) => (
+                      <span
+                        key={language}
+                        className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium"
+                      >
+                        {language}
+                      </span>
+                    ))}
                   </div>
-                )}
+                </div>
+              )}
 
-                {/* Languages */}
-                {user.languages && user.languages.length > 0 && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                      <Languages className="w-5 h-5 text-blue-600" />
-                      Languages I Speak
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {(user.languages as string[]).map((language) => (
-                        <span
-                          key={language}
-                          className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
-                        >
-                          {language}
-                        </span>
-                      ))}
-                    </div>
+              {/* Travel Traits */}
+              {user.travelTraits && user.travelTraits.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-purple-600" />
+                    Travel Style
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {(user.travelTraits as string[]).map((trait) => (
+                      <span
+                        key={trait}
+                        className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium"
+                      >
+                        {trait}
+                      </span>
+                    ))}
                   </div>
-                )}
+                </div>
+              )}
 
-                {/* Learning Languages */}
-                {user.learningLanguages && user.learningLanguages.length > 0 && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                      <BookOpen className="w-5 h-5 text-orange-600" />
-                      Learning Languages
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {(user.learningLanguages as string[]).map((language) => (
-                        <span
-                          key={language}
-                          className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium"
-                        >
-                          {language}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-6">
-                {/* Travel Traits */}
-                {user.travelTraits && user.travelTraits.length > 0 && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-purple-600" />
-                      Travel Style
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {(user.travelTraits as string[]).map((trait) => (
-                        <span
-                          key={trait}
-                          className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium"
-                        >
-                          {trait}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Instagram */}
-                {user.instagramUrl && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                      <Share2 className="w-5 h-5 text-pink-500" />
-                      Instagram
-                    </h3>
-                    <a 
-                      href={`https://instagram.com/${user.instagramUrl.replace('@', '')}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-pink-600 hover:text-pink-700 font-medium"
-                    >
-                      @{user.instagramUrl.replace('@', '')}
-                    </a>
-                  </div>
-                )}
-
-                {/* WhatsApp */}
-                {user.whatsapp && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                      <MessageCircle className="w-5 h-5 text-green-600" />
-                      WhatsApp
-                    </h3>
-                    <p className="text-gray-700">{user.whatsapp}</p>
-                  </div>
-                )}
-
-                {/* Most Influenced Country */}
-                {user.mostInfluencedCountry && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                      <Heart className="w-5 h-5 text-red-500" />
-                      Most Influenced by {user.mostInfluencedCountry}
-                    </h3>
-                    {user.mostInfluencedCountryDescription && (
-                      <p className="text-gray-700">{user.mostInfluencedCountryDescription}</p>
-                    )}
-                  </div>
-                )}
-              </div>
+              {/* Most Influenced Country */}
+              {user.mostInfluencedCountry && (
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <Heart className="w-5 h-5 text-red-500" />
+                    Most Influenced by {user.mostInfluencedCountry}
+                  </h3>
+                  {user.mostInfluencedCountryDescription && (
+                    <p className="text-gray-700">{user.mostInfluencedCountryDescription}</p>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Travel Experience */}

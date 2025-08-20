@@ -13,7 +13,7 @@ const HomePage: React.FC = () => {
   const { user, loading } = useAuth();
 
   const handleGetStarted = () => {
-    navigate('/signup');
+    navigate('/dashboard');
   };
 
   const handleCreateProfile = () => {
@@ -41,7 +41,7 @@ const HomePage: React.FC = () => {
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center space-x-2">
+            <Link to="/dashboard" className="flex items-center space-x-2">
               <img src={logoImageWhite} alt="SplitStay" className="h-8 w-auto" />
               <span className="text-xl font-bold text-navy">SplitStay</span>
             </Link>
@@ -55,7 +55,7 @@ const HomePage: React.FC = () => {
                 </a>
               </nav>
               <button
-                onClick={() => navigate("/signup")}
+                onClick={handleGetStarted}
                 className="px-3 py-2 md:px-4 bg-navy text-white rounded-lg hover:bg-navy-dark transition-colors text-sm md:text-base"
               >
                 Get Started

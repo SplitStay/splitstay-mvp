@@ -38,8 +38,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const navigate = useNavigate()
   const isLocalhost = window.location.hostname === 'localhost';
   const redirectTo = isLocalhost
-    ? 'http://localhost:5173'
-    : window.location.origin;
+    ? 'http://localhost:5173/create-profile'
+    : `${window.location.origin}/create-profile`;
 
   useEffect(() => {
     // Get initial session
@@ -51,10 +51,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      (event, session) => {
         setSession(session)
         setUser(session?.user ?? null)
         setLoading(false)
+        
+        // Handle post-authentication redirect
+        if (event === 'SIGNED_IN' && session?.user) {
+          // Always check if user needs profile creation after sign in
+          setTimeout(async () => {
+            try {
+              const { data: userData, error } = await supabase
+                .from('user')
+                .select('profileCreated')
+                .eq('id', session.user.id)
+                .single();
+              
+              if (!error && (!userData || !userData.profileCreated)) {
+                // User needs to create profile
+                navigate('/create-profile');
+              } else if (!error && userData.profileCreated) {
+                // User has profile, go to dashboard
+                navigate('/dashboard');
+              }
+            } catch (error) {
+              // If user doesn't exist in our table, they need to create profile
+              navigate('/create-profile');
+            }
+          }, 100);
+        }
       }
     )
 
@@ -65,7 +90,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options
+      options: {
+        ...options,
+        emailRedirectTo: `${redirectTo}/create-profile`
+      }
     })
     return { error }
   }

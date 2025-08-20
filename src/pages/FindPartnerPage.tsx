@@ -71,7 +71,21 @@ const FindPartnerPage = () => {
   };
 
   const handleMessageHost = async (trip: Trip) => {
-    if (!user?.id || !trip.hostId) return;
+    // If guest user, redirect to auth with context
+    if (!user?.id) {
+      navigate('/signup', { 
+        state: { 
+          from: '/find-partners', 
+          action: 'message', 
+          tripId: trip.id,
+          hostName: trip.host?.name || 'host',
+          tripName: trip.name 
+        } 
+      });
+      return;
+    }
+    
+    if (!trip.hostId) return;
     
     try {
       setMessageLoading(trip.id);
@@ -109,7 +123,7 @@ const FindPartnerPage = () => {
       {/* Header */}
       <header className="px-6 py-4 bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <Link to="/" className="text-2xl font-bold text-blue-600">
+          <Link to="/dashboard" className="text-2xl font-bold text-blue-600">
             SplitStay
           </Link>
           <button
@@ -367,11 +381,11 @@ const FindPartnerPage = () => {
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleMessageHost(trip)}
-                          disabled={isMessageLoading || trip.hostId === user?.id}
+                          disabled={isMessageLoading || (user?.id && trip.hostId === user?.id)}
                           className="flex items-center gap-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors"
                         >
                           <MessageCircle className="w-4 h-4" />
-                          {isMessageLoading ? 'Loading...' : 'Message'}
+                          {isMessageLoading ? 'Loading...' : user?.id ? 'Message' : 'Sign up to Message'}
                         </button>
                         <button 
                           onClick={() => navigate(`/trip/${trip.id}`)}

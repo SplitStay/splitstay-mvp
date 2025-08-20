@@ -126,11 +126,11 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
       }}
       className="space-y-6 lg:space-y-8"
     >
-      <div className="text-center mb-6">
-        <h2 className="text-2xl lg:text-3xl font-bold text-blue-700 mb-2">
+      <div className="text-center mb-4 sm:mb-6">
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-700 mb-2">
           Let's start with the basics
         </h2>
-        <p className="text-gray-600 text-lg">
+        <p className="text-gray-600 text-sm sm:text-base lg:text-lg">
           Tell us a bit about yourself
         </p>
       </div>
@@ -146,7 +146,7 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
                 <img
                   src={profileImagePreview}
                   alt="Profile preview"
-                  className="w-32 h-32 rounded-full object-cover border-4 border-gray-200 shadow-lg"
+                  className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-gray-200 shadow-lg"
                 />
                 {isUploading && (
                   <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
@@ -168,12 +168,12 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
             ) : (
               <label
                 htmlFor="profile-image-upload"
-                className="w-32 h-32 rounded-full bg-gray-50 border-2 border-dashed border-gray-300 flex items-center justify-center hover:border-gray-400 transition-colors cursor-pointer"
+                className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gray-50 border-2 border-dashed border-gray-300 flex items-center justify-center hover:border-gray-400 transition-colors cursor-pointer"
               >
                 {isUploading ? (
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-400"></div>
                 ) : (
-                  <Upload className="w-8 h-8 text-gray-400" />
+                  <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
                 )}
               </label>
             )}
@@ -187,7 +187,7 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
             />
             <label
               htmlFor="profile-image-upload"
-              className={`cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium mt-4 transition-colors ${
+              className={`cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-medium mt-3 sm:mt-4 transition-colors ${
                 isUploading ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
@@ -197,8 +197,8 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
         </div>
 
         <div>
-          <label htmlFor="fullName" className="block text-lg font-semibold text-gray-800 mb-2">
-            <User className="inline w-5 h-5 mr-2 text-blue-600" />
+          <label htmlFor="fullName" className="block text-base sm:text-lg font-semibold text-gray-800 mb-2">
+            <User className="inline w-4 h-4 sm:w-5 sm:h-5 mr-2 text-blue-600" />
             What should we call you? <span className="text-red-500">*</span>
           </label>
           <input
@@ -207,18 +207,18 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
             value={formData.fullName}
             onChange={(e) => setFormData({...formData, fullName: e.target.value})}
             placeholder="e.g. Jane"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-lg"
+            className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base sm:text-lg"
             required
           />
         </div>
 
         <div>
-          <label className="block text-lg font-semibold text-gray-800 mb-2">
-            <Users className="inline w-5 h-5 mr-2 text-purple-600" />
+          <label className="block text-base sm:text-lg font-semibold text-gray-800 mb-2">
+            <Users className="inline w-4 h-4 sm:w-5 sm:h-5 mr-2 text-purple-600" />
             Gender <span className="text-red-500">*</span>
           </label>
-          <div className="flex gap-4">
-            <label className="flex items-center gap-2 text-lg">
+          <div className="flex gap-3 sm:gap-4">
+            <label className="flex items-center gap-2 text-base sm:text-lg">
               <input
                 type="radio"
                 name="gender"
@@ -226,10 +226,11 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
                 checked={formData.gender === "male"}
                 onChange={() => setFormData({...formData, gender: "male"})}
                 required
+                className="w-4 h-4"
               />
               Male
             </label>
-            <label className="flex items-center gap-2 text-lg">
+            <label className="flex items-center gap-2 text-base sm:text-lg">
               <input
                 type="radio"
                 name="gender"
@@ -237,6 +238,7 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
                 checked={formData.gender === "female"}
                 onChange={() => setFormData({...formData, gender: "female"})}
                 required
+                className="w-4 h-4"
               />
               Female
             </label>
@@ -244,16 +246,16 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
         </div>
 
         <div>
-          <label className="block text-lg font-semibold text-gray-800 mb-2">
-            <Calendar className="inline w-5 h-5 mr-2 text-green-600" />
+          <label className="block text-base sm:text-lg font-semibold text-gray-800 mb-2">
+            <Calendar className="inline w-4 h-4 sm:w-5 sm:h-5 mr-2 text-green-600" />
             Date of Birth <span className="text-red-500">*</span>
           </label>
-          <div className="flex gap-4">
+          <div className="flex gap-2 sm:gap-4">
             <div className="flex-1">
               <select
                 value={formData.dayOfBirth}
                 onChange={(e) => setFormData({...formData, dayOfBirth: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg bg-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-2 sm:px-4 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-lg bg-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 required
               >
                 <option value="">Day</option>
@@ -266,7 +268,7 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
               <select
                 value={formData.monthOfBirth}
                 onChange={(e) => setFormData({...formData, monthOfBirth: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg bg-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-2 sm:px-4 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-lg bg-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 required
               >
                 <option value="">Month</option>
@@ -279,7 +281,7 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
               <select
                 value={formData.yearOfBirth}
                 onChange={(e) => setFormData({...formData, yearOfBirth: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg bg-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-2 sm:px-4 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-lg bg-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 required
               >
                 <option value="">Year</option>
@@ -289,15 +291,15 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
               </select>
             </div>
           </div>
-          <p className="text-gray-500 mt-2">Must be 18+</p>
+          <p className="text-sm text-gray-500 mt-2">Must be 18+</p>
         </div>
       </div>
 
-      <div className="flex gap-4 mt-8">
+      <div className="flex gap-3 sm:gap-4 mt-6 sm:mt-8">
         <button
           type="button"
           onClick={() => window.history.back()}
-          className="w-1/2 bg-gray-100 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-200"
+          className="w-1/2 bg-gray-100 text-gray-700 py-3 sm:py-4 rounded-lg font-medium hover:bg-gray-200 text-sm sm:text-base"
         >
           Back
         </button>
@@ -305,7 +307,7 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
           whileHover={{ scale: 1.03 }}
           type="submit"
           disabled={!isFormValid}
-          className={`w-1/2 py-3 rounded-lg font-bold text-lg shadow-lg transition ${
+          className={`w-1/2 py-3 sm:py-4 rounded-lg font-bold text-sm sm:text-lg shadow-lg transition ${
             isFormValid
               ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700"
               : "bg-gray-300 text-gray-500 cursor-not-allowed"

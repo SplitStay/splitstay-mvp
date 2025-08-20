@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
+import { GuestModeProvider } from './contexts/GuestModeContext'
 import { ChatService } from './lib/chatService'
 import { useEffect } from 'react'
 import { HomePage, LoginPage, SignupPage, ForgotPasswordPage, ResetPasswordPage, DashboardPage, TermsPage, PrivacyPage, HowItWorks, FindPartnerPage } from './pages'
@@ -21,27 +22,18 @@ const queryClient = new QueryClient({
   },
 })
 
-// Public Route Component (redirect to home if already authenticated)
+// Public Route Component (always accessible)
 const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, loading } = useAuth()
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full"
-        />
-      </div>
-    )
-  }
-
-  return !user ? <>{children}</> : <Navigate to="/dashboard" replace />
+  return <>{children}</>
 }
 
-// Private Route Component (redirect to login if not authenticated)
-const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+// Guest-Friendly Route Component (accessible to all, but shows different UI for guests)
+const GuestFriendlyRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return <>{children}</>
+}
+
+// Auth Required Route Component (redirect to login if not authenticated)
+const AuthRequiredRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth()
 
   if (loading) {
@@ -124,30 +116,34 @@ function AppRoutes() {
       <Route 
         path="/dashboard" 
         element={
-          <PrivateRoute>
+          <GuestFriendlyRoute>
             <DashboardPage />
-          </PrivateRoute>
+          </GuestFriendlyRoute>
         } 
       />
       <Route 
         path="/create-profile" 
         element={
-          <PrivateRoute>
+          <AuthRequiredRoute>
             <CreateProfilePage />
-          </PrivateRoute>
+          </AuthRequiredRoute>
         } 
       />
       <Route 
         path="/edit-profile" 
         element={
-          <PrivateRoute>
+          <AuthRequiredRoute>
             <EditProfilePage />
-          </PrivateRoute>
+          </AuthRequiredRoute>
         } 
       />
       <Route 
         path="/profile/:id" 
-        element={<ProfilePage />} 
+        element={
+          <GuestFriendlyRoute>
+            <ProfilePage />
+          </GuestFriendlyRoute>
+        } 
       />
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
@@ -155,33 +151,33 @@ function AppRoutes() {
       <Route
         path="/post-trip"
         element={
-          <PrivateRoute>
+          <GuestFriendlyRoute>
             <PostTripPage />
-          </PrivateRoute>
+          </GuestFriendlyRoute>
         }
       />
       <Route
         path="/find-partners"
         element={
-          <PrivateRoute>
+          <GuestFriendlyRoute>
             <FindPartnerPage />
-          </PrivateRoute>
+          </GuestFriendlyRoute>
         }
       />
       <Route
         path="/messages"
         element={
-          <PrivateRoute>
+          <AuthRequiredRoute>
             <MessagesPage />
-          </PrivateRoute>
+          </AuthRequiredRoute>
         }
       />
       <Route
         path="/trip/:id"
         element={
-          <PrivateRoute>
+          <GuestFriendlyRoute>
             <TripDetailPage />
-          </PrivateRoute>
+          </GuestFriendlyRoute>
         }
       />
       
@@ -196,7 +192,9 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <AuthProvider>
-          <AppRoutes />
+          <GuestModeProvider>
+            <AppRoutes />
+          </GuestModeProvider>
         </AuthProvider>
       </Router>
     </QueryClientProvider>

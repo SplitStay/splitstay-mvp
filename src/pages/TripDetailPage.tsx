@@ -33,7 +33,21 @@ export const TripDetailPage: React.FC = () => {
   }
 
   const handleMessageHost = async () => {
-    if (!user?.id || !trip?.hostId) return
+    // If guest user, redirect to auth with context
+    if (!user?.id) {
+      navigate('/signup', { 
+        state: { 
+          from: `/trip/${trip?.id}`, 
+          action: 'message', 
+          tripId: trip?.id,
+          hostName: trip?.host?.name || 'host',
+          tripName: trip?.name 
+        } 
+      });
+      return;
+    }
+    
+    if (!trip?.hostId) return
     
     try {
       setMessageLoading(true)

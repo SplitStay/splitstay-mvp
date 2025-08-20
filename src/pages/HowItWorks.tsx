@@ -95,7 +95,7 @@ function HowItWorks() {
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center space-x-2">
+            <Link to="/dashboard" className="flex items-center space-x-2">
               <img src={logoImageWhite} alt="SplitStay" className="h-8 w-auto" />
               <span className="text-xl font-bold text-navy">SplitStay</span>
             </Link>

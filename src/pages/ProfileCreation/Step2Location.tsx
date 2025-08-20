@@ -52,19 +52,19 @@ export const Step2Location: React.FC<Step2Props> = ({
       }}
       className="space-y-6 lg:space-y-8"
     >
-      <div className="text-center mb-6">
-        <h2 className="text-2xl lg:text-3xl font-bold text-blue-700 mb-2">
+      <div className="text-center mb-4 sm:mb-6">
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-700 mb-2">
           Tell us about your roots
         </h2>
-        <p className="text-gray-600 text-lg">
+        <p className="text-gray-600 text-sm sm:text-base lg:text-lg">
           Where are you from and what has shaped you?
         </p>
       </div>
 
       <div className="space-y-6">
         <div>
-          <label className="block text-lg font-semibold text-gray-800 mb-2">
-            <MapPin className="inline w-5 h-5 mr-2 text-blue-600" />
+          <label className="block text-base sm:text-lg font-semibold text-gray-800 mb-2">
+            <MapPin className="inline w-4 h-4 sm:w-5 sm:h-5 mr-2 text-blue-600" />
             Where were you born? <span className="text-red-500">*</span>
           </label>
           <CityAutocomplete
@@ -72,7 +72,7 @@ export const Step2Location: React.FC<Step2Props> = ({
             onChange={(value) => setFormData({...formData, birthPlace: value})}
             placeholder="Start typing... e.g. Barcelona"
             required
-            className="[&>input]:text-lg [&>input]:py-3"
+            className="[&>input]:text-sm [&>input]:sm:text-lg [&>input]:py-3 [&>input]:sm:py-4"
           />
         </div>
 
@@ -85,7 +85,7 @@ export const Step2Location: React.FC<Step2Props> = ({
             value={formData.currentPlace}
             onChange={(value) => setFormData({...formData, currentPlace: value})}
             placeholder="Start typing... e.g. Amsterdam"
-            className="[&>input]:text-lg [&>input]:py-3"
+            className="[&>input]:text-sm [&>input]:sm:text-lg [&>input]:py-3 [&>input]:sm:py-4"
           />
         </div>
 

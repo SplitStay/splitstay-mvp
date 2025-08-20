@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUser, useUpdateUser } from "@/hooks/useUser";
+import { createTrip } from "@/lib/tripService";
 import toast from "react-hot-toast";
 
 import { ProgressBar } from "./ProfileCreation/ProgressBar";
@@ -94,6 +95,21 @@ export default function CreateProfilePage() {
 
       await refetchUser();
       toast.success("Profile created successfully!");
+      
+      // Check for pending trip data and create trip
+      const pendingTripData = localStorage.getItem('splitstay_pending_trip');
+      if (pendingTripData) {
+        try {
+          const tripData = JSON.parse(pendingTripData);
+          await createTrip(tripData);
+          localStorage.removeItem('splitstay_pending_trip');
+          toast.success("Trip posted successfully!", { icon: '✈️' });
+        } catch (error) {
+          console.error('Error creating pending trip:', error);
+          toast.error('Profile created but failed to post trip. You can try posting again from the dashboard.');
+        }
+      }
+      
       navigate("/dashboard");
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Failed to create profile. Please try again.";
@@ -119,20 +135,22 @@ export default function CreateProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-200 via-white to-purple-200 flex flex-col items-center py-6 lg:py-8">
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-2xl lg:max-w-4xl"
-      >
-        <div className="w-full bg-white rounded-2xl shadow-xl p-6 lg:p-8">
-          <h1 className="text-3xl font-bold text-blue-700 mb-4 lg:mb-6 text-center">Create Your Profile</h1>
-          <ProgressBar
-            currentStep={currentStep}
-            totalSteps={totalSteps}
-            stepTitles={stepTitles}
-          />
+    <div className="min-h-screen bg-gradient-to-br from-blue-200 via-white to-purple-200">
+      {/* Mobile-first layout */}
+      <div className="px-4 py-4 sm:px-6 sm:py-6 lg:py-8">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-md mx-auto sm:max-w-lg lg:max-w-2xl"
+        >
+          <div className="w-full bg-white rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-6 lg:p-8">
+            <h1 className="text-2xl sm:text-3xl font-bold text-blue-700 mb-4 sm:mb-6 text-center">Create Your Profile</h1>
+            <ProgressBar
+              currentStep={currentStep}
+              totalSteps={totalSteps}
+              stepTitles={stepTitles}
+            />
           <AnimatePresence mode="wait">
             {currentStep === 1 && (
               <Step1BasicInfo
@@ -205,6 +223,7 @@ export default function CreateProfilePage() {
           </AnimatePresence>
         </div>
       </motion.div>
+      </div>
     </div>
   );
 }

@@ -224,8 +224,14 @@ export class ChatService {
   }
 
   static async updateUserPresence(isOnline: boolean): Promise<void> {
-    const { error } = await supabase.rpc('update_user_presence', { p_is_online: isOnline })
-    if (error) throw error
+    try {
+      const { error } = await supabase.rpc('update_user_presence', { p_is_online: isOnline })
+      if (error) {
+        console.warn('User presence RPC not available:', error)
+      }
+    } catch (error) {
+      console.warn('Failed to update user presence:', error)
+    }
   }
   // Subscribe to new messages in a conversation
   static subscribeToMessages(conversationId: string, callback: (message: Message) => void) {

@@ -6,11 +6,12 @@ import Step2Accommodation from './PostTripSteps/Step2Accommodation';
 import Step3Preferences from './PostTripSteps/Step3Preferences';
 import TripPreview from './PostTripSteps/TripPreview';
 import PostTripSuccessModal from './PostTripSteps/PostTripSuccessModal';
-import { ProfileGuard } from '@/components/ProfileGuard';
+
 import { supabase } from '@/lib/supabase';
 import { createTrip, type TripFormData } from '@/lib/tripService';
 import { motion } from 'framer-motion';
 import { useUser } from '@/hooks/useUser';
+import { useAuth } from '@/contexts/AuthContext';
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -45,6 +46,9 @@ const PostTripPage = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { data: user } = useUser();
+  const { user: authUser } = useAuth();
+  
+  const isGuest = !authUser;
 
   // Step navigation
   const next = () => setStep((s) => (s < 4 ? (s + 1) as Step : s));
@@ -52,6 +56,30 @@ const PostTripPage = () => {
 
   // Handle trip post
   const handlePost = async () => {
+    // If guest user, save trip data and redirect to auth
+    if (isGuest) {
+      const tripData = {
+        name: trip.name,
+        location: trip.location,
+        flexible: trip.flexible,
+        startDate: trip.startDate,
+        endDate: trip.endDate,
+        estimatedMonth: trip.estimatedMonth,
+        estimatedYear: trip.estimatedYear,
+        bookingUrl: trip.bookingUrl,
+        numberOfRooms: trip.numberOfRooms,
+        rooms: trip.rooms,
+        vibe: trip.vibe || vibe,
+        matchWith: trip.matchWith,
+        thumbnailUrl: trip.thumbnailUrl,
+        instagram,
+      };
+      
+      localStorage.setItem('splitstay_pending_trip', JSON.stringify(tripData));
+      navigate('/signup', { state: { from: '/post-trip', action: 'create_trip', tripName: trip.name } });
+      return;
+    }
+    
     if (!user) {
       toast.error('User not loaded. Please try again.');
       return;
@@ -69,13 +97,11 @@ const PostTripPage = () => {
         endDate: trip.endDate,
         estimatedMonth: trip.estimatedMonth,
         estimatedYear: trip.estimatedYear,
-        accommodationTypeId: trip.accommodationTypeId,
         bookingUrl: trip.bookingUrl,
         numberOfRooms: trip.numberOfRooms,
         rooms: trip.rooms,
         vibe: trip.vibe || vibe,
         matchWith: trip.matchWith,
-        isPublic: trip.isPublic,
         thumbnailUrl: trip.thumbnailUrl,
       };
 
@@ -106,8 +132,7 @@ const PostTripPage = () => {
 
   // Step rendering
   return (
-    <ProfileGuard>
-      <div className="min-h-screen bg-gradient-to-br from-blue-200 via-white to-purple-200 flex flex-col items-center py-6 lg:py-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-200 via-white to-purple-200 flex flex-col items-center py-6 lg:py-8">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -181,7 +206,6 @@ const PostTripPage = () => {
         trip={trip}
       />
       </div>
-    </ProfileGuard>
   );
 };
 
