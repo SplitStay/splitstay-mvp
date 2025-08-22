@@ -56,18 +56,27 @@ function AppRoutes() {
 
   useEffect(() => {
     if (user?.id) {
-      ChatService.updateUserPresence(true)
+      // Safe presence update that won't break navigation
+      const updatePresence = (isOnline: boolean) => {
+        try {
+          ChatService.updateUserPresence(isOnline)
+        } catch (error) {
+          // Silently ignore presence errors to prevent navigation issues
+        }
+      }
+
+      updatePresence(true)
       
       const handleVisibilityChange = () => {
         if (document.visibilityState === 'visible') {
-          ChatService.updateUserPresence(true)
+          updatePresence(true)
         } else {
-          ChatService.updateUserPresence(false)
+          updatePresence(false)
         }
       }
       
       const handleBeforeUnload = () => {
-        ChatService.updateUserPresence(false)
+        updatePresence(false)
       }
       
       document.addEventListener('visibilitychange', handleVisibilityChange)
@@ -76,7 +85,7 @@ function AppRoutes() {
       return () => {
         document.removeEventListener('visibilitychange', handleVisibilityChange)
         window.removeEventListener('beforeunload', handleBeforeUnload)
-        ChatService.updateUserPresence(false)
+        updatePresence(false)
       }
     }
   }, [user?.id])

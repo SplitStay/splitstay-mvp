@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Calendar, Users, Building2, CalendarDays } from 'lucide-react';
+import { MapPin, Calendar, Users, Building2, CalendarDays, ImageIcon } from 'lucide-react';
 import { Badge } from './ui/badge';
 import type { Trip } from '../lib/tripService';
+import { iframelyService } from '../lib/iframely';
 
 interface TripCardProps {
   trip: Trip & {
@@ -15,6 +16,25 @@ interface TripCardProps {
 }
 
 export const TripCard: React.FC<TripCardProps> = ({ trip, onClick, className = '' }) => {
+  const [accommodationImage, setAccommodationImage] = useState<string | null>(null);
+  const [imageLoading, setImageLoading] = useState(false);
+
+  useEffect(() => {
+    if (trip.bookingUrl && !trip.thumbnailUrl) {
+      setImageLoading(true);
+      iframelyService.getAccommodationPreview(trip.bookingUrl)
+        .then(preview => {
+          if (preview.image) {
+            setAccommodationImage(preview.image);
+          }
+          setImageLoading(false);
+        })
+        .catch(() => {
+          setImageLoading(false);
+        });
+    }
+  }, [trip.bookingUrl, trip.thumbnailUrl]);
+
   const getDateDisplay = () => {
     if (trip.flexible) {
       const month = (trip as any).estimatedmonth || trip.estimatedMonth;
@@ -68,9 +88,23 @@ export const TripCard: React.FC<TripCardProps> = ({ trip, onClick, className = '
             alt={trip.name}
             className="w-full h-full object-cover"
           />
+        ) : accommodationImage ? (
+          <img 
+            src={accommodationImage} 
+            alt={`${trip.location} accommodation`}
+            className="w-full h-full object-cover"
+          />
+        ) : imageLoading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+          </div>
         ) : (
           <div className="flex items-center justify-center h-full">
-            <Building2 className="w-16 h-16 text-white/70" />
+            <div className="text-center">
+              <ImageIcon className="w-12 h-12 text-white/70 mx-auto mb-2" />
+              <p className="text-white/80 text-sm font-medium">{trip.location}</p>
+              <p className="text-white/60 text-xs">{trip.accommodation_type?.name || 'Accommodation'}</p>
+            </div>
           </div>
         )}
         

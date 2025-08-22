@@ -1,27 +1,16 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import Select from 'react-select';
-import { Languages, Users, Smile, Instagram, Eye } from 'lucide-react';
+import { Users, Smile, Eye } from 'lucide-react';
 
-const languageOptions = [
-  { value: 'English', label: 'English' },
-  { value: 'French', label: 'French' },
-  { value: 'Spanish', label: 'Spanish' },
-  { value: 'German', label: 'German' },
-  { value: 'Other', label: 'Other' },
-];
+
 
 interface Props {
   trip: any;
   setTrip: (t: any) => void;
-  languages: string[];
-  setLanguages: (l: string[]) => void;
   matchWith: string;
   setMatchWith: (m: string) => void;
   vibe: string;
   setVibe: (v: string) => void;
-  instagram: string;
-  setInstagram: (i: string) => void;
   back: () => void;
   next: () => void;
 }
@@ -29,14 +18,10 @@ interface Props {
 const Step3Preferences: React.FC<Props> = ({
   trip,
   setTrip,
-  languages,
-  setLanguages,
   matchWith,
   setMatchWith,
   vibe,
   setVibe,
-  instagram,
-  setInstagram,
   back,
   next,
 }) => {
@@ -58,20 +43,7 @@ const Step3Preferences: React.FC<Props> = ({
       }}
       className="space-y-8 bg-white/90 rounded-2xl shadow-xl p-8"
     >
-      <div>
-        <label className="block text-lg font-semibold text-gray-800 mb-2">
-          <Languages className="inline w-5 h-5 mr-2 text-blue-600" />
-          Languages Spoken <span className="text-red-500">*</span>
-        </label>
-        <Select
-          isMulti
-          options={languageOptions}
-          value={languageOptions.filter(opt => languages.includes(opt.value))}
-          onChange={opts => setLanguages((opts as any[]).map(o => o.value))}
-          className="react-select-container"
-          classNamePrefix="react-select"
-        />
-      </div>
+
       <div>
         <label className="block text-lg font-semibold text-gray-800 mb-2">
           <Users className="inline w-5 h-5 mr-2 text-purple-600" />
@@ -107,19 +79,7 @@ const Step3Preferences: React.FC<Props> = ({
           required
         />
       </div>
-      <div>
-        <label className="block text-lg font-semibold text-gray-800 mb-2">
-          <Instagram className="inline w-5 h-5 mr-2 text-pink-500" />
-          Instagram
-        </label>
-        <input
-          type="text"
-          value={instagram}
-          onChange={e => setInstagram(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 text-lg"
-          placeholder="Your Instagram handle"
-        />
-      </div>
+
       <div>
         <label className="block text-lg font-semibold text-gray-800 mb-2">
           <Eye className="inline w-5 h-5 mr-2 text-blue-400" />

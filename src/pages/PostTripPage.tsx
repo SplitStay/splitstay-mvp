@@ -38,10 +38,8 @@ const PostTripPage = () => {
   const [step, setStep] = useState<Step>(1);
   const [trip, setTrip] = useState(defaultTrip);
   const [personalNote, setPersonalNote] = useState('');
-  const [languages, setLanguages] = useState<string[]>([]);
   const [matchWith, setMatchWith] = useState<'male' | 'female' | 'anyone'>('anyone');
   const [vibe, setVibe] = useState('');
-  const [instagram, setInstagram] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -72,7 +70,6 @@ const PostTripPage = () => {
         vibe: trip.vibe || vibe,
         matchWith: trip.matchWith,
         thumbnailUrl: trip.thumbnailUrl,
-        instagram,
       };
       
       localStorage.setItem('splitstay_pending_trip', JSON.stringify(tripData));
@@ -105,13 +102,7 @@ const PostTripPage = () => {
         thumbnailUrl: trip.thumbnailUrl,
       };
 
-      // Update user Instagram if provided
-      if (instagram) {
-        await supabase
-          .from('user')
-          .update({ instagramUrl: instagram })
-          .eq('id', user.id);
-      }
+
 
       // Create the trip
       await createTrip(tripData);
@@ -170,14 +161,10 @@ const PostTripPage = () => {
             <Step3Preferences
               trip={trip}
               setTrip={setTrip}
-              languages={languages}
-              setLanguages={setLanguages}
               matchWith={matchWith}
               setMatchWith={(m) => setMatchWith(m as 'male' | 'female' | 'anyone')}
               vibe={vibe}
               setVibe={setVibe}
-              instagram={instagram}
-              setInstagram={setInstagram}
               back={back}
               next={next}
             />
@@ -186,10 +173,8 @@ const PostTripPage = () => {
             <TripPreview
               trip={trip}
               personalNote={personalNote}
-              languages={languages}
               matchWith={matchWith}
               vibe={vibe}
-              instagram={instagram}
               back={back}
               onPost={handlePost}
               loading={loading}

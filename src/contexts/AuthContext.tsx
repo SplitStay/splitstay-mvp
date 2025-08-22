@@ -58,27 +58,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         
         // Handle post-authentication redirect
         if (event === 'SIGNED_IN' && session?.user) {
-          // Always check if user needs profile creation after sign in
-          setTimeout(async () => {
-            try {
-              const { data: userData, error } = await supabase
-                .from('user')
-                .select('profileCreated')
-                .eq('id', session.user.id)
-                .single();
-              
-              if (!error && (!userData || !userData.profileCreated)) {
-                // User needs to create profile
+          // Only redirect if we're on the home page (from email verification or OAuth)
+          const currentPath = window.location.pathname;
+          const hasAuthTokens = window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token');
+          
+          if ((currentPath === '/' || currentPath === '') && hasAuthTokens) {
+            // This is from email verification or OAuth, check profile status
+            setTimeout(async () => {
+              try {
+                const { data: userData, error } = await supabase
+                  .from('user')
+                  .select('profileCreated')
+                  .eq('id', session.user.id)
+                  .single();
+                
+                if (!error && (!userData || !userData.profileCreated)) {
+                  // User needs to create profile
+                  navigate('/create-profile');
+                } else if (!error && userData.profileCreated) {
+                  // User has profile, go to dashboard
+                  navigate('/dashboard');
+                }
+              } catch (error) {
+                // If user doesn't exist in our table, they need to create profile
                 navigate('/create-profile');
-              } else if (!error && userData.profileCreated) {
-                // User has profile, go to dashboard
-                navigate('/dashboard');
               }
-            } catch (error) {
-              // If user doesn't exist in our table, they need to create profile
-              navigate('/create-profile');
-            }
-          }, 100);
+            }, 100);
+          }
         }
       }
     )

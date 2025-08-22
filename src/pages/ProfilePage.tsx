@@ -19,7 +19,7 @@ export default function ProfilePage() {
   const showCreateProfileButton = authUser && !currentUser?.profileCreated
 
   const handleCreateProfile = () => {
-    navigate('/create-profile')
+      navigate('/create-profile')
   }
 
   if (isLoading) {
@@ -52,29 +52,29 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-200 via-white to-purple-200">
-      {/* Header */}
+        {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link to="/dashboard" className="text-2xl font-bold text-blue-600">
-              SplitStay
+                SplitStay
             </Link>
-            {showCreateProfileButton && (
+              {showCreateProfileButton && (
               <button
-                onClick={handleCreateProfile}
+                  onClick={handleCreateProfile}
                 className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors font-medium"
               >
                 <UserPlus className="w-4 h-4" />
                 Create Profile
               </button>
-            )}
+              )}
+            </div>
           </div>
-        </div>
       </div>
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <motion.div
+                  <motion.div 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -84,19 +84,19 @@ export default function ProfilePage() {
           <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-12 text-white">
             <div className="flex flex-col md:flex-row items-center gap-6">
               <div className="relative">
-                {user.imageUrl ? (
-                  <img
-                    src={user.imageUrl}
-                    alt={user.name || 'Profile'}
+                    {user.imageUrl ? (
+                      <img
+                        src={user.imageUrl}
+                        alt={user.name || 'Profile'}
                     className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
-                  />
-                ) : (
+                      />
+                    ) : (
                   <div className="w-32 h-32 rounded-full bg-white/20 border-4 border-white flex items-center justify-center">
                     <User className="w-16 h-16 text-white/70" />
-                  </div>
-                )}
-              </div>
-              
+                        </div>
+                          )}
+                        </div>
+                        
               <div className="text-center md:text-left flex-1">
                 <h1 className="text-3xl lg:text-4xl font-bold mb-2">
                   {user.name || 'Anonymous Traveler'}
@@ -107,43 +107,43 @@ export default function ProfilePage() {
                     <div className="flex items-center gap-2">
                       <MapPin className="w-4 h-4" />
                       <span>{user.currentPlace}</span>
-                    </div>
-                  )}
+                                  </div>
+                                )}
                   {user.birthPlace && (
                     <div className="flex items-center gap-2">
                       <Globe className="w-4 h-4" />
                       <span>From {user.birthPlace}</span>
-                    </div>
-                  )}
-                </div>
-
+                                </div>
+                              )}
+                            </div>
+                            
                 {user.bio && (
                   <p className="mt-4 text-white/90 text-lg max-w-2xl">
                     {user.bio}
                   </p>
-                )}
-              </div>
+                            )}
+                          </div>
 
               <div className="flex flex-col gap-3">
-                {isOwnProfile && (
+                    {isOwnProfile && (
                   <button
-                    onClick={() => navigate('/edit-profile')}
+                          onClick={() => navigate('/edit-profile')}
                     className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors font-medium"
-                  >
-                    <Edit className="w-4 h-4" />
+                        >
+                          <Edit className="w-4 h-4" />
                     Edit Profile
                   </button>
                 )}
                 <button
-                  onClick={() => setIsShareModalOpen(true)}
+                          onClick={() => setIsShareModalOpen(true)}
                   className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors font-medium"
-                >
-                  <Share2 className="w-4 h-4" />
+                        >
+                          <Share2 className="w-4 h-4" />
                   Share Profile
                 </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
 
           {/* Profile Content */}
           <div className="p-8">
@@ -160,22 +160,22 @@ export default function ProfilePage() {
                     <p className="text-gray-700">
                       {new Date().getFullYear() - user.yearOfBirth} years old
                     </p>
-                  </div>
-                )}
+                          </div>
+                        )}
 
                 {/* Gender */}
-                {user.gender && (
+                        {user.gender && (
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
                       <User className="w-5 h-5 text-blue-600" />
                       Gender
                     </h3>
                     <p className="text-gray-700 capitalize">{user.gender}</p>
-                  </div>
-                )}
+                          </div>
+              )}
 
-                {/* Languages */}
-                {user.languages && user.languages.length > 0 && (
+              {/* Languages */}
+              {user.languages && user.languages.length > 0 && (
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                       <Languages className="w-5 h-5 text-blue-600" />
@@ -184,17 +184,17 @@ export default function ProfilePage() {
                     <div className="flex flex-wrap gap-2">
                       {(user.languages as string[]).map((language) => (
                         <span
-                          key={language}
+                            key={language}
                           className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
-                        >
-                          {language}
+                          >
+                              {language}
                         </span>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
                   </div>
-                )}
+              )}
 
-                {/* Learning Languages */}
+              {/* Learning Languages */}
                 {user.learningLanguages && user.learningLanguages.length > 0 && (
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
@@ -204,20 +204,20 @@ export default function ProfilePage() {
                     <div className="flex flex-wrap gap-2">
                       {(user.learningLanguages as string[]).map((language) => (
                         <span
-                          key={language}
+                            key={language}
                           className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium"
-                        >
-                          {language}
+                            >
+                              {language}
                         </span>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
                   </div>
-                )}
+              )}
               </div>
 
               <div className="space-y-6">
-                {/* Travel Traits */}
-                {user.travelTraits && user.travelTraits.length > 0 && (
+              {/* Travel Traits */}
+              {user.travelTraits && user.travelTraits.length > 0 && (
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                       <Sparkles className="w-5 h-5 text-purple-600" />
@@ -226,13 +226,13 @@ export default function ProfilePage() {
                     <div className="flex flex-wrap gap-2">
                       {(user.travelTraits as string[]).map((trait) => (
                         <span
-                          key={trait}
+                            key={trait}
                           className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium"
-                        >
-                          {trait}
+                            >
+                              {trait}
                         </span>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
                   </div>
                 )}
 
@@ -251,46 +251,46 @@ export default function ProfilePage() {
                     >
                       @{user.instagramUrl.replace('@', '')}
                     </a>
-                  </div>
+                      </div>
                 )}
 
                 {/* WhatsApp */}
                 {user.whatsapp && (
-                  <div>
+                      <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
                       <MessageCircle className="w-5 h-5 text-green-600" />
                       WhatsApp
                     </h3>
                     <p className="text-gray-700">{user.whatsapp}</p>
-                  </div>
+                      </div>
                 )}
-
+                    
                 {/* Most Influenced Country */}
-                {user.mostInfluencedCountry && (
+                      {user.mostInfluencedCountry && (
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                       <Heart className="w-5 h-5 text-red-500" />
                       Most Influenced by {user.mostInfluencedCountry}
                     </h3>
-                    {user.mostInfluencedCountryDescription && (
+                          {user.mostInfluencedCountryDescription && (
                       <p className="text-gray-700">{user.mostInfluencedCountryDescription}</p>
-                    )}
-                  </div>
-                )}
+                          )}
+                        </div>
+                      )}
               </div>
             </div>
-
+                      
             {/* Travel Experience */}
-            {user.mostInfluencedExperience && (
+                      {user.mostInfluencedExperience && (
               <div className="mt-8">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <Star className="w-5 h-5 text-yellow-500" />
                   Most Impactful Travel Experience
                 </h3>
                 <div className="bg-gray-50 rounded-lg p-6">
-                  <p className="text-gray-700 leading-relaxed">{user.mostInfluencedExperience}</p>
-                </div>
-              </div>
+                          <p className="text-gray-700 leading-relaxed">{user.mostInfluencedExperience}</p>
+                        </div>
+                    </div>
             )}
 
             {/* Travel Photos */}
@@ -303,8 +303,8 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {(user.travelPhotos as string[]).map((photo, index) => (
                     <div key={index} className="aspect-square rounded-lg overflow-hidden">
-                      <img
-                        src={photo}
+                            <img
+                              src={photo}
                         alt={`Travel photo ${index + 1}`}
                         className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                       />
@@ -327,14 +327,14 @@ export default function ProfilePage() {
               </div>
             )}
           </div>
-        </motion.div>
-      </div>
+          </motion.div>
+        </div>
 
       {/* Share Modal */}
-      <ShareInviteModal
-        open={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-      />
-    </div>
+        <ShareInviteModal 
+          open={isShareModalOpen}
+          onClose={() => setIsShareModalOpen(false)}
+        />
+      </div>
   )
 }

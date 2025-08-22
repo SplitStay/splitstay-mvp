@@ -256,8 +256,9 @@ export const Step3Languages: React.FC<Step3Props> = ({
           </label>
           <div className="space-y-2">
             <div className="flex items-center">
-              <span className="text-xs text-gray-500 bg-gray-50 px-3 py-3 rounded-l-lg border border-r-0 border-gray-300">
-                splitstay.travel/profile/
+              <span className="text-xs text-gray-500 bg-gray-50 px-2 sm:px-3 py-3 rounded-l-lg border border-r-0 border-gray-300 whitespace-nowrap overflow-hidden">
+                <span className="hidden sm:inline">splitstay.travel/profile/</span>
+                <span className="sm:hidden">splitstay.../</span>
               </span>
               <input
                 id="personalizedLink"
@@ -265,7 +266,7 @@ export const Step3Languages: React.FC<Step3Props> = ({
                 value={formData.personalizedLink}
                 onChange={(e) => handlePersonalizedLinkChange(e.target.value)}
                 placeholder="yourname"
-                className={`flex-1 px-3 py-3 border rounded-r-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                className={`flex-1 px-2 sm:px-3 py-3 border rounded-r-lg text-sm sm:text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
                   personalizedLinkError ? 'border-red-300' : 'border-gray-300'
                 }`}
               />

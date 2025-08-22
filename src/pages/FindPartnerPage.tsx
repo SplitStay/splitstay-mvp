@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, MapPin, Calendar, User, Building, Clock, Users, Globe, Flag, MapIcon, CalendarDays, Home, MessageCircle } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
-import { searchTrips, Trip } from '../lib/tripService';
+import { searchTrips, type Trip } from '../lib/tripService';
 import { ChatService } from '../lib/chatService';
 import { useAuth } from '../contexts/AuthContext';
 import { formatDistanceToNow } from 'date-fns';
@@ -24,6 +24,11 @@ const FindPartnerPage = () => {
   useEffect(() => {
     loadTrips();
   }, []);
+
+  // Real-time filtering - trigger whenever any filter changes
+  useEffect(() => {
+    handleApplyFilters();
+  }, [searchQuery, selectedRegion, selectedCountry, selectedCity, selectedDates, selectedType, isFlexible]);
 
   const loadTrips = async () => {
     try {
@@ -57,12 +62,77 @@ const FindPartnerPage = () => {
         filters.location = searchQuery;
       }
       
+      if (selectedType !== 'All Types') {
+        filters.accommodationTypeId = selectedType;
+      }
+      
       if (isFlexible) {
         filters.flexible = true;
       }
       
       const filteredTrips = await searchTrips(filters);
-      setTrips(filteredTrips);
+      
+      // Apply client-side filtering for fields not handled by backend
+      let clientFilteredTrips = filteredTrips;
+      
+      // Filter by region
+      if (selectedRegion !== 'All Regions') {
+        clientFilteredTrips = clientFilteredTrips.filter(trip => {
+          const location = trip.location.toLowerCase();
+          switch (selectedRegion) {
+            case 'Europe':
+              return ['france', 'spain', 'italy', 'germany', 'uk', 'united kingdom', 'portugal', 'greece', 'netherlands', 'belgium', 'austria', 'switzerland', 'sweden', 'norway', 'denmark', 'finland', 'poland', 'czech', 'hungary', 'croatia', 'romania', 'bulgaria', 'ireland', 'iceland'].some(country => location.includes(country));
+            case 'Asia':
+              return ['japan', 'china', 'thailand', 'india', 'singapore', 'malaysia', 'indonesia', 'vietnam', 'korea', 'philippines', 'taiwan', 'hong kong', 'cambodia', 'laos', 'myanmar', 'nepal', 'sri lanka', 'bangladesh'].some(country => location.includes(country));
+            case 'North America':
+              return ['usa', 'united states', 'canada', 'mexico'].some(country => location.includes(country));
+            case 'South America':
+              return ['brazil', 'argentina', 'chile', 'peru', 'colombia', 'venezuela', 'ecuador', 'bolivia', 'uruguay', 'paraguay'].some(country => location.includes(country));
+            case 'Africa':
+              return ['south africa', 'egypt', 'morocco', 'kenya', 'nigeria', 'ghana', 'tunisia', 'tanzania', 'ethiopia', 'uganda'].some(country => location.includes(country));
+            case 'Oceania':
+              return ['australia', 'new zealand', 'fiji', 'samoa', 'tonga'].some(country => location.includes(country));
+            default:
+              return true;
+          }
+        });
+      }
+      
+      // Filter by country
+      if (selectedCountry !== 'All Countries') {
+        clientFilteredTrips = clientFilteredTrips.filter(trip => 
+          trip.location.toLowerCase().includes(selectedCountry.toLowerCase())
+        );
+      }
+      
+      // Filter by city
+      if (selectedCity !== 'All Cities') {
+        clientFilteredTrips = clientFilteredTrips.filter(trip => 
+          trip.location.toLowerCase().includes(selectedCity.toLowerCase())
+        );
+      }
+      
+      // Filter by date range
+      if (selectedDates !== 'Any Dates') {
+        clientFilteredTrips = clientFilteredTrips.filter(trip => {
+          if (trip.flexible) {
+            // For flexible trips, check if estimated dates fall within range
+            if ((trip as any).estimatedmonth && (trip as any).estimatedyear) {
+              const tripDate = new Date(parseInt((trip as any).estimatedyear), parseInt((trip as any).estimatedmonth) - 1);
+              return true; // For now, show all flexible trips when dates are selected
+            }
+            return false;
+          } else {
+            // For fixed dates, check if trip dates overlap with filter range
+            if (trip.startDate && trip.endDate) {
+              return true; // For now, show all fixed date trips when dates are selected
+            }
+            return false;
+          }
+        });
+      }
+      
+      setTrips(clientFilteredTrips);
     } catch (error) {
       console.error('Error filtering trips:', error);
     } finally {
@@ -78,7 +148,7 @@ const FindPartnerPage = () => {
           from: '/find-partners', 
           action: 'message', 
           tripId: trip.id,
-          hostName: trip.host?.name || 'host',
+          hostName: (trip as any).host?.name || 'host',
           tripName: trip.name 
         } 
       });
@@ -176,11 +246,202 @@ const FindPartnerPage = () => {
                 className="pl-10 pr-4 py-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none w-full"
               >
                 <option>All Countries</option>
+                <option>Afghanistan</option>
+                <option>Albania</option>
+                <option>Algeria</option>
+                <option>Andorra</option>
+                <option>Angola</option>
+                <option>Antigua and Barbuda</option>
+                <option>Argentina</option>
+                <option>Armenia</option>
+                <option>Australia</option>
+                <option>Austria</option>
+                <option>Azerbaijan</option>
+                <option>Bahamas</option>
+                <option>Bahrain</option>
+                <option>Bangladesh</option>
+                <option>Barbados</option>
+                <option>Belarus</option>
+                <option>Belgium</option>
+                <option>Belize</option>
+                <option>Benin</option>
+                <option>Bhutan</option>
+                <option>Bolivia</option>
+                <option>Bosnia and Herzegovina</option>
+                <option>Botswana</option>
+                <option>Brazil</option>
+                <option>Brunei</option>
+                <option>Bulgaria</option>
+                <option>Burkina Faso</option>
+                <option>Burundi</option>
+                <option>Cabo Verde</option>
+                <option>Cambodia</option>
+                <option>Cameroon</option>
+                <option>Canada</option>
+                <option>Central African Republic</option>
+                <option>Chad</option>
+                <option>Chile</option>
+                <option>China</option>
+                <option>Colombia</option>
+                <option>Comoros</option>
+                <option>Congo</option>
+                <option>Costa Rica</option>
+                <option>Croatia</option>
+                <option>Cuba</option>
+                <option>Cyprus</option>
+                <option>Czech Republic</option>
+                <option>Democratic Republic of the Congo</option>
+                <option>Denmark</option>
+                <option>Djibouti</option>
+                <option>Dominica</option>
+                <option>Dominican Republic</option>
+                <option>East Timor</option>
+                <option>Ecuador</option>
+                <option>Egypt</option>
+                <option>El Salvador</option>
+                <option>Equatorial Guinea</option>
+                <option>Eritrea</option>
+                <option>Estonia</option>
+                <option>Eswatini</option>
+                <option>Ethiopia</option>
+                <option>Fiji</option>
+                <option>Finland</option>
                 <option>France</option>
-                <option>Spain</option>
-                <option>Italy</option>
-                <option>Portugal</option>
+                <option>Gabon</option>
+                <option>Gambia</option>
+                <option>Georgia</option>
+                <option>Germany</option>
+                <option>Ghana</option>
+                <option>Greece</option>
+                <option>Grenada</option>
+                <option>Guatemala</option>
+                <option>Guinea</option>
+                <option>Guinea-Bissau</option>
+                <option>Guyana</option>
+                <option>Haiti</option>
+                <option>Honduras</option>
+                <option>Hungary</option>
+                <option>Iceland</option>
                 <option>India</option>
+                <option>Indonesia</option>
+                <option>Iran</option>
+                <option>Iraq</option>
+                <option>Ireland</option>
+                <option>Israel</option>
+                <option>Italy</option>
+                <option>Ivory Coast</option>
+                <option>Jamaica</option>
+                <option>Japan</option>
+                <option>Jordan</option>
+                <option>Kazakhstan</option>
+                <option>Kenya</option>
+                <option>Kiribati</option>
+                <option>Kuwait</option>
+                <option>Kyrgyzstan</option>
+                <option>Laos</option>
+                <option>Latvia</option>
+                <option>Lebanon</option>
+                <option>Lesotho</option>
+                <option>Liberia</option>
+                <option>Libya</option>
+                <option>Liechtenstein</option>
+                <option>Lithuania</option>
+                <option>Luxembourg</option>
+                <option>Madagascar</option>
+                <option>Malawi</option>
+                <option>Malaysia</option>
+                <option>Maldives</option>
+                <option>Mali</option>
+                <option>Malta</option>
+                <option>Marshall Islands</option>
+                <option>Mauritania</option>
+                <option>Mauritius</option>
+                <option>Mexico</option>
+                <option>Micronesia</option>
+                <option>Moldova</option>
+                <option>Monaco</option>
+                <option>Mongolia</option>
+                <option>Montenegro</option>
+                <option>Morocco</option>
+                <option>Mozambique</option>
+                <option>Myanmar</option>
+                <option>Namibia</option>
+                <option>Nauru</option>
+                <option>Nepal</option>
+                <option>Netherlands</option>
+                <option>New Zealand</option>
+                <option>Nicaragua</option>
+                <option>Niger</option>
+                <option>Nigeria</option>
+                <option>North Korea</option>
+                <option>North Macedonia</option>
+                <option>Norway</option>
+                <option>Oman</option>
+                <option>Pakistan</option>
+                <option>Palau</option>
+                <option>Palestine</option>
+                <option>Panama</option>
+                <option>Papua New Guinea</option>
+                <option>Paraguay</option>
+                <option>Peru</option>
+                <option>Philippines</option>
+                <option>Poland</option>
+                <option>Portugal</option>
+                <option>Qatar</option>
+                <option>Romania</option>
+                <option>Russia</option>
+                <option>Rwanda</option>
+                <option>Saint Kitts and Nevis</option>
+                <option>Saint Lucia</option>
+                <option>Saint Vincent and the Grenadines</option>
+                <option>Samoa</option>
+                <option>San Marino</option>
+                <option>Sao Tome and Principe</option>
+                <option>Saudi Arabia</option>
+                <option>Senegal</option>
+                <option>Serbia</option>
+                <option>Seychelles</option>
+                <option>Sierra Leone</option>
+                <option>Singapore</option>
+                <option>Slovakia</option>
+                <option>Slovenia</option>
+                <option>Solomon Islands</option>
+                <option>Somalia</option>
+                <option>South Africa</option>
+                <option>South Korea</option>
+                <option>South Sudan</option>
+                <option>Spain</option>
+                <option>Sri Lanka</option>
+                <option>Sudan</option>
+                <option>Suriname</option>
+                <option>Sweden</option>
+                <option>Switzerland</option>
+                <option>Syria</option>
+                <option>Taiwan</option>
+                <option>Tajikistan</option>
+                <option>Tanzania</option>
+                <option>Thailand</option>
+                <option>Togo</option>
+                <option>Tonga</option>
+                <option>Trinidad and Tobago</option>
+                <option>Tunisia</option>
+                <option>Turkey</option>
+                <option>Turkmenistan</option>
+                <option>Tuvalu</option>
+                <option>Uganda</option>
+                <option>Ukraine</option>
+                <option>United Arab Emirates</option>
+                <option>United Kingdom</option>
+                <option>United States</option>
+                <option>Uruguay</option>
+                <option>Uzbekistan</option>
+                <option>Vanuatu</option>
+                <option>Vatican City</option>
+                <option>Venezuela</option>
+                <option>Vietnam</option>
+                <option>Yemen</option>
+                <option>Zambia</option>
+                <option>Zimbabwe</option>
               </select>
             </div>
 
@@ -223,10 +484,10 @@ const FindPartnerPage = () => {
                 className="pl-10 pr-4 py-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none w-full"
               >
                 <option>All Types</option>
-                <option>Hotel</option>
-                <option>Airbnb</option>
-                <option>Hostel</option>
+                <option>Hostel Room</option>
+                <option>Hotel Room</option>
                 <option>Apartment</option>
+                <option>House</option>
               </select>
             </div>
 
@@ -259,22 +520,15 @@ const FindPartnerPage = () => {
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-4 justify-center">
-            <button 
-              onClick={handleApplyFilters}
-              disabled={loading}
-              className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white px-8 py-3 rounded-lg font-medium transition-colors"
-            >
-              <Filter className="w-4 h-4" />
-              {loading ? 'Searching...' : 'Apply Filters'}
-            </button>
+          {/* Clear Filters Button */}
+          <div className="flex justify-center">
             <button
               onClick={handleClearFilters}
               disabled={loading}
-              className="bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white px-8 py-3 rounded-lg font-medium transition-colors"
+              className="flex items-center gap-2 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white px-6 py-3 rounded-lg font-medium transition-colors"
             >
-              Clear Filters
+              <Filter className="w-4 h-4" />
+              Clear All Filters
             </button>
           </div>
         </div>
@@ -352,12 +606,12 @@ const FindPartnerPage = () => {
                       
                       <div className="flex items-center gap-2 text-gray-600">
                         <User className="w-4 h-4" />
-                        <span>Host: {trip.host?.name || 'Unknown'}</span>
+                        <span>Host: {(trip as any).host?.name || 'Unknown'}</span>
                       </div>
                       
                       <div className="flex items-center gap-2 text-gray-600">
                         <Building className="w-4 h-4" />
-                        <span>{trip.accommodation_type?.name || 'Accommodation'}</span>
+                        <span>{(trip as any).accommodation_type?.name || 'Accommodation'}</span>
                       </div>
                     </div>
 
@@ -381,11 +635,11 @@ const FindPartnerPage = () => {
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleMessageHost(trip)}
-                          disabled={isMessageLoading || (user?.id && trip.hostId === user?.id)}
+                          disabled={messageLoading === trip.id || Boolean(user?.id && trip.hostId && trip.hostId === user.id)}
                           className="flex items-center gap-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors"
                         >
                           <MessageCircle className="w-4 h-4" />
-                          {isMessageLoading ? 'Loading...' : user?.id ? 'Message' : 'Sign up to Message'}
+                          {messageLoading === trip.id ? 'Loading...' : user?.id ? 'Message' : 'Sign up to Message'}
                         </button>
                         <button 
                           onClick={() => navigate(`/trip/${trip.id}`)}

@@ -82,58 +82,59 @@ const ShareInviteModal: React.FC<ShareInviteModalProps> = ({
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 40, scale: 0.95 }}
         transition={{ duration: 0.3 }}
-        className="bg-white rounded-2xl p-8 shadow-xl w-full max-w-md mx-4"
+        className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 shadow-xl w-full max-w-sm sm:max-w-md mx-4"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-2xl font-bold text-blue-700 mb-4 text-center">
+        <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-700 mb-3 sm:mb-4 text-center">
           Share Your Profile & Invite Friends
         </h2>
-        <p className="text-gray-600 mb-4 text-center">
+        <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 text-center">
           Invite your friends to join SplitStay! Sharing is optional, but helps us grow.
         </p>
         <textarea
-          className="w-full p-3 border border-gray-300 rounded-lg mb-4 text-gray-800 resize-none"
-          rows={4}
+          className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg mb-3 sm:mb-4 text-gray-800 resize-none text-xs sm:text-sm"
+          rows={3}
           value={fullMessage}
           readOnly
         />
-        <div className="flex flex-col gap-3 mb-4">
+        <div className="flex flex-col gap-2 sm:gap-3 mb-3 sm:mb-4">
           {typeof navigator.share === 'function' && (
             <button
               onClick={handleShare}
-              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              className="w-full bg-blue-600 text-white py-2 sm:py-3 px-3 sm:px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm sm:text-base"
             >
               Share via Device...
             </button>
           )}
           <button
             onClick={() => window.open(whatsappUrl, '_blank')}
-            className="w-full bg-green-500 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-600 transition-colors"
+            className="w-full bg-green-500 text-white py-2 sm:py-3 px-3 sm:px-4 rounded-lg font-medium hover:bg-green-600 transition-colors text-sm sm:text-base"
           >
             Share on WhatsApp
           </button>
           <button
             onClick={() => window.open(facebookUrl, '_blank')}
-            className="w-full bg-blue-800 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-900 transition-colors"
+            className="w-full bg-blue-800 text-white py-2 sm:py-3 px-3 sm:px-4 rounded-lg font-medium hover:bg-blue-900 transition-colors text-sm sm:text-base"
           >
             Share on Facebook
           </button>
           <button
             onClick={handleInstagramShare}
-            className="w-full bg-pink-500 text-white py-3 px-4 rounded-lg font-medium hover:bg-pink-600 transition-colors"
+            className="w-full bg-pink-500 text-white py-2 sm:py-3 px-3 sm:px-4 rounded-lg font-medium hover:bg-pink-600 transition-colors text-sm sm:text-base"
           >
-            Share on Instagram (Copy to Clipboard)
+            <span className="hidden sm:inline">Share on Instagram (Copy to Clipboard)</span>
+            <span className="sm:hidden">Instagram</span>
           </button>
           <button
             onClick={handleCopy}
-            className="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+            className="w-full bg-gray-100 text-gray-700 py-2 sm:py-3 px-3 sm:px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors text-sm sm:text-base"
           >
             {copied ? 'Copied!' : 'Copy Message'}
           </button>
         </div>
         <button
           onClick={onClose}
-          className="w-full text-gray-500 hover:text-blue-600 transition-colors text-sm underline"
+          className="w-full text-gray-500 hover:text-blue-600 transition-colors text-xs sm:text-sm underline"
         >
           Skip
         </button>

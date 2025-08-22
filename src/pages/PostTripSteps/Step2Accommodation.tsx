@@ -55,10 +55,11 @@ const Step2Accommodation: React.FC<Props> = ({
         }
       } catch (error) {
         console.error('Failed to load accommodation types:', error);
-        // Fallback to default types
         setAccommodationTypes([
-          { id: 'villa', name: 'Villa', displayOrder: 1, createdAt: '', updatedAt: '' },
-          { id: 'hotel', name: 'Hotel', displayOrder: 2, createdAt: '', updatedAt: '' },
+          { id: 'hostel-room', name: 'Hostel Room', displayOrder: 1, createdAt: '', updatedAt: '' },
+          { id: 'hotel-room', name: 'Hotel Room', displayOrder: 2, createdAt: '', updatedAt: '' },
+          { id: 'apartment', name: 'Apartment', displayOrder: 3, createdAt: '', updatedAt: '' },
+          { id: 'house', name: 'House', displayOrder: 4, createdAt: '', updatedAt: '' },
         ]);
       }
     };
@@ -91,6 +92,9 @@ const Step2Accommodation: React.FC<Props> = ({
 
     const timeoutId = setTimeout(async () => {
       setAccommodationPreview(prev => ({ ...prev, isLoading: true, error: null }));
+      
+      // Clear cache for this URL to force fresh fetch with new server-side extraction
+      iframelyService.clearCacheForUrl(accommodationLink);
       
       try {
         const preview = await iframelyService.getAccommodationPreview(accommodationLink);
