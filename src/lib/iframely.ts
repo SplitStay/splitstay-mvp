@@ -44,15 +44,38 @@ class IframelyService {
   private readonly apiKey = import.meta.env.VITE_IFRAMELY_API_KEY || 'e7ef2fd691282a8112c2ce56874a1d24';
   private cache = new Map<string, AccommodationPreview>();
   
-  // Fallback services
-  private readonly linkPreviewApiKey = import.meta.env.VITE_LINK_PREVIEW_API_KEY;
-  private readonly linkPreviewUrl = 'https://api.linkpreview.net';
+  // Server-side extraction via Supabase
+  private readonly supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  private readonly supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
   private createBookingSiteFallback(url: string): AccommodationPreview {
     const siteName = this.extractSiteName(url);
+    
+    // Try to extract hotel name from URL
+    let hotelName = '';
+    try {
+      const urlPath = new URL(url).pathname;
+      const pathParts = urlPath.split('/');
+      
+      // Look for hotel name in URL path (usually after /hotel/)
+      const hotelIndex = pathParts.findIndex(part => part === 'hotel');
+      if (hotelIndex !== -1 && hotelIndex + 2 < pathParts.length) {
+        const hotelSlug = pathParts[hotelIndex + 2];
+        hotelName = hotelSlug
+          .replace(/\.html.*$/, '')
+          .replace(/[-_]/g, ' ')
+          .replace(/\b\w/g, l => l.toUpperCase())
+          .trim();
+      }
+    } catch (e) {
+      // Ignore URL parsing errors
+    }
+    
+    const title = hotelName || `${siteName.charAt(0).toUpperCase() + siteName.slice(1)} Accommodation`;
+    
     return {
-      title: `${siteName.charAt(0).toUpperCase() + siteName.slice(1)} Accommodation`,
-      description: `This accommodation is available on ${siteName}. Due to security measures, we cannot display a preview, but you can click the link below to view full details, photos, and booking information.`,
+      title,
+      description: `${hotelName ? hotelName + ' - ' : ''}Available on ${siteName.charAt(0).toUpperCase() + siteName.slice(1)}. Click to view full details, photos, pricing, and book your stay.`,
       image: '',
       site: siteName.charAt(0).toUpperCase() + siteName.slice(1),
       author: '',
@@ -72,11 +95,65 @@ class IframelyService {
       }
     }
 
-    // We'll return loading state inline when needed
+    if (!this.isValidUrl(url)) {
+      throw new Error('Please enter a valid accommodation URL');
+    }
+
+    // Check if this is a known blocked booking site
+    const isBlockedBookingSite = ['booking.com', 'hotels.com', 'expedia.com', 'agoda.com'].some(site => url.includes(site));
 
     try {
+      // For blocked booking sites, try our server-side extraction first
+      if (isBlockedBookingSite && this.supabaseUrl) {
+        console.log('Attempting server-side extraction for blocked booking site:', url);
+        try {
+          const serverResult = await this.extractMetaViaSupabase(url);
+          console.log('Server extraction result:', serverResult);
+          
+          if (serverResult.success) {
+            // Even if we don't get image/title, we got a successful response
+            // Let's create a better fallback with URL parsing
+            let title = serverResult.title;
+            let description = serverResult.description;
+            
+            // If no title extracted, try to parse from URL
+            if (!title && url.includes('booking.com')) {
+              const urlParts = url.split('/');
+              const hotelSlug = urlParts.find(part => part.includes('hotel') || part.length > 10);
+              if (hotelSlug) {
+                title = hotelSlug
+                  .replace(/hotel-|hotel\//, '')
+                  .replace(/\.html.*$/, '')
+                  .replace(/-/g, ' ')
+                  .replace(/\b\w/g, l => l.toUpperCase());
+              }
+            }
+            
+            if (!description) {
+              description = `${title ? title + ' - ' : ''}View this accommodation on ${serverResult.site || 'Booking.com'} for full details, photos, and booking information.`;
+            }
+            const preview: AccommodationPreview = {
+              title: title || 'Accommodation',
+              description: description,
+              image: serverResult.image || '',
+              site: serverResult.site || this.extractSiteName(url),
+              author: '',
+              url: serverResult.url || url,
+              favicon: serverResult.favicon || `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}`,
+              isLoading: false,
+              error: null,
+            };
+            console.log('Using server-extracted preview:', preview);
+            this.cache.set(url, preview);
+            return preview;
+          }
+        } catch (serverError) {
+          console.log('Server-side extraction failed, falling back to Iframely:', serverError);
+        }
+      }
+
+      // Try Iframely as primary method (or fallback for server-side extraction failure)
       if (!this.apiKey) {
-        // Return a demo preview when API key is not configured
         return {
           title: 'Demo Accommodation Preview',
           description: 'This is a demo preview. Configure VITE_IFRAMELY_API_KEY to see real accommodation previews from Booking.com, Airbnb, and other sites.',
@@ -90,19 +167,12 @@ class IframelyService {
         };
       }
 
-      if (!this.isValidUrl(url)) {
-        throw new Error('Please enter a valid accommodation URL');
-      }
-
-      // Try different parameters for booking.com
-      const isBookingCom = url.includes('booking.com');
       const params = new URLSearchParams({
         url: url,
         key: this.apiKey,
       });
       
-      // For booking.com, try without iframe and omit_script parameters
-      if (!isBookingCom) {
+      if (!isBlockedBookingSite) {
         params.append('iframe', '1');
         params.append('omit_script', '1');
       }
@@ -113,7 +183,7 @@ class IframelyService {
       if (response.status === 202) {
         const processingPreview = {
           title: 'Processing accommodation...',
-          description: 'Iframely is processing this accommodation link. This usually takes a few seconds for complex booking sites.',
+          description: 'Processing this accommodation link...',
           image: '',
           site: this.extractSiteName(url),
           author: '',
@@ -123,16 +193,14 @@ class IframelyService {
           error: null,
         };
         
-        // Cache the processing state
         this.cache.set(url, processingPreview);
         
-        // Retry after 3 seconds, but only up to 3 times
         if (retryCount < 3) {
           setTimeout(async () => {
             try {
               await this.getAccommodationPreview(url, retryCount + 1);
             } catch (error) {
-              // Ignore retry errors, user can manually refresh
+              // Ignore retry errors
             }
           }, 3000);
         }
@@ -141,44 +209,32 @@ class IframelyService {
       }
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch preview: ${response.status}`);
+        throw new Error(`Iframely failed: ${response.status}`);
       }
 
       const data: IframelyResponse = await response.json();
 
-      // Debug logging can be enabled if needed
-      // console.log('Iframely response:', { status: response.status, hasData: !!data.meta });
-
-      // Handle errors from booking sites specially
       if (data.error) {
-        const isBookingSite = ['booking.com', 'hotels.com', 'expedia.com'].some(site => url.includes(site));
-        
-        if (isBookingSite) {
-          // Return fallback for booking sites instead of throwing error
+        if (isBlockedBookingSite) {
           const fallback = this.createBookingSiteFallback(url);
           this.cache.set(url, fallback);
           return fallback;
         }
-        
         throw new Error(data.error);
       }
 
-      // Handle empty response or blocked content from booking sites
       if (!data.meta && !data.links && !data.html) {
-        const isBookingSite = ['booking.com', 'hotels.com', 'expedia.com'].some(site => url.includes(site));
-        
-        if (isBookingSite) {
+        if (isBlockedBookingSite) {
           const fallback = this.createBookingSiteFallback(url);
           this.cache.set(url, fallback);
           return fallback;
         }
-        
-        throw new Error('No preview data available for this URL. The site may be blocking preview generation.');
+        throw new Error('No preview data available for this URL.');
       }
 
       const preview: AccommodationPreview = {
-        title: data.meta?.title || (url.includes('booking.com') ? 'Booking.com Property' : 'Accommodation'),
-        description: this.truncateDescription(data.meta?.description || (url.includes('booking.com') ? 'Hotel or accommodation from Booking.com. Click to view full details on the booking site.' : '')),
+        title: data.meta?.title || 'Accommodation',
+        description: this.truncateDescription(data.meta?.description || ''),
         image: this.getBestThumbnail(data.links?.thumbnail) || '',
         site: data.meta?.site || this.extractSiteName(url),
         author: data.meta?.author || '',
@@ -188,11 +244,17 @@ class IframelyService {
         error: null,
       };
 
-      // Cache the result
       this.cache.set(url, preview);
       return preview;
 
     } catch (error) {
+      // Final fallback for blocked booking sites
+      if (isBlockedBookingSite) {
+        const fallback = this.createBookingSiteFallback(url);
+        this.cache.set(url, fallback);
+        return fallback;
+      }
+
       const errorPreview: AccommodationPreview = {
         title: '',
         description: '',
@@ -268,8 +330,43 @@ class IframelyService {
     return description.substring(0, maxLength).trim() + '...';
   }
 
+  private async extractMetaViaSupabase(url: string): Promise<{
+    success: boolean;
+    title?: string;
+    description?: string;
+    image?: string;
+    site?: string;
+    favicon?: string;
+    url?: string;
+    error?: string;
+  }> {
+    if (!this.supabaseUrl || !this.supabaseAnonKey) {
+      throw new Error('Supabase configuration missing');
+    }
+
+    const response = await fetch(`${this.supabaseUrl}/functions/v1/extract-accommodation-meta`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': this.supabaseAnonKey,
+        'Authorization': `Bearer ${this.supabaseAnonKey}`,
+      },
+      body: JSON.stringify({ url }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Server extraction failed: ${response.status}`);
+    }
+
+    return await response.json();
+  }
+
   clearCache(): void {
     this.cache.clear();
+  }
+
+  clearCacheForUrl(url: string): void {
+    this.cache.delete(url);
   }
 }
 
