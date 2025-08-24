@@ -54,6 +54,15 @@ async function extractWithPuppeteer(url: string, parsedUrl: URL): Promise<Respon
     // Wait a bit more for dynamic content
     await page.waitForTimeout(2000)
     
+    // For booking.com, wait for images to load
+    if (parsedUrl.hostname.includes('booking.com')) {
+      try {
+        await page.waitForSelector('img[data-testid="hero-image"], .bh-photo-grid img, .hp__gallery-container img', { timeout: 5000 })
+      } catch (e) {
+        console.log('Image selectors not found, continuing with extraction')
+      }
+    }
+    
     // Extract data using DOM selectors specific to each site
     const extractedData = await page.evaluate((hostname) => {
       if (hostname.includes('booking.com')) {
@@ -66,7 +75,14 @@ async function extractWithPuppeteer(url: string, parsedUrl: URL): Promise<Respon
           image: document.querySelector('img[data-testid="hero-image"]')?.getAttribute('src') ||
                  document.querySelector('.bh-photo-grid img')?.getAttribute('src') ||
                  document.querySelector('.hotel_header_image img')?.getAttribute('src') ||
-                 document.querySelector('img[alt*="hotel" i]')?.getAttribute('src'),
+                 document.querySelector('img[data-testid="property-gallery-image"]')?.getAttribute('src') ||
+                 document.querySelector('.hp__gallery-container img')?.getAttribute('src') ||
+                 document.querySelector('[data-testid="gallery-images"] img')?.getAttribute('src') ||
+                 document.querySelector('.hp-gallery__image img')?.getAttribute('src') ||
+                 document.querySelector('.gallery-image img')?.getAttribute('src') ||
+                 document.querySelector('img[alt*="hotel" i]')?.getAttribute('src') ||
+                 document.querySelector('img[alt*="property" i]')?.getAttribute('src') ||
+                 document.querySelector('img[src*="booking.com"]')?.getAttribute('src'),
           
           description: document.querySelector('[data-testid="property-description"]')?.textContent?.trim() ||
                       document.querySelector('.hotel_description_wrapper_exp')?.textContent?.trim() ||

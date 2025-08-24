@@ -154,7 +154,16 @@ const Step1Destination: React.FC<Props> = ({ trip, setTrip, next }) => {
             </label>
             <DatePicker
               selected={startDate}
-              onChange={date => setStartDate(date)}
+              onChange={date => {
+                setStartDate(date);
+                // If no end date is set or end date is before/same as new start date, 
+                // set end date to one day after start date
+                if (date && (!endDate || endDate <= date)) {
+                  const nextDay = new Date(date);
+                  nextDay.setDate(nextDay.getDate() + 1);
+                  setEndDate(nextDay);
+                }
+              }}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg"
               dateFormat="yyyy-MM-dd"
               required={!flexible}

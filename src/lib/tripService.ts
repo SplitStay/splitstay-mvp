@@ -122,7 +122,12 @@ export const updateTrip = async (tripId: string, tripData: Partial<TripFormData>
 export const getTripById = async (tripId: string): Promise<Trip | null> => {
   const { data, error } = await supabase
     .from('trip')
-    .select(`*`)
+    .select(`
+      *,
+      host:user!hostId(name, imageUrl),
+      joinee:user!joineeId(name, imageUrl),
+      accommodation_type(name)
+    `)
     .eq('id', tripId)
     .single();
 
@@ -146,7 +151,12 @@ export const getUserTrips = async (): Promise<Trip[]> => {
 
   const { data, error } = await supabase
     .from('trip')
-    .select(`*`)
+    .select(`
+      *,
+      host:user!hostId(name, imageUrl),
+      joinee:user!joineeId(name, imageUrl),
+      accommodation_type(name)
+    `)
     .or(`hostId.eq.${user.id},joineeId.eq.${user.id}`)
     .order('createdAt', { ascending: false });
 
@@ -169,7 +179,12 @@ export const searchTrips = async (filters: {
 }): Promise<Trip[]> => {
   let query = supabase
     .from('trip')
-    .select(`*`)
+    .select(`
+      *,
+      host:user!hostId(name, imageUrl),
+      joinee:user!joineeId(name, imageUrl),
+      accommodation_type(name)
+    `)
     .is('joineeId', null);
 
   if (filters.location) {

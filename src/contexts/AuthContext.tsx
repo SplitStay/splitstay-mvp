@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import type { User, Session, AuthError } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { useNavigate } from 'react-router-dom'
+import { identifyUser, amplitudeService } from '../lib/amplitude'
 
 interface AuthContextType {
   user: User | null
@@ -38,8 +39,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const navigate = useNavigate()
   const isLocalhost = window.location.hostname === 'localhost';
   const redirectTo = isLocalhost
-    ? 'http://localhost:5173/create-profile'
-    : `${window.location.origin}/create-profile`;
+    ? 'http://localhost:5173'
+    : window.location.origin;
 
   useEffect(() => {
     // Get initial session
@@ -51,19 +52,51 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         setSession(session)
         setUser(session?.user ?? null)
         setLoading(false)
         
+        // Handle Amplitude user identification (non-blocking)
+        if (event === 'SIGNED_IN' && session?.user) {
+          // Identify user in Amplitude asynchronously
+          setTimeout(async () => {
+            try {
+              const { data: userData } = await supabase
+                .from('user')
+                .select('name, email, currentPlace')
+                .eq('id', session.user.id)
+                .single()
+              
+              identifyUser(session.user.id, {
+                email: session.user.email,
+                name: userData?.name,
+                location: userData?.currentPlace,
+                sign_up_method: session.user.app_metadata?.provider || 'email'
+              })
+            } catch (error) {
+              // Fallback identification with minimal data
+              identifyUser(session.user.id, {
+                email: session.user.email,
+                sign_up_method: session.user.app_metadata?.provider || 'email'
+              })
+            }
+          }, 0)
+        } else if (event === 'SIGNED_OUT') {
+          // Reset Amplitude asynchronously
+          setTimeout(() => {
+            amplitudeService.reset()
+          }, 0)
+        }
+        
         // Handle post-authentication redirect
         if (event === 'SIGNED_IN' && session?.user) {
-          // Only redirect if we're on the home page (from email verification or OAuth)
           const currentPath = window.location.pathname;
           const hasAuthTokens = window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token');
+          const isAuthCallback = hasAuthTokens || currentPath === '/';
           
-          if ((currentPath === '/' || currentPath === '') && hasAuthTokens) {
-            // This is from email verification or OAuth, check profile status
+          // Check if we should redirect (OAuth callback or on home page)
+          if (isAuthCallback) {
             setTimeout(async () => {
               try {
                 const { data: userData, error } = await supabase
@@ -72,12 +105,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                   .eq('id', session.user.id)
                   .single();
                 
-                if (!error && (!userData || !userData.profileCreated)) {
-                  // User needs to create profile
-                  navigate('/create-profile');
-                } else if (!error && userData.profileCreated) {
+                if (!error && userData?.profileCreated) {
                   // User has profile, go to dashboard
                   navigate('/dashboard');
+                } else {
+                  // User needs to create profile or doesn't exist
+                  navigate('/create-profile');
                 }
               } catch (error) {
                 // If user doesn't exist in our table, they need to create profile
@@ -98,7 +131,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       password,
       options: {
         ...options,
-        emailRedirectTo: `${redirectTo}/create-profile`
+        emailRedirectTo: redirectTo
       }
     })
     return { error }
@@ -113,7 +146,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }
 
   const signInWithOAuth = async (provider: 'google' | 'facebook') => {
-    console.log("Called")
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
@@ -125,13 +157,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut()
-    navigate('/')
+    
+    setUser(null)
+    setSession(null)
+    
+    window.localStorage.removeItem('supabase.auth.token')
+    
+    setTimeout(() => {
+      navigate('/')
+      window.location.reload()
+    }, 100)
+    
     return { error }
   }
 
   const resetPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${redirectTo}/reset-password`
+      redirectTo: `${window.location.origin}/reset-password`
     })
     return { error }
   }

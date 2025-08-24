@@ -3,6 +3,12 @@ import { createRoot } from 'react-dom/client'
 import { Toaster } from 'react-hot-toast'
 import './index.css'
 import App from './App.tsx'
+import { amplitudeService } from './lib/amplitude'
+
+// Initialize Amplitude asynchronously without blocking the app
+amplitudeService.init().catch(error => {
+  console.error('Failed to initialize Amplitude:', error)
+})
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

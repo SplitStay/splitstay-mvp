@@ -12,6 +12,7 @@ import { createTrip, type TripFormData } from '@/lib/tripService';
 import { motion } from 'framer-motion';
 import { useUser } from '@/hooks/useUser';
 import { useAuth } from '@/contexts/AuthContext';
+import { trackEvent } from '@/lib/amplitude';
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -26,7 +27,7 @@ const defaultTrip = {
   estimatedYear: null as string | null,
   accommodationTypeId: '',
   bookingUrl: '',
-  numberOfRooms: 3,
+  numberOfRooms: 1,
   rooms: [],
   matchWith: 'anyone',
   vibe: '',
@@ -111,6 +112,16 @@ const PostTripPage = () => {
         duration: 4000,
         icon: '✈️',
       });
+      
+      trackEvent('Add_Trip', {
+        location: trip.location,
+        flexible: trip.flexible,
+        has_booking_url: !!trip.bookingUrl,
+        number_of_rooms: trip.numberOfRooms,
+        match_with: trip.matchWith,
+        has_vibe: !!vibe
+      });
+      
       setShowSuccess(true);
       
     } catch (error) {

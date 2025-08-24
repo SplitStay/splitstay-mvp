@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
+import { supabase } from '../lib/supabase'
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('')
@@ -26,8 +27,25 @@ export const LoginPage: React.FC = () => {
         setError(error.message)
         toast.error(error.message)
       } else {
-        toast.success('Welcome back!', { icon: '👋' })
-        navigate('/')
+        const { data: { user } } = await supabase.auth.getUser()
+        
+        if (user) {
+          const { data: userData } = await supabase
+            .from('user')
+            .select('profileCreated')
+            .eq('id', user.id)
+            .single()
+          
+          toast.success('Welcome back!', { icon: '👋' })
+          
+          if (userData?.profileCreated) {
+            navigate('/dashboard')
+          } else {
+            navigate('/create-profile')
+          }
+        } else {
+          navigate('/')
+        }
       }
     } catch {
       const errorMsg = 'An unexpected error occurred'

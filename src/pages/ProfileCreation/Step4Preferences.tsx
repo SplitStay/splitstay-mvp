@@ -15,6 +15,7 @@ interface Step4Props {
   onBack: () => void;
   onSubmit: () => void;
   isLoading: boolean;
+  isEditMode?: boolean;
 }
 
 export const Step4Preferences: React.FC<Step4Props> = ({
@@ -26,7 +27,8 @@ export const Step4Preferences: React.FC<Step4Props> = ({
   setTravelPhotos,
   onBack,
   onSubmit,
-  isLoading
+  isLoading,
+  isEditMode = false
 }) => {
   const [showTraitModal, setShowTraitModal] = useState(false);
   const [traitSearchTerm, setTraitSearchTerm] = useState('');
@@ -248,7 +250,7 @@ export const Step4Preferences: React.FC<Step4Props> = ({
               : "bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700"
           }`}
         >
-          {isLoading ? "Creating Profile..." : "Create Profile"}
+          {isLoading ? (isEditMode ? "Updating Profile..." : "Creating Profile...") : (isEditMode ? "Update Profile" : "Create Profile")}
         </motion.button>
       </div>
 

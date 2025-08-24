@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import { trackEvent } from "@/lib/amplitude";
 import logoImage from "@/assets/logo.jpg"
 import logoImageWhite from "@/assets/logoWhite.jpeg"
 type UserPath = "host" | "guest" | null;
@@ -11,6 +12,10 @@ const HomePage: React.FC = () => {
   const [selectedPath, setSelectedPath] = useState<UserPath>(null);
   
   const { user, loading } = useAuth();
+
+  useEffect(() => {
+    trackEvent('Homepage_View')
+  }, [])
 
   const handleGetStarted = () => {
     navigate('/dashboard');

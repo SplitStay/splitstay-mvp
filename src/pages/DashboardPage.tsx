@@ -285,7 +285,7 @@ export const DashboardPage = () => {
                         if (trip.flexible) return true;
                         return trip.startDate ? new Date(trip.startDate) >= new Date() : true;
                       }).length > 0 ? (
-                        <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 auto-rows-fr">
                           {userTrips.filter(trip => {
                             if (trip.flexible) return true;
                             return trip.startDate ? new Date(trip.startDate) >= new Date() : true;
@@ -324,7 +324,7 @@ export const DashboardPage = () => {
                         if (trip.flexible) return false;
                         return trip.endDate ? new Date(trip.endDate) < new Date() : false;
                       }).length > 0 ? (
-                        <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 auto-rows-fr">
                           {userTrips.filter(trip => {
                             if (trip.flexible) return false;
                             return trip.endDate ? new Date(trip.endDate) < new Date() : false;

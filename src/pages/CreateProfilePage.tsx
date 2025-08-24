@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUser, useUpdateUser } from "@/hooks/useUser";
 import { createTrip } from "@/lib/tripService";
+import { trackEvent } from "@/lib/amplitude";
 import toast from "react-hot-toast";
 
 import { ProgressBar } from "./ProfileCreation/ProgressBar";
@@ -23,6 +24,10 @@ export default function CreateProfilePage() {
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
   const [travelPhotos, setTravelPhotos] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  useEffect(() => {
+    trackEvent('Onboarding_Started')
+  }, [])
+
   const [formData, setFormData] = useState({
     fullName: "",
     birthPlace: "",
@@ -95,6 +100,14 @@ export default function CreateProfilePage() {
 
       await refetchUser();
       toast.success("Profile created successfully!");
+      trackEvent('Profile_Completed', {
+        languages_count: selectedLanguages.length,
+        learning_languages_count: selectedLearningLanguages.length,
+        traits_count: selectedTraits.length,
+        has_bio: !!formData.bio,
+        has_profile_image: !!profileImageUrl,
+        travel_photos_count: travelPhotos.filter(photo => photo !== null).length
+      });
 
       // Check for pending trip data and create trip
       const pendingTripData = localStorage.getItem('splitstay_pending_trip');

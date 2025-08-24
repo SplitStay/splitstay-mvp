@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 
 interface Props {
@@ -10,10 +10,10 @@ interface Props {
 const defaultShareMessage = "Check out my new trip on SplitStay! Join me or post your own adventure:";
 
 const PostTripSuccessModal: React.FC<Props> = ({ open, onClose, trip }) => {
-  if (!open) return null;
-
   const tripUrl = `${window.location.origin}/trip/${trip.id || ''}`;
-  const shareText = `${defaultShareMessage}\n${tripUrl}`;
+  const [shareText, setShareText] = useState(`${defaultShareMessage}\n${tripUrl}`);
+  
+  if (!open) return null;
 
   const handleShare = async () => {
     if (typeof navigator.share === 'function') {
@@ -36,7 +36,7 @@ const PostTripSuccessModal: React.FC<Props> = ({ open, onClose, trip }) => {
 
   // Platform-specific share URLs
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
-  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(tripUrl)}&quote=${encodeURIComponent(defaultShareMessage)}`;
+  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(tripUrl)}&quote=${encodeURIComponent(shareText)}`;
   // Instagram does not support direct text sharing; we copy to clipboard and instruct the user
   const handleInstagramShare = async () => {
     await navigator.clipboard.writeText(shareText);
@@ -62,7 +62,8 @@ const PostTripSuccessModal: React.FC<Props> = ({ open, onClose, trip }) => {
           className="w-full p-3 border border-gray-300 rounded-lg mb-4 text-gray-800 resize-none"
           rows={3}
           value={shareText}
-          readOnly
+          onChange={(e) => setShareText(e.target.value)}
+          placeholder="Enter your message..."
         />
         <div className="flex flex-col gap-3 mb-4">
           {typeof navigator.share === 'function' && (

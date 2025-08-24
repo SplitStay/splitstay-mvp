@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { Mail, Lock, User, Eye, EyeOff, ArrowLeft } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
+import { trackEvent } from '../lib/amplitude'
 
 export const SignupPage: React.FC = () => {
   const [email, setEmail] = useState('')
@@ -54,6 +55,10 @@ export const SignupPage: React.FC = () => {
           icon: '📧',
         })
         setMessage('Check your email for the confirmation link!')
+        trackEvent('Account_Created', {
+          method: 'email',
+          has_name: !!(firstName && lastName)
+        })
       }
     } catch {
       setError('An unexpected error occurred')
@@ -63,7 +68,6 @@ export const SignupPage: React.FC = () => {
   }
 
   const handleOAuthSignIn = async (provider: 'google' | 'facebook') => {
-    console.log("Called signup oauth")
     setError('')
     setIsLoading(true)
 
@@ -71,6 +75,10 @@ export const SignupPage: React.FC = () => {
       const { error } = await signInWithOAuth(provider)
       if (error) {
         setError(error.message)
+      } else {
+        trackEvent('Account_Created', {
+          method: provider
+        })
       }
     } catch {
       setError('An unexpected error occurred')
