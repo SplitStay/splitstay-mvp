@@ -44,15 +44,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
       
-      // Check if this is an email confirmation redirect on initial load
+      // Check if user needs to be redirected on initial load
       if (session?.user) {
         const urlParams = new URLSearchParams(window.location.search);
         const signupType = urlParams.get('type');
+        const currentPath = window.location.pathname;
+        const hasAuthTokens = window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token');
+        
+        // Check if this is an OAuth user
+        const isOAuthUser = session.user.app_metadata?.provider === 'google' || 
+                           session.user.app_metadata?.provider === 'facebook';
         
         if (signupType === 'signup') {
           // This is an email confirmation, redirect to profile creation
@@ -60,6 +66,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setTimeout(() => {
             navigate('/create-profile');
           }, 100);
+        } else if ((hasAuthTokens || isOAuthUser) && currentPath === '/') {
+          // OAuth user or user with tokens on homepage - check profile status
+          try {
+            const { data: userData, error } = await supabase
+              .from('user')
+              .select('profileCreated')
+              .eq('id', session.user.id)
+              .single();
+            
+            if (!error && userData?.profileCreated) {
+              // User has profile, go to dashboard
+              navigate('/dashboard');
+            } else {
+              // User needs to create profile or doesn't exist
+              navigate('/create-profile');
+            }
+          } catch (error) {
+            // If user doesn't exist in our table, they need to create profile
+            navigate('/create-profile');
+          }
         }
       }
     })
@@ -111,8 +137,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           const signupType = urlParams.get('type');
           const isEmailConfirmation = signupType === 'signup';
           const isPasswordRecovery = signupType === 'recovery';
-          const isOAuthCallback = hasAuthTokens && !signupType;
           const isOnHomePage = currentPath === '/';
+          
+          // Check if this is an OAuth provider sign-in
+          const isOAuthUser = session.user.app_metadata?.provider === 'google' || 
+                             session.user.app_metadata?.provider === 'facebook';
           
           // Handle email confirmation specifically
           if (isEmailConfirmation) {
@@ -130,8 +159,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             return;
           }
           
-          // Handle OAuth callback or initial sign in
-          if (isOAuthCallback || (isOnHomePage && hasAuthTokens)) {
+          // Handle OAuth callback or any sign-in with auth tokens
+          // OAuth users or users with auth tokens in URL should check profile status
+          if (hasAuthTokens || isOAuthUser) {
+            // Clear the URL if we have tokens in it
+            if (hasAuthTokens) {
+              window.history.replaceState({}, document.title, currentPath);
+            }
+            
             setTimeout(async () => {
               try {
                 const { data: userData, error } = await supabase
@@ -184,7 +219,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${redirectTo}/`
+        redirectTo: `${redirectTo}/?oauth=true`
       }
     })
     return { error }

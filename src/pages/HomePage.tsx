@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { trackEvent } from "@/lib/amplitude";
 import { EmailConfirmationHandler } from "@/components/EmailConfirmationHandler";
+import { OAuthCallbackHandler } from "@/components/OAuthCallbackHandler";
 import logoImage from "@/assets/logo.jpg"
 import logoImageWhite from "@/assets/logoWhite.jpeg"
 import heroImage from "@/assets/hero.png"
@@ -15,9 +16,10 @@ const HomePage: React.FC = () => {
   
   const { user, loading } = useAuth();
   
-  // Check if this is an email confirmation redirect
+  // Check if this is an email confirmation or OAuth redirect
   const urlParams = new URLSearchParams(window.location.search);
   const isEmailConfirmation = urlParams.get('type') === 'signup';
+  const isOAuthCallback = urlParams.get('oauth') === 'true' || window.location.hash.includes('access_token');
 
   useEffect(() => {
     trackEvent('Homepage_View')
@@ -34,6 +36,11 @@ const HomePage: React.FC = () => {
   // Handle email confirmation redirect
   if (isEmailConfirmation) {
     return <EmailConfirmationHandler />;
+  }
+  
+  // Handle OAuth callback redirect
+  if (isOAuthCallback) {
+    return <OAuthCallbackHandler />;
   }
 
   if (loading) {
