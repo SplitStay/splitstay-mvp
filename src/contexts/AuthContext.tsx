@@ -93,10 +93,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (event === 'SIGNED_IN' && session?.user) {
           const currentPath = window.location.pathname;
           const hasAuthTokens = window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token');
-          const isAuthCallback = hasAuthTokens || currentPath === '/';
+          const urlParams = new URLSearchParams(window.location.search);
+          const isEmailConfirmation = hasAuthTokens && (urlParams.get('type') === 'signup' || urlParams.get('type') === 'recovery');
+          const isOAuthCallback = hasAuthTokens && !isEmailConfirmation;
+          const isOnHomePage = currentPath === '/';
           
-          // Check if we should redirect (OAuth callback or on home page)
-          if (isAuthCallback) {
+          // Check if we should redirect (email confirmation, OAuth callback, or on home page with auth tokens)
+          if (isEmailConfirmation || isOAuthCallback || (isOnHomePage && hasAuthTokens)) {
             setTimeout(async () => {
               try {
                 const { data: userData, error } = await supabase
@@ -131,7 +134,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       password,
       options: {
         ...options,
-        emailRedirectTo: redirectTo
+        emailRedirectTo: `${redirectTo}/?type=signup`
       }
     })
     return { error }
@@ -173,7 +176,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const resetPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`
+      redirectTo: `${window.location.origin}/reset-password?type=recovery`
     })
     return { error }
   }

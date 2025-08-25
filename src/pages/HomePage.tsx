@@ -25,10 +25,6 @@ const HomePage: React.FC = () => {
     navigate('/signup');
   };
 
-  const handleSignInClick = () => {
-    navigate('/login');
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-cream flex items-center justify-center">
@@ -102,7 +98,10 @@ const HomePage: React.FC = () => {
                   ? "border-navy bg-navy/5 shadow-lg" 
                   : "border-gray-200 hover:border-navy"
               }`}
-              onClick={() => setSelectedPath("host")}
+              onClick={() => {
+                setSelectedPath("host");
+                navigate('/post-trip');
+              }}
             >
               <h2 className="text-xl font-bold text-navy mb-3">
                 Have an accommodation to share?
@@ -119,7 +118,10 @@ const HomePage: React.FC = () => {
                   ? "border-navy bg-navy/5 shadow-lg" 
                   : "border-gray-200 hover:border-navy"
               }`}
-              onClick={() => setSelectedPath("guest")}
+              onClick={() => {
+                setSelectedPath("guest");
+                navigate('/find-partners');
+              }}
             >
               <h2 className="text-xl font-bold text-navy mb-3">
                 Looking to join someone else's trip?
