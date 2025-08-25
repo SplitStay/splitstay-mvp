@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { trackEvent } from "@/lib/amplitude";
+import { EmailConfirmationHandler } from "@/components/EmailConfirmationHandler";
 import logoImage from "@/assets/logo.jpg"
 import logoImageWhite from "@/assets/logoWhite.jpeg"
 type UserPath = "host" | "guest" | null;
@@ -12,6 +13,10 @@ const HomePage: React.FC = () => {
   const [selectedPath, setSelectedPath] = useState<UserPath>(null);
   
   const { user, loading } = useAuth();
+  
+  // Check if this is an email confirmation redirect
+  const urlParams = new URLSearchParams(window.location.search);
+  const isEmailConfirmation = urlParams.get('type') === 'signup';
 
   useEffect(() => {
     trackEvent('Homepage_View')
@@ -24,6 +29,11 @@ const HomePage: React.FC = () => {
   const handleCreateProfile = () => {
     navigate('/signup');
   };
+  
+  // Handle email confirmation redirect
+  if (isEmailConfirmation) {
+    return <EmailConfirmationHandler />;
+  }
 
   if (loading) {
     return (

@@ -48,6 +48,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
+      
+      // Check if this is an email confirmation redirect on initial load
+      if (session?.user) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const signupType = urlParams.get('type');
+        
+        if (signupType === 'signup') {
+          // This is an email confirmation, redirect to profile creation
+          window.history.replaceState({}, document.title, '/');
+          setTimeout(() => {
+            navigate('/create-profile');
+          }, 100);
+        }
+      }
     })
 
     // Listen for auth changes
@@ -94,12 +108,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           const currentPath = window.location.pathname;
           const hasAuthTokens = window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token');
           const urlParams = new URLSearchParams(window.location.search);
-          const isEmailConfirmation = hasAuthTokens && (urlParams.get('type') === 'signup' || urlParams.get('type') === 'recovery');
-          const isOAuthCallback = hasAuthTokens && !isEmailConfirmation;
+          const signupType = urlParams.get('type');
+          const isEmailConfirmation = signupType === 'signup';
+          const isPasswordRecovery = signupType === 'recovery';
+          const isOAuthCallback = hasAuthTokens && !signupType;
           const isOnHomePage = currentPath === '/';
           
-          // Check if we should redirect (email confirmation, OAuth callback, or on home page with auth tokens)
-          if (isEmailConfirmation || isOAuthCallback || (isOnHomePage && hasAuthTokens)) {
+          // Handle email confirmation specifically
+          if (isEmailConfirmation) {
+            // Clear URL parameters and redirect to profile creation
+            window.history.replaceState({}, document.title, '/');
+            setTimeout(() => {
+              navigate('/create-profile');
+            }, 100);
+            return;
+          }
+          
+          // Handle password recovery
+          if (isPasswordRecovery) {
+            window.history.replaceState({}, document.title, '/reset-password');
+            return;
+          }
+          
+          // Handle OAuth callback or initial sign in
+          if (isOAuthCallback || (isOnHomePage && hasAuthTokens)) {
             setTimeout(async () => {
               try {
                 const { data: userData, error } = await supabase
@@ -134,7 +166,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       password,
       options: {
         ...options,
-        emailRedirectTo: `${redirectTo}/?type=signup`
+        emailRedirectTo: `${redirectTo}/?type=signup#`
       }
     })
     return { error }
@@ -152,7 +184,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo
+        redirectTo: `${redirectTo}/`
       }
     })
     return { error }
