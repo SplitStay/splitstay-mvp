@@ -11,6 +11,7 @@
     "list-tables": "node scripts/list-tables.mjs"
   },
   "dependencies": {
+    "@amplitude/analytics-browser": "^2.11.8",
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@supabase/supabase-js": "^2.51.0",
