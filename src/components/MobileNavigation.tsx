@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Plus, Users, MessageCircle, User, Sparkles, Home } from 'lucide-react'
+import { Menu, X, Plus, Users, MessageCircle, User, Sparkles, Home, LogOut } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
 
 interface MobileNavigationProps {
   isGuest: boolean
@@ -16,6 +17,7 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const navigate = useNavigate()
+  const { signOut } = useAuth()
 
   const handleNavigation = (path: string, requiresAuth = false, action?: string) => {
     if (requiresAuth && isGuest && action) {
@@ -24,6 +26,11 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
       navigate(path)
     }
     setIsOpen(false)
+  }
+
+  const handleSignOut = async () => {
+    setIsOpen(false)
+    await signOut()
   }
 
   const menuItems = isGuest ? [
@@ -146,6 +153,19 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
                     </button>
                   ))}
                 </div>
+
+                {/* Sign Out Button for logged-in users */}
+                {!isGuest && (
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-left"
+                    >
+                      <LogOut className="w-5 h-5" />
+                      <span className="font-medium">Sign Out</span>
+                    </button>
+                  </div>
+                )}
               </nav>
             </motion.div>
           </>
