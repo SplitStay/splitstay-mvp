@@ -7,6 +7,7 @@ import { getUserTrips, type Trip } from '../lib/tripService'
 import { TripCard } from '../components/TripCard'
 import { MobileNavigation } from '../components/MobileNavigation'
 import ShareInviteModal from '@/components/ShareInviteModal'
+import { MVPBanner } from '../components/MVPBanner'
 import { useNavigate, Link } from 'react-router-dom'
 
 export const DashboardPage = () => {
@@ -95,6 +96,9 @@ export const DashboardPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-200 via-white to-purple-200">
+      {/* MVP Banner */}
+      <MVPBanner />
+      
       {/* Mobile Navigation */}
       <MobileNavigation 
         isGuest={isGuest}
