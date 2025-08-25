@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import { createTrip } from '../lib/tripService';
+import toast from 'react-hot-toast';
 
 export const OAuthCallbackHandler: React.FC = () => {
   const navigate = useNavigate();
@@ -21,6 +23,20 @@ export const OAuthCallbackHandler: React.FC = () => {
             .single();
 
           if (!error && userData?.profileCreated) {
+            // Check for pending trip data and create trip for existing users
+            const pendingTripData = localStorage.getItem('splitstay_pending_trip');
+            if (pendingTripData) {
+              try {
+                const tripData = JSON.parse(pendingTripData);
+                await createTrip(tripData);
+                localStorage.removeItem('splitstay_pending_trip');
+                toast.success('Trip posted successfully!', { icon: '✈️' });
+              } catch (error) {
+                console.error('Error creating pending trip:', error);
+                toast.error('Failed to post your trip. You can try posting again from the dashboard.');
+              }
+            }
+            
             // User has profile, go to dashboard
             navigate('/dashboard', { replace: true });
           } else {

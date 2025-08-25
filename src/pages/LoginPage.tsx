@@ -5,6 +5,7 @@ import { Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
+import { createTrip } from '../lib/tripService'
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('')
@@ -37,6 +38,20 @@ export const LoginPage: React.FC = () => {
             .single()
           
           toast.success('Welcome back!', { icon: '👋' })
+          
+          // Check for pending trip data and create trip for existing users
+          const pendingTripData = localStorage.getItem('splitstay_pending_trip')
+          if (pendingTripData && userData?.profileCreated) {
+            try {
+              const tripData = JSON.parse(pendingTripData)
+              await createTrip(tripData)
+              localStorage.removeItem('splitstay_pending_trip')
+              toast.success('Trip posted successfully!', { icon: '✈️' })
+            } catch (error) {
+              console.error('Error creating pending trip:', error)
+              toast.error('Failed to post your trip. You can try posting again from the dashboard.')
+            }
+          }
           
           if (userData?.profileCreated) {
             navigate('/dashboard')
