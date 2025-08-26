@@ -29,12 +29,20 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 // Guest-Friendly Route Component (accessible to all, but shows different UI for guests)
 const GuestFriendlyRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  console.log('👥 GuestFriendlyRoute render:', { currentPath: window.location.pathname })
   return <>{children}</>
 }
 
 // Auth Required Route Component (redirect to login if not authenticated)
 const AuthRequiredRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth()
+  
+  console.log('🔐 AuthRequiredRoute check:', { 
+    hasUser: !!user, 
+    loading, 
+    currentPath: window.location.pathname,
+    willRedirect: !loading && !user 
+  })
 
   if (loading) {
     return (
@@ -48,11 +56,18 @@ const AuthRequiredRoute: React.FC<{ children: React.ReactNode }> = ({ children }
     )
   }
 
-  return user ? <>{children}</> : <Navigate to="/login" replace />
+  if (!user) {
+    console.log('🚨 AuthRequiredRoute: Redirecting to login - no user')
+    return <Navigate to="/login" replace />
+  }
+  
+  return <>{children}</>
 }
 
 function AppRoutes() {
   const { user } = useAuth()
+  
+  console.log('🗺️ AppRoutes render:', { hasUser: !!user, currentPath: window.location.pathname })
 
   useEffect(() => {
     if (user?.id) {

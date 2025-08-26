@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, MoreVertical, Phone, Video } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { ConversationWithUser, MessageWithSender, ChatService } from '../../lib/chatService'
 import { useAuth } from '../../contexts/AuthContext'
 import { MessageInput } from './MessageInput'
@@ -275,17 +275,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversation, onBack, cl
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <Phone className="w-5 h-5 text-gray-600" />
-            </button>
-            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <Video className="w-5 h-5 text-gray-600" />
-            </button>
-            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <MoreVertical className="w-5 h-5 text-gray-600" />
-            </button>
-          </div>
+          {/* Call and options icons are currently disabled */}
         </div>
       </div>
 
