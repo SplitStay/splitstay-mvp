@@ -56,18 +56,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const currentPath = window.location.pathname;
         const hasAuthTokens = window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token');
         
-        // Check if this is an OAuth user
-        const isOAuthUser = session.user.app_metadata?.provider === 'google' || 
-                           session.user.app_metadata?.provider === 'facebook';
-        
         if (signupType === 'signup') {
           // This is an email confirmation, redirect to profile creation
           window.history.replaceState({}, document.title, '/');
           setTimeout(() => {
             navigate('/create-profile');
           }, 100);
-        } else if ((hasAuthTokens || isOAuthUser) && currentPath === '/') {
-          // OAuth user or user with tokens on homepage - check profile status
+        } else if (hasAuthTokens && currentPath === '/') {
+          // ONLY redirect if we have auth tokens AND we're on the homepage
+          // This means it's an OAuth callback, not just a regular page load
           try {
             const { data: userData, error } = await supabase
               .from('user')
@@ -82,11 +79,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               // User needs to create profile or doesn't exist
               navigate('/create-profile');
             }
+            
+            // Clean up the URL after handling the callback
+            window.history.replaceState({}, document.title, '/');
           } catch (error) {
             // If user doesn't exist in our table, they need to create profile
             navigate('/create-profile');
           }
         }
+        // DO NOT redirect if user is already on a specific page (like /messages)
       }
     })
 
@@ -97,9 +98,36 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(session?.user ?? null)
         setLoading(false)
         
-        // Handle Amplitude user identification (non-blocking)
+        // Only handle navigation for actual sign in/out events, not token refreshes
         if (event === 'SIGNED_IN' && session?.user) {
-          // Identify user in Amplitude asynchronously
+          // Only redirect on initial sign in, not on token refresh or tab focus
+          const currentPath = window.location.pathname;
+          const hasAuthTokens = window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token');
+          
+          // Only redirect if we're actually on a callback URL with tokens (initial OAuth callback)
+          if (hasAuthTokens && (currentPath === '/' || currentPath === '/oauth-callback')) {
+            // Check if user needs profile creation
+            try {
+              const { data: userData, error } = await supabase
+                .from('user')
+                .select('profileCreated')
+                .eq('id', session.user.id)
+                .single();
+              
+              if (!error && userData?.profileCreated) {
+                navigate('/dashboard');
+              } else {
+                navigate('/create-profile');
+              }
+              
+              // Clean up URL after handling OAuth callback
+              window.history.replaceState({}, document.title, currentPath);
+            } catch (error) {
+              navigate('/create-profile');
+            }
+          }
+          
+          // Handle Amplitude user identification (non-blocking)
           setTimeout(async () => {
             try {
               const { data: userData } = await supabase

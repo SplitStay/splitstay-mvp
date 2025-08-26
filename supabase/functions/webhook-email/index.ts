@@ -59,7 +59,8 @@ serve(async (req: Request) => {
         From: 'hello@splitstay.travel',
         To: payload.record.recipient_email,
         Subject: payload.record.subject,
-        TextBody: payload.record.body,
+        TextBody: payload.record.body, // Plain text version
+        HtmlBody: payload.record.body.replace(/\n/g, '<br>'), // Convert line breaks to HTML
       }),
     })
     

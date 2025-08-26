@@ -168,22 +168,8 @@ export class ChatService {
       })
       .eq('id', conversationId)
 
-    // Send email notification if recipient is offline
-    const { data: conversation } = await supabase
-      .from('conversations')
-      .select('user1_id, user2_id')
-      .eq('id', conversationId)
-      .single()
-
-    if (conversation) {
-      const recipientId = conversation.user1_id === senderId 
-        ? conversation.user2_id 
-        : conversation.user1_id
-
-      // Send email notification (async, don't wait)
-      EmailService.notifyOfflineMessage(senderId, recipientId, content, conversationId)
-        .catch(error => console.error('Email notification failed:', error))
-    }
+    // Email notifications are now handled by database triggers
+    // No need for frontend email calls since DB triggers handle offline notifications
     
     return data as Message
   }

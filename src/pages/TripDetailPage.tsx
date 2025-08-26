@@ -96,10 +96,7 @@ export const TripDetailPage: React.FC = () => {
       
       if (requestError) {
         console.error('Error creating request:', requestError)
-      } else {
-        // Send email notification to host (async, don't wait)
-        EmailService.notifyTripRequest(user.id, trip.id, requestMessage)
-          .catch(error => console.error('Email notification failed:', error))
+      // Email notifications are now handled by database triggers when request is inserted
       }
       
       // Create or get conversation with host
@@ -423,28 +420,35 @@ export const TripDetailPage: React.FC = () => {
                   <img 
                     src={trip.host.imageUrl}
                     alt={trip.host.name || 'Host'}
-                    className="w-16 h-16 rounded-full object-cover"
+                    className="w-16 h-16 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => navigate(`/profile/${trip.hostId}`)}
                   />
                 ) : (
-                  <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center">
+                  <div 
+                    className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-300 transition-colors"
+                    onClick={() => navigate(`/profile/${trip.hostId}`)}
+                  >
                     <Users className="w-8 h-8 text-gray-400" />
                   </div>
                 )}
                 <div className="flex-1">
-                  <h3 className="font-bold text-lg text-gray-900">
+                  {/* TODO: Make profile clickable to redirect to user's profile page */}
+                  <h3 className="font-bold text-lg text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
+                      onClick={() => navigate(`/profile/${trip.hostId}`)}>
                     {trip.host?.name || 'Host'}
                     {user?.id === trip.hostId && (
                       <span className="ml-2 text-sm font-normal text-blue-600">(You)</span>
                     )}
                   </h3>
-                  <div className="flex items-center gap-1 mt-1">
+                  {/* TODO: Implement real star rating system with reviews */}
+                  {/* <div className="flex items-center gap-1 mt-1">
                     <Star className="w-4 h-4 text-yellow-500 fill-current" />
                     <Star className="w-4 h-4 text-yellow-500 fill-current" />
                     <Star className="w-4 h-4 text-yellow-500 fill-current" />
                     <Star className="w-4 h-4 text-yellow-500 fill-current" />
                     <Star className="w-4 h-4 text-gray-300" />
                     <span className="text-sm text-gray-600 ml-1">4.0</span>
-                  </div>
+                  </div> */}
                   <div className="flex items-center gap-2 mt-2 text-sm text-gray-600">
                     <Shield className="w-4 h-4 text-green-500" />
                     <span>Verified host</span>
