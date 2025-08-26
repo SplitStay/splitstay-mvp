@@ -19,22 +19,7 @@ const HomePage: React.FC = () => {
   // Check if this is an email confirmation or OAuth redirect
   const urlParams = new URLSearchParams(window.location.search);
   const isEmailConfirmation = urlParams.get('type') === 'signup';
-  // Only treat as OAuth callback if we have FRESH tokens (not from previous auth)
-  // This prevents redirects when navigating back to homepage after auth
-  const [isOAuthCallback, setIsOAuthCallback] = useState(
-    urlParams.get('oauth') === 'true' || (window.location.hash.includes('access_token') && window.location.hash.includes('refresh_token'))
-  );
-  
-  // Clear OAuth callback flag after initial check
-  useEffect(() => {
-    if (isOAuthCallback) {
-      // Clean up URL and clear flag after handling OAuth
-      setTimeout(() => {
-        window.history.replaceState({}, document.title, window.location.pathname);
-        setIsOAuthCallback(false);
-      }, 100);
-    }
-  }, [isOAuthCallback]);
+  const isOAuthCallback = urlParams.get('oauth') === 'true' || window.location.hash.includes('access_token');
 
   useEffect(() => {
     trackEvent('Homepage_View')

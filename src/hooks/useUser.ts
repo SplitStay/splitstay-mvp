@@ -2,8 +2,8 @@ import { useQuery, useMutation, useQueryClient, type UseQueryResult } from '@tan
 import { supabase } from '@/lib/supabase'
 import type { Tables, TablesUpdate } from '@/types/database.types'
 
-export const useUser = (): UseQueryResult<Tables<'user'>, Error> => {
-  return useQuery<Tables<'user'>, Error>({
+export const useUser = (): UseQueryResult<Tables<'user'> | undefined, Error> => {
+  return useQuery<Tables<'user'> | undefined, Error>({
     queryKey: ['user'],
     queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession()
@@ -19,6 +19,12 @@ export const useUser = (): UseQueryResult<Tables<'user'>, Error> => {
         .single()
 
       if (error) {
+        // If the user row doesn't exist yet (new OAuth sign-in), don't throw; let UI render and recover
+        // PostgREST not found error code is PGRST116
+        // @ts-expect-error error may have code
+        if ((error as any).code === 'PGRST116') {
+          return undefined
+        }
         throw error
       }
 

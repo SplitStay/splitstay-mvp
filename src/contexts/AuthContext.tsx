@@ -37,12 +37,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
-  
-  // Wrap navigate to log all navigation calls
-  const loggedNavigate = (to: string, options?: any) => {
-    console.log('🧭 Navigation called:', { to, from: window.location.pathname, options })
-    return navigate(to, options)
-  }
   const isLocalhost = window.location.hostname === 'localhost';
   const redirectTo = isLocalhost
     ? 'http://localhost:5173'
@@ -51,13 +45,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(async ({ data: { session } }) => {
-      console.log('🔄 AuthContext: Initial session check', {
-        hasSession: !!session,
-        currentPath: window.location.pathname,
-        hasHash: !!window.location.hash,
-        hash: window.location.hash
-      })
-      
       setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
@@ -67,30 +54,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const urlParams = new URLSearchParams(window.location.search);
         const signupType = urlParams.get('type');
         const currentPath = window.location.pathname;
+        const hasAuthTokens = window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token');
         
-        // Only check for auth tokens if we're on the homepage
-        // This prevents redirects when navigating to specific pages
-        const hasAuthTokens = currentPath === '/' && 
-          (window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token'));
-        
-        console.log('🔄 AuthContext: Redirect check', {
-          signupType,
-          currentPath,
-          hasAuthTokens,
-          willRedirect: signupType === 'signup' || hasAuthTokens
-        })
+        // Check if this is an OAuth user
+        const isOAuthUser = session.user.app_metadata?.provider === 'google' || 
+                           session.user.app_metadata?.provider === 'facebook';
         
         if (signupType === 'signup') {
-          console.log('🚀 AuthContext: Redirecting for email confirmation')
           // This is an email confirmation, redirect to profile creation
           window.history.replaceState({}, document.title, '/');
           setTimeout(() => {
-            loggedNavigate('/create-profile');
+            navigate('/create-profile');
           }, 100);
-        } else if (hasAuthTokens) {
-          console.log('🚀 AuthContext: Redirecting for OAuth callback')
-          // ONLY redirect if we have auth tokens AND we're on the homepage
-          // This means it's an OAuth callback, not just a regular page load
+        } else if ((hasAuthTokens || isOAuthUser) && currentPath === '/') {
+          // OAuth user or user with tokens on homepage - check profile status
           try {
             const { data: userData, error } = await supabase
               .from('user')
@@ -99,90 +76,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               .single();
             
             if (!error && userData?.profileCreated) {
-              console.log('🚀 AuthContext: Redirecting to dashboard (profile exists)')
               // User has profile, go to dashboard
-              loggedNavigate('/dashboard');
+              navigate('/dashboard');
             } else {
-              console.log('🚀 AuthContext: Redirecting to create-profile (no profile)')
               // User needs to create profile or doesn't exist
-              loggedNavigate('/create-profile');
+              navigate('/create-profile');
             }
-            
-            // Clean up the URL after handling the callback
-            window.history.replaceState({}, document.title, '/');
           } catch (error) {
-            console.log('🚀 AuthContext: Redirecting to create-profile (error)')
             // If user doesn't exist in our table, they need to create profile
-            loggedNavigate('/create-profile');
+            navigate('/create-profile');
           }
-        } else {
-          console.log('✅ AuthContext: No redirect needed, staying on', currentPath)
         }
-        // DO NOT redirect if user is already on a specific page (like /messages)
       }
     })
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('🔥 AuthContext: Auth state change', {
-          event,
-          hasSession: !!session,
-          currentPath: window.location.pathname,
-          hasHash: !!window.location.hash
-        })
-
-        // Only update state, don't navigate unless it's a real sign in/out
         setSession(session)
         setUser(session?.user ?? null)
         setLoading(false)
         
-        // IMPORTANT: Only handle redirects for actual sign-in events, not for:
-        // - TOKEN_REFRESHED (happens on tab focus)
-        // - USER_UPDATED (happens on profile updates)
-        // - INITIAL_SESSION (handled separately above)
-        // - MFA_CHALLENGE_VERIFIED
+        // Handle Amplitude user identification (non-blocking)
         if (event === 'SIGNED_IN' && session?.user) {
-          // Check if this is an actual new sign-in (has auth tokens in URL)
-          const hasAuthTokens = window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token');
-          const currentPath = window.location.pathname;
-          
-          console.log('🔥 AuthContext: SIGNED_IN event', {
-            hasAuthTokens,
-            currentPath,
-            willRedirect: hasAuthTokens && (currentPath === '/' || currentPath === '/oauth-callback')
-          })
-          
-          // ONLY redirect if:
-          // 1. We have auth tokens in the URL (OAuth callback)
-          // 2. We're on the homepage or OAuth callback page
-          // 3. This is NOT a tab switch or refresh
-          if (hasAuthTokens && (currentPath === '/' || currentPath === '/oauth-callback')) {
-            console.log('🚀 AuthContext: SIGNED_IN redirecting')
-            // Check if user needs profile creation
-            try {
-              const { data: userData, error } = await supabase
-                .from('user')
-                .select('profileCreated')
-                .eq('id', session.user.id)
-                .single();
-              
-              if (!error && userData?.profileCreated) {
-                loggedNavigate('/dashboard');
-              } else {
-                loggedNavigate('/create-profile');
-              }
-              
-              // Clean up URL after handling OAuth callback
-              window.history.replaceState({}, document.title, currentPath);
-            } catch (error) {
-              loggedNavigate('/create-profile');
-            }
-          } else {
-            console.log('✅ AuthContext: SIGNED_IN no redirect needed')
-          }
-          
-          // Handle Amplitude user identification (non-blocking)
+          // Identify user in Amplitude asynchronously
           setTimeout(async () => {
             try {
               const { data: userData } = await supabase
@@ -212,7 +129,66 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           }, 0)
         }
         
-        // Removed redundant post-authentication redirect that caused redirects on tab focus for OAuth users
+        // Handle post-authentication redirect
+        if (event === 'SIGNED_IN' && session?.user) {
+          const currentPath = window.location.pathname;
+          const hasAuthTokens = window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token');
+          const urlParams = new URLSearchParams(window.location.search);
+          const signupType = urlParams.get('type');
+          const isEmailConfirmation = signupType === 'signup';
+          const isPasswordRecovery = signupType === 'recovery';
+          const isOnHomePage = currentPath === '/';
+          
+          // Check if this is an OAuth provider sign-in
+          const isOAuthUser = session.user.app_metadata?.provider === 'google' || 
+                             session.user.app_metadata?.provider === 'facebook';
+          
+          // Handle email confirmation specifically
+          if (isEmailConfirmation) {
+            // Clear URL parameters and redirect to profile creation
+            window.history.replaceState({}, document.title, '/');
+            setTimeout(() => {
+              navigate('/create-profile');
+            }, 100);
+            return;
+          }
+          
+          // Handle password recovery
+          if (isPasswordRecovery) {
+            window.history.replaceState({}, document.title, '/reset-password');
+            return;
+          }
+          
+          // Handle OAuth callback or any sign-in with auth tokens
+          // OAuth users or users with auth tokens in URL should check profile status
+          if (hasAuthTokens || isOAuthUser) {
+            // Clear the URL if we have tokens in it
+            if (hasAuthTokens) {
+              window.history.replaceState({}, document.title, currentPath);
+            }
+            
+            setTimeout(async () => {
+              try {
+                const { data: userData, error } = await supabase
+                  .from('user')
+                  .select('profileCreated')
+                  .eq('id', session.user.id)
+                  .single();
+                
+                if (!error && userData?.profileCreated) {
+                  // User has profile, go to dashboard
+                  navigate('/dashboard');
+                } else {
+                  // User needs to create profile or doesn't exist
+                  navigate('/create-profile');
+                }
+              } catch (error) {
+                // If user doesn't exist in our table, they need to create profile
+                navigate('/create-profile');
+              }
+            }, 100);
+          }
+        }
       }
     )
 

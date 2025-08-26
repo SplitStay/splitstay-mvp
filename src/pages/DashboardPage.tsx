@@ -94,6 +94,17 @@ export const DashboardPage = () => {
     )
   }
 
+  // If auth is present but user row is missing yet (fresh OAuth), render a minimal shell instead of blank
+  if (!isGuest && !user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-200 via-white to-purple-200">
+        <MVPBanner />
+        <MobileNavigation isGuest={false} onAuthRequired={() => {}} user={undefined} />
+        <div className="px-4 py-10 text-center text-gray-600">Setting up your account...</div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-200 via-white to-purple-200">
       {/* MVP Banner */}

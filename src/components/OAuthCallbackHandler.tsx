@@ -8,6 +8,9 @@ import toast from 'react-hot-toast';
 export const OAuthCallbackHandler: React.FC = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
+  const urlParams = new URLSearchParams(window.location.search);
+  const hasHashTokens = window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token');
+  const hasCodeParam = urlParams.has('code');
 
   useEffect(() => {
     const handleOAuthRedirect = async () => {
@@ -48,13 +51,18 @@ export const OAuthCallbackHandler: React.FC = () => {
           navigate('/create-profile', { replace: true });
         }
       } else {
-        // No user, redirect to login
+        // If we're in the middle of an OAuth callback (tokens/code present), wait for session
+        if (hasHashTokens || hasCodeParam) {
+          return;
+        }
+
+        // Otherwise, no user and not an OAuth callback -> go to login
         navigate('/login', { replace: true });
       }
     };
 
     handleOAuthRedirect();
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, hasHashTokens, hasCodeParam]);
 
   if (loading) {
     return (
