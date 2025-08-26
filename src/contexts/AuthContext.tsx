@@ -94,18 +94,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+
+        // Only update state, don't navigate unless it's a real sign in/out
         setSession(session)
         setUser(session?.user ?? null)
         setLoading(false)
         
-        // Only handle navigation for actual sign in/out events, not token refreshes
+        // IMPORTANT: Only handle redirects for actual sign-in events, not for:
+        // - TOKEN_REFRESHED (happens on tab focus)
+        // - USER_UPDATED (happens on profile updates)
+        // - INITIAL_SESSION (handled separately above)
+        // - MFA_CHALLENGE_VERIFIED
         if (event === 'SIGNED_IN' && session?.user) {
-          // Only redirect on initial sign in, not on token refresh or tab focus
-          const currentPath = window.location.pathname;
+          // Check if this is an actual new sign-in (has auth tokens in URL)
           const hasAuthTokens = window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token');
+          const currentPath = window.location.pathname;
           
-          // Only redirect if we're actually on a callback URL with tokens (initial OAuth callback)
+          // ONLY redirect if:
+          // 1. We have auth tokens in the URL (OAuth callback)
+          // 2. We're on the homepage or OAuth callback page
+          // 3. This is NOT a tab switch or refresh
           if (hasAuthTokens && (currentPath === '/' || currentPath === '/oauth-callback')) {
+
             // Check if user needs profile creation
             try {
               const { data: userData, error } = await supabase
