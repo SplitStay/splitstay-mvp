@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { EmailService } from './emailService'
 
 // Conversations/messages schema
 export interface Conversation {
@@ -72,11 +73,18 @@ export class ChatService {
           .limit(1)
           .single()
 
+        // Get unread count using the database function
+        const { data: unreadCount } = await supabase
+          .rpc('get_unread_message_count', {
+            p_conversation_id: conv.id,
+            p_user_id: userId
+          })
+
         return {
           ...conv,
           other_user,
           last_message: lastMessage || undefined,
-          unread_count: 0
+          unread_count: unreadCount || 0
         } as ConversationWithUser
       })
     )
@@ -159,6 +167,23 @@ export class ChatService {
         updated_at: new Date().toISOString() 
       })
       .eq('id', conversationId)
+
+    // Send email notification if recipient is offline
+    const { data: conversation } = await supabase
+      .from('conversations')
+      .select('user1_id, user2_id')
+      .eq('id', conversationId)
+      .single()
+
+    if (conversation) {
+      const recipientId = conversation.user1_id === senderId 
+        ? conversation.user2_id 
+        : conversation.user1_id
+
+      // Send email notification (async, don't wait)
+      EmailService.notifyOfflineMessage(senderId, recipientId, content, conversationId)
+        .catch(error => console.error('Email notification failed:', error))
+    }
     
     return data as Message
   }
@@ -225,9 +250,22 @@ export class ChatService {
 
   static async updateUserPresence(isOnline: boolean): Promise<void> {
     try {
-      const { error } = await supabase.rpc('update_user_presence', { p_is_online: isOnline })
+      const userId = (await supabase.auth.getUser()).data.user?.id
+      if (!userId) return
+
+      const { error } = await supabase
+        .from('user_presence')
+        .upsert({
+          user_id: userId,
+          is_online: isOnline,
+          last_seen_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
+        })
+      
       if (error) {
-        console.warn('User presence RPC not available:', error)
+        console.warn('Error updating presence:', error)
       }
     } catch (error) {
       console.warn('Failed to update user presence:', error)

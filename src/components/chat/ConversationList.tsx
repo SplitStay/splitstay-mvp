@@ -119,10 +119,12 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                   key={conv.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors mb-1 ${
+                  className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors mb-1 border-l-4 ${
                     isSelected 
-                      ? 'bg-blue-50 border border-blue-200' 
-                      : 'hover:bg-gray-50'
+                      ? 'bg-blue-50 border border-blue-200 border-l-blue-500' 
+                      : conv.unread_count && conv.unread_count > 0
+                        ? 'bg-blue-25 border border-blue-100 border-l-blue-400 shadow-sm'
+                        : 'hover:bg-gray-50 border-l-transparent border border-transparent'
                   }`}
                   onClick={() => onSelectChat(conv.id)}
                 >
@@ -138,7 +140,11 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
-                      <h3 className="font-medium text-gray-900 truncate">
+                      <h3 className={`truncate ${
+                        conv.unread_count && conv.unread_count > 0 
+                          ? 'font-semibold text-gray-900' 
+                          : 'font-medium text-gray-900'
+                      }`}>
                         {otherUser?.name || otherUser?.email || 'Unknown User'}
                       </h3>
                       {conv.last_message && (
@@ -149,7 +155,11 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                     </div>
                     
                     <div className="flex items-center justify-between">
-                      <p className="text-sm text-gray-600 truncate">
+                      <p className={`text-sm truncate ${
+                        conv.unread_count && conv.unread_count > 0 
+                          ? 'text-gray-900 font-medium' 
+                          : 'text-gray-600'
+                      }`}>
                         {conv.last_message?.content || 'No messages yet'}
                       </p>
                       {conv.unread_count && conv.unread_count > 0 && (

@@ -80,6 +80,29 @@ export const MessagesPage: React.FC = () => {
         }
       }
 
+      // Listen for messages being read to update unread counts
+      const handleMessagesRead = async (event: CustomEvent) => {
+        const { conversationId } = event.detail
+        if (user?.id) {
+          // Refresh unread count for this conversation
+          const { data: unreadCount } = await supabase
+            .rpc('get_unread_message_count', {
+              p_conversation_id: conversationId,
+              p_user_id: user.id
+            })
+          
+          setConversations(prev => 
+            prev.map(conv => 
+              conv.id === conversationId 
+                ? { ...conv, unread_count: unreadCount || 0 }
+                : conv
+            )
+          )
+        }
+      }
+
+      window.addEventListener('messagesRead', handleMessagesRead as EventListener)
+
       // When conversations list changes, refresh presence info
       const partnerIds = Array.from(new Set(conversations.map(c => c.other_user?.id).filter(Boolean) as string[]))
       loadPresenceForConversations(partnerIds)
@@ -118,6 +141,7 @@ export const MessagesPage: React.FC = () => {
         conversationsSub.unsubscribe()
         messagesSub.unsubscribe()
         presenceSub.unsubscribe()
+        window.removeEventListener('messagesRead', handleMessagesRead as EventListener)
       }
     }
   }, [user?.id])

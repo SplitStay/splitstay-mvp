@@ -7,6 +7,8 @@ import { ChatService } from '../lib/chatService'
 import { useAuth } from '../contexts/AuthContext'
 import { iframelyService } from '../lib/iframely'
 import { Badge } from '../components/ui/badge'
+import { supabase } from '../lib/supabase'
+import { EmailService } from '../lib/emailService'
 
 export const TripDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>()
@@ -80,12 +82,30 @@ export const TripDetailPage: React.FC = () => {
     try {
       setRequestLoading(true)
       
+      // Create a formal request in the database (this will trigger email notification)
+      const requestMessage = `Hi ${trip.host?.name || 'there'}! I'm interested in joining your trip "${trip.name}" in ${trip.location}. The dates ${formatTripDates(trip)} work well for me. Could you tell me more about the accommodation and plans?`
+      
+      const { error: requestError } = await supabase
+        .from('request')
+        .insert({
+          userId: user.id,
+          tripId: trip.id,
+          message: requestMessage,
+          status: 'pending'
+        })
+      
+      if (requestError) {
+        console.error('Error creating request:', requestError)
+      } else {
+        // Send email notification to host (async, don't wait)
+        EmailService.notifyTripRequest(user.id, trip.id, requestMessage)
+          .catch(error => console.error('Email notification failed:', error))
+      }
+      
       // Create or get conversation with host
       const conv = await ChatService.getOrCreateDirectConversation(user.id, trip.hostId)
       
-      // Send default request message
-      const requestMessage = `Hi ${trip.host?.name || 'there'}! I'm interested in joining your trip "${trip.name}" in ${trip.location}. The dates ${formatTripDates(trip)} work well for me. Could you tell me more about the accommodation and plans?`
-      
+      // Send the message in chat
       await ChatService.sendMessage(
         conv.id,
         user.id,

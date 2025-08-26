@@ -98,6 +98,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversation, onBack, cl
       }
       if (user?.id) {
         await ChatService.markMessagesAsRead(conversation.id)
+        // Notify parent component that messages were read
+        window.dispatchEvent(new CustomEvent('messagesRead', { 
+          detail: { conversationId: conversation.id } 
+        }))
       }
     } catch (error) {
       console.error('Error loading messages:', error)
