@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft } from 'lucide-react'
 import { ConversationWithUser, MessageWithSender, ChatService } from '../../lib/chatService'
@@ -82,8 +82,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversation, onBack, cl
     }
   }, [conversation.id, otherUser?.id])
 
-  useEffect(() => {
-    scrollToBottom()
+  useLayoutEffect(() => {
+    // Use setTimeout to ensure DOM is fully rendered before scrolling
+    const timeoutId = setTimeout(() => {
+      scrollToBottom()
+    }, 10)
+    
+    return () => clearTimeout(timeoutId)
   }, [messages])
 
   const loadMessages = async () => {
@@ -107,6 +112,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversation, onBack, cl
       console.error('Error loading messages:', error)
     } finally {
       setLoading(false)
+      // Ensure scroll to bottom after loading is complete
+      setTimeout(() => scrollToBottom(), 50)
     }
   }
 
@@ -175,7 +182,14 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversation, onBack, cl
   }
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (messagesEndRef.current) {
+      // Use instant scroll for initial load, smooth for new messages
+      const behavior = loading ? 'instant' : 'smooth'
+      messagesEndRef.current.scrollIntoView({ 
+        behavior: behavior as ScrollBehavior,
+        block: 'end'
+      })
+    }
   }
 
   const formatMessageTime = (date: string) => {

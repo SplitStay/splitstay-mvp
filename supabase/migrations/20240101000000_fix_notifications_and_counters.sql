@@ -92,6 +92,8 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Function to send email notification for offline message
+-- COMMENTED OUT: Using webhook approach in fix_triggers_webhook.sql instead
+/*
 CREATE OR REPLACE FUNCTION notify_offline_message() RETURNS TRIGGER AS $$
 DECLARE
   v_recipient_id UUID;
@@ -157,13 +159,17 @@ EXCEPTION
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+*/
 
 -- Create trigger for offline message notifications
+-- COMMENTED OUT: Using webhook approach in fix_triggers_webhook.sql instead
+/*
 DROP TRIGGER IF EXISTS trigger_notify_offline_message ON messages;
 CREATE TRIGGER trigger_notify_offline_message
   AFTER INSERT ON messages
   FOR EACH ROW
   EXECUTE FUNCTION notify_offline_message();
+*/
 
 -- Function to send email notification for trip join request
 CREATE OR REPLACE FUNCTION notify_trip_join_request() RETURNS TRIGGER AS $$
