@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { trackEvent } from "@/lib/amplitude";
 import { EmailConfirmationHandler } from "@/components/EmailConfirmationHandler";
-import { OAuthCallbackHandler } from "@/components/OAuthCallbackHandler";
 import logoImage from "@/assets/logo.jpg"
 import logoImageWhite from "@/assets/logoWhite.jpeg"
 import heroImage from "@/assets/hero.png"
@@ -19,7 +18,8 @@ const HomePage: React.FC = () => {
   // Check if this is an email confirmation or OAuth redirect
   const urlParams = new URLSearchParams(window.location.search);
   const isEmailConfirmation = urlParams.get('type') === 'signup';
-  const isOAuthCallback = urlParams.get('oauth') === 'true' || window.location.hash.includes('access_token');
+  // Only show OAuth loading if we have actual auth tokens to process
+  const isOAuthCallback = window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token');
 
   useEffect(() => {
     trackEvent('Homepage_View')
@@ -38,9 +38,16 @@ const HomePage: React.FC = () => {
     return <EmailConfirmationHandler />;
   }
   
-  // Handle OAuth callback redirect
+  // Handle OAuth callback redirect - only show loading if we have tokens to process
   if (isOAuthCallback) {
-    return <OAuthCallbackHandler />;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Completing sign in...</p>
+        </div>
+      </div>
+    );
   }
 
   if (loading) {

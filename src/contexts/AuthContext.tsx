@@ -10,7 +10,7 @@ interface AuthContextType {
   loading: boolean
   signUp: (email: string, password: string, options?: { data?: Record<string, unknown> }) => Promise<{ error: AuthError | null }>
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>
-  signInWithOAuth: (provider: 'google' | 'facebook') => Promise<{ error: AuthError | null }>
+  signInWithOAuth: (provider: 'google' | 'facebook', redirectAfterLogin?: string) => Promise<{ error: AuthError | null }>
   signOut: () => Promise<{ error: AuthError | null }>
   resetPassword: (email: string) => Promise<{ error: AuthError | null }>
   updatePassword: (password: string) => Promise<{ error: AuthError | null }>
@@ -56,18 +56,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const currentPath = window.location.pathname;
         const hasAuthTokens = window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token');
         
-        // Check if this is an OAuth user
-        const isOAuthUser = session.user.app_metadata?.provider === 'google' || 
-                           session.user.app_metadata?.provider === 'facebook';
-        
         if (signupType === 'signup') {
           // This is an email confirmation, redirect to profile creation
           window.history.replaceState({}, document.title, '/');
           setTimeout(() => {
             navigate('/create-profile');
           }, 100);
-        } else if ((hasAuthTokens || isOAuthUser) && currentPath === '/') {
-          // OAuth user or user with tokens on homepage - check profile status
+        } else if (hasAuthTokens || urlParams.get('oauth') === 'true') {
+          // Fresh OAuth callback - check profile status
+          // Clear OAuth parameter from URL
+          if (urlParams.get('oauth') === 'true') {
+            urlParams.delete('oauth');
+            const newSearch = urlParams.toString();
+            const newUrl = currentPath + (newSearch ? '?' + newSearch : '');
+            window.history.replaceState({}, document.title, newUrl);
+          }
+          
+          // Check for stored OAuth redirect URL first
+          const oauthRedirect = localStorage.getItem('splitstay_oauth_redirect');
+          
           try {
             const { data: userData, error } = await supabase
               .from('user')
@@ -76,15 +83,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               .single();
             
             if (!error && userData?.profileCreated) {
-              // User has profile, go to dashboard
-              navigate('/dashboard');
+              // User has profile
+              if (oauthRedirect) {
+                // Clear and use the stored redirect
+                localStorage.removeItem('splitstay_oauth_redirect');
+                setTimeout(() => navigate(oauthRedirect), 100);
+              } else if (currentPath === '/') {
+                // Only redirect to dashboard if we're on homepage
+                setTimeout(() => navigate('/dashboard'), 100);
+              }
+              // Otherwise stay on current page
             } else {
               // User needs to create profile or doesn't exist
-              navigate('/create-profile');
+              setTimeout(() => navigate('/create-profile'), 100);
             }
           } catch (error) {
             // If user doesn't exist in our table, they need to create profile
-            navigate('/create-profile');
+            setTimeout(() => navigate('/create-profile'), 100);
           }
         }
       }
@@ -137,11 +152,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           const signupType = urlParams.get('type');
           const isEmailConfirmation = signupType === 'signup';
           const isPasswordRecovery = signupType === 'recovery';
-          const isOnHomePage = currentPath === '/';
-          
-          // Check if this is an OAuth provider sign-in
-          const isOAuthUser = session.user.app_metadata?.provider === 'google' || 
-                             session.user.app_metadata?.provider === 'facebook';
           
           // Handle email confirmation specifically
           if (isEmailConfirmation) {
@@ -159,12 +169,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             return;
           }
           
-          // Handle OAuth callback or any sign-in with auth tokens
-          // OAuth users or users with auth tokens in URL should check profile status
-          if (hasAuthTokens || isOAuthUser) {
-            // Clear the URL if we have tokens in it
+          // Handle OAuth callback - when we have auth tokens or oauth=true parameter
+          if (hasAuthTokens || urlParams.get('oauth') === 'true') {
+            // Clear the URL of auth tokens and oauth parameter
             if (hasAuthTokens) {
               window.history.replaceState({}, document.title, currentPath);
+            } else if (urlParams.get('oauth') === 'true') {
+              urlParams.delete('oauth');
+              const newSearch = urlParams.toString();
+              const newUrl = currentPath + (newSearch ? '?' + newSearch : '');
+              window.history.replaceState({}, document.title, newUrl);
             }
             
             setTimeout(async () => {
@@ -175,11 +189,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                   .eq('id', session.user.id)
                   .single();
                 
+                // Check for stored OAuth redirect URL
+                const oauthRedirect = localStorage.getItem('splitstay_oauth_redirect');
+                
                 if (!error && userData?.profileCreated) {
-                  // User has profile, go to dashboard
-                  navigate('/dashboard');
+                  // User has profile
+                  if (oauthRedirect) {
+                    // Clear the stored redirect and navigate to it
+                    localStorage.removeItem('splitstay_oauth_redirect');
+                    navigate(oauthRedirect);
+                  } else if (currentPath === '/') {
+                    // Only redirect to dashboard if we're on homepage
+                    navigate('/dashboard');
+                  }
+                  // Otherwise stay on current page
                 } else {
                   // User needs to create profile or doesn't exist
+                  // Keep the redirect URL for after profile creation
                   navigate('/create-profile');
                 }
               } catch (error) {
@@ -215,7 +241,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return { error }
   }
 
-  const signInWithOAuth = async (provider: 'google' | 'facebook') => {
+  const signInWithOAuth = async (provider: 'google' | 'facebook', redirectAfterLogin?: string) => {
+    // Store the intended redirect URL in localStorage for OAuth callback
+    if (redirectAfterLogin) {
+      localStorage.setItem('splitstay_oauth_redirect', redirectAfterLogin)
+    }
+    
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {

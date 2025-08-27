@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
@@ -13,6 +13,8 @@ export const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const redirectUrl = searchParams.get('redirect')
 
   const { signIn, signInWithOAuth } = useAuth()
 
@@ -38,7 +40,10 @@ export const LoginPage: React.FC = () => {
           
           toast.success('Welcome back!', { icon: '👋' })
           
-          if (userData?.profileCreated) {
+          // Check if we have a redirect URL from the auth guard
+          if (redirectUrl) {
+            navigate(redirectUrl)
+          } else if (userData?.profileCreated) {
             navigate('/dashboard')
           } else {
             navigate('/create-profile')
@@ -61,7 +66,7 @@ export const LoginPage: React.FC = () => {
     setIsLoading(true)
 
     try {
-      const { error } = await signInWithOAuth(provider)
+      const { error } = await signInWithOAuth(provider, redirectUrl || undefined)
       if (error) {
         setError(error.message)
         toast.error(error.message)

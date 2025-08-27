@@ -35,6 +35,7 @@ const GuestFriendlyRoute: React.FC<{ children: React.ReactNode }> = ({ children 
 // Auth Required Route Component (redirect to login if not authenticated)
 const AuthRequiredRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth()
+  const location = window.location
 
   if (loading) {
     return (
@@ -49,7 +50,9 @@ const AuthRequiredRoute: React.FC<{ children: React.ReactNode }> = ({ children }
   }
 
   if (!user) {
-    return <Navigate to="/login" replace />
+    // Preserve the intended destination URL including pathname and search params
+    const redirectUrl = location.pathname + location.search + location.hash
+    return <Navigate to={`/login?redirect=${encodeURIComponent(redirectUrl)}`} replace />
   }
   
   return <>{children}</>

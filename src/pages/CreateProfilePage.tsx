@@ -123,7 +123,14 @@ export default function CreateProfilePage() {
         }
       }
       
-      navigate("/dashboard");
+      // Check for OAuth redirect URL from before profile creation
+      const oauthRedirect = localStorage.getItem('splitstay_oauth_redirect');
+      if (oauthRedirect) {
+        localStorage.removeItem('splitstay_oauth_redirect');
+        navigate(oauthRedirect);
+      } else {
+        navigate("/dashboard");
+      }
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Failed to create profile. Please try again.";
       toast.error(errorMessage);
