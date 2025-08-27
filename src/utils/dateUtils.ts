@@ -2,6 +2,26 @@
  * Utility functions for handling flexible vs exact dates
  */
 
+/**
+ * Parse a date string (YYYY-MM-DD) as a local date to avoid timezone issues
+ */
+export const parseLocalDate = (dateString: string | null): Date | null => {
+  if (!dateString) return null;
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day); // month is 0-indexed
+};
+
+/**
+ * Format a date as YYYY-MM-DD in local timezone
+ */
+export const formatDateForStorage = (date: Date | null): string | null => {
+  if (!date) return null;
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 export const formatTripDate = (trip: {
   flexible?: boolean;
   startDate?: string | null;
@@ -17,21 +37,23 @@ export const formatTripDate = (trip: {
   }
   
   if (trip.startDate && trip.endDate) {
-    const start = new Date(trip.startDate);
-    const end = new Date(trip.endDate);
+    const start = parseLocalDate(trip.startDate);
+    const end = parseLocalDate(trip.endDate);
     
-    const startFormatted = start.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric' 
-    });
-    
-    const endFormatted = end.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric',
-      year: 'numeric'
-    });
-    
-    return `${startFormatted} - ${endFormatted}`;
+    if (start && end) {
+      const startFormatted = start.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric' 
+      });
+      
+      const endFormatted = end.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric',
+        year: 'numeric'
+      });
+      
+      return `${startFormatted} - ${endFormatted}`;
+    }
   }
   
   return 'Dates TBD';
@@ -68,9 +90,10 @@ export const isUpcomingTrip = (trip: {
   }
   
   if (trip.startDate) {
-    const startDate = new Date(trip.startDate);
+    const startDate = parseLocalDate(trip.startDate);
     const now = new Date();
-    return startDate >= now;
+    now.setHours(0, 0, 0, 0); // Compare dates only, not times
+    return startDate ? startDate >= now : true;
   }
   
   return true; // Default to upcoming if no date info
@@ -92,9 +115,10 @@ export const isPastTrip = (trip: {
   }
   
   if (trip.endDate) {
-    const endDate = new Date(trip.endDate);
+    const endDate = parseLocalDate(trip.endDate);
     const now = new Date();
-    return endDate < now;
+    now.setHours(0, 0, 0, 0); // Compare dates only, not times
+    return endDate ? endDate < now : false;
   }
   
   return false; // Default to not past if no date info

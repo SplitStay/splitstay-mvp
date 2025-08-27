@@ -182,6 +182,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             }
             
             setTimeout(async () => {
+              console.log('[OAuth Debug] Checking user profile for:', session.user.id);
               try {
                 const { data: userData, error } = await supabase
                   .from('user')
@@ -189,11 +190,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                   .eq('id', session.user.id)
                   .single();
                 
+                console.log('[OAuth Debug] User query result:', { userData, error });
+                
                 // Check for stored OAuth redirect URL
                 const oauthRedirect = localStorage.getItem('splitstay_oauth_redirect');
                 
                 if (!error && userData?.profileCreated) {
                   // User has profile
+                  console.log('[OAuth Debug] User has profile, redirecting to dashboard or stored URL');
                   if (oauthRedirect) {
                     // Clear the stored redirect and navigate to it
                     localStorage.removeItem('splitstay_oauth_redirect');
@@ -206,10 +210,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 } else {
                   // User needs to create profile or doesn't exist
                   // Keep the redirect URL for after profile creation
+                  console.log('[OAuth Debug] User needs profile creation:', { error, userData });
                   navigate('/create-profile');
                 }
               } catch (error) {
                 // If user doesn't exist in our table, they need to create profile
+                console.log('[OAuth Debug] Error checking user:', error);
                 navigate('/create-profile');
               }
             }, 100);

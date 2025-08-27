@@ -4,6 +4,7 @@ import { MapPin, Calendar, Users, Building2, CalendarDays, ImageIcon, ArrowRight
 import { Badge } from './ui/badge';
 import type { Trip } from '../lib/tripService';
 import { iframelyService } from '../lib/iframely';
+import { parseLocalDate } from '../utils/dateUtils';
 
 interface TripCardProps {
   trip: Trip & {
@@ -44,16 +45,21 @@ export const TripCard: React.FC<TripCardProps> = ({ trip, onClick, className = '
     }
     
     if (trip.startDate && trip.endDate) {
-      const start = new Date(trip.startDate).toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric' 
-      });
-      const end = new Date(trip.endDate).toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric',
-        year: 'numeric'
-      });
-      return `${start} - ${end}`;
+      const start = parseLocalDate(trip.startDate);
+      const end = parseLocalDate(trip.endDate);
+      
+      if (start && end) {
+        const startFormatted = start.toLocaleDateString('en-US', { 
+          month: 'short', 
+          day: 'numeric' 
+        });
+        const endFormatted = end.toLocaleDateString('en-US', { 
+          month: 'short', 
+          day: 'numeric',
+          year: 'numeric'
+        });
+        return `${startFormatted} - ${endFormatted}`;
+      }
     }
     
     return 'Dates TBD';

@@ -3,6 +3,7 @@ import DatePicker from 'react-datepicker';
 import { motion } from 'framer-motion';
 import { MapPin } from 'lucide-react';
 import CityAutocomplete from '@/components/CityAutocomplete';
+import { parseLocalDate, formatDateForStorage } from '../../utils/dateUtils';
 import 'react-datepicker/dist/react-datepicker.css';
 
 interface Props {
@@ -13,8 +14,8 @@ interface Props {
 
 const Step1Destination: React.FC<Props> = ({ trip, setTrip, next }) => {
   const [city, setCity] = useState(trip.location || '');
-  const [startDate, setStartDate] = useState(trip.startDate ? new Date(trip.startDate) : null);
-  const [endDate, setEndDate] = useState(trip.endDate ? new Date(trip.endDate) : null);
+  const [startDate, setStartDate] = useState(parseLocalDate(trip.startDate));
+  const [endDate, setEndDate] = useState(parseLocalDate(trip.endDate));
   const [flexible, setFlexible] = useState(trip.flexible || false);
   const [estimatedMonth, setEstimatedMonth] = useState(trip.estimatedMonth || 'September');
   const [estimatedYear, setEstimatedYear] = useState(trip.estimatedYear || '2025');
@@ -49,8 +50,8 @@ const Step1Destination: React.FC<Props> = ({ trip, setTrip, next }) => {
             ...trip,
             location: city,
             flexible: false,
-            startDate: startDate?.toISOString() || null,
-            endDate: endDate?.toISOString() || null,
+            startDate: formatDateForStorage(startDate),
+            endDate: formatDateForStorage(endDate),
             estimatedMonth: null,
             estimatedYear: null,
           });
