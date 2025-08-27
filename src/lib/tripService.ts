@@ -17,6 +17,7 @@ export interface TripFormData {
   
   vibe: string;
   matchWith: string;
+  isPublic?: boolean;
   
   thumbnailUrl?: string | null;
 }
@@ -42,6 +43,7 @@ export const createTrip = async (tripData: TripFormData): Promise<Trip> => {
     rooms: tripData.rooms as any,
     matchwith: tripData.matchWith,
     flexible: tripData.flexible,
+    ispublic: tripData.isPublic ?? true,
     thumbnailUrl: tripData.thumbnailUrl,
     ...(tripData.flexible ? {
       estimatedmonth: tripData.estimatedMonth,

@@ -478,12 +478,12 @@ export const TripDetailPage: React.FC = () => {
                 {user?.id === trip.hostId ? (
                   // Host viewing their own trip
                   <div className="space-y-3">
-                    <button
+                    {/* <button
                       onClick={() => navigate(`/dashboard`)}
                       className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
                     >
                       <span>Manage Trip</span>
-                    </button>
+                    </button> */}
                     <div className="text-center text-sm text-gray-500">
                       This is your trip
                     </div>

@@ -100,6 +100,7 @@ const PostTripPage = () => {
         rooms: trip.rooms,
         vibe: trip.vibe || vibe,
         matchWith: trip.matchWith,
+        isPublic: trip.isPublic,
         thumbnailUrl: trip.thumbnailUrl,
       };
 
