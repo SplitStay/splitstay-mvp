@@ -28,10 +28,6 @@ const HomePage: React.FC = () => {
   const handleGetStarted = () => {
     navigate('/dashboard');
   };
-
-  const handleCreateProfile = () => {
-    navigate('/signup');
-  };
   
   // Handle email confirmation redirect
   if (isEmailConfirmation) {
@@ -129,14 +125,22 @@ const HomePage: React.FC = () => {
                 You're early — and that's exactly the point. SplitStay is just opening up. The first few travelers shape what this becomes. Want to be one of them?
               </p>
               
-              {/* CTA Button */}
-              <div className="mb-6">
+              {/* CTA Buttons */}
+              <div className="mb-6 flex flex-col sm:flex-row gap-4 sm:gap-6">
                 <Button 
-                  onClick={handleCreateProfile}
+                  onClick={handleGetStarted}
                   size="lg"
                   className="bg-blue-600 text-white hover:bg-blue-700 text-lg px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
                 >
-                  Create My Profile
+                  Post Your Trip
+                </Button>
+                <Button 
+                  onClick={() => navigate('/signup')}
+                  size="lg"
+                  variant="outline"
+                  className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white text-lg px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+                >
+                  Create Profile
                 </Button>
               </div>
               
