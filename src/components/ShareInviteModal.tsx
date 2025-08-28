@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useUser } from '@/hooks/useUser';
 import type { Tables } from '@/types/database.types';
@@ -16,12 +16,12 @@ const generatePersonalizedMessage = (user: Tables<'user'> | undefined): string =
   }
 
   
-  // Use Vite environment variable for the base URL
-  const baseUrl = import.meta.env.VITE_APP_URL;
+  // Use Vite environment variable for the base URL, fallback to current origin
+  const baseUrl = import.meta.env.VITE_APP_URL || window.location.origin;
   
   // Use customized URL if available, otherwise use ID
   const profileIdentifier = user?.personalizedLink || user?.id;
-  const message = `Just joined SplitStay — it helps you connect with like-minded travelers to share accommodations and save on costs. Here’s my profile — feel free to create yours too! \n${baseUrl}/profile/${profileIdentifier}`;
+  const message = `Just joined SplitStay — it helps you connect with like-minded travelers to share accommodations and save on costs. Here's my profile — feel free to create yours too! \n${baseUrl}/profile/${profileIdentifier}`;
 
   return message;
 };
@@ -34,11 +34,18 @@ const ShareInviteModal: React.FC<ShareInviteModalProps> = ({
 }) => {
   const [copied, setCopied] = useState(false);
   const { data: user } = useUser();
+  const [editableMessage, setEditableMessage] = useState('');
+
+  useEffect(() => {
+    if (open) {
+      const personalizedMessage = message || generatePersonalizedMessage(user);
+      setEditableMessage(personalizedMessage);
+    }
+  }, [open, message, user]);
 
   if (!open) return null;
 
-  const personalizedMessage = message || generatePersonalizedMessage(user);
-  const fullMessage = personalizedMessage;
+  const fullMessage = editableMessage;
 
   const handleShare = async () => {
     if (typeof navigator.share === 'function') {
@@ -60,16 +67,35 @@ const ShareInviteModal: React.FC<ShareInviteModalProps> = ({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Clipboard error
+      // Clipboard error - fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = fullMessage;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
   // Platform-specific share URLs
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(fullMessage)}`;
-  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl || window.location.origin)}&quote=${encodeURIComponent(personalizedMessage)}`;
+  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl || window.location.origin)}&quote=${encodeURIComponent(fullMessage)}`;
   const handleInstagramShare = async () => {
-    await navigator.clipboard.writeText(fullMessage);
-    alert('Message copied! Open Instagram and paste it in a DM or Story.');
+    try {
+      await navigator.clipboard.writeText(fullMessage);
+      alert('Message copied! Open Instagram and paste it in a DM or Story.');
+    } catch {
+      // Clipboard error - fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = fullMessage;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert('Message copied! Open Instagram and paste it in a DM or Story.');
+    }
   };
 
   return (
@@ -92,10 +118,11 @@ const ShareInviteModal: React.FC<ShareInviteModalProps> = ({
           Invite your friends to join SplitStay! Sharing is optional, but helps us grow.
         </p>
         <textarea
-          className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg mb-3 sm:mb-4 text-gray-800 resize-none text-xs sm:text-sm"
-          rows={3}
+          className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg mb-3 sm:mb-4 text-gray-800 resize-none text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          rows={4}
           value={fullMessage}
-          readOnly
+          onChange={(e) => setEditableMessage(e.target.value)}
+          placeholder="Edit your message..."
         />
         <div className="flex flex-col gap-2 sm:gap-3 mb-3 sm:mb-4">
           {typeof navigator.share === 'function' && (

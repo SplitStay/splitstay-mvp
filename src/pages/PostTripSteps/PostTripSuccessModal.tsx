@@ -12,6 +12,7 @@ const defaultShareMessage = "Check out my new trip on SplitStay! Join me or post
 const PostTripSuccessModal: React.FC<Props> = ({ open, onClose, trip }) => {
   const tripUrl = `${window.location.origin}/trip/${trip.id || ''}`;
   const [shareText, setShareText] = useState(`${defaultShareMessage}\n${tripUrl}`);
+  const [copied, setCopied] = useState(false);
   
   if (!open) return null;
 
@@ -30,8 +31,21 @@ const PostTripSuccessModal: React.FC<Props> = ({ open, onClose, trip }) => {
   };
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(shareText);
-    // Optionally show a toast/snackbar
+    try {
+      await navigator.clipboard.writeText(shareText);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard error - fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = shareText;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   // Platform-specific share URLs
@@ -39,8 +53,19 @@ const PostTripSuccessModal: React.FC<Props> = ({ open, onClose, trip }) => {
   const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(tripUrl)}&quote=${encodeURIComponent(shareText)}`;
   // Instagram does not support direct text sharing; we copy to clipboard and instruct the user
   const handleInstagramShare = async () => {
-    await navigator.clipboard.writeText(shareText);
-    alert('Message copied! Open Instagram and paste it in a DM or Story.');
+    try {
+      await navigator.clipboard.writeText(shareText);
+      alert('Message copied! Open Instagram and paste it in a DM or Story.');
+    } catch {
+      // Clipboard error - fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = shareText;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert('Message copied! Open Instagram and paste it in a DM or Story.');
+    }
   };
 
   return (
@@ -96,7 +121,7 @@ const PostTripSuccessModal: React.FC<Props> = ({ open, onClose, trip }) => {
             onClick={handleCopy}
             className="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors"
           >
-            Copy Trip Link & Message
+            {copied ? 'Copied!' : 'Copy Trip Link & Message'}
           </button>
         </div>
         <button

@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { ArrowLeft, MapPin, Calendar, Users, Building2, MessageCircle, Heart, Share2, ExternalLink, CalendarDays, Home, Star, Shield, Check, X, Clock, Globe, DollarSign } from 'lucide-react'
-import { getTripById, Trip } from '../lib/tripService'
+import { ArrowLeft, MapPin, Calendar, Users, Building2, MessageCircle, Heart, Share2, ExternalLink, CalendarDays, Home, Shield, Check, X, Clock, Globe, DollarSign } from 'lucide-react'
+import { getTripById, type Trip } from '../lib/tripService'
 import { ChatService } from '../lib/chatService'
 import { useAuth } from '../contexts/AuthContext'
 import { iframelyService } from '../lib/iframely'
-import { Badge } from '../components/ui/badge'
 import { supabase } from '../lib/supabase'
-import { EmailService } from '../lib/emailService'
+import ShareInviteModal from '../components/ShareInviteModal'
 
 export const TripDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>()
@@ -21,7 +19,7 @@ export const TripDetailPage: React.FC = () => {
   const [accommodationImage, setAccommodationImage] = useState<string | null>(null)
   const [imageLoading, setImageLoading] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
-  const [activeImageIndex, setActiveImageIndex] = useState(0)
+  const [showShareModal, setShowShareModal] = useState(false)
 
   useEffect(() => {
     if (id) {
@@ -153,6 +151,20 @@ export const TripDetailPage: React.FC = () => {
     }
   }
 
+  const handleShare = () => {
+    setShowShareModal(true)
+  }
+
+  const generateTripShareMessage = () => {
+    if (!trip) return ''
+    
+    const baseUrl = window.location.origin
+    const tripUrl = `${baseUrl}/trip/${trip.id}`
+    const dates = formatTripDates(trip)
+    
+    return `Check out this amazing trip to ${trip.location}! ${dates} - Join me on SplitStay and let's explore together. ${tripUrl}`
+  }
+
   const formatTripDates = (trip: Trip) => {
     if (trip.flexible) {
       const month = (trip as any).estimatedmonth || trip.estimatedMonth
@@ -191,13 +203,6 @@ export const TripDetailPage: React.FC = () => {
   }
 
   const roomSummary = getRoomSummary()
-
-  // Mock images for gallery (in production, these would come from the trip data)
-  const galleryImages = [
-    trip?.thumbnailUrl || accommodationImage,
-    trip?.host?.imageUrl,
-    // Add more images from trip.images if available
-  ].filter(Boolean)
 
   if (loading) {
     return (
@@ -286,7 +291,10 @@ export const TripDetailPage: React.FC = () => {
           >
             <Heart className={`w-5 h-5 ${isSaved ? 'fill-current' : ''}`} />
           </button>
-          <button className="p-2 bg-white/90 backdrop-blur-sm rounded-lg hover:bg-white transition-colors">
+          <button 
+            onClick={handleShare}
+            className="p-2 bg-white/90 backdrop-blur-sm rounded-lg hover:bg-white transition-colors"
+          >
             <Share2 className="w-5 h-5" />
           </button>
         </div>
@@ -542,6 +550,14 @@ export const TripDetailPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Share Modal */}
+      <ShareInviteModal
+        open={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        message={generateTripShareMessage()}
+        shareUrl={`${window.location.origin}/trip/${trip?.id}`}
+      />
     </div>
   )
 }
