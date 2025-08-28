@@ -223,6 +223,7 @@ export default function EditProfilePage() {
                 setFormData={(data: any) => setFormData({...formData, ...data})}
                 onNext={handleNext}
                 onBack={handleBack}
+                originalPersonalizedLink={userData?.personalizedLink || ""}
               />
             )}
 

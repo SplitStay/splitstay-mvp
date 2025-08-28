@@ -101,7 +101,7 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
                       formData.monthOfBirth && 
                       formData.yearOfBirth &&
                       formData.gender &&
-                      profileImagePreview;
+                      (profileImagePreview || profileImageUrl);
 
   const dayOptions = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
   const monthOptions = [

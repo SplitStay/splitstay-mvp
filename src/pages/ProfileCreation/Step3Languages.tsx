@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { X, Plus, Languages, MessageCircle, Link } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Step3Props {
   selectedLanguages: string[];
@@ -14,6 +15,7 @@ interface Step3Props {
   setFormData: (data: any) => void;
   onNext: () => void;
   onBack: () => void;
+  originalPersonalizedLink?: string;
 }
 
 export const Step3Languages: React.FC<Step3Props> = ({
@@ -24,8 +26,10 @@ export const Step3Languages: React.FC<Step3Props> = ({
   setSelectedLearningLanguages,
   setFormData,
   onNext,
-  onBack
+  onBack,
+  originalPersonalizedLink
 }) => {
+  const { user } = useAuth();
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showLearningModal, setShowLearningModal] = useState(false);
   const [languageSearchTerm, setLanguageSearchTerm] = useState('');
@@ -66,6 +70,7 @@ export const Step3Languages: React.FC<Step3Props> = ({
         .from('user')
         .select('id')
         .eq('personalizedLink', link)
+        .neq('id', user?.id || '')
         .limit(1);
       
       if (error) return false;
@@ -130,6 +135,10 @@ export const Step3Languages: React.FC<Step3Props> = ({
     if (!formData.personalizedLink.trim()) return true;
     if (personalizedLinkError) return false;
     if (checkingAvailability) return false;
+    
+    // If the URL hasn't changed from the original, it's valid
+    if (formData.personalizedLink === originalPersonalizedLink) return true;
+    
     return personalizedLinkAvailable === true;
   };
 
