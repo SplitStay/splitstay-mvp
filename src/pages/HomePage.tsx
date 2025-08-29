@@ -6,7 +6,7 @@ import { trackEvent } from "@/lib/amplitude";
 import { EmailConfirmationHandler } from "@/components/EmailConfirmationHandler";
 import logoImage from "@/assets/logo.jpg"
 import logoImageWhite from "@/assets/logoWhite.jpeg"
-import heroImage from "@/assets/hero.png"
+import heroImage from "@/assets/hero-2.png"
 type UserPath = "host" | "guest" | null;
 
 const HomePage: React.FC = () => {
@@ -103,77 +103,64 @@ const HomePage: React.FC = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-50 via-white to-purple-50 py-12 sm:py-16 lg:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            {/* Content */}
-            <div className="text-center lg:text-left">
-              {/* Logo for mobile */}
-              <div className="lg:hidden mb-8">
-                <img 
-                  src={logoImage} 
-                  alt="SplitStay Logo" 
-                  className="h-24 sm:h-32 w-auto mx-auto"
-                />
-              </div>
-              
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 sm:mb-6">
-                Share your accommodation. Save money. Meet travelers.
-              </h1>
-              
-              <p className="text-lg sm:text-xl text-gray-600 mb-8 leading-relaxed">
-                You're early — and that's exactly the point. SplitStay is just opening up. The first few travelers shape what this becomes. Want to be one of them?
-              </p>
-              
-              {/* CTA Buttons */}
-              <div className="mb-6 flex flex-col sm:flex-row gap-4 sm:gap-6">
-                <Button 
-                  onClick={handleGetStarted}
-                  size="lg"
-                  className="bg-blue-600 text-white hover:bg-blue-700 text-lg px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
-                >
-                  Post Your Trip
-                </Button>
-                <Button 
-                  onClick={() => navigate('/signup')}
-                  size="lg"
-                  variant="outline"
-                  className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white text-lg px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
-                >
-                  Create Profile
-                </Button>
-              </div>
-              
-              {/* Login Link */}
-              {!user && (
-                <p className="text-gray-600">
-                  Already have a profile?{" "}
-                  <Link 
-                    to="/login"
-                    className="text-blue-600 hover:text-blue-700 underline transition-colors duration-300 font-medium"
-                  >
-                    Log in
-                  </Link>
+      <section className="relative min-h-screen bg-gray-100">
+        {/* Hero Image Background */}
+        <div className="absolute inset-0">
+          <img 
+            src={heroImage} 
+            alt="Travel together, save money" 
+            className="w-full h-full object-cover"
+          />
+        </div>
+        
+        {/* Content Card Overlay */}
+        <div className="relative z-10 flex items-center min-h-screen">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            <div className="max-w-2xl">
+              {/* Gray Content Card with Opacity */}
+              <div className="bg-gray-800/40 backdrop-blur-sm rounded-2xl shadow-2xl p-8 sm:p-10 lg:p-12">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+                  Share your<br />
+                  accommodation.<br />
+                  Save money.<br />
+                  Meet travelers.
+                </h1>
+                
+                <p className="text-lg sm:text-xl text-gray-200 mb-8 leading-relaxed">
+                  You're early — and that's exactly the point. SplitStay is just opening up. The 
+                  first few travelers shape what this becomes. Want to be one of them?
                 </p>
-              )}
-            </div>
-            
-            {/* Hero Image */}
-            <div className="order-first lg:order-last">
-              <div className="relative">
-                <img 
-                  src={heroImage} 
-                  alt="Travel together, save money" 
-                  className="w-full h-auto rounded-2xl shadow-2xl"
-                />
-                {/* Desktop Logo Overlay */}
-                <div className="hidden lg:block absolute top-4 left-4">
-                  <img 
-                    src={logoImage} 
-                    alt="SplitStay Logo" 
-                    className="h-16 w-auto opacity-90"
-                  />
+                
+                {/* CTA Buttons */}
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button 
+                    onClick={handleGetStarted}
+                    size="lg"
+                    className="bg-white text-gray-900 hover:bg-gray-100 text-base px-8 py-3 rounded-lg font-semibold transition-all duration-300 shadow-md hover:shadow-lg"
+                  >
+                    Post Your Trip
+                  </Button>
+                  <Button 
+                    onClick={() => navigate('/signup')}
+                    size="lg"
+                    className="bg-white text-gray-900 hover:bg-gray-100 text-base px-8 py-3 rounded-lg font-semibold transition-all duration-300 shadow-md hover:shadow-lg"
+                  >
+                    Create Profile
+                  </Button>
                 </div>
+                
+                {/* Login Link */}
+                {!user && (
+                  <p className="text-gray-300 mt-6 text-sm">
+                    Already have a profile?{" "}
+                    <Link 
+                      to="/login"
+                      className="text-white hover:text-gray-100 underline transition-colors duration-300 font-medium"
+                    >
+                      Log in
+                    </Link>
+                  </p>
+                )}
               </div>
             </div>
           </div>
