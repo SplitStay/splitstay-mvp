@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, MapPin, Calendar, Users, Building2, MessageCircle, Heart, Share2, ExternalLink, CalendarDays, Home, Shield, Check, X, Clock, Globe, DollarSign } from 'lucide-react'
+import { ArrowLeft, MapPin, Calendar, Users, Building2, MessageCircle, Heart, Share2, ExternalLink, CalendarDays, Home, Shield, Check, X, Clock, Globe, DollarSign, Edit } from 'lucide-react'
 import { getTripById, type Trip } from '../lib/tripService'
 import { ChatService } from '../lib/chatService'
 import { useAuth } from '../contexts/AuthContext'
 import { iframelyService } from '../lib/iframely'
 import { supabase } from '../lib/supabase'
 import ShareInviteModal from '../components/ShareInviteModal'
+import { EditTripModal } from '../components/EditTripModal'
 
 export const TripDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>()
@@ -20,6 +21,7 @@ export const TripDetailPage: React.FC = () => {
   const [imageLoading, setImageLoading] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
   const [showShareModal, setShowShareModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
 
   useEffect(() => {
     if (id) {
@@ -486,12 +488,13 @@ export const TripDetailPage: React.FC = () => {
                 {user?.id === trip.hostId ? (
                   // Host viewing their own trip
                   <div className="space-y-3">
-                    {/* <button
-                      onClick={() => navigate(`/dashboard`)}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                    <button
+                      onClick={() => setShowEditModal(true)}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                     >
+                      <Edit className="w-5 h-5" />
                       <span>Manage Trip</span>
-                    </button> */}
+                    </button>
                     <div className="text-center text-sm text-gray-500">
                       This is your trip
                     </div>
@@ -558,6 +561,21 @@ export const TripDetailPage: React.FC = () => {
         message={generateTripShareMessage()}
         shareUrl={`${window.location.origin}/trip/${trip?.id}`}
       />
+
+      {/* Edit Trip Modal */}
+      {trip && (
+        <EditTripModal
+          trip={trip}
+          open={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          onUpdate={() => {
+            if (id) loadTrip(id)
+          }}
+          onDelete={() => {
+            navigate('/dashboard')
+          }}
+        />
+      )}
     </div>
   )
 }

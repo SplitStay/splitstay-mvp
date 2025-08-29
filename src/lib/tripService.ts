@@ -72,7 +72,7 @@ export const createTrip = async (tripData: TripFormData): Promise<Trip> => {
   return data;
 };
 
-export const updateTrip = async (tripId: string, tripData: Partial<TripFormData>): Promise<Trip> => {
+export const updateTrip = async (tripId: string, tripData: any): Promise<Trip> => {
   const { data: { user } } = await supabase.auth.getUser();
   
   if (!user) {
@@ -82,19 +82,24 @@ export const updateTrip = async (tripId: string, tripData: Partial<TripFormData>
   const updateData: any = {};
   
   if (tripData.name) updateData.name = tripData.name;
+  if (tripData.description) updateData.description = tripData.description;
   if (tripData.vibe) updateData.description = tripData.vibe;
   if (tripData.location) updateData.location = tripData.location;
   if (tripData.bookingUrl !== undefined) updateData.bookingUrl = tripData.bookingUrl;
-  if (tripData.numberOfRooms) updateData.numberofrooms = tripData.numberOfRooms;
+  if (tripData.numberofrooms !== undefined) updateData.numberofrooms = tripData.numberofrooms;
+  if (tripData.numberOfRooms !== undefined) updateData.numberofrooms = tripData.numberOfRooms;
   if (tripData.rooms) updateData.rooms = tripData.rooms as any;
-  if (tripData.matchWith) updateData.matchwith = tripData.matchWith;
+  if (tripData.matchwith !== undefined) updateData.matchwith = tripData.matchwith;
+  if (tripData.matchWith !== undefined) updateData.matchwith = tripData.matchWith;
   if (tripData.flexible !== undefined) updateData.flexible = tripData.flexible;
   if (tripData.thumbnailUrl !== undefined) updateData.thumbnailUrl = tripData.thumbnailUrl;
+  if (tripData.ispublic !== undefined) updateData.ispublic = tripData.ispublic;
+  if (tripData.isPublic !== undefined) updateData.ispublic = tripData.isPublic;
 
   if (tripData.flexible !== undefined) {
     if (tripData.flexible) {
-      updateData.estimatedmonth = tripData.estimatedMonth;
-      updateData.estimatedyear = tripData.estimatedYear;
+      updateData.estimatedmonth = tripData.estimatedmonth || tripData.estimatedMonth;
+      updateData.estimatedyear = tripData.estimatedyear || tripData.estimatedYear;
       updateData.startDate = null;
       updateData.endDate = null;
     } else {
