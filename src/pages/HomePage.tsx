@@ -7,6 +7,16 @@ import { EmailConfirmationHandler } from "@/components/EmailConfirmationHandler"
 import logoImage from "@/assets/logo.jpg"
 import logoImageWhite from "@/assets/logoWhite.jpeg"
 import heroImage from "@/assets/hero-2.png"
+
+// Trustpilot global type
+declare global {
+  interface Window {
+    Trustpilot: {
+      loadFromElement: (element: Element | null) => void;
+    };
+  }
+}
+
 type UserPath = "host" | "guest" | null;
 
 const HomePage: React.FC = () => {
@@ -23,6 +33,35 @@ const HomePage: React.FC = () => {
 
   useEffect(() => {
     trackEvent('Homepage_View')
+    
+    // Check if Trustpilot script already exists
+    const existingScript = document.querySelector('script[src*="tp.widget.bootstrap"]');
+    
+    if (!existingScript) {
+      // Load Trustpilot script
+      const trustpilotScript = document.createElement('script');
+      trustpilotScript.type = 'text/javascript';
+      trustpilotScript.src = 'https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js';
+      trustpilotScript.async = true;
+      
+      // Initialize widgets after script loads
+      trustpilotScript.onload = () => {
+        setTimeout(() => {
+          if (window.Trustpilot) {
+            window.Trustpilot.loadFromElement(document.querySelector('.trustpilot-widget'));
+          }
+        }, 200);
+      };
+      
+      document.head.appendChild(trustpilotScript);
+    } else {
+      // Script already exists, just initialize
+      setTimeout(() => {
+        if (window.Trustpilot) {
+          window.Trustpilot.loadFromElement(document.querySelector('.trustpilot-widget'));
+        }
+      }, 200);
+    }
   }, [])
 
   const handleGetStarted = () => {
@@ -287,6 +326,29 @@ const HomePage: React.FC = () => {
               </p>
             </div>
 
+          </div>
+          
+          {/* Trustpilot Section */}
+          <div className="mt-12 sm:mt-16 text-center">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+              Trusted by Travelers Worldwide
+            </h2>
+            <p className="text-lg text-gray-600 mb-8">
+              See what our community says about their SplitStay experiences
+            </p>
+            
+            <div className="trustpilot-widget" 
+                 data-locale="fr-FR" 
+                 data-template-id="5419b6ffb0d04a076446a9af" 
+                 data-businessunit-id="68c2e6929c48f935dec54d57" 
+                 data-style-height="52px" 
+                 data-style-width="100%">
+              <a href="https://fr.trustpilot.com/review/splitstay.travel" 
+                 target="_blank" 
+                 rel="noopener">
+                Trustpilot
+              </a>
+            </div>
           </div>
         </div>
       </section>
