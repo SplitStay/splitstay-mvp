@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SplitStay Widget Examples</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #f8fafc;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .header h1 {
+            color: #1e293b;
+            font-size: 36px;
+            margin-bottom: 16px;
+        }
+        
+        .header p {
+            color: #64748b;
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .example-section {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .example-title {
+            color: #1e293b;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        
+        .example-description {
+            color: #64748b;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        
+        .widget-demo {
+            background: #f1f5f9;
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        
+        .code-block {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin-bottom: 16px;
+        }
+        
+        .copy-button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .copy-button:hover {
+            background: #1d4ed8;
+        }
+        
+        .integration-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 40px;
+        }
+        
+        .integration-card {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .integration-card h3 {
+            color: #1e293b;
+            margin-bottom: 12px;
+        }
+        
+        .integration-card p {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>SplitStay Widget Examples</h1>
+        <p>Embed SplitStay widgets on your website to help travelers discover accommodation sharing opportunities.</p>
+    </div>
+
+    <!-- Share Button Widget -->
+    <div class="example-section">
+        <h2 class="example-title">1. Share Button Widget</h2>
+        <p class="example-description">
+            A simple call-to-action button that directs users to post their trip on SplitStay. Perfect for travel blogs and booking confirmation pages.
+        </p>
+        
+        <div class="widget-demo">
+            <div class="splitstay-widget" data-type="share-button"></div>
+        </div>
+        
+        <div class="code-block"><!-- Include the SplitStay widget script -->
+&lt;script src="https://splitstay.travel/splitstay-widget.js" async&gt;&lt;/script&gt;
+
+&lt;!-- Basic share button --&gt;
+&lt;div class="splitstay-widget" data-type="share-button"&gt;&lt;/div&gt;
+
+&lt;!-- Custom text --&gt;
+&lt;div class="splitstay-widget" 
+     data-type="share-button" 
+     data-text="Split Your Hotel Costs"&gt;&lt;/div&gt;</div>
+        <button class="copy-button" onclick="copyCode(this)">Copy Code</button>
+    </div>
+
+    <!-- Find Partner Widget -->
+    <div class="example-section">
+        <h2 class="example-title">2. Find Partner Widget</h2>
+        <p class="example-description">
+            Directs users to browse available trips and find travel partners. Great for travel planning websites and forums.
+        </p>
+        
+        <div class="widget-demo">
+            <div class="splitstay-widget" data-type="find-partner"></div>
+        </div>
+        
+        <div class="code-block">&lt;div class="splitstay-widget" data-type="find-partner"&gt;&lt;/div&gt;
+
+&lt;!-- Custom text --&gt;
+&lt;div class="splitstay-widget" 
+     data-type="find-partner" 
+     data-text="Find Your Travel Buddy"&gt;&lt;/div&gt;</div>
+        <button class="copy-button" onclick="copyCode(this)">Copy Code</button>
+    </div>
+
+    <!-- Card Widget -->
+    <div class="example-section">
+        <h2 class="example-title">3. Card Widget</h2>
+        <p class="example-description">
+            A complete promotional card with title, description, and call-to-action. Perfect for sidebars and dedicated sections.
+        </p>
+        
+        <div class="widget-demo">
+            <div class="splitstay-widget" data-type="card"></div>
+        </div>
+        
+        <div class="code-block">&lt;div class="splitstay-widget" data-type="card"&gt;&lt;/div&gt;
+
+&lt;!-- Customized card --&gt;
+&lt;div class="splitstay-widget" 
+     data-type="card"
+     data-title="Save on Your Next Trip"
+     data-description="Join thousands of travelers sharing accommodation costs worldwide."
+     data-button-text="Start Saving"&gt;&lt;/div&gt;</div>
+        <button class="copy-button" onclick="copyCode(this)">Copy Code</button>
+    </div>
+
+    <!-- Compact Widget -->
+    <div class="example-section">
+        <h2 class="example-title">4. Compact Widget</h2>
+        <p class="example-description">
+            A minimal widget that fits inline with text content. Perfect for blog posts and article content.
+        </p>
+        
+        <div class="widget-demo">
+            <p>Looking to save on accommodation? Try <div class="splitstay-widget" data-type="compact" style="display: inline-block;"></div> for your next trip!</p>
+        </div>
+        
+        <div class="code-block">&lt;p&gt;Looking to save on accommodation? Try 
+&lt;div class="splitstay-widget" data-type="compact"&gt;&lt;/div&gt; 
+for your next trip!&lt;/p&gt;</div>
+        <button class="copy-button" onclick="copyCode(this)">Copy Code</button>
+    </div>
+
+    <!-- Configuration Options -->
+    <div class="example-section">
+        <h2 class="example-title">Configuration Options</h2>
+        <p class="example-description">
+            Customize your widgets with these data attributes:
+        </p>
+        
+        <div class="code-block">data-type="share-button|find-partner|card|compact"  // Widget type
+data-text="Custom Button Text"                      // Button text
+data-title="Custom Title"                           // Card title
+data-description="Custom Description"               // Card description
+data-button-text="Custom Button Text"              // Card button text
+data-campaign="your-campaign-name"                  // UTM campaign tracking</div>
+    </div>
+
+    <!-- Integration Examples -->
+    <div class="integration-section">
+        <div class="integration-card">
+            <h3>🏨 Hotel Booking Sites</h3>
+            <p>Add the share button widget to booking confirmation pages to help guests find roommates and reduce costs.</p>
+        </div>
+        
+        <div class="integration-card">
+            <h3>✈️ Travel Blogs</h3>
+            <p>Use the card widget in sidebars or the compact widget inline with travel tips and destination guides.</p>
+        </div>
+        
+        <div class="integration-card">
+            <h3>🎒 Travel Forums</h3>
+            <p>Integrate the find partner widget in discussion threads about specific destinations.</p>
+        </div>
+        
+        <div class="integration-card">
+            <h3>📱 Travel Apps</h3>
+            <p>Embed widgets in web views or use the API endpoints for native integrations.</p>
+        </div>
+    </div>
+
+    <!-- Include the widget script -->
+    <script src="splitstay-widget.js" async></script>
+    
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const text = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = '#059669';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '#2563eb';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
