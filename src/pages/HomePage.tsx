@@ -338,13 +338,13 @@ const HomePage: React.FC = () => {
             </p>
             
             <div className="trustpilot-widget" 
-                 data-locale="fr-FR" 
+                 data-locale="en-US" 
                  data-template-id="56278e9abfbbba0bdcd568bc" 
                  data-businessunit-id="68c2e6929c48f935dec54d57" 
                  data-style-height="52px" 
                  data-style-width="100%" 
                  data-token="ca6782ba-27ae-4953-8e1c-277fd41b135b">
-              <a href="https://fr.trustpilot.com/review/splitstay.travel" 
+              <a href="https://www.trustpilot.com/review/splitstay.travel" 
                  target="_blank" 
                  rel="noopener">
                 Trustpilot
