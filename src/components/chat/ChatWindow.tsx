@@ -42,6 +42,68 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 
   const otherUser = conversation.other_user;
 
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      // Use instant scroll for initial load, smooth for new messages
+      const behavior = loading ? 'instant' : 'smooth';
+      messagesEndRef.current.scrollIntoView({
+        behavior: behavior as ScrollBehavior,
+        block: 'end',
+      });
+    }
+  };
+
+  const loadMessages = async () => {
+    try {
+      setLoading(true);
+      const conversationMessages = await ChatService.getConversationMessages(
+        conversation.id,
+      );
+      setMessages(conversationMessages);
+      const ids = conversationMessages.map((m) => m.id);
+      if (user?.id && otherUser?.id) {
+        const receipts = await ChatService.fetchReadReceiptsForMessages(
+          ids,
+          otherUser.id,
+        );
+        setReadByOther(receipts);
+      }
+      if (user?.id) {
+        await ChatService.markMessagesAsRead(conversation.id);
+        // Notify parent component that messages were read
+        window.dispatchEvent(
+          new CustomEvent('messagesRead', {
+            detail: { conversationId: conversation.id },
+          }),
+        );
+      }
+    } catch (error) {
+      console.error('Error loading messages:', error);
+    } finally {
+      setLoading(false);
+      // Ensure scroll to bottom after loading is complete
+      setTimeout(() => scrollToBottom(), 50);
+    }
+  };
+
+  const loadPresence = async () => {
+    if (!otherUser?.id) return;
+    try {
+      const { data } = await supabase
+        .from('user_presence')
+        .select('is_online, last_active_at')
+        .eq('user_id', otherUser.id)
+        .single();
+      if (data) {
+        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+        const lastActive = new Date(data.last_active_at || 0);
+        setIsOtherUserOnline(data.is_online && lastActive > fiveMinutesAgo);
+      }
+    } catch (_error) {
+      setIsOtherUserOnline(false);
+    }
+  };
+
   useEffect(() => {
     loadMessages();
     loadPresence();
@@ -123,11 +185,9 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     conversation.id,
     otherUser?.id,
     // biome-ignore lint/correctness/useExhaustiveDependencies: loadPresence defined after useEffect
-    // biome-ignore lint/correctness/noInvalidUseBeforeDeclaration: Hoisting pattern
     loadPresence,
     otherUser,
     // biome-ignore lint/correctness/useExhaustiveDependencies: loadMessages defined after useEffect
-    // biome-ignore lint/correctness/noInvalidUseBeforeDeclaration: Hoisting pattern
     loadMessages,
     user?.id,
   ]);
@@ -139,60 +199,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     }, 10);
 
     return () => clearTimeout(timeoutId);
-    // biome-ignore lint/correctness/useExhaustiveDependencies: scrollToBottom defined after useEffect
-    // biome-ignore lint/correctness/noInvalidUseBeforeDeclaration: Hoisting pattern
+    // biome-ignore lint/correctness/useExhaustiveDependencies: scrollToBottom intentionally omitted
   }, [scrollToBottom]);
-
-  const loadMessages = async () => {
-    try {
-      setLoading(true);
-      const conversationMessages = await ChatService.getConversationMessages(
-        conversation.id,
-      );
-      setMessages(conversationMessages);
-      const ids = conversationMessages.map((m) => m.id);
-      if (user?.id && otherUser?.id) {
-        const receipts = await ChatService.fetchReadReceiptsForMessages(
-          ids,
-          otherUser.id,
-        );
-        setReadByOther(receipts);
-      }
-      if (user?.id) {
-        await ChatService.markMessagesAsRead(conversation.id);
-        // Notify parent component that messages were read
-        window.dispatchEvent(
-          new CustomEvent('messagesRead', {
-            detail: { conversationId: conversation.id },
-          }),
-        );
-      }
-    } catch (error) {
-      console.error('Error loading messages:', error);
-    } finally {
-      setLoading(false);
-      // Ensure scroll to bottom after loading is complete
-      setTimeout(() => scrollToBottom(), 50);
-    }
-  };
-
-  const loadPresence = async () => {
-    if (!otherUser?.id) return;
-    try {
-      const { data } = await supabase
-        .from('user_presence')
-        .select('is_online, last_active_at')
-        .eq('user_id', otherUser.id)
-        .single();
-      if (data) {
-        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-        const lastActive = new Date(data.last_active_at || 0);
-        setIsOtherUserOnline(data.is_online && lastActive > fiveMinutesAgo);
-      }
-    } catch (_error) {
-      setIsOtherUserOnline(false);
-    }
-  };
 
   const handleSendMessage = async (content: string) => {
     if (!user?.id || !content.trim()) return;
@@ -239,17 +247,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       console.error('Error sending file:', error);
     } finally {
       setSending(false);
-    }
-  };
-
-  const scrollToBottom = () => {
-    if (messagesEndRef.current) {
-      // Use instant scroll for initial load, smooth for new messages
-      const behavior = loading ? 'instant' : 'smooth';
-      messagesEndRef.current.scrollIntoView({
-        behavior: behavior as ScrollBehavior,
-        block: 'end',
-      });
     }
   };
 

@@ -21,7 +21,8 @@
       "correctness": {
         "useExhaustiveDependencies": "warn",
         "useHookAtTopLevel": "error",
-        "noUnusedVariables": "error"
+        "noUnusedVariables": "error",
+        "noInvalidUseBeforeDeclaration": "error"
       },
       "style": {
         "noCommonJs": "error",

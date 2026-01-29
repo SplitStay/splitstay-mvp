@@ -70,64 +70,6 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
       createDefaultRooms(trip.numberOfRooms || 1),
   });
 
-  useEffect(() => {
-    if (open && trip) {
-      const tripRooms =
-        (trip.rooms as RoomConfiguration[]) ||
-        createDefaultRooms(trip.numberOfRooms || 1);
-      setFormData({
-        name: trip.name || '',
-        location: trip.location || '',
-        description: trip.description || '',
-        bookingUrl: trip.bookingUrl || '',
-        flexible: trip.flexible || false,
-        startDate: trip.startDate || '',
-        endDate: trip.endDate || '',
-        estimatedMonth:
-          // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
-          (trip as any).estimatedmonth || (trip as any).estimatedMonth || '',
-        estimatedYear:
-          // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
-          (trip as any).estimatedyear || (trip as any).estimatedYear || '',
-        numberOfRooms: trip.numberOfRooms || 1,
-        matchWith:
-          // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
-          (trip as any).matchwith || (trip as any).matchWith || 'anyone',
-        isPublic:
-          // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
-          (trip as any).ispublic !== undefined ? (trip as any).ispublic : true,
-        rooms: tripRooms,
-      });
-
-      if (trip.bookingUrl) {
-        loadAccommodationPreview(trip.bookingUrl);
-      }
-    }
-    // biome-ignore lint/correctness/useExhaustiveDependencies: Function is defined after useEffect
-    // biome-ignore lint/correctness/noInvalidUseBeforeDeclaration: Hoisting pattern
-  }, [open, trip, loadAccommodationPreview]);
-
-  useEffect(() => {
-    if (formData.numberOfRooms !== formData.rooms.length) {
-      setFormData((prev) => ({
-        ...prev,
-        rooms: createDefaultRooms(formData.numberOfRooms),
-      }));
-    }
-  }, [formData.numberOfRooms, formData.rooms.length]);
-
-  useEffect(() => {
-    if (formData.startDate && !formData.flexible) {
-      const startDate = new Date(formData.startDate);
-      const endDate = new Date(startDate);
-      endDate.setDate(endDate.getDate() + 1);
-      setFormData((prev) => ({
-        ...prev,
-        endDate: endDate.toISOString().split('T')[0],
-      }));
-    }
-  }, [formData.startDate, formData.flexible]);
-
   const loadAccommodationPreview = async (url: string) => {
     if (!url || !url.trim()) {
       setAccommodationPreview({
@@ -166,6 +108,63 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
       setPreviewLoading(false);
     }
   };
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: loadAccommodationPreview intentionally omitted to prevent infinite loops
+  useEffect(() => {
+    if (open && trip) {
+      const tripRooms =
+        (trip.rooms as RoomConfiguration[]) ||
+        createDefaultRooms(trip.numberOfRooms || 1);
+      setFormData({
+        name: trip.name || '',
+        location: trip.location || '',
+        description: trip.description || '',
+        bookingUrl: trip.bookingUrl || '',
+        flexible: trip.flexible || false,
+        startDate: trip.startDate || '',
+        endDate: trip.endDate || '',
+        estimatedMonth:
+          // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
+          (trip as any).estimatedmonth || (trip as any).estimatedMonth || '',
+        estimatedYear:
+          // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
+          (trip as any).estimatedyear || (trip as any).estimatedYear || '',
+        numberOfRooms: trip.numberOfRooms || 1,
+        matchWith:
+          // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
+          (trip as any).matchwith || (trip as any).matchWith || 'anyone',
+        isPublic:
+          // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
+          (trip as any).ispublic !== undefined ? (trip as any).ispublic : true,
+        rooms: tripRooms,
+      });
+
+      if (trip.bookingUrl) {
+        loadAccommodationPreview(trip.bookingUrl);
+      }
+    }
+  }, [open, trip]);
+
+  useEffect(() => {
+    if (formData.numberOfRooms !== formData.rooms.length) {
+      setFormData((prev) => ({
+        ...prev,
+        rooms: createDefaultRooms(formData.numberOfRooms),
+      }));
+    }
+  }, [formData.numberOfRooms, formData.rooms.length]);
+
+  useEffect(() => {
+    if (formData.startDate && !formData.flexible) {
+      const startDate = new Date(formData.startDate);
+      const endDate = new Date(startDate);
+      endDate.setDate(endDate.getDate() + 1);
+      setFormData((prev) => ({
+        ...prev,
+        endDate: endDate.toISOString().split('T')[0],
+      }));
+    }
+  }, [formData.startDate, formData.flexible]);
 
   const updateRoom = (
     roomId: number,

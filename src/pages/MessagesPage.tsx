@@ -31,6 +31,20 @@ export const MessagesPage: React.FC = () => {
   // Get initial chat ID from URL params
   const initialChatId = searchParams.get('chat');
 
+  const loadConversations = async () => {
+    if (!user?.id) return;
+
+    try {
+      setLoading(true);
+      const userChats = await ChatService.getUserConversations(user.id);
+      setConversations(userChats);
+    } catch (error) {
+      console.error('Error loading conversations:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 1024);
@@ -46,6 +60,7 @@ export const MessagesPage: React.FC = () => {
     }
   }, [initialChatId]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: loadConversations intentionally omitted to prevent infinite loops
   useEffect(() => {
     if (user?.id) {
       loadConversations();
@@ -197,23 +212,7 @@ export const MessagesPage: React.FC = () => {
         );
       };
     }
-    // biome-ignore lint/correctness/useExhaustiveDependencies: loadConversations defined after useEffect
-    // biome-ignore lint/correctness/noInvalidUseBeforeDeclaration: Function hoisted logically
-  }, [user?.id, conversations.map, loadConversations]);
-
-  const loadConversations = async () => {
-    if (!user?.id) return;
-
-    try {
-      setLoading(true);
-      const userChats = await ChatService.getUserConversations(user.id);
-      setConversations(userChats);
-    } catch (error) {
-      console.error('Error loading conversations:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [user?.id, conversations.map]);
 
   const handleSelectChat = (chatId: string) => {
     setSelectedChatId(chatId);
