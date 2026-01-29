@@ -13,7 +13,10 @@
     "preview": "vite preview",
     "list-tables": "node scripts/list-tables.mjs",
     "test": "vitest",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "db:reset": "DOCKER_HOST=unix:///run/user/1000/podman/podman.sock npx supabase db reset",
+    "db:start": "DOCKER_HOST=unix:///run/user/1000/podman/podman.sock npx supabase start",
+    "db:stop": "DOCKER_HOST=unix:///run/user/1000/podman/podman.sock npx supabase stop"
   },
   "dependencies": {
     "@amplitude/analytics-browser": "^2.11.8",
