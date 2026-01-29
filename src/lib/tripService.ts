@@ -53,25 +53,25 @@ export const createTrip = async (tripData: TripFormData): Promise<Trip> => {
     location: tripData.location,
     hostId: user.id,
     bookingUrl: tripData.bookingUrl,
-    numberofrooms: tripData.numberOfRooms,
+    numberOfRooms: tripData.numberOfRooms,
     // biome-ignore lint/suspicious/noExplicitAny: Supabase JSON column
     rooms: tripData.rooms as any,
-    matchwith: tripData.matchWith,
+    matchWith: tripData.matchWith,
     flexible: tripData.flexible,
-    ispublic: tripData.isPublic ?? true,
+    isPublic: tripData.isPublic ?? true,
     thumbnailUrl: tripData.thumbnailUrl,
     ...(tripData.flexible
       ? {
-          estimatedmonth: tripData.estimatedMonth,
-          estimatedyear: tripData.estimatedYear,
+          estimatedMonth: tripData.estimatedMonth,
+          estimatedYear: tripData.estimatedYear,
           startDate: null,
           endDate: null,
         }
       : {
           startDate: tripData.startDate,
           endDate: tripData.endDate,
-          estimatedmonth: null,
-          estimatedyear: null,
+          estimatedMonth: null,
+          estimatedYear: null,
         }),
   };
 
@@ -111,35 +111,28 @@ export const updateTrip = async (
   if (tripData.location) updateData.location = tripData.location;
   if (tripData.bookingUrl !== undefined)
     updateData.bookingUrl = tripData.bookingUrl;
-  if (tripData.numberofrooms !== undefined)
-    updateData.numberofrooms = tripData.numberofrooms;
   if (tripData.numberOfRooms !== undefined)
-    updateData.numberofrooms = tripData.numberOfRooms;
+    updateData.numberOfRooms = tripData.numberOfRooms;
   // biome-ignore lint/suspicious/noExplicitAny: Supabase JSON column
   if (tripData.rooms) updateData.rooms = tripData.rooms as any;
-  if (tripData.matchwith !== undefined)
-    updateData.matchwith = tripData.matchwith;
   if (tripData.matchWith !== undefined)
-    updateData.matchwith = tripData.matchWith;
+    updateData.matchWith = tripData.matchWith;
   if (tripData.flexible !== undefined) updateData.flexible = tripData.flexible;
   if (tripData.thumbnailUrl !== undefined)
     updateData.thumbnailUrl = tripData.thumbnailUrl;
-  if (tripData.ispublic !== undefined) updateData.ispublic = tripData.ispublic;
-  if (tripData.isPublic !== undefined) updateData.ispublic = tripData.isPublic;
+  if (tripData.isPublic !== undefined) updateData.isPublic = tripData.isPublic;
 
   if (tripData.flexible !== undefined) {
     if (tripData.flexible) {
-      updateData.estimatedmonth =
-        tripData.estimatedmonth || tripData.estimatedMonth;
-      updateData.estimatedyear =
-        tripData.estimatedyear || tripData.estimatedYear;
+      updateData.estimatedMonth = tripData.estimatedMonth;
+      updateData.estimatedYear = tripData.estimatedYear;
       updateData.startDate = null;
       updateData.endDate = null;
     } else {
       updateData.startDate = tripData.startDate;
       updateData.endDate = tripData.endDate;
-      updateData.estimatedmonth = null;
-      updateData.estimatedyear = null;
+      updateData.estimatedMonth = null;
+      updateData.estimatedYear = null;
     }
   }
 
@@ -303,8 +296,8 @@ export const searchTrips = async (filters: {
     filters.estimatedYear
   ) {
     query = query
-      .eq('estimatedmonth', filters.estimatedMonth)
-      .eq('estimatedyear', filters.estimatedYear);
+      .eq('estimatedMonth', filters.estimatedMonth)
+      .eq('estimatedYear', filters.estimatedYear);
   }
 
   const { data, error } = await query

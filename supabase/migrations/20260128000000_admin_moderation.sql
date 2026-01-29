@@ -74,7 +74,7 @@ CREATE POLICY "Admins can unhide trips"
 CREATE OR REPLACE VIEW searchable_trips AS
 SELECT t.*
 FROM trip t
-WHERE t.ispublic = true
+WHERE t."isPublic" = true
   AND NOT EXISTS (
     SELECT 1 FROM hidden_trips ht WHERE ht."tripId" = t.id
   );

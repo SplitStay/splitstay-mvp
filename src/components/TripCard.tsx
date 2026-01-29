@@ -56,10 +56,8 @@ export const TripCard: React.FC<TripCardProps> = ({
 
   const getDateDisplay = () => {
     if (trip.flexible) {
-      // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
-      const month = (trip as any).estimatedmonth || trip.estimatedMonth;
-      // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
-      const year = (trip as any).estimatedyear || trip.estimatedYear;
+      const month = trip.estimatedMonth;
+      const year = trip.estimatedYear;
       return month && year ? `${month} ${year}` : 'Dates TBD';
     }
 

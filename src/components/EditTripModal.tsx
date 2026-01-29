@@ -193,24 +193,24 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
         description: formData.description,
         location: formData.location,
         bookingUrl: formData.bookingUrl,
-        numberofrooms: formData.numberOfRooms,
+        numberOfRooms: formData.numberOfRooms,
         rooms: formData.rooms,
-        matchwith: formData.matchWith,
+        matchWith: formData.matchWith,
         flexible: formData.flexible,
-        ispublic: formData.isPublic,
+        isPublic: formData.isPublic,
         thumbnailUrl: accommodationPreview.image || trip.thumbnailUrl,
         ...(formData.flexible
           ? {
-              estimatedmonth: formData.estimatedMonth,
-              estimatedyear: formData.estimatedYear,
+              estimatedMonth: formData.estimatedMonth,
+              estimatedYear: formData.estimatedYear,
               startDate: null,
               endDate: null,
             }
           : {
               startDate: formData.startDate,
               endDate: formData.endDate,
-              estimatedmonth: null,
-              estimatedyear: null,
+              estimatedMonth: null,
+              estimatedYear: null,
             }),
       };
 
