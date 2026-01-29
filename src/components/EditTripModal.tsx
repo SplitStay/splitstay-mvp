@@ -53,18 +53,11 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
     flexible: trip.flexible || false,
     startDate: trip.startDate || '',
     endDate: trip.endDate || '',
-    estimatedMonth:
-      // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
-      (trip as any).estimatedmonth || (trip as any).estimatedMonth || '',
-    estimatedYear:
-      // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
-      (trip as any).estimatedyear || (trip as any).estimatedYear || '',
+    estimatedMonth: trip.estimatedMonth || '',
+    estimatedYear: trip.estimatedYear || '',
     numberOfRooms: trip.numberOfRooms || 1,
-    // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
-    matchWith: (trip as any).matchwith || (trip as any).matchWith || 'anyone',
-    isPublic:
-      // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
-      (trip as any).ispublic !== undefined ? (trip as any).ispublic : true,
+    matchWith: trip.matchWith || 'anyone',
+    isPublic: trip.isPublic ?? true,
     rooms:
       (trip.rooms as RoomConfiguration[]) ||
       createDefaultRooms(trip.numberOfRooms || 1),
@@ -123,19 +116,11 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
         flexible: trip.flexible || false,
         startDate: trip.startDate || '',
         endDate: trip.endDate || '',
-        estimatedMonth:
-          // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
-          (trip as any).estimatedmonth || (trip as any).estimatedMonth || '',
-        estimatedYear:
-          // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
-          (trip as any).estimatedyear || (trip as any).estimatedYear || '',
+        estimatedMonth: trip.estimatedMonth || '',
+        estimatedYear: trip.estimatedYear || '',
         numberOfRooms: trip.numberOfRooms || 1,
-        matchWith:
-          // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
-          (trip as any).matchwith || (trip as any).matchWith || 'anyone',
-        isPublic:
-          // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
-          (trip as any).ispublic !== undefined ? (trip as any).ispublic : true,
+        matchWith: trip.matchWith || 'anyone',
+        isPublic: trip.isPublic ?? true,
         rooms: tripRooms,
       });
 
