@@ -1,17 +1,18 @@
-import React, { useState, useRef, KeyboardEvent } from 'react'
-import { Send, Paperclip, Smile } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { FileUpload } from './FileUpload'
-import { UploadResult } from '../../lib/storageService'
-import { EmojiReactionPicker } from './EmojiReactionPicker'
+import { AnimatePresence, motion } from 'framer-motion';
+import { Paperclip, Send, Smile } from 'lucide-react';
+import type React from 'react';
+import { type KeyboardEvent, useRef, useState } from 'react';
+import type { UploadResult } from '../../lib/storageService';
+import { EmojiReactionPicker } from './EmojiReactionPicker';
+import { FileUpload } from './FileUpload';
 
 interface MessageInputProps {
-  onSendMessage: (message: string) => void
-  onFileUpload?: (uploadResult: UploadResult) => void
-  conversationId?: string
-  userId?: string
-  disabled?: boolean
-  placeholder?: string
+  onSendMessage: (message: string) => void;
+  onFileUpload?: (uploadResult: UploadResult) => void;
+  conversationId?: string;
+  userId?: string;
+  disabled?: boolean;
+  placeholder?: string;
 }
 
 export const MessageInput: React.FC<MessageInputProps> = ({
@@ -20,55 +21,58 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   conversationId,
   userId,
   disabled = false,
-  placeholder = 'Type a message...'
+  placeholder = 'Type a message...',
 }) => {
-  const [message, setMessage] = useState('')
-  const [showFileUpload, setShowFileUpload] = useState(false)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const emojiBtnRef = useRef<HTMLButtonElement>(null)
-  const [emojiOpen, setEmojiOpen] = useState(false)
-  const [emojiPosition, setEmojiPosition] = useState<{ x: number; y: number } | undefined>(undefined)
+  const [message, setMessage] = useState('');
+  const [showFileUpload, setShowFileUpload] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const emojiBtnRef = useRef<HTMLButtonElement>(null);
+  const [emojiOpen, setEmojiOpen] = useState(false);
+  const [emojiPosition, setEmojiPosition] = useState<
+    { x: number; y: number } | undefined
+  >(undefined);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (message.trim() && !disabled) {
-      onSendMessage(message)
-      setMessage('')
+      onSendMessage(message);
+      setMessage('');
       if (textareaRef.current) {
-        textareaRef.current.style.height = 'auto'
+        textareaRef.current.style.height = 'auto';
       }
     }
-  }
+  };
 
   const handleKeyPress = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSubmit(e as any)
+      e.preventDefault();
+      // biome-ignore lint/suspicious/noExplicitAny: Event type coercion
+      handleSubmit(e as any);
     }
-  }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setMessage(e.target.value)
-    
+    setMessage(e.target.value);
+
     // Auto-resize textarea
-    const textarea = e.target
-    textarea.style.height = 'auto'
-    textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`
-  }
+    const textarea = e.target;
+    textarea.style.height = 'auto';
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+  };
 
   const openEmojiPicker = () => {
-    const rect = emojiBtnRef.current?.getBoundingClientRect()
+    const rect = emojiBtnRef.current?.getBoundingClientRect();
     if (rect) {
-      setEmojiPosition({ x: rect.right, y: rect.bottom })
+      setEmojiPosition({ x: rect.right, y: rect.bottom });
     } else {
-      setEmojiPosition(undefined)
+      setEmojiPosition(undefined);
     }
-    setEmojiOpen(true)
-  }
+    setEmojiOpen(true);
+  };
 
   const handleEmojiSelect = (emoji: string) => {
-    setMessage(prev => prev + emoji)
-  }
+    setMessage((prev) => prev + emoji);
+  };
 
   return (
     <form onSubmit={handleSubmit} className="p-4">
@@ -78,7 +82,9 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           type="button"
           onClick={() => setShowFileUpload(!showFileUpload)}
           className={`flex-shrink-0 p-2 hover:bg-gray-100 rounded-lg transition-colors ${
-            showFileUpload ? 'text-blue-600 bg-blue-50' : 'text-gray-500 hover:text-gray-700'
+            showFileUpload
+              ? 'text-blue-600 bg-blue-50'
+              : 'text-gray-500 hover:text-gray-700'
           }`}
           disabled={disabled}
         >
@@ -98,7 +104,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
             style={{ minHeight: '48px', maxHeight: '120px' }}
             rows={1}
           />
-          
+
           {/* Emoji button */}
           <button
             ref={emojiBtnRef}
@@ -140,8 +146,8 @@ export const MessageInput: React.FC<MessageInputProps> = ({
               conversationId={conversationId}
               userId={userId}
               onFileSelect={(result) => {
-                onFileUpload?.(result)
-                setShowFileUpload(false)
+                onFileUpload?.(result);
+                setShowFileUpload(false);
               }}
             />
           </motion.div>
@@ -156,6 +162,5 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         onClose={() => setEmojiOpen(false)}
       />
     </form>
-  )
-}
-
+  );
+};

@@ -1,15 +1,13 @@
 /**
  * SplitStay Embeddable Widget
  * Version: 1.0.0
- * 
+ *
  * Usage:
  * <script src="https://splitstay.travel/splitstay-widget.js" async></script>
  * <div class="splitstay-widget" data-type="share-button"></div>
  */
 
-(function() {
-  'use strict';
-
+(() => {
   // Configuration
   const SPLITSTAY_BASE_URL = 'https://splitstay.travel';
   const WIDGET_VERSION = '1.0.0';
@@ -132,7 +130,7 @@
         ${config.text || 'Share with SplitStay'}
       </a>
     `,
-    
+
     'find-partner': (config) => `
       <a href="${SPLITSTAY_BASE_URL}/find-partners?utm_source=widget&utm_medium=embed&utm_campaign=${config.campaign || 'partner'}" 
          target="_blank" 
@@ -142,8 +140,8 @@
         ${config.text || 'Find Travel Partner'}
       </a>
     `,
-    
-    'card': (config) => `
+
+    card: (config) => `
       <div class="splitstay-card">
         <h3>${config.title || 'Split Your Travel Costs'}</h3>
         <p>${config.description || 'Connect with verified travelers and save up to 50% on accommodation costs.'}</p>
@@ -156,8 +154,8 @@
         </a>
       </div>
     `,
-    
-    'compact': (config) => `
+
+    compact: (config) => `
       <a href="${SPLITSTAY_BASE_URL}?utm_source=widget&utm_medium=embed&utm_campaign=${config.campaign || 'partner'}" 
          target="_blank" 
          rel="noopener noreferrer"
@@ -165,7 +163,7 @@
         ${SPLITSTAY_ICON}
         ${config.text || 'SplitStay'}
       </a>
-    `
+    `,
   };
 
   // Initialize widget
@@ -177,22 +175,22 @@
       description: element.getAttribute('data-description'),
       buttonText: element.getAttribute('data-button-text'),
       campaign: element.getAttribute('data-campaign'),
-      theme: element.getAttribute('data-theme') || 'default'
+      theme: element.getAttribute('data-theme') || 'default',
     };
 
     const template = WIDGET_TEMPLATES[type];
     if (template) {
       element.innerHTML = template(config);
-      
+
       // Add tracking
       const links = element.querySelectorAll('a');
-      links.forEach(link => {
+      links.forEach((link) => {
         link.addEventListener('click', () => {
           // Track widget click (you can integrate with your analytics)
           if (window.gtag) {
             window.gtag('event', 'widget_click', {
               widget_type: type,
-              campaign: config.campaign || 'partner'
+              campaign: config.campaign || 'partner',
             });
           }
         });
@@ -203,7 +201,7 @@
   // Inject CSS
   function injectStyles() {
     if (document.getElementById('splitstay-widget-styles')) return;
-    
+
     const style = document.createElement('style');
     style.id = 'splitstay-widget-styles';
     style.textContent = CSS_STYLES;
@@ -213,9 +211,11 @@
   // Initialize all widgets
   function initializeAllWidgets() {
     injectStyles();
-    
-    const widgets = document.querySelectorAll('.splitstay-widget:not([data-initialized])');
-    widgets.forEach(widget => {
+
+    const widgets = document.querySelectorAll(
+      '.splitstay-widget:not([data-initialized])',
+    );
+    widgets.forEach((widget) => {
       initializeWidget(widget);
       widget.setAttribute('data-initialized', 'true');
     });
@@ -233,16 +233,22 @@
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         mutation.addedNodes.forEach((node) => {
-          if (node.nodeType === 1) { // Element node
-            if (node.classList && node.classList.contains('splitstay-widget') && !node.getAttribute('data-initialized')) {
+          if (node.nodeType === 1) {
+            // Element node
+            if (
+              node.classList?.contains('splitstay-widget') &&
+              !node.getAttribute('data-initialized')
+            ) {
               initializeWidget(node);
               node.setAttribute('data-initialized', 'true');
             }
-            
+
             // Check child elements
-            const childWidgets = node.querySelectorAll && node.querySelectorAll('.splitstay-widget:not([data-initialized])');
+            const childWidgets = node.querySelectorAll?.(
+              '.splitstay-widget:not([data-initialized])',
+            );
             if (childWidgets) {
-              childWidgets.forEach(widget => {
+              childWidgets.forEach((widget) => {
                 initializeWidget(widget);
                 widget.setAttribute('data-initialized', 'true');
               });
@@ -251,10 +257,10 @@
         });
       });
     });
-    
+
     observer.observe(document.body, {
       childList: true,
-      subtree: true
+      subtree: true,
     });
   }
 
@@ -262,7 +268,6 @@
   window.SplitStayWidget = {
     version: WIDGET_VERSION,
     init: initializeAllWidgets,
-    initElement: initializeWidget
+    initElement: initializeWidget,
   };
-
 })();

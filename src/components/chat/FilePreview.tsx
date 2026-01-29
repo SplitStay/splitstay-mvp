@@ -1,14 +1,15 @@
-import React, { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Download, Play, FileText, Image as ImageIcon, Video } from 'lucide-react'
-import { StorageService } from '../../lib/storageService'
+import { motion } from 'framer-motion';
+import { Download, FileText, Image as ImageIcon, Video } from 'lucide-react';
+import type React from 'react';
+import { useState } from 'react';
+import { StorageService } from '../../lib/storageService';
 
 interface FilePreviewProps {
-  fileName: string
-  fileSize: number
-  mimeType: string
-  publicUrl: string
-  className?: string
+  fileName: string;
+  fileSize: number;
+  mimeType: string;
+  publicUrl: string;
+  className?: string;
 }
 
 export const FilePreview: React.FC<FilePreviewProps> = ({
@@ -16,26 +17,26 @@ export const FilePreview: React.FC<FilePreviewProps> = ({
   fileSize,
   mimeType,
   publicUrl,
-  className = ''
+  className = '',
 }) => {
-  const [imageError, setImageError] = useState(false)
-  const [videoError, setVideoError] = useState(false)
+  const [imageError, setImageError] = useState(false);
+  const [videoError, setVideoError] = useState(false);
 
   const handleDownload = () => {
-    const link = document.createElement('a')
-    link.href = publicUrl
-    link.download = fileName
-    link.target = '_blank'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  }
+    const link = document.createElement('a');
+    link.href = publicUrl;
+    link.download = fileName;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
-  const isImage = mimeType.startsWith('image/')
-  const isVideo = mimeType.startsWith('video/')
-  const extension = fileName.split('.').pop()?.toLowerCase() || ''
-  const isPdf = mimeType === 'application/pdf' || extension === 'pdf'
-  const isDocument = !isImage && !isVideo
+  const isImage = mimeType.startsWith('image/');
+  const isVideo = mimeType.startsWith('video/');
+  const extension = fileName.split('.').pop()?.toLowerCase() || '';
+  const isPdf = mimeType === 'application/pdf' || extension === 'pdf';
+  const isDocument = !isImage && !isVideo;
 
   if (isImage && !imageError) {
     return (
@@ -51,6 +52,7 @@ export const FilePreview: React.FC<FilePreviewProps> = ({
           onError={() => setImageError(true)}
         />
         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded-lg flex items-center justify-center">
+          {/* biome-ignore lint/a11y/useButtonType: Download action button */}
           <button
             onClick={handleDownload}
             className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white bg-opacity-90 hover:bg-opacity-100 rounded-full p-2 shadow-lg"
@@ -60,10 +62,12 @@ export const FilePreview: React.FC<FilePreviewProps> = ({
         </div>
         <div className="mt-1">
           <p className="text-xs text-gray-500 truncate">{fileName}</p>
-          <p className="text-xs text-gray-400">{StorageService.formatFileSize(fileSize)}</p>
+          <p className="text-xs text-gray-400">
+            {StorageService.formatFileSize(fileSize)}
+          </p>
         </div>
       </motion.div>
-    )
+    );
   }
 
   if (isVideo && !videoError) {
@@ -73,6 +77,7 @@ export const FilePreview: React.FC<FilePreviewProps> = ({
         animate={{ opacity: 1, scale: 1 }}
         className={`relative group max-w-sm ${className}`}
       >
+        {/* biome-ignore lint/a11y/useMediaCaption: User uploaded video */}
         <video
           controls
           className="rounded-lg max-w-full h-auto max-h-64"
@@ -84,10 +89,12 @@ export const FilePreview: React.FC<FilePreviewProps> = ({
         </video>
         <div className="mt-1">
           <p className="text-xs text-gray-500 truncate">{fileName}</p>
-          <p className="text-xs text-gray-400">{StorageService.formatFileSize(fileSize)}</p>
+          <p className="text-xs text-gray-400">
+            {StorageService.formatFileSize(fileSize)}
+          </p>
         </div>
       </motion.div>
-    )
+    );
   }
 
   // PDF: show a lightweight embedded preview when possible
@@ -104,8 +111,12 @@ export const FilePreview: React.FC<FilePreviewProps> = ({
               {extension || 'pdf'}
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">{fileName}</p>
-              <p className="text-xs text-gray-500">{StorageService.formatFileSize(fileSize)}</p>
+              <p className="text-sm font-medium text-gray-900 truncate">
+                {fileName}
+              </p>
+              <p className="text-xs text-gray-500">
+                {StorageService.formatFileSize(fileSize)}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-1">
@@ -117,6 +128,7 @@ export const FilePreview: React.FC<FilePreviewProps> = ({
             >
               View
             </a>
+            {/* biome-ignore lint/a11y/useButtonType: Download action button */}
             <button
               onClick={handleDownload}
               className="p-1 hover:bg-gray-100 rounded"
@@ -127,7 +139,12 @@ export const FilePreview: React.FC<FilePreviewProps> = ({
           </div>
         </div>
         <div className="h-56 bg-gray-50">
-          <object data={publicUrl} type="application/pdf" width="100%" height="100%">
+          <object
+            data={publicUrl}
+            type="application/pdf"
+            width="100%"
+            height="100%"
+          >
             <div className="flex items-center justify-center h-full">
               <div className="text-xs text-gray-500 p-3 text-center">
                 PDF preview unavailable. Click "View" to open in a new tab.
@@ -136,7 +153,7 @@ export const FilePreview: React.FC<FilePreviewProps> = ({
           </object>
         </div>
       </motion.div>
-    )
+    );
   }
 
   // Generic document fallback card
@@ -158,7 +175,7 @@ export const FilePreview: React.FC<FilePreviewProps> = ({
             )}
           </div>
         </div>
-        
+
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-gray-900 truncate">
             {fileName}
@@ -167,7 +184,7 @@ export const FilePreview: React.FC<FilePreviewProps> = ({
             {StorageService.formatFileSize(fileSize)}
           </p>
         </div>
-        
+
         <div className="flex items-center gap-1">
           <a
             href={publicUrl}
@@ -177,6 +194,7 @@ export const FilePreview: React.FC<FilePreviewProps> = ({
           >
             Open
           </a>
+          {/* biome-ignore lint/a11y/useButtonType: Download action button */}
           <button
             onClick={handleDownload}
             className="flex-shrink-0 p-2 hover:bg-gray-200 rounded-lg transition-colors"
@@ -187,5 +205,5 @@ export const FilePreview: React.FC<FilePreviewProps> = ({
         </div>
       </div>
     </motion.div>
-  )
-}
+  );
+};

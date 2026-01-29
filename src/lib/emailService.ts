@@ -1,26 +1,32 @@
-import { supabase } from './supabase'
+import { supabase } from './supabase';
 
+// biome-ignore lint/complexity/noStaticOnlyClass: Service pattern
 export class EmailService {
   // Send email via edge function
-  static async sendEmail(to: string, subject: string, body: string): Promise<boolean> {
+  static async sendEmail(
+    to: string,
+    subject: string,
+    body: string,
+  ): Promise<boolean> {
     try {
+      // biome-ignore lint/correctness/noUnusedVariables: data unused but destructured for API clarity
       const { data, error } = await supabase.functions.invoke('send-email', {
         body: {
           to,
           subject,
-          body
-        }
-      })
+          body,
+        },
+      });
 
       if (error) {
-        console.error('Email error:', error)
-        return false
+        console.error('Email error:', error);
+        return false;
       }
 
-      return true
+      return true;
     } catch (error) {
-      console.error('Failed to send email:', error)
-      return false
+      console.error('Failed to send email:', error);
+      return false;
     }
   }
 
@@ -31,16 +37,16 @@ export class EmailService {
         .from('user_presence')
         .select('is_online, last_seen_at')
         .eq('user_id', userId)
-        .single()
+        .single();
 
-      if (!data) return false
+      if (!data) return false;
 
-      const tenSecondsAgo = new Date(Date.now() - 10 * 1000)
-      const lastSeen = new Date(data.last_seen_at)
+      const tenSecondsAgo = new Date(Date.now() - 10 * 1000);
+      const lastSeen = new Date(data.last_seen_at);
 
-      return data.is_online && lastSeen > tenSecondsAgo
-    } catch (error) {
-      return false
+      return data.is_online && lastSeen > tenSecondsAgo;
+    } catch (_error) {
+      return false;
     }
   }
 
@@ -49,39 +55,39 @@ export class EmailService {
     senderId: string,
     recipientId: string,
     messageContent: string,
-    conversationId: string
+    conversationId: string,
   ): Promise<void> {
     try {
       // Check if recipient is online
-      const isOnline = await this.isUserOnline(recipientId)
-      if (isOnline) return // Don't send email if user is online
+      const isOnline = await EmailService.isUserOnline(recipientId);
+      if (isOnline) return; // Don't send email if user is online
 
       // Get user details
       const { data: recipient } = await supabase
         .from('user')
         .select('email, name')
         .eq('id', recipientId)
-        .single()
+        .single();
 
       const { data: sender } = await supabase
         .from('user')
         .select('name')
         .eq('id', senderId)
-        .single()
+        .single();
 
-      if (!recipient?.email) return
+      if (!recipient?.email) return;
 
-      const senderName = sender?.name || 'a user'
-      const subject = `New message from ${senderName} on SplitStay`
+      const senderName = sender?.name || 'a user';
+      const subject = `New message from ${senderName} on SplitStay`;
       const body = `You have a new message from ${senderName} on SplitStay:
 
-${messageContent.length > 200 ? messageContent.substring(0, 200) + '...' : messageContent}
+${messageContent.length > 200 ? `${messageContent.substring(0, 200)}...` : messageContent}
 
-View the conversation at: https://splitstay.travel/messages?chat=${conversationId}`
+View the conversation at: https://splitstay.travel/messages?chat=${conversationId}`;
 
-      await this.sendEmail(recipient.email, subject, body)
+      await EmailService.sendEmail(recipient.email, subject, body);
     } catch (error) {
-      console.error('Failed to send offline message notification:', error)
+      console.error('Failed to send offline message notification:', error);
     }
   }
 
@@ -89,7 +95,7 @@ View the conversation at: https://splitstay.travel/messages?chat=${conversationI
   static async notifyTripRequest(
     requesterId: string,
     tripId: string,
-    message?: string
+    message?: string,
   ): Promise<void> {
     try {
       // Get trip and host details
@@ -102,34 +108,38 @@ View the conversation at: https://splitstay.travel/messages?chat=${conversationI
           host:user!trip_hostId_fkey(email, name)
         `)
         .eq('id', tripId)
-        .single()
+        .single();
 
       const { data: requester } = await supabase
         .from('user')
         .select('name')
         .eq('id', requesterId)
-        .single()
+        .single();
 
-      if (!trip?.host?.email) return
+      if (!trip?.host?.email) return;
 
-      const requesterName = requester?.name || 'Someone'
-      const hostName = trip.host.name || 'there'
-      
-      const subject = `${requesterName} wants to join your trip to ${trip.location}`
+      const requesterName = requester?.name || 'Someone';
+      const hostName = trip.host.name || 'there';
+
+      const subject = `${requesterName} wants to join your trip to ${trip.location}`;
       const body = `Hi ${hostName},
 
 ${requesterName} has requested to join your trip "${trip.name}" in ${trip.location}.
 
-${message ? `Their message: ${message}
+${
+  message
+    ? `Their message: ${message}
 
-` : ''}View and respond to this request at: https://splitstay.com/messages
+`
+    : ''
+}View and respond to this request at: https://splitstay.com/messages
 
 Happy travels!
-The SplitStay Team`
+The SplitStay Team`;
 
-      await this.sendEmail(trip.host.email, subject, body)
+      await EmailService.sendEmail(trip.host.email, subject, body);
     } catch (error) {
-      console.error('Failed to send trip request notification:', error)
+      console.error('Failed to send trip request notification:', error);
     }
   }
 }

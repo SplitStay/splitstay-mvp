@@ -35,27 +35,27 @@ export const formatTripDate = (trip: {
     }
     return 'Dates TBD';
   }
-  
+
   if (trip.startDate && trip.endDate) {
     const start = parseLocalDate(trip.startDate);
     const end = parseLocalDate(trip.endDate);
-    
+
     if (start && end) {
-      const startFormatted = start.toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric' 
-      });
-      
-      const endFormatted = end.toLocaleDateString('en-US', { 
-        month: 'short', 
+      const startFormatted = start.toLocaleDateString('en-US', {
+        month: 'short',
         day: 'numeric',
-        year: 'numeric'
       });
-      
+
+      const endFormatted = end.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
+
       return `${startFormatted} - ${endFormatted}`;
     }
   }
-  
+
   return 'Dates TBD';
 };
 
@@ -82,20 +82,20 @@ export const isUpcomingTrip = (trip: {
   if (trip.flexible) {
     // For flexible trips, consider them upcoming if estimated year is current or future
     if (trip.estimatedYear) {
-      const estimatedYear = parseInt(trip.estimatedYear);
+      const estimatedYear = parseInt(trip.estimatedYear, 10);
       const currentYear = new Date().getFullYear();
       return estimatedYear >= currentYear;
     }
     return true; // Default to upcoming for flexible trips without year
   }
-  
+
   if (trip.startDate) {
     const startDate = parseLocalDate(trip.startDate);
     const now = new Date();
     now.setHours(0, 0, 0, 0); // Compare dates only, not times
     return startDate ? startDate >= now : true;
   }
-  
+
   return true; // Default to upcoming if no date info
 };
 
@@ -107,19 +107,19 @@ export const isPastTrip = (trip: {
   if (trip.flexible) {
     // For flexible trips, consider them past if estimated year is before current year
     if (trip.estimatedYear) {
-      const estimatedYear = parseInt(trip.estimatedYear);
+      const estimatedYear = parseInt(trip.estimatedYear, 10);
       const currentYear = new Date().getFullYear();
       return estimatedYear < currentYear;
     }
     return false; // Default to not past for flexible trips without year
   }
-  
+
   if (trip.endDate) {
     const endDate = parseLocalDate(trip.endDate);
     const now = new Date();
     now.setHours(0, 0, 0, 0); // Compare dates only, not times
     return endDate ? endDate < now : false;
   }
-  
+
   return false; // Default to not past if no date info
 };

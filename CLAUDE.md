@@ -7,7 +7,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 npm run dev          # Start Vite dev server with HMR (--host flag exposes to network)
 npm run build        # Production build (TypeScript + Vite)
-npm run lint         # ESLint across all .ts/.tsx files
+npm run lint         # Biome lint across all files
+npm run format       # Biome format with auto-fix
+npm run check        # Biome check (lint + format)
+npm run check:fix    # Biome check with auto-fix
 npm run preview      # Serve production build locally
 ```
 
@@ -20,6 +23,7 @@ Single-page React 19 application with a Supabase backend (PostgreSQL, auth, real
 ### Tech Stack
 
 - **React 19** with TypeScript (strict mode), built with **Vite 7** + SWC
+- **Biome** for linting and formatting
 - **Tailwind CSS 3** with **shadcn/ui** (New York variant) for components
 - **Framer Motion** for animations
 - **TanStack Query v5** for server state (5-min stale time, 10-min GC)

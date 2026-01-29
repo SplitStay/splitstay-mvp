@@ -1,50 +1,77 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Plus, Users, MessageCircle, User, Sparkles, Home, LogOut } from 'lucide-react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+  Home,
+  LogOut,
+  Menu,
+  MessageCircle,
+  Plus,
+  Sparkles,
+  User,
+  Users,
+  X,
+} from 'lucide-react';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 interface MobileNavigationProps {
-  isGuest: boolean
-  onAuthRequired: (action: string) => void
-  user?: any
+  isGuest: boolean;
+  onAuthRequired: (action: string) => void;
+  // biome-ignore lint/suspicious/noExplicitAny: User type from auth context
+  user?: any;
 }
 
 export const MobileNavigation: React.FC<MobileNavigationProps> = ({
   isGuest,
   onAuthRequired,
-  user
+  user,
 }) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const navigate = useNavigate()
-  const { signOut } = useAuth()
+  const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
 
-  const handleNavigation = (path: string, requiresAuth = false, action?: string) => {
+  const handleNavigation = (
+    path: string,
+    requiresAuth = false,
+    action?: string,
+  ) => {
     if (requiresAuth && isGuest && action) {
-      onAuthRequired(action)
+      onAuthRequired(action);
     } else {
-      navigate(path)
+      navigate(path);
     }
-    setIsOpen(false)
-  }
+    setIsOpen(false);
+  };
 
   const handleSignOut = async () => {
-    setIsOpen(false)
-    await signOut()
-  }
+    setIsOpen(false);
+    await signOut();
+  };
 
-  const menuItems = isGuest ? [
-    { icon: Home, label: 'Dashboard', path: '/dashboard' },
-    { icon: Users, label: 'Find Partners', path: '/find-partners' },
-    { icon: Plus, label: 'Add Trip', action: 'create_trip', requiresAuth: true },
-    { icon: Sparkles, label: 'Create Profile', action: 'create_profile', requiresAuth: true },
-  ] : [
-    { icon: Home, label: 'Dashboard', path: '/dashboard' },
-    { icon: Users, label: 'Find Partners', path: '/find-partners' },
-    { icon: Plus, label: 'Add Trip', path: '/post-trip' },
-    { icon: MessageCircle, label: 'Messages', path: '/messages' },
-    { icon: User, label: 'My Profile', path: `/profile/${user?.id}` },
-  ]
+  const menuItems = isGuest
+    ? [
+        { icon: Home, label: 'Dashboard', path: '/dashboard' },
+        { icon: Users, label: 'Find Partners', path: '/find-partners' },
+        {
+          icon: Plus,
+          label: 'Add Trip',
+          action: 'create_trip',
+          requiresAuth: true,
+        },
+        {
+          icon: Sparkles,
+          label: 'Create Profile',
+          action: 'create_profile',
+          requiresAuth: true,
+        },
+      ]
+    : [
+        { icon: Home, label: 'Dashboard', path: '/dashboard' },
+        { icon: Users, label: 'Find Partners', path: '/find-partners' },
+        { icon: Plus, label: 'Add Trip', path: '/post-trip' },
+        { icon: MessageCircle, label: 'Messages', path: '/messages' },
+        { icon: User, label: 'My Profile', path: `/profile/${user?.id}` },
+      ];
 
   return (
     <>
@@ -54,6 +81,7 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
           <Link to="/dashboard" className="text-xl font-bold text-blue-600">
             SplitStay
           </Link>
+          {/* biome-ignore lint/a11y/useButtonType: Menu toggle button */}
           <button
             onClick={() => setIsOpen(true)}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -86,13 +114,14 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
             >
               {/* Sidebar Header */}
               <div className="flex items-center justify-between p-4 border-b border-gray-200">
-                <Link 
-                  to="/dashboard" 
+                <Link
+                  to="/dashboard"
                   className="text-xl font-bold text-blue-600"
                   onClick={() => setIsOpen(false)}
                 >
                   SplitStay
                 </Link>
+                {/* biome-ignore lint/a11y/useButtonType: Close sidebar button */}
                 <button
                   onClick={() => setIsOpen(false)}
                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -143,9 +172,16 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
               <nav className="p-4">
                 <div className="space-y-2">
                   {menuItems.map((item) => (
+                    // biome-ignore lint/a11y/useButtonType: Navigation button
                     <button
                       key={item.label}
-                      onClick={() => handleNavigation(item.path || '', item.requiresAuth, item.action)}
+                      onClick={() =>
+                        handleNavigation(
+                          item.path || '',
+                          item.requiresAuth,
+                          item.action,
+                        )
+                      }
                       className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors text-left"
                     >
                       <item.icon className="w-5 h-5" />
@@ -157,6 +193,7 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
                 {/* Sign Out Button for logged-in users */}
                 {!isGuest && (
                   <div className="mt-4 pt-4 border-t border-gray-200">
+                    {/* biome-ignore lint/a11y/useButtonType: Sign out button */}
                     <button
                       onClick={handleSignOut}
                       className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-left"
@@ -172,5 +209,5 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
         )}
       </AnimatePresence>
     </>
-  )
-}
+  );
+};

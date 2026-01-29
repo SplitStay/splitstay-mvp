@@ -31,11 +31,26 @@ class LocationIQService {
   private readonly BASE_URL = 'https://us1.locationiq.com/v1/autocomplete';
   private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
   private readonly FALLBACK_CITIES = [
-    "New York, United States", "Los Angeles, United States", "London, United Kingdom", 
-    "Paris, France", "Tokyo, Japan", "Berlin, Germany", "Madrid, Spain", "Rome, Italy",
-    "Amsterdam, Netherlands", "Barcelona, Spain", "Toronto, Canada", "Sydney, Australia",
-    "Bangkok, Thailand", "Singapore, Singapore", "Seoul, South Korea", "Mumbai, India",
-    "Dubai, United Arab Emirates", "Istanbul, Turkey", "Moscow, Russia", "São Paulo, Brazil"
+    'New York, United States',
+    'Los Angeles, United States',
+    'London, United Kingdom',
+    'Paris, France',
+    'Tokyo, Japan',
+    'Berlin, Germany',
+    'Madrid, Spain',
+    'Rome, Italy',
+    'Amsterdam, Netherlands',
+    'Barcelona, Spain',
+    'Toronto, Canada',
+    'Sydney, Australia',
+    'Bangkok, Thailand',
+    'Singapore, Singapore',
+    'Seoul, South Korea',
+    'Mumbai, India',
+    'Dubai, United Arab Emirates',
+    'Istanbul, Turkey',
+    'Moscow, Russia',
+    'São Paulo, Brazil',
   ];
   private cache: Map<string, CacheEntry> = new Map();
   private abortController: AbortController | null = null;
@@ -66,7 +81,10 @@ class LocationIQService {
 
   private shouldUseApi(): boolean {
     // Check if API is available and not in cooldown
-    if (!this.isApiAvailable && Date.now() - this.lastApiError < this.API_COOLDOWN) {
+    if (
+      !this.isApiAvailable &&
+      Date.now() - this.lastApiError < this.API_COOLDOWN
+    ) {
       return false;
     }
     return !!this.API_KEY;
@@ -74,9 +92,9 @@ class LocationIQService {
 
   private fallbackSearch(query: string): string[] {
     // Simple fallback using the predefined cities list
-    return this.FALLBACK_CITIES
-      .filter(city => city.toLowerCase().includes(query.toLowerCase()))
-      .slice(0, 5); // Limit to 5 results for fallback
+    return this.FALLBACK_CITIES.filter((city) =>
+      city.toLowerCase().includes(query.toLowerCase()),
+    ).slice(0, 5); // Limit to 5 results for fallback
   }
 
   private markApiAsUnavailable(): void {
@@ -96,7 +114,7 @@ class LocationIQService {
     }
 
     const cacheKey = this.getCacheKey(query);
-    
+
     // Check cache first
     const cachedEntry = this.cache.get(cacheKey);
     if (cachedEntry && this.isValidCache(cachedEntry)) {
@@ -127,7 +145,7 @@ class LocationIQService {
 
       const response = await fetch(url.toString(), {
         headers: {
-          'accept': 'application/json',
+          accept: 'application/json',
         },
         signal: this.abortController.signal,
       });
@@ -139,22 +157,24 @@ class LocationIQService {
           this.markApiAsUnavailable();
           return this.fallbackSearch(query);
         }
-        throw new Error(`LocationIQ API error: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `LocationIQ API error: ${response.status} ${response.statusText}`,
+        );
       }
 
       const data: LocationIQPlace[] = await response.json();
-      
+
       // Mark API as available since we got a successful response
       this.markApiAsAvailable();
-      
+
       // Filter and format results to only include cities
       const cities = data
-        .filter(place => place.type === 'city' || place.class === 'place')
-        .map(place => this.formatCityName(place))
+        .filter((place) => place.type === 'city' || place.class === 'place')
+        .map((place) => this.formatCityName(place))
         .filter((city, index, arr) => arr.indexOf(city) === index) // Remove duplicates
         .slice(0, 8); // Limit to 8 results
 
-      console.log("cities", cities);
+      console.log('cities', cities);
 
       // Cache the results
       this.cache.set(cacheKey, {
@@ -171,9 +191,12 @@ class LocationIQService {
         // Request was aborted, return fallback
         return this.fallbackSearch(query);
       }
-      
-      console.warn('LocationIQ API error, falling back to local search:', error);
-      
+
+      console.warn(
+        'LocationIQ API error, falling back to local search:',
+        error,
+      );
+
       // Mark API as temporarily unavailable and use fallback
       this.markApiAsUnavailable();
       return this.fallbackSearch(query);
@@ -204,17 +227,21 @@ class LocationIQService {
   }
 
   // Get API status for UI feedback
-  getApiStatus(): { 
-    isAvailable: boolean; 
-    isInCooldown: boolean; 
+  getApiStatus(): {
+    isAvailable: boolean;
+    isInCooldown: boolean;
     cooldownEndsAt: number | null;
     hasApiKey: boolean;
   } {
-    const isInCooldown = !this.isApiAvailable && (Date.now() - this.lastApiError < this.API_COOLDOWN);
+    const isInCooldown =
+      !this.isApiAvailable &&
+      Date.now() - this.lastApiError < this.API_COOLDOWN;
     return {
       isAvailable: this.isApiAvailable,
       isInCooldown,
-      cooldownEndsAt: isInCooldown ? this.lastApiError + this.API_COOLDOWN : null,
+      cooldownEndsAt: isInCooldown
+        ? this.lastApiError + this.API_COOLDOWN
+        : null,
       hasApiKey: !!this.API_KEY,
     };
   }

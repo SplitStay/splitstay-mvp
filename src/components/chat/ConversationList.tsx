@@ -1,19 +1,19 @@
-import React from 'react'
-import { motion } from 'framer-motion'
-import { Search } from 'lucide-react'
-import { ConversationWithUser } from '../../lib/chatService'
-import { useAuth } from '../../contexts/AuthContext'
-import { formatDistanceToNow } from 'date-fns'
+import { formatDistanceToNow } from 'date-fns';
+import { motion } from 'framer-motion';
+import { Search } from 'lucide-react';
+import type React from 'react';
+import { useAuth } from '../../contexts/AuthContext';
+import type { ConversationWithUser } from '../../lib/chatService';
 
 interface ConversationListProps {
-  conversations: ConversationWithUser[]
-  selectedChatId?: string
-  onSelectChat: (chatId: string) => void
-  onStartNewChat: () => void
-  searchQuery: string
-  onSearchChange: (query: string) => void
-  loading?: boolean
-  onlineMap?: Record<string, boolean>
+  conversations: ConversationWithUser[];
+  selectedChatId?: string;
+  onSelectChat: (chatId: string) => void;
+  onStartNewChat: () => void;
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+  loading?: boolean;
+  onlineMap?: Record<string, boolean>;
 }
 
 export const ConversationList: React.FC<ConversationListProps> = ({
@@ -24,16 +24,21 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   searchQuery,
   onSearchChange,
   loading = false,
-  onlineMap = {}
+  onlineMap = {},
 }) => {
-  const { user } = useAuth()
+  // biome-ignore lint/correctness/noUnusedVariables: Reserved for future use
+  const { user } = useAuth();
 
-  const filteredConversations = conversations.filter(conv => {
-    const otherUser = conv.other_user
-    return otherUser?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-           otherUser?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-           conv.last_message?.content.toLowerCase().includes(searchQuery.toLowerCase())
-  })
+  const filteredConversations = conversations.filter((conv) => {
+    const otherUser = conv.other_user;
+    return (
+      otherUser?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      otherUser?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      conv.last_message?.content
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase())
+    );
+  });
 
   if (loading) {
     return (
@@ -43,6 +48,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
         </div>
         <div className="flex-1 p-4">
           {[...Array(5)].map((_, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: Loading skeleton
             <div key={i} className="flex items-center gap-3 p-3 mb-2">
               <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
               <div className="flex-1">
@@ -53,7 +59,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -63,7 +69,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-gray-900">Messages</h2>
         </div>
-        
+
         {/* Search */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -88,12 +94,12 @@ export const ConversationList: React.FC<ConversationListProps> = ({
               {searchQuery ? 'No conversations found' : 'No messages yet'}
             </h3>
             <p className="text-gray-500 mb-4">
-              {searchQuery 
-                ? 'Try searching with different keywords' 
-                : 'Start a conversation with a travel partner'
-              }
+              {searchQuery
+                ? 'Try searching with different keywords'
+                : 'Start a conversation with a travel partner'}
             </p>
             {!searchQuery && (
+              // biome-ignore lint/a11y/useButtonType: Action button
               <button
                 onClick={onStartNewChat}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
@@ -105,17 +111,17 @@ export const ConversationList: React.FC<ConversationListProps> = ({
         ) : (
           <div className="p-2">
             {filteredConversations.map((conv) => {
-              const otherUser = conv.other_user
-              const isSelected = selectedChatId === conv.id
-              
+              const otherUser = conv.other_user;
+              const isSelected = selectedChatId === conv.id;
+
               return (
                 <motion.div
                   key={conv.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors mb-1 border-l-4 ${
-                    isSelected 
-                      ? 'bg-blue-50 border border-blue-200 border-l-blue-500' 
+                    isSelected
+                      ? 'bg-blue-50 border border-blue-200 border-l-blue-500'
                       : (conv.unread_count ?? 0) > 0
                         ? 'bg-blue-25 border border-blue-100 border-l-blue-400 shadow-sm'
                         : 'hover:bg-gray-50 border-l-transparent border border-transparent'
@@ -125,35 +131,46 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                   {/* Avatar */}
                   <div className="relative">
                     <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-medium">
-                      {otherUser?.name?.[0]?.toUpperCase() || otherUser?.email?.[0]?.toUpperCase() || '?'}
+                      {otherUser?.name?.[0]?.toUpperCase() ||
+                        otherUser?.email?.[0]?.toUpperCase() ||
+                        '?'}
                     </div>
                     {/* Online indicator (realtime) */}
-                    <div className={`absolute bottom-0 right-0 w-3 h-3 border-2 border-white rounded-full ${onlineMap[otherUser?.id || ''] ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+                    <div
+                      className={`absolute bottom-0 right-0 w-3 h-3 border-2 border-white rounded-full ${onlineMap[otherUser?.id || ''] ? 'bg-green-500' : 'bg-gray-400'}`}
+                    ></div>
                   </div>
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
-                      <h3 className={`truncate ${
-                        (conv.unread_count ?? 0) > 0 
-                          ? 'font-semibold text-gray-900' 
-                          : 'font-medium text-gray-900'
-                      }`}>
+                      <h3
+                        className={`truncate ${
+                          (conv.unread_count ?? 0) > 0
+                            ? 'font-semibold text-gray-900'
+                            : 'font-medium text-gray-900'
+                        }`}
+                      >
                         {otherUser?.name || otherUser?.email || 'Unknown User'}
                       </h3>
                       {conv.last_message && (
                         <span className="text-xs text-gray-500">
-                          {formatDistanceToNow(new Date(conv.last_message.created_at), { addSuffix: true })}
+                          {formatDistanceToNow(
+                            new Date(conv.last_message.created_at),
+                            { addSuffix: true },
+                          )}
                         </span>
                       )}
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
-                      <p className={`text-sm truncate ${
-                        (conv.unread_count ?? 0) > 0 
-                          ? 'text-gray-900 font-medium' 
-                          : 'text-gray-600'
-                      }`}>
+                      <p
+                        className={`text-sm truncate ${
+                          (conv.unread_count ?? 0) > 0
+                            ? 'text-gray-900 font-medium'
+                            : 'text-gray-600'
+                        }`}
+                      >
                         {conv.last_message?.content || 'No messages yet'}
                       </p>
                       {(conv.unread_count ?? 0) > 0 && (
@@ -164,11 +181,11 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                     </div>
                   </div>
                 </motion.div>
-              )
+              );
             })}
           </div>
         )}
       </div>
     </div>
-  )
-}
+  );
+};

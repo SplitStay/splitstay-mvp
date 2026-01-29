@@ -1,11 +1,11 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import { Users, Smile, Eye } from 'lucide-react';
-
-
+import { Eye, Smile, Users } from 'lucide-react';
+import type React from 'react';
 
 interface Props {
+  // biome-ignore lint/suspicious/noExplicitAny: Trip form data shape
   trip: any;
+  // biome-ignore lint/suspicious/noExplicitAny: Trip form data shape
   setTrip: (t: any) => void;
   matchWith: string;
   setMatchWith: (m: string) => void;
@@ -30,27 +30,27 @@ const Step3Preferences: React.FC<Props> = ({
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      onSubmit={e => {
+      onSubmit={(e) => {
         e.preventDefault();
         // Save trip preferences
         setTrip({
           ...trip,
           matchWith,
           vibe,
-          isPublic: trip.isPublic ?? true
+          isPublic: trip.isPublic ?? true,
         });
         next();
       }}
       className="space-y-8 bg-white/90 rounded-2xl shadow-xl p-8"
     >
-
       <div>
+        {/* biome-ignore lint/a11y/noLabelWithoutControl: Label for radio group */}
         <label className="block text-lg font-semibold text-gray-800 mb-2">
           <Users className="inline w-5 h-5 mr-2 text-purple-600" />
           Open to Match With <span className="text-red-500">*</span>
         </label>
         <div className="flex gap-4">
-          {['male', 'female', 'anyone'].map(opt => (
+          {['male', 'female', 'anyone'].map((opt) => (
             <label key={opt} className="flex items-center gap-2 text-lg">
               <input
                 type="radio"
@@ -66,13 +66,14 @@ const Step3Preferences: React.FC<Props> = ({
         </div>
       </div>
       <div>
+        {/* biome-ignore lint/a11y/noLabelWithoutControl: Label associated via layout */}
         <label className="block text-lg font-semibold text-gray-800 mb-2">
           <Smile className="inline w-5 h-5 mr-2 text-yellow-500" />
           Trip Vibe / Description <span className="text-red-500">*</span>
         </label>
         <textarea
           value={vibe}
-          onChange={e => setVibe(e.target.value)}
+          onChange={(e) => setVibe(e.target.value)}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 text-lg"
           placeholder="e.g. I'm chill, want to explore and relax — not looking to party."
           rows={3}
@@ -81,13 +82,16 @@ const Step3Preferences: React.FC<Props> = ({
       </div>
 
       <div>
+        {/* biome-ignore lint/a11y/noLabelWithoutControl: Label associated via layout */}
         <label className="block text-lg font-semibold text-gray-800 mb-2">
           <Eye className="inline w-5 h-5 mr-2 text-blue-400" />
           Privacy <span className="text-red-500">*</span>
         </label>
         <select
-          value={trip.isPublic ?? true ? 'true' : 'false'}
-          onChange={e => setTrip({ ...trip, isPublic: e.target.value === 'true' })}
+          value={(trip.isPublic ?? true) ? 'true' : 'false'}
+          onChange={(e) =>
+            setTrip({ ...trip, isPublic: e.target.value === 'true' })
+          }
           className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg"
           required
         >

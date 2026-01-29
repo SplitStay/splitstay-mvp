@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import CityAutocomplete from '@/components/CityAutocomplete';
 
 interface LocationModalProps {
@@ -8,7 +8,11 @@ interface LocationModalProps {
   onSubmit: (location: string) => void;
 }
 
-const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose, onSubmit }) => {
+const LocationModal: React.FC<LocationModalProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
+}) => {
   const [input, setInput] = useState('');
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
@@ -49,14 +53,28 @@ const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose, onSubmit
               <input
                 type="checkbox"
                 checked={acceptedTerms}
-                onChange={e => setAcceptedTerms(e.target.checked)}
+                onChange={(e) => setAcceptedTerms(e.target.checked)}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 required
               />
               I agree to the
-              <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Terms of Use</a>
+              <a
+                href="/terms"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline"
+              >
+                Terms of Use
+              </a>
               &
-              <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Privacy Policy</a>
+              <a
+                href="/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline"
+              >
+                Privacy Policy
+              </a>
             </label>
           </div>
           <div className="flex gap-3">
@@ -81,4 +99,4 @@ const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose, onSubmit
   );
 };
 
-export default LocationModal; 
+export default LocationModal;

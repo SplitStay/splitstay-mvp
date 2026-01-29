@@ -1,6 +1,6 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import { ExternalLink, AlertCircle, Loader2, Shield } from 'lucide-react';
+import { AlertCircle, ExternalLink, Loader2, Shield } from 'lucide-react';
+import type React from 'react';
 import type { AccommodationPreview as AccommodationPreviewType } from '../lib/iframely';
 
 interface Props {
@@ -9,10 +9,10 @@ interface Props {
   imageAspectRatio?: 'square' | 'landscape' | 'wide' | 'auto';
 }
 
-export const AccommodationPreview: React.FC<Props> = ({ 
-  preview, 
-  className = '', 
-  imageAspectRatio = 'landscape' 
+export const AccommodationPreview: React.FC<Props> = ({
+  preview,
+  className = '',
+  imageAspectRatio = 'landscape',
 }) => {
   // Get aspect ratio classes based on prop
   const getAspectRatioClass = () => {
@@ -38,7 +38,9 @@ export const AccommodationPreview: React.FC<Props> = ({
       >
         <div className="flex items-center justify-center py-8">
           <Loader2 className="w-6 h-6 animate-spin text-blue-600 mr-3" />
-          <span className="text-gray-600">Loading accommodation preview...</span>
+          <span className="text-gray-600">
+            Loading accommodation preview...
+          </span>
         </div>
       </motion.div>
     );
@@ -64,7 +66,8 @@ export const AccommodationPreview: React.FC<Props> = ({
   }
 
   // Check if this is a blocked booking site
-  const isBlockedBookingSite = !preview.image && preview.description.includes('security measures');
+  const isBlockedBookingSite =
+    !preview.image && preview.description.includes('security measures');
 
   return (
     <motion.div
@@ -75,7 +78,9 @@ export const AccommodationPreview: React.FC<Props> = ({
     >
       {/* Image Section or Blocked Site Header */}
       {preview.image ? (
-        <div className={`relative ${getAspectRatioClass()} bg-gray-100 overflow-hidden`}>
+        <div
+          className={`relative ${getAspectRatioClass()} bg-gray-100 overflow-hidden`}
+        >
           <img
             src={preview.image}
             alt={preview.title}
@@ -86,7 +91,7 @@ export const AccommodationPreview: React.FC<Props> = ({
           />
           {/* Gradient overlay for better text readability */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-          
+
           {/* Overlay with site info */}
           <div className="absolute top-3 left-3">
             <div className="flex items-center bg-white/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-lg border border-white/20">
@@ -129,7 +134,9 @@ export const AccommodationPreview: React.FC<Props> = ({
                     }}
                   />
                 )}
-                <span className="font-semibold text-gray-800">{preview.site}</span>
+                <span className="font-semibold text-gray-800">
+                  {preview.site}
+                </span>
               </div>
               <span className="text-sm text-gray-600">Secure Booking Site</span>
             </div>
@@ -155,9 +162,7 @@ export const AccommodationPreview: React.FC<Props> = ({
         </div>
 
         {preview.author && (
-          <p className="text-sm text-gray-600 mb-2">
-            by {preview.author}
-          </p>
+          <p className="text-sm text-gray-600 mb-2">by {preview.author}</p>
         )}
 
         {preview.description && (

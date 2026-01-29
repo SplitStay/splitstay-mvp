@@ -1,19 +1,20 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { Toaster } from 'react-hot-toast'
-import './index.css'
-import App from './App.tsx'
-import { amplitudeService } from './lib/amplitude'
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { Toaster } from 'react-hot-toast';
+import './index.css';
+import App from './App.tsx';
+import { amplitudeService } from './lib/amplitude';
 
 // Initialize Amplitude asynchronously without blocking the app
-amplitudeService.init().catch(error => {
-  console.error('Failed to initialize Amplitude:', error)
-})
+amplitudeService.init().catch((error) => {
+  console.error('Failed to initialize Amplitude:', error);
+});
 
+// biome-ignore lint/style/noNonNullAssertion: Root element guaranteed in index.html
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
-    <Toaster 
+    <Toaster
       position="top-center"
       toastOptions={{
         duration: 5000,
@@ -37,4 +38,4 @@ createRoot(document.getElementById('root')!).render(
       }}
     />
   </StrictMode>,
-)
+);

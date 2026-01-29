@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { X, Plus, Languages, MessageCircle, Link } from "lucide-react";
-import { supabase } from "@/lib/supabase";
-import { useAuth } from "@/contexts/AuthContext";
+import { motion } from 'framer-motion';
+import { Languages, Plus, X } from 'lucide-react';
+import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
 
 interface Step3Props {
   selectedLanguages: string[];
@@ -12,6 +12,7 @@ interface Step3Props {
   };
   setSelectedLanguages: (languages: string[]) => void;
   setSelectedLearningLanguages: (languages: string[]) => void;
+  // biome-ignore lint/suspicious/noExplicitAny: Partial form data
   setFormData: (data: any) => void;
   onNext: () => void;
   onBack: () => void;
@@ -27,7 +28,7 @@ export const Step3Languages: React.FC<Step3Props> = ({
   setFormData,
   onNext,
   onBack,
-  originalPersonalizedLink
+  originalPersonalizedLink,
 }) => {
   const { user } = useAuth();
   const [showLanguageModal, setShowLanguageModal] = useState(false);
@@ -35,36 +36,119 @@ export const Step3Languages: React.FC<Step3Props> = ({
   const [languageSearchTerm, setLanguageSearchTerm] = useState('');
   const [learningSearchTerm, setLearningSearchTerm] = useState('');
   const [personalizedLinkError, setPersonalizedLinkError] = useState('');
-  const [personalizedLinkAvailable, setPersonalizedLinkAvailable] = useState<boolean | null>(null);
+  const [personalizedLinkAvailable, setPersonalizedLinkAvailable] = useState<
+    boolean | null
+  >(null);
   const [checkingAvailability, setCheckingAvailability] = useState(false);
 
-  const mainLanguages = ["English", "Spanish", "French", "German", "Italian", "Portuguese", "Mandarin", "Japanese"];
-  
+  const mainLanguages = [
+    'English',
+    'Spanish',
+    'French',
+    'German',
+    'Italian',
+    'Portuguese',
+    'Mandarin',
+    'Japanese',
+  ];
+
   const allLanguages = [
-    "English", "Spanish", "French", "German", "Dutch", "Italian", "Portuguese", "Mandarin", 
-    "Japanese", "Korean", "Arabic", "Russian", "Hindi", "Bengali", "Thai", "Vietnamese", 
-    "Indonesian", "Malay", "Turkish", "Greek", "Hebrew", "Polish", "Czech", "Hungarian", 
-    "Romanian", "Bulgarian", "Croatian", "Serbian", "Swedish", "Norwegian", "Danish", 
-    "Finnish", "Estonian", "Latvian", "Lithuanian", "Slovenian", "Slovak", "Ukrainian", 
-    "Catalan", "Basque", "Galician", "Irish", "Welsh", "Scots Gaelic", "Icelandic", 
-    "Albanian", "Macedonian", "Maltese", "Luxembourgish", "Faroese", "Swahili", 
-    "Amharic", "Yoruba", "Igbo", "Hausa", "Zulu", "Afrikaans", "Tagalog", "Cebuano", 
-    "Ilocano", "Tamil", "Telugu", "Marathi", "Gujarati", "Kannada", "Malayalam", 
-    "Punjabi", "Urdu", "Nepali", "Sinhala", "Burmese", "Khmer", "Lao", "Mongolian", 
-    "Kazakh", "Uzbek", "Kyrgyz", "Tajik", "Turkmen", "Azerbaijani", "Armenian", "Georgian"
+    'English',
+    'Spanish',
+    'French',
+    'German',
+    'Dutch',
+    'Italian',
+    'Portuguese',
+    'Mandarin',
+    'Japanese',
+    'Korean',
+    'Arabic',
+    'Russian',
+    'Hindi',
+    'Bengali',
+    'Thai',
+    'Vietnamese',
+    'Indonesian',
+    'Malay',
+    'Turkish',
+    'Greek',
+    'Hebrew',
+    'Polish',
+    'Czech',
+    'Hungarian',
+    'Romanian',
+    'Bulgarian',
+    'Croatian',
+    'Serbian',
+    'Swedish',
+    'Norwegian',
+    'Danish',
+    'Finnish',
+    'Estonian',
+    'Latvian',
+    'Lithuanian',
+    'Slovenian',
+    'Slovak',
+    'Ukrainian',
+    'Catalan',
+    'Basque',
+    'Galician',
+    'Irish',
+    'Welsh',
+    'Scots Gaelic',
+    'Icelandic',
+    'Albanian',
+    'Macedonian',
+    'Maltese',
+    'Luxembourgish',
+    'Faroese',
+    'Swahili',
+    'Amharic',
+    'Yoruba',
+    'Igbo',
+    'Hausa',
+    'Zulu',
+    'Afrikaans',
+    'Tagalog',
+    'Cebuano',
+    'Ilocano',
+    'Tamil',
+    'Telugu',
+    'Marathi',
+    'Gujarati',
+    'Kannada',
+    'Malayalam',
+    'Punjabi',
+    'Urdu',
+    'Nepali',
+    'Sinhala',
+    'Burmese',
+    'Khmer',
+    'Lao',
+    'Mongolian',
+    'Kazakh',
+    'Uzbek',
+    'Kyrgyz',
+    'Tajik',
+    'Turkmen',
+    'Azerbaijani',
+    'Armenian',
+    'Georgian',
   ];
 
   const validatePersonalizedLink = (value: string): string => {
     if (!value) return '';
     if (value.length < 3) return 'URL must be at least 3 characters long';
     if (value.length > 30) return 'URL must be less than 30 characters';
-    if (!/^[a-zA-Z0-9]+$/.test(value)) return 'URL can only contain letters and numbers';
+    if (!/^[a-zA-Z0-9]+$/.test(value))
+      return 'URL can only contain letters and numbers';
     return '';
   };
 
   const checkLinkAvailability = async (link: string): Promise<boolean> => {
     if (!link || validatePersonalizedLink(link)) return false;
-    
+
     try {
       const { data, error } = await supabase
         .from('user')
@@ -72,30 +156,30 @@ export const Step3Languages: React.FC<Step3Props> = ({
         .eq('personalizedLink', link)
         .neq('id', user?.id || '')
         .limit(1);
-      
+
       if (error) return false;
       return data.length === 0;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   };
 
   const handlePersonalizedLinkChange = async (value: string) => {
     const cleanValue = value.trim();
-    setFormData({...formData, personalizedLink: cleanValue});
-    
+    setFormData({ ...formData, personalizedLink: cleanValue });
+
     const formatError = validatePersonalizedLink(cleanValue);
     setPersonalizedLinkError(formatError);
-    
+
     if (formatError || !cleanValue) {
       setPersonalizedLinkAvailable(null);
       setCheckingAvailability(false);
       return;
     }
-    
+
     setCheckingAvailability(true);
     setPersonalizedLinkAvailable(null);
-    
+
     const timeout = setTimeout(async () => {
       const isAvailable = await checkLinkAvailability(cleanValue);
       setPersonalizedLinkAvailable(isAvailable);
@@ -112,7 +196,7 @@ export const Step3Languages: React.FC<Step3Props> = ({
 
   const handleLanguageToggle = (language: string) => {
     if (selectedLanguages.includes(language)) {
-      setSelectedLanguages(selectedLanguages.filter(l => l !== language));
+      setSelectedLanguages(selectedLanguages.filter((l) => l !== language));
     } else {
       setSelectedLanguages([...selectedLanguages, language]);
     }
@@ -120,7 +204,9 @@ export const Step3Languages: React.FC<Step3Props> = ({
 
   const handleLearningLanguageToggle = (language: string) => {
     if (selectedLearningLanguages.includes(language)) {
-      setSelectedLearningLanguages(selectedLearningLanguages.filter(l => l !== language));
+      setSelectedLearningLanguages(
+        selectedLearningLanguages.filter((l) => l !== language),
+      );
     } else {
       setSelectedLearningLanguages([...selectedLearningLanguages, language]);
     }
@@ -135,10 +221,10 @@ export const Step3Languages: React.FC<Step3Props> = ({
     if (!formData.personalizedLink.trim()) return true;
     if (personalizedLinkError) return false;
     if (checkingAvailability) return false;
-    
+
     // If the URL hasn't changed from the original, it's valid
     if (formData.personalizedLink === originalPersonalizedLink) return true;
-    
+
     return personalizedLinkAvailable === true;
   };
 
@@ -166,11 +252,12 @@ export const Step3Languages: React.FC<Step3Props> = ({
 
       <div className="space-y-6">
         <div>
+          {/* biome-ignore lint/a11y/noLabelWithoutControl: Label for button group */}
           <label className="block text-lg font-semibold text-gray-800 mb-2">
             <Languages className="inline w-5 h-5 mr-2 text-blue-600" />
             Languages you speak <span className="text-red-500">*</span>
           </label>
-          
+
           <div className="grid grid-cols-2 gap-2 mb-4">
             {mainLanguages.map((language) => (
               <button
@@ -179,23 +266,23 @@ export const Step3Languages: React.FC<Step3Props> = ({
                 onClick={() => handleLanguageToggle(language)}
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                   selectedLanguages.includes(language)
-                    ? "bg-blue-600 text-white shadow-md"
-                    : "bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+                    ? 'bg-blue-600 text-white shadow-md'
+                    : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-700'
                 }`}
               >
                 {language}
               </button>
             ))}
           </div>
-          
+
           <button
             type="button"
             onClick={() => setShowLanguageModal(true)}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:border-blue-300 hover:bg-blue-50 transition-all text-left flex items-center justify-between"
           >
             <span>
-              {selectedLanguages.length > 0 
-                ? `${selectedLanguages.length} selected, add more...` 
+              {selectedLanguages.length > 0
+                ? `${selectedLanguages.length} selected, add more...`
                 : 'Add languages...'}
             </span>
             <Plus className="w-4 h-4" />
@@ -210,6 +297,7 @@ export const Step3Languages: React.FC<Step3Props> = ({
                 >
                   {language}
                   <button
+                    type="button"
                     onClick={() => handleLanguageToggle(language)}
                     className="ml-1 hover:text-blue-600"
                   >
@@ -222,18 +310,20 @@ export const Step3Languages: React.FC<Step3Props> = ({
         </div>
 
         <div>
+          {/* biome-ignore lint/a11y/noLabelWithoutControl: Label for button group */}
           <label className="block text-sm font-medium text-gray-700 mb-3">
-            Languages you're learning <span className="text-gray-400">(optional)</span>
+            Languages you're learning{' '}
+            <span className="text-gray-400">(optional)</span>
           </label>
-          
+
           <button
             type="button"
             onClick={() => setShowLearningModal(true)}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:border-orange-300 hover:bg-orange-50 transition-all text-left flex items-center justify-between"
           >
             <span>
-              {selectedLearningLanguages.length > 0 
-                ? `${selectedLearningLanguages.length} selected` 
+              {selectedLearningLanguages.length > 0
+                ? `${selectedLearningLanguages.length} selected`
                 : 'Add learning languages...'}
             </span>
             <Plus className="w-4 h-4" />
@@ -248,6 +338,7 @@ export const Step3Languages: React.FC<Step3Props> = ({
                 >
                   {language}
                   <button
+                    type="button"
                     onClick={() => handleLearningLanguageToggle(language)}
                     className="ml-1 hover:text-orange-600"
                   >
@@ -260,13 +351,18 @@ export const Step3Languages: React.FC<Step3Props> = ({
         </div>
 
         <div>
-          <label htmlFor="personalizedLink" className="block text-sm font-medium text-gray-700 mb-2">
+          <label
+            htmlFor="personalizedLink"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
             Custom Profile URL <span className="text-gray-400">(optional)</span>
           </label>
           <div className="space-y-2">
             <div className="flex items-center">
               <span className="text-xs text-gray-500 bg-gray-50 px-2 sm:px-3 py-3 rounded-l-lg border border-r-0 border-gray-300 whitespace-nowrap overflow-hidden">
-                <span className="hidden sm:inline">splitstay.travel/profile/</span>
+                <span className="hidden sm:inline">
+                  splitstay.travel/profile/
+                </span>
                 <span className="sm:hidden">splitstay.../</span>
               </span>
               <input
@@ -290,9 +386,13 @@ export const Step3Languages: React.FC<Step3Props> = ({
               {personalizedLinkError && (
                 <p className="text-xs text-red-600">{personalizedLinkError}</p>
               )}
-              {personalizedLinkAvailable === true && !personalizedLinkError && formData.personalizedLink && (
-                <p className="text-xs text-green-600">✓ This URL is available!</p>
-              )}
+              {personalizedLinkAvailable === true &&
+                !personalizedLinkError &&
+                formData.personalizedLink && (
+                  <p className="text-xs text-green-600">
+                    ✓ This URL is available!
+                  </p>
+                )}
             </div>
           </div>
         </div>
@@ -312,8 +412,8 @@ export const Step3Languages: React.FC<Step3Props> = ({
           disabled={!isFormValid}
           className={`w-1/2 py-3 rounded-lg font-bold text-lg shadow-lg transition ${
             isFormValid
-              ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
           }`}
         >
           Continue
@@ -321,17 +421,24 @@ export const Step3Languages: React.FC<Step3Props> = ({
       </div>
 
       {showLanguageModal && (
-        <div 
+        // biome-ignore lint/a11y/useKeyWithClickEvents: Modal backdrop click
+        // biome-ignore lint/a11y/noStaticElementInteractions: Modal backdrop
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
           onClick={() => setShowLanguageModal(false)}
         >
-          <div 
+          {/* biome-ignore lint/a11y/useKeyWithClickEvents: Stop propagation */}
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: Modal content */}
+          <div
             className="bg-white rounded-lg p-6 w-96 max-h-96 overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">Select Languages You Speak</h3>
+              <h3 className="text-lg font-semibold">
+                Select Languages You Speak
+              </h3>
               <button
+                type="button"
                 onClick={() => setShowLanguageModal(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
@@ -347,40 +454,47 @@ export const Step3Languages: React.FC<Step3Props> = ({
             />
             <div className="max-h-60 overflow-y-auto">
               {allLanguages
-                .filter(lang => 
-                  lang.toLowerCase().includes(languageSearchTerm.toLowerCase())
+                .filter((lang) =>
+                  lang.toLowerCase().includes(languageSearchTerm.toLowerCase()),
                 )
-                .map(language => (
-                <button
-                  key={language}
-                  type="button"
-                  onClick={() => handleLanguageToggle(language)}
-                  className={`w-full text-left px-3 py-2 rounded transition-all ${
-                    selectedLanguages.includes(language)
-                      ? "bg-blue-600 text-white"
-                      : "hover:bg-blue-50"
-                  }`}
-                >
-                  {language}
-                </button>
-              ))}
+                .map((language) => (
+                  <button
+                    key={language}
+                    type="button"
+                    onClick={() => handleLanguageToggle(language)}
+                    className={`w-full text-left px-3 py-2 rounded transition-all ${
+                      selectedLanguages.includes(language)
+                        ? 'bg-blue-600 text-white'
+                        : 'hover:bg-blue-50'
+                    }`}
+                  >
+                    {language}
+                  </button>
+                ))}
             </div>
           </div>
         </div>
       )}
 
       {showLearningModal && (
-        <div 
+        // biome-ignore lint/a11y/useKeyWithClickEvents: Modal backdrop click
+        // biome-ignore lint/a11y/noStaticElementInteractions: Modal backdrop
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
           onClick={() => setShowLearningModal(false)}
         >
-          <div 
+          {/* biome-ignore lint/a11y/useKeyWithClickEvents: Stop propagation */}
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: Modal content */}
+          <div
             className="bg-white rounded-lg p-6 w-96 max-h-96 overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">Select Learning Languages</h3>
+              <h3 className="text-lg font-semibold">
+                Select Learning Languages
+              </h3>
               <button
+                type="button"
                 onClick={() => setShowLearningModal(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
@@ -396,23 +510,23 @@ export const Step3Languages: React.FC<Step3Props> = ({
             />
             <div className="max-h-60 overflow-y-auto">
               {allLanguages
-                .filter(lang => 
-                  lang.toLowerCase().includes(learningSearchTerm.toLowerCase())
+                .filter((lang) =>
+                  lang.toLowerCase().includes(learningSearchTerm.toLowerCase()),
                 )
-                .map(language => (
-                <button
-                  key={language}
-                  type="button"
-                  onClick={() => handleLearningLanguageToggle(language)}
-                  className={`w-full text-left px-3 py-2 rounded transition-all ${
-                    selectedLearningLanguages.includes(language)
-                      ? "bg-orange-600 text-white"
-                      : "hover:bg-orange-50"
-                  }`}
-                >
-                  {language}
-                </button>
-              ))}
+                .map((language) => (
+                  <button
+                    key={language}
+                    type="button"
+                    onClick={() => handleLearningLanguageToggle(language)}
+                    className={`w-full text-left px-3 py-2 rounded transition-all ${
+                      selectedLearningLanguages.includes(language)
+                        ? 'bg-orange-600 text-white'
+                        : 'hover:bg-orange-50'
+                    }`}
+                  >
+                    {language}
+                  </button>
+                ))}
             </div>
           </div>
         </div>

@@ -1,7 +1,8 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, type ReactNode, useContext, useState } from 'react';
 
 interface PendingAction {
   type: 'message' | 'create_trip' | 'join_trip';
+  // biome-ignore lint/suspicious/noExplicitAny: Action data varies by type
   data?: any;
   redirectTo?: string;
 }
@@ -14,7 +15,9 @@ interface GuestModeContextType {
   triggerAuthForAction: (action: PendingAction) => void;
 }
 
-const GuestModeContext = createContext<GuestModeContextType | undefined>(undefined);
+const GuestModeContext = createContext<GuestModeContextType | undefined>(
+  undefined,
+);
 
 export const useGuestMode = () => {
   const context = useContext(GuestModeContext);
@@ -28,8 +31,12 @@ interface GuestModeProviderProps {
   children: ReactNode;
 }
 
-export const GuestModeProvider: React.FC<GuestModeProviderProps> = ({ children }) => {
-  const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
+export const GuestModeProvider: React.FC<GuestModeProviderProps> = ({
+  children,
+}) => {
+  const [pendingAction, setPendingAction] = useState<PendingAction | null>(
+    null,
+  );
 
   const clearPendingAction = () => {
     setPendingAction(null);

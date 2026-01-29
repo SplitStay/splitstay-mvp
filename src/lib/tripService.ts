@@ -1,6 +1,6 @@
-import { supabase } from './supabase';
 import type { Tables, TablesInsert } from '../types/database.types';
 import type { RoomConfiguration } from './accommodationService';
+import { supabase } from './supabase';
 
 export interface TripFormData {
   name: string;
@@ -14,11 +14,11 @@ export interface TripFormData {
   bookingUrl?: string | null;
   numberOfRooms: number;
   rooms: RoomConfiguration[];
-  
+
   vibe: string;
   matchWith: string;
   isPublic?: boolean;
-  
+
   thumbnailUrl?: string | null;
 }
 
@@ -26,12 +26,15 @@ export type Trip = Tables<'trip'>;
 export type TripInsert = TablesInsert<'trip'>;
 
 export const createTrip = async (tripData: TripFormData): Promise<Trip> => {
-  const { data: { user } } = await supabase.auth.getUser();
-  
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   if (!user) {
     throw new Error('User must be authenticated to create a trip');
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: Dynamic trip data construction
   const tripInsert: any = {
     id: crypto.randomUUID(),
     name: tripData.name,
@@ -40,22 +43,25 @@ export const createTrip = async (tripData: TripFormData): Promise<Trip> => {
     hostId: user.id,
     bookingUrl: tripData.bookingUrl,
     numberofrooms: tripData.numberOfRooms,
+    // biome-ignore lint/suspicious/noExplicitAny: Supabase JSON column
     rooms: tripData.rooms as any,
     matchwith: tripData.matchWith,
     flexible: tripData.flexible,
     ispublic: tripData.isPublic ?? true,
     thumbnailUrl: tripData.thumbnailUrl,
-    ...(tripData.flexible ? {
-      estimatedmonth: tripData.estimatedMonth,
-      estimatedyear: tripData.estimatedYear,
-      startDate: null,
-      endDate: null,
-    } : {
-      startDate: tripData.startDate,
-      endDate: tripData.endDate,
-      estimatedmonth: null,
-      estimatedyear: null,
-    })
+    ...(tripData.flexible
+      ? {
+          estimatedmonth: tripData.estimatedMonth,
+          estimatedyear: tripData.estimatedYear,
+          startDate: null,
+          endDate: null,
+        }
+      : {
+          startDate: tripData.startDate,
+          endDate: tripData.endDate,
+          estimatedmonth: null,
+          estimatedyear: null,
+        }),
   };
 
   const { data, error } = await supabase
@@ -72,34 +78,50 @@ export const createTrip = async (tripData: TripFormData): Promise<Trip> => {
   return data;
 };
 
-export const updateTrip = async (tripId: string, tripData: any): Promise<Trip> => {
-  const { data: { user } } = await supabase.auth.getUser();
-  
+export const updateTrip = async (
+  tripId: string,
+  // biome-ignore lint/suspicious/noExplicitAny: Partial trip update data
+  tripData: any,
+): Promise<Trip> => {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   if (!user) {
     throw new Error('User must be authenticated to update a trip');
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: Dynamic update object construction
   const updateData: any = {};
-  
+
   if (tripData.name) updateData.name = tripData.name;
   if (tripData.description) updateData.description = tripData.description;
   if (tripData.vibe) updateData.description = tripData.vibe;
   if (tripData.location) updateData.location = tripData.location;
-  if (tripData.bookingUrl !== undefined) updateData.bookingUrl = tripData.bookingUrl;
-  if (tripData.numberofrooms !== undefined) updateData.numberofrooms = tripData.numberofrooms;
-  if (tripData.numberOfRooms !== undefined) updateData.numberofrooms = tripData.numberOfRooms;
+  if (tripData.bookingUrl !== undefined)
+    updateData.bookingUrl = tripData.bookingUrl;
+  if (tripData.numberofrooms !== undefined)
+    updateData.numberofrooms = tripData.numberofrooms;
+  if (tripData.numberOfRooms !== undefined)
+    updateData.numberofrooms = tripData.numberOfRooms;
+  // biome-ignore lint/suspicious/noExplicitAny: Supabase JSON column
   if (tripData.rooms) updateData.rooms = tripData.rooms as any;
-  if (tripData.matchwith !== undefined) updateData.matchwith = tripData.matchwith;
-  if (tripData.matchWith !== undefined) updateData.matchwith = tripData.matchWith;
+  if (tripData.matchwith !== undefined)
+    updateData.matchwith = tripData.matchwith;
+  if (tripData.matchWith !== undefined)
+    updateData.matchwith = tripData.matchWith;
   if (tripData.flexible !== undefined) updateData.flexible = tripData.flexible;
-  if (tripData.thumbnailUrl !== undefined) updateData.thumbnailUrl = tripData.thumbnailUrl;
+  if (tripData.thumbnailUrl !== undefined)
+    updateData.thumbnailUrl = tripData.thumbnailUrl;
   if (tripData.ispublic !== undefined) updateData.ispublic = tripData.ispublic;
   if (tripData.isPublic !== undefined) updateData.ispublic = tripData.isPublic;
 
   if (tripData.flexible !== undefined) {
     if (tripData.flexible) {
-      updateData.estimatedmonth = tripData.estimatedmonth || tripData.estimatedMonth;
-      updateData.estimatedyear = tripData.estimatedyear || tripData.estimatedYear;
+      updateData.estimatedmonth =
+        tripData.estimatedmonth || tripData.estimatedMonth;
+      updateData.estimatedyear =
+        tripData.estimatedyear || tripData.estimatedYear;
       updateData.startDate = null;
       updateData.endDate = null;
     } else {
@@ -150,8 +172,10 @@ export const getTripById = async (tripId: string): Promise<Trip | null> => {
 };
 
 export const getUserTrips = async (): Promise<Trip[]> => {
-  const { data: { user } } = await supabase.auth.getUser();
-  
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   if (!user) {
     throw new Error('User must be authenticated to fetch trips');
   }
@@ -210,7 +234,11 @@ export const searchTrips = async (filters: {
     query = query
       .gte('startDate', filters.startDate)
       .lte('endDate', filters.endDate);
-  } else if (filters.flexible && filters.estimatedMonth && filters.estimatedYear) {
+  } else if (
+    filters.flexible &&
+    filters.estimatedMonth &&
+    filters.estimatedYear
+  ) {
     query = query
       .eq('estimatedmonth', filters.estimatedMonth)
       .eq('estimatedyear', filters.estimatedYear);
@@ -229,8 +257,10 @@ export const searchTrips = async (filters: {
 };
 
 export const deleteTrip = async (tripId: string): Promise<void> => {
-  const { data: { user } } = await supabase.auth.getUser();
-  
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   if (!user) {
     throw new Error('User must be authenticated to delete a trip');
   }
@@ -239,7 +269,7 @@ export const deleteTrip = async (tripId: string): Promise<void> => {
     .from('trip')
     .delete()
     .eq('id', tripId)
-    .eq('hostId', user.id); 
+    .eq('hostId', user.id);
 
   if (error) {
     console.error('Error deleting trip:', error);

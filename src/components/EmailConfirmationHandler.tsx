@@ -11,11 +11,11 @@ export const EmailConfirmationHandler: React.FC = () => {
 
     const urlParams = new URLSearchParams(window.location.search);
     const signupType = urlParams.get('type');
-    
+
     if (signupType === 'signup' && user) {
       // Clear the URL parameters
       window.history.replaceState({}, document.title, '/');
-      
+
       // Navigate to profile creation
       navigate('/create-profile', { replace: true });
     } else if (!user) {

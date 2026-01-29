@@ -1,28 +1,32 @@
-import React, { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { ExternalLink, AlertCircle } from 'lucide-react'
-import { iframelyService, AccommodationPreview } from '../../lib/iframely'
+import { motion } from 'framer-motion';
+import { AlertCircle, ExternalLink } from 'lucide-react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
+import { type AccommodationPreview, iframelyService } from '../../lib/iframely';
 
 interface LinkPreviewCardProps {
-  url: string
-  className?: string
+  url: string;
+  className?: string;
 }
 
-export const LinkPreviewCard: React.FC<LinkPreviewCardProps> = ({ url, className = '' }) => {
-  const [preview, setPreview] = useState<AccommodationPreview | null>(null)
-  const [loading, setLoading] = useState(true)
+export const LinkPreviewCard: React.FC<LinkPreviewCardProps> = ({
+  url,
+  className = '',
+}) => {
+  const [preview, setPreview] = useState<AccommodationPreview | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let isMounted = true
+    let isMounted = true;
 
     const fetchPreview = async () => {
       try {
-        setLoading(true)
-        const result = await iframelyService.getAccommodationPreview(url)
+        setLoading(true);
+        const result = await iframelyService.getAccommodationPreview(url);
         if (isMounted) {
-          setPreview(result)
+          setPreview(result);
         }
-      } catch (error) {
+      } catch (_error) {
         if (isMounted) {
           setPreview({
             title: 'Link Preview',
@@ -33,26 +37,28 @@ export const LinkPreviewCard: React.FC<LinkPreviewCardProps> = ({ url, className
             url,
             favicon: '',
             isLoading: false,
-            error: 'Failed to load preview'
-          })
+            error: 'Failed to load preview',
+          });
         }
       } finally {
         if (isMounted) {
-          setLoading(false)
+          setLoading(false);
         }
       }
-    }
+    };
 
-    fetchPreview()
+    fetchPreview();
 
     return () => {
-      isMounted = false
-    }
-  }, [url])
+      isMounted = false;
+    };
+  }, [url]);
 
   if (loading) {
     return (
-      <div className={`border border-gray-200 rounded-lg p-3 bg-gray-50 animate-pulse ${className}`}>
+      <div
+        className={`border border-gray-200 rounded-lg p-3 bg-gray-50 animate-pulse ${className}`}
+      >
         <div className="flex gap-3">
           <div className="w-16 h-16 bg-gray-300 rounded flex-shrink-0"></div>
           <div className="flex-1 min-w-0">
@@ -62,18 +68,20 @@ export const LinkPreviewCard: React.FC<LinkPreviewCardProps> = ({ url, className
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (!preview || preview.error) {
     return (
-      <div className={`border border-gray-200 rounded-lg p-3 bg-gray-50 ${className}`}>
+      <div
+        className={`border border-gray-200 rounded-lg p-3 bg-gray-50 ${className}`}
+      >
         <div className="flex items-center gap-2 text-gray-500 text-sm">
           <AlertCircle className="w-4 h-4" />
           <span>Unable to load link preview</span>
-          <a 
-            href={url} 
-            target="_blank" 
+          <a
+            href={url}
+            target="_blank"
             rel="noopener noreferrer"
             className="text-blue-500 hover:text-blue-700 ml-auto flex items-center gap-1"
           >
@@ -81,7 +89,7 @@ export const LinkPreviewCard: React.FC<LinkPreviewCardProps> = ({ url, className
           </a>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -91,9 +99,9 @@ export const LinkPreviewCard: React.FC<LinkPreviewCardProps> = ({ url, className
       transition={{ duration: 0.2 }}
       className={`border border-gray-200 rounded-lg overflow-hidden hover:border-gray-300 transition-colors ${className}`}
     >
-      <a 
-        href={preview.url} 
-        target="_blank" 
+      <a
+        href={preview.url}
+        target="_blank"
         rel="noopener noreferrer"
         className="block hover:bg-gray-50 transition-colors"
       >
@@ -101,13 +109,13 @@ export const LinkPreviewCard: React.FC<LinkPreviewCardProps> = ({ url, className
           <div className="flex gap-3">
             {preview.image && (
               <div className="w-16 h-16 flex-shrink-0">
-                <img 
-                  src={preview.image} 
+                <img
+                  src={preview.image}
                   alt={preview.title}
                   className="w-full h-full object-cover rounded"
                   onError={(e) => {
-                    const target = e.target as HTMLImageElement
-                    target.style.display = 'none'
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
                   }}
                 />
               </div>
@@ -125,17 +133,19 @@ export const LinkPreviewCard: React.FC<LinkPreviewCardProps> = ({ url, className
               )}
               <div className="flex items-center gap-2 text-xs text-gray-500">
                 {preview.favicon && (
-                  <img 
-                    src={preview.favicon} 
-                    alt="" 
+                  <img
+                    src={preview.favicon}
+                    alt=""
                     className="w-4 h-4"
                     onError={(e) => {
-                      const target = e.target as HTMLImageElement
-                      target.style.display = 'none'
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
                     }}
                   />
                 )}
-                <span className="truncate">{preview.site || new URL(preview.url).hostname}</span>
+                <span className="truncate">
+                  {preview.site || new URL(preview.url).hostname}
+                </span>
                 <ExternalLink className="w-3 h-3 ml-auto flex-shrink-0" />
               </div>
             </div>
@@ -143,5 +153,5 @@ export const LinkPreviewCard: React.FC<LinkPreviewCardProps> = ({ url, className
         </div>
       </a>
     </motion.div>
-  )
-}
+  );
+};

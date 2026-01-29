@@ -1,210 +1,247 @@
-import React, { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, MapPin, Calendar, Users, Building2, MessageCircle, Heart, Share2, ExternalLink, CalendarDays, Home, Shield, Check, X, Clock, Globe, DollarSign, Edit } from 'lucide-react'
-import { getTripById, type Trip } from '../lib/tripService'
-import { ChatService } from '../lib/chatService'
-import { useAuth } from '../contexts/AuthContext'
-import { iframelyService } from '../lib/iframely'
-import { supabase } from '../lib/supabase'
-import ShareInviteModal from '../components/ShareInviteModal'
-import { EditTripModal } from '../components/EditTripModal'
+import {
+  ArrowLeft,
+  Building2,
+  Calendar,
+  CalendarDays,
+  Check,
+  Clock,
+  DollarSign,
+  Edit,
+  ExternalLink,
+  Globe,
+  Heart,
+  Home,
+  MapPin,
+  MessageCircle,
+  Share2,
+  Shield,
+  Users,
+  X,
+} from 'lucide-react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { EditTripModal } from '../components/EditTripModal';
+import ShareInviteModal from '../components/ShareInviteModal';
+import { useAuth } from '../contexts/AuthContext';
+import { ChatService } from '../lib/chatService';
+import { iframelyService } from '../lib/iframely';
+import { supabase } from '../lib/supabase';
+import { getTripById, type Trip } from '../lib/tripService';
 
 export const TripDetailPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>()
-  const navigate = useNavigate()
-  const { user } = useAuth()
-  const [trip, setTrip] = useState<Trip | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [messageLoading, setMessageLoading] = useState(false)
-  const [requestLoading, setRequestLoading] = useState(false)
-  const [accommodationImage, setAccommodationImage] = useState<string | null>(null)
-  const [imageLoading, setImageLoading] = useState(false)
-  const [isSaved, setIsSaved] = useState(false)
-  const [showShareModal, setShowShareModal] = useState(false)
-  const [showEditModal, setShowEditModal] = useState(false)
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [trip, setTrip] = useState<Trip | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [messageLoading, setMessageLoading] = useState(false);
+  const [requestLoading, setRequestLoading] = useState(false);
+  const [accommodationImage, setAccommodationImage] = useState<string | null>(
+    null,
+  );
+  const [imageLoading, setImageLoading] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Initial data load only
   useEffect(() => {
     if (id) {
-      loadTrip(id)
+      loadTrip(id);
     }
-  }, [id])
+  }, [id]);
 
   useEffect(() => {
     if (trip?.bookingUrl && !trip.thumbnailUrl) {
-      setImageLoading(true)
-      iframelyService.getAccommodationPreview(trip.bookingUrl)
-        .then(preview => {
+      setImageLoading(true);
+      iframelyService
+        .getAccommodationPreview(trip.bookingUrl)
+        .then((preview) => {
           if (preview.image) {
-            setAccommodationImage(preview.image)
+            setAccommodationImage(preview.image);
           }
-          setImageLoading(false)
+          setImageLoading(false);
         })
         .catch(() => {
-          setImageLoading(false)
-        })
+          setImageLoading(false);
+        });
     }
-  }, [trip?.bookingUrl, trip?.thumbnailUrl])
+  }, [trip?.bookingUrl, trip?.thumbnailUrl]);
 
   const loadTrip = async (tripId: string) => {
     try {
-      setLoading(true)
-      const tripData = await getTripById(tripId)
-      setTrip(tripData)
+      setLoading(true);
+      const tripData = await getTripById(tripId);
+      setTrip(tripData);
     } catch (error) {
-      console.error('Error loading trip:', error)
+      console.error('Error loading trip:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleRequestToJoin = async () => {
     if (!user?.id) {
-      navigate('/signup', { 
-        state: { 
-          from: `/trip/${trip?.id}`, 
-          action: 'request_to_join', 
+      navigate('/signup', {
+        state: {
+          from: `/trip/${trip?.id}`,
+          action: 'request_to_join',
           tripId: trip?.id,
           hostName: trip?.host?.name || 'host',
-          tripName: trip?.name 
-        } 
-      })
-      return
+          tripName: trip?.name,
+        },
+      });
+      return;
     }
-    
-    if (!trip?.hostId) return
-    
+
+    if (!trip?.hostId) return;
+
     // Prevent users from requesting to join their own trip
     if (user.id === trip.hostId) {
-      console.log('Cannot request to join your own trip')
-      return
+      console.log('Cannot request to join your own trip');
+      return;
     }
-    
+
     try {
-      setRequestLoading(true)
-      
+      setRequestLoading(true);
+
       // Create a formal request in the database (this will trigger email notification)
-      const requestMessage = `Hi ${trip.host?.name || 'there'}! I'm interested in joining your trip "${trip.name}" in ${trip.location}. The dates ${formatTripDates(trip)} work well for me. Could you tell me more about the accommodation and plans?`
-      
-      const { error: requestError } = await supabase
-        .from('request')
-        .insert({
-          userId: user.id,
-          tripId: trip.id,
-          message: requestMessage,
-          status: 'pending'
-        })
-      
+      const requestMessage = `Hi ${trip.host?.name || 'there'}! I'm interested in joining your trip "${trip.name}" in ${trip.location}. The dates ${formatTripDates(trip)} work well for me. Could you tell me more about the accommodation and plans?`;
+
+      const { error: requestError } = await supabase.from('request').insert({
+        userId: user.id,
+        tripId: trip.id,
+        message: requestMessage,
+        status: 'pending',
+      });
+
       if (requestError) {
-        console.error('Error creating request:', requestError)
-      // Email notifications are now handled by database triggers when request is inserted
+        console.error('Error creating request:', requestError);
+        // Email notifications are now handled by database triggers when request is inserted
       }
-      
+
       // Create or get conversation with host
-      const conv = await ChatService.getOrCreateDirectConversation(user.id, trip.hostId)
-      
-      // Send the message in chat
-      await ChatService.sendMessage(
-        conv.id,
+      const conv = await ChatService.getOrCreateDirectConversation(
         user.id,
-        requestMessage,
-        'text'
-      )
-      
+        trip.hostId,
+      );
+
+      // Send the message in chat
+      await ChatService.sendMessage(conv.id, user.id, requestMessage, 'text');
+
       // Navigate to messages
-      navigate(`/messages?chat=${conv.id}`)
-      
+      navigate(`/messages?chat=${conv.id}`);
     } catch (error) {
-      console.error('Error sending join request:', error)
+      console.error('Error sending join request:', error);
     } finally {
-      setRequestLoading(false)
+      setRequestLoading(false);
     }
-  }
+  };
 
   const handleMessageHost = async () => {
     if (!user?.id) {
-      navigate('/signup', { 
-        state: { 
-          from: `/trip/${trip?.id}`, 
-          action: 'message', 
+      navigate('/signup', {
+        state: {
+          from: `/trip/${trip?.id}`,
+          action: 'message',
           tripId: trip?.id,
           hostName: trip?.host?.name || 'host',
-          tripName: trip?.name 
-        } 
-      })
-      return
+          tripName: trip?.name,
+        },
+      });
+      return;
     }
-    
-    if (!trip?.hostId) return
-    
+
+    if (!trip?.hostId) return;
+
     // Prevent users from messaging themselves
     if (user.id === trip.hostId) {
-      console.log('Cannot message yourself')
-      return
+      console.log('Cannot message yourself');
+      return;
     }
-    
+
     try {
-      setMessageLoading(true)
-      const conv = await ChatService.getOrCreateDirectConversation(user.id, trip.hostId)
-      navigate(`/messages?chat=${conv.id}`)
+      setMessageLoading(true);
+      const conv = await ChatService.getOrCreateDirectConversation(
+        user.id,
+        trip.hostId,
+      );
+      navigate(`/messages?chat=${conv.id}`);
     } catch (error) {
-      console.error('Error creating chat:', error)
+      console.error('Error creating chat:', error);
     } finally {
-      setMessageLoading(false)
+      setMessageLoading(false);
     }
-  }
+  };
 
   const handleShare = () => {
-    setShowShareModal(true)
-  }
+    setShowShareModal(true);
+  };
 
   const generateTripShareMessage = () => {
-    if (!trip) return ''
-    
-    const baseUrl = window.location.origin
-    const tripUrl = `${baseUrl}/trip/${trip.id}`
-    const dates = formatTripDates(trip)
-    
-    return `Check out this amazing trip to ${trip.location}! ${dates} - Join me on SplitStay and let's explore together. ${tripUrl}`
-  }
+    if (!trip) return '';
+
+    const baseUrl = window.location.origin;
+    const tripUrl = `${baseUrl}/trip/${trip.id}`;
+    const dates = formatTripDates(trip);
+
+    return `Check out this amazing trip to ${trip.location}! ${dates} - Join me on SplitStay and let's explore together. ${tripUrl}`;
+  };
 
   const formatTripDates = (trip: Trip) => {
     if (trip.flexible) {
-      const month = (trip as any).estimatedmonth || trip.estimatedMonth
-      const year = (trip as any).estimatedyear || trip.estimatedYear
-      return month && year ? `${month} ${year}` : 'Dates TBD'
+      // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
+      const month = (trip as any).estimatedmonth || trip.estimatedMonth;
+      // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
+      const year = (trip as any).estimatedyear || trip.estimatedYear;
+      return month && year ? `${month} ${year}` : 'Dates TBD';
     } else if (trip.startDate && trip.endDate) {
-      const start = new Date(trip.startDate)
-      const end = new Date(trip.endDate)
-      const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' }
-      return `${start.toLocaleDateString('en-US', options)} - ${end.toLocaleDateString('en-US', options)}`
+      const start = new Date(trip.startDate);
+      const end = new Date(trip.endDate);
+      const options: Intl.DateTimeFormatOptions = {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      };
+      return `${start.toLocaleDateString('en-US', options)} - ${end.toLocaleDateString('en-US', options)}`;
     }
-    return 'Flexible dates'
-  }
+    return 'Flexible dates';
+  };
 
   const getDuration = (trip: Trip) => {
     if (trip.startDate && trip.endDate) {
-      const start = new Date(trip.startDate)
-      const end = new Date(trip.endDate)
-      const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
-      return `${days} ${days === 1 ? 'day' : 'days'}`
+      const start = new Date(trip.startDate);
+      const end = new Date(trip.endDate);
+      const days = Math.ceil(
+        (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24),
+      );
+      return `${days} ${days === 1 ? 'day' : 'days'}`;
     }
-    return null
-  }
+    return null;
+  };
 
   const getRoomSummary = () => {
-    if (!trip?.rooms || !Array.isArray(trip.rooms)) return null
-    
-    const totalBeds = trip.rooms.reduce((sum: number, room: any) => sum + (room.numberOfBeds || 0), 0)
-    const ensuiteRooms = trip.rooms.filter((room: any) => room.ensuiteBathroom).length
-    
+    if (!trip?.rooms || !Array.isArray(trip.rooms)) return null;
+
+    const totalBeds = trip.rooms.reduce(
+      // biome-ignore lint/suspicious/noExplicitAny: Room is JSON column
+      (sum: number, room: any) => sum + (room.numberOfBeds || 0),
+      0,
+    );
+    const ensuiteRooms = trip.rooms.filter(
+      // biome-ignore lint/suspicious/noExplicitAny: Room is JSON column
+      (room: any) => room.ensuiteBathroom,
+    ).length;
+
     return {
       totalBeds,
       ensuiteRooms,
-      totalRooms: trip.numberOfRooms || trip.rooms.length
-    }
-  }
+      totalRooms: trip.numberOfRooms || trip.rooms.length,
+    };
+  };
 
-  const roomSummary = getRoomSummary()
+  const roomSummary = getRoomSummary();
 
   if (loading) {
     return (
@@ -226,16 +263,21 @@ export const TripDetailPage: React.FC = () => {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (!trip) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Trip not found</h2>
-          <p className="text-gray-600 mb-4">This trip may have been removed or is no longer available.</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Trip not found
+          </h2>
+          <p className="text-gray-600 mb-4">
+            This trip may have been removed or is no longer available.
+          </p>
           <button
+            type="button"
             onClick={() => navigate('/find-partner')}
             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
@@ -243,17 +285,17 @@ export const TripDetailPage: React.FC = () => {
           </button>
         </div>
       </div>
-    )
+    );
   }
 
-  const mainImage = trip.thumbnailUrl || accommodationImage
+  const mainImage = trip.thumbnailUrl || accommodationImage;
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Image Section */}
       <div className="relative h-64 sm:h-96 lg:h-[500px] bg-gradient-to-br from-blue-500 to-purple-600">
         {mainImage ? (
-          <img 
+          <img
             src={mainImage}
             alt={trip.name}
             className="w-full h-full object-cover"
@@ -271,12 +313,13 @@ export const TripDetailPage: React.FC = () => {
             </div>
           </div>
         )}
-        
+
         {/* Overlay gradient for better text readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-        
+
         {/* Back button */}
         <button
+          type="button"
           onClick={() => navigate(-1)}
           className="absolute top-4 left-4 p-2 bg-white/90 backdrop-blur-sm rounded-lg hover:bg-white transition-colors"
         >
@@ -286,14 +329,18 @@ export const TripDetailPage: React.FC = () => {
         {/* Save and Share buttons */}
         <div className="absolute top-4 right-4 flex gap-2">
           <button
+            type="button"
             onClick={() => setIsSaved(!isSaved)}
             className={`p-2 rounded-lg transition-colors ${
-              isSaved ? 'bg-red-500 text-white' : 'bg-white/90 backdrop-blur-sm hover:bg-white'
+              isSaved
+                ? 'bg-red-500 text-white'
+                : 'bg-white/90 backdrop-blur-sm hover:bg-white'
             }`}
           >
             <Heart className={`w-5 h-5 ${isSaved ? 'fill-current' : ''}`} />
           </button>
-          <button 
+          <button
+            type="button"
             onClick={handleShare}
             className="p-2 bg-white/90 backdrop-blur-sm rounded-lg hover:bg-white transition-colors"
           >
@@ -303,7 +350,9 @@ export const TripDetailPage: React.FC = () => {
 
         {/* Title overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2">{trip.name}</h1>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2">
+            {trip.name}
+          </h1>
           <div className="flex flex-wrap items-center gap-4 text-sm sm:text-base">
             <div className="flex items-center gap-2">
               <MapPin className="w-4 h-4" />
@@ -333,28 +382,39 @@ export const TripDetailPage: React.FC = () => {
               <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                 <Building2 className="w-6 h-6 text-blue-600 mb-2" />
                 <p className="text-xs text-gray-500">Type</p>
-                <p className="font-semibold text-sm">{trip.accommodation_type?.name || 'Accommodation'}</p>
+                <p className="font-semibold text-sm">
+                  {trip.accommodation_type?.name || 'Accommodation'}
+                </p>
               </div>
               <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                 <Users className="w-6 h-6 text-blue-600 mb-2" />
                 <p className="text-xs text-gray-500">Group Size</p>
-                <p className="font-semibold text-sm">{roomSummary?.totalRooms || 1} room{(roomSummary?.totalRooms || 1) !== 1 ? 's' : ''}</p>
+                <p className="font-semibold text-sm">
+                  {roomSummary?.totalRooms || 1} room
+                  {(roomSummary?.totalRooms || 1) !== 1 ? 's' : ''}
+                </p>
               </div>
               <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                 <CalendarDays className="w-6 h-6 text-blue-600 mb-2" />
                 <p className="text-xs text-gray-500">Flexibility</p>
-                <p className="font-semibold text-sm">{trip.flexible ? 'Flexible' : 'Fixed dates'}</p>
+                <p className="font-semibold text-sm">
+                  {trip.flexible ? 'Flexible' : 'Fixed dates'}
+                </p>
               </div>
               <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                 <Globe className="w-6 h-6 text-blue-600 mb-2" />
                 <p className="text-xs text-gray-500">Status</p>
-                <p className="font-semibold text-sm">{trip.joinee ? 'Matched' : 'Open'}</p>
+                <p className="font-semibold text-sm">
+                  {trip.joinee ? 'Matched' : 'Open'}
+                </p>
               </div>
             </div>
 
             {/* Description */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">About this trip</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">
+                About this trip
+              </h2>
               <p className="text-gray-700 leading-relaxed">
                 {trip.description || 'No description provided for this trip.'}
               </p>
@@ -362,22 +422,27 @@ export const TripDetailPage: React.FC = () => {
 
             {/* Accommodation Details */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Accommodation Details</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">
+                Accommodation Details
+              </h2>
               <div className="space-y-3">
                 {roomSummary && (
                   <>
                     <div className="flex items-center gap-3">
                       <Home className="w-5 h-5 text-gray-400" />
                       <span className="text-gray-700">
-                        {roomSummary.totalRooms} room{roomSummary.totalRooms !== 1 ? 's' : ''}, 
-                        {roomSummary.totalBeds} bed{roomSummary.totalBeds !== 1 ? 's' : ''}
+                        {roomSummary.totalRooms} room
+                        {roomSummary.totalRooms !== 1 ? 's' : ''},
+                        {roomSummary.totalBeds} bed
+                        {roomSummary.totalBeds !== 1 ? 's' : ''}
                       </span>
                     </div>
                     {roomSummary.ensuiteRooms > 0 && (
                       <div className="flex items-center gap-3">
                         <Check className="w-5 h-5 text-green-500" />
                         <span className="text-gray-700">
-                          {roomSummary.ensuiteRooms} ensuite bathroom{roomSummary.ensuiteRooms !== 1 ? 's' : ''}
+                          {roomSummary.ensuiteRooms} ensuite bathroom
+                          {roomSummary.ensuiteRooms !== 1 ? 's' : ''}
                         </span>
                       </div>
                     )}
@@ -399,7 +464,9 @@ export const TripDetailPage: React.FC = () => {
 
             {/* What's Included */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">What's Included</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">
+                What's Included
+              </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="flex items-center gap-3">
                   <Check className="w-5 h-5 text-green-500" />
@@ -427,14 +494,17 @@ export const TripDetailPage: React.FC = () => {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-6">
               <div className="flex items-start gap-4 mb-4">
                 {trip.host?.imageUrl ? (
-                  <img 
+                  // biome-ignore lint/a11y/useKeyWithClickEvents: Keyboard nav via profile link
+                  <img
                     src={trip.host.imageUrl}
                     alt={trip.host.name || 'Host'}
                     className="w-16 h-16 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => navigate(`/profile/${trip.hostId}`)}
                   />
                 ) : (
-                  <div 
+                  // biome-ignore lint/a11y/noStaticElementInteractions: Keyboard nav via profile link
+                  // biome-ignore lint/a11y/useKeyWithClickEvents: Keyboard nav via profile link
+                  <div
                     className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-300 transition-colors"
                     onClick={() => navigate(`/profile/${trip.hostId}`)}
                   >
@@ -443,11 +513,16 @@ export const TripDetailPage: React.FC = () => {
                 )}
                 <div className="flex-1">
                   {/* TODO: Make profile clickable to redirect to user's profile page */}
-                  <h3 className="font-bold text-lg text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
-                      onClick={() => navigate(`/profile/${trip.hostId}`)}>
+                  {/* biome-ignore lint/a11y/useKeyWithClickEvents: Keyboard nav via profile buttons */}
+                  <h3
+                    className="font-bold text-lg text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
+                    onClick={() => navigate(`/profile/${trip.hostId}`)}
+                  >
                     {trip.host?.name || 'Host'}
                     {user?.id === trip.hostId && (
-                      <span className="ml-2 text-sm font-normal text-blue-600">(You)</span>
+                      <span className="ml-2 text-sm font-normal text-blue-600">
+                        (You)
+                      </span>
                     )}
                   </h3>
                   {/* TODO: Implement real star rating system with reviews */}
@@ -489,6 +564,7 @@ export const TripDetailPage: React.FC = () => {
                   // Host viewing their own trip
                   <div className="space-y-3">
                     <button
+                      type="button"
                       onClick={() => setShowEditModal(true)}
                       className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                     >
@@ -503,21 +579,27 @@ export const TripDetailPage: React.FC = () => {
                   // Other users viewing the trip
                   <>
                     <button
+                      type="button"
                       onClick={handleMessageHost}
                       disabled={messageLoading}
                       className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <MessageCircle className="w-5 h-5" />
-                      <span>{messageLoading ? 'Loading...' : 'Message Host'}</span>
+                      <span>
+                        {messageLoading ? 'Loading...' : 'Message Host'}
+                      </span>
                     </button>
-                    
+
                     {!trip.joinee && (
-                      <button 
+                      <button
+                        type="button"
                         onClick={handleRequestToJoin}
                         disabled={requestLoading}
                         className="w-full px-4 py-3 border-2 border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {requestLoading ? 'Sending Request...' : 'Request to Join'}
+                        {requestLoading
+                          ? 'Sending Request...'
+                          : 'Request to Join'}
                       </button>
                     )}
                   </>
@@ -533,9 +615,14 @@ export const TripDetailPage: React.FC = () => {
                   </div>
                   <p className="text-2xl font-bold text-gray-900">
                     ${trip.estimatedCost}
-                    <span className="text-sm font-normal text-gray-600"> / person</span>
+                    <span className="text-sm font-normal text-gray-600">
+                      {' '}
+                      / person
+                    </span>
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">Split between travelers</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Split between travelers
+                  </p>
                 </div>
               )}
             </div>
@@ -569,13 +656,13 @@ export const TripDetailPage: React.FC = () => {
           open={showEditModal}
           onClose={() => setShowEditModal(false)}
           onUpdate={() => {
-            if (id) loadTrip(id)
+            if (id) loadTrip(id);
           }}
           onDelete={() => {
-            navigate('/dashboard')
+            navigate('/dashboard');
           }}
         />
       )}
     </div>
-  )
-}
+  );
+};

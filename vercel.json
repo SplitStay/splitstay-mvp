@@ -5,7 +5,7 @@
       "destination": "https://dhqvohruecmttgfkfdeb.supabase.co/auth/$1"
     },
     {
-      "source": "/rest/(.*)", 
+      "source": "/rest/(.*)",
       "destination": "https://dhqvohruecmttgfkfdeb.supabase.co/rest/$1"
     },
     {

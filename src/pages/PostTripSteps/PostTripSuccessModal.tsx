@@ -1,19 +1,24 @@
-import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import type React from 'react';
+import { useState } from 'react';
 
 interface Props {
   open: boolean;
   onClose: () => void;
+  // biome-ignore lint/suspicious/noExplicitAny: Trip form data shape
   trip: any;
 }
 
-const defaultShareMessage = "Check out my new trip on SplitStay! Join me or post your own adventure:";
+const defaultShareMessage =
+  'Check out my new trip on SplitStay! Join me or post your own adventure:';
 
 const PostTripSuccessModal: React.FC<Props> = ({ open, onClose, trip }) => {
   const tripUrl = `${window.location.origin}/trip/${trip.id || ''}`;
-  const [shareText, setShareText] = useState(`${defaultShareMessage}\n${tripUrl}`);
+  const [shareText, setShareText] = useState(
+    `${defaultShareMessage}\n${tripUrl}`,
+  );
   const [copied, setCopied] = useState(false);
-  
+
   if (!open) return null;
 
   const handleShare = async () => {
@@ -93,6 +98,7 @@ const PostTripSuccessModal: React.FC<Props> = ({ open, onClose, trip }) => {
         <div className="flex flex-col gap-3 mb-4">
           {typeof navigator.share === 'function' && (
             <button
+              type="button"
               onClick={handleShare}
               className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors"
             >
@@ -100,24 +106,28 @@ const PostTripSuccessModal: React.FC<Props> = ({ open, onClose, trip }) => {
             </button>
           )}
           <button
+            type="button"
             onClick={() => window.open(whatsappUrl, '_blank')}
             className="w-full bg-green-500 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-600 transition-colors"
           >
             Share on WhatsApp
           </button>
           <button
+            type="button"
             onClick={() => window.open(facebookUrl, '_blank')}
             className="w-full bg-blue-800 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-900 transition-colors"
           >
             Share on Facebook
           </button>
           <button
+            type="button"
             onClick={handleInstagramShare}
             className="w-full bg-pink-500 text-white py-3 px-4 rounded-lg font-medium hover:bg-pink-600 transition-colors"
           >
             Share on Instagram (Copy to Clipboard)
           </button>
           <button
+            type="button"
             onClick={handleCopy}
             className="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors"
           >
@@ -125,6 +135,7 @@ const PostTripSuccessModal: React.FC<Props> = ({ open, onClose, trip }) => {
           </button>
         </div>
         <button
+          type="button"
           onClick={onClose}
           className="w-full text-gray-500 hover:text-blue-600 transition-colors text-sm underline"
         >

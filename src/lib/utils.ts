@@ -1,5 +1,5 @@
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -11,13 +11,16 @@ export function formatPrice(amount: number) {
     style: 'currency',
     currency: 'EUR',
     minimumFractionDigits: 0,
-    maximumFractionDigits: 2
+    maximumFractionDigits: 2,
   }).format(amount);
 }
 
 // Format date range
 export function formatDateRange(startDate: Date, endDate: Date) {
-  const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
+  const options: Intl.DateTimeFormatOptions = {
+    month: 'short',
+    day: 'numeric',
+  };
   const start = new Date(startDate).toLocaleDateString('en-US', options);
   const end = new Date(endDate).toLocaleDateString('en-US', options);
   return `${start} – ${end}`;
@@ -34,7 +37,11 @@ export function calculateNights(startDate: Date, endDate: Date) {
 
 // Format date with year
 export function formatDate(date: Date) {
-  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  };
   return new Date(date).toLocaleDateString('en-US', options);
 }
 
@@ -52,10 +59,10 @@ export function getCurrentDayOfStay(checkInDate: Date, checkOutDate: Date) {
   const now = new Date();
   const checkIn = new Date(checkInDate);
   const checkOut = new Date(checkOutDate);
-  
+
   if (now < checkIn) return 0; // Not started yet
   if (now > checkOut) return -1; // Already completed
-  
+
   const diffTime = Math.abs(now.getTime() - checkIn.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   return diffDays;

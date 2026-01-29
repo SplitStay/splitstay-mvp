@@ -1,86 +1,93 @@
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { useUser, useUpdateUser } from '@/hooks/useUser'
-import { Plus, Users, MessageCircle, User, LogOut, Calendar, Bell, Plane, Sparkles } from 'lucide-react'
-import { useAuth } from '../contexts/AuthContext'
-import { getUserTrips, type Trip } from '../lib/tripService'
-import { TripCard } from '../components/TripCard'
-import { MobileNavigation } from '../components/MobileNavigation'
-import ShareInviteModal from '@/components/ShareInviteModal'
-import { MVPBanner } from '../components/MVPBanner'
-import { useNavigate, Link } from 'react-router-dom'
+import { motion } from 'framer-motion';
+import {
+  Bell,
+  Calendar,
+  LogOut,
+  MessageCircle,
+  Plane,
+  Plus,
+  Sparkles,
+  User,
+  Users,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import ShareInviteModal from '@/components/ShareInviteModal';
+import { useUpdateUser, useUser } from '@/hooks/useUser';
+import { MobileNavigation } from '../components/MobileNavigation';
+import { MVPBanner } from '../components/MVPBanner';
+import { TripCard } from '../components/TripCard';
+import { useAuth } from '../contexts/AuthContext';
+import { getUserTrips, type Trip } from '../lib/tripService';
 
 export const DashboardPage = () => {
-  const { data: user, isLoading, error } = useUser()
-  const { user: authUser } = useAuth()
-  const updateUser = useUpdateUser()
-  const [showShareModal, setShowShareModal] = useState(false)
-  const [activeTab, setActiveTab] = useState<'future' | 'past'>('future')
-  const [userTrips, setUserTrips] = useState<Trip[]>([])
-  const [tripsLoading, setTripsLoading] = useState(false)
-  const { signOut } = useAuth()
-  const navigate = useNavigate()
-  
-  const isGuest = !authUser
+  const { data: user, isLoading, error } = useUser();
+  const { user: authUser } = useAuth();
+  const updateUser = useUpdateUser();
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [activeTab, setActiveTab] = useState<'future' | 'past'>('future');
+  const [userTrips, setUserTrips] = useState<Trip[]>([]);
+  const [tripsLoading, setTripsLoading] = useState(false);
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const isGuest = !authUser;
 
   useEffect(() => {
     // Show share modal if profile was just created and share modal hasn't been shown yet
-    if (user && user.profileCreated && !user.shareModalShown) {
-      setShowShareModal(true)
+    if (user?.profileCreated && !user.shareModalShown) {
+      setShowShareModal(true);
     }
-  }, [user])
-
-
+  }, [user]);
 
   // Load user's trips
   useEffect(() => {
     if (user?.id && !isGuest) {
       const loadTrips = async () => {
         try {
-          setTripsLoading(true)
-          const trips = await getUserTrips()
-          setUserTrips(trips)
+          setTripsLoading(true);
+          const trips = await getUserTrips();
+          setUserTrips(trips);
         } catch (error) {
-          console.error('Error loading trips:', error)
+          console.error('Error loading trips:', error);
         } finally {
-          setTripsLoading(false)
+          setTripsLoading(false);
         }
-      }
-      loadTrips()
+      };
+      loadTrips();
     }
-  }, [user?.id, isGuest])
-
+  }, [user?.id, isGuest]);
 
   const handleShareModalClose = async () => {
-    setShowShareModal(false)
+    setShowShareModal(false);
     // Mark share modal as shown so it doesn't appear again
-    if (user && user.profileCreated && !user.shareModalShown) {
+    if (user?.profileCreated && !user.shareModalShown) {
       try {
-        await updateUser.mutateAsync({ shareModalShown: true })
+        await updateUser.mutateAsync({ shareModalShown: true });
       } catch (error) {
-        console.error('Failed to update shareModalShown:', error)
+        console.error('Failed to update shareModalShown:', error);
       }
     }
-  }
+  };
 
   const handleSignOut = async () => {
-    await signOut()
-  }
+    await signOut();
+  };
 
   const handleAuthRequired = (action?: string) => {
-    navigate('/signup', { state: { from: '/dashboard', action } })
-  }
+    navigate('/signup', { state: { from: '/dashboard', action } });
+  };
 
   if (isLoading && !isGuest) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
         <motion.div
           animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
           className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full"
         />
       </div>
-    )
+    );
   }
 
   if (error && !isGuest) {
@@ -91,7 +98,7 @@ export const DashboardPage = () => {
           <p className="text-gray-600">Failed to load user data</p>
         </div>
       </div>
-    )
+    );
   }
 
   // If auth is present but user row is missing yet (fresh OAuth), render a minimal shell instead of blank
@@ -99,19 +106,25 @@ export const DashboardPage = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-200 via-white to-purple-200">
         <MVPBanner />
-        <MobileNavigation isGuest={false} onAuthRequired={() => {}} user={undefined} />
-        <div className="px-4 py-10 text-center text-gray-600">Setting up your account...</div>
+        <MobileNavigation
+          isGuest={false}
+          onAuthRequired={() => {}}
+          user={undefined}
+        />
+        <div className="px-4 py-10 text-center text-gray-600">
+          Setting up your account...
+        </div>
       </div>
-    )
+    );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-200 via-white to-purple-200">
       {/* MVP Banner */}
       <MVPBanner />
-      
+
       {/* Mobile Navigation */}
-      <MobileNavigation 
+      <MobileNavigation
         isGuest={isGuest}
         onAuthRequired={handleAuthRequired}
         user={user}
@@ -127,6 +140,7 @@ export const DashboardPage = () => {
             {isGuest ? (
               <>
                 <button
+                  type="button"
                   onClick={() => navigate('/post-trip')}
                   className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full transition-colors font-medium"
                 >
@@ -134,6 +148,7 @@ export const DashboardPage = () => {
                   Add a Trip
                 </button>
                 <button
+                  type="button"
                   onClick={() => navigate('/find-partners')}
                   className="flex items-center gap-2 bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-full transition-colors font-medium"
                 >
@@ -141,6 +156,7 @@ export const DashboardPage = () => {
                   Find Partners
                 </button>
                 <button
+                  type="button"
                   onClick={() => handleAuthRequired('create_profile')}
                   className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition-colors font-medium"
                 >
@@ -151,6 +167,7 @@ export const DashboardPage = () => {
             ) : (
               <>
                 <button
+                  type="button"
                   onClick={() => navigate('/post-trip')}
                   className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full transition-colors font-medium"
                 >
@@ -158,6 +175,7 @@ export const DashboardPage = () => {
                   Add a Trip
                 </button>
                 <button
+                  type="button"
                   onClick={() => navigate('/find-partners')}
                   className="flex items-center gap-2 bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-full transition-colors font-medium"
                 >
@@ -165,6 +183,7 @@ export const DashboardPage = () => {
                   Find Partners
                 </button>
                 <button
+                  type="button"
                   onClick={() => navigate('/messages')}
                   className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full transition-colors font-medium"
                 >
@@ -172,6 +191,7 @@ export const DashboardPage = () => {
                   Messages
                 </button>
                 <button
+                  type="button"
                   onClick={() => navigate(`/profile/${user?.id}`)}
                   className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition-colors font-medium"
                 >
@@ -179,6 +199,7 @@ export const DashboardPage = () => {
                   Show Profile
                 </button>
                 <button
+                  type="button"
                   onClick={handleSignOut}
                   className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full transition-colors font-medium"
                 >
@@ -207,7 +228,8 @@ export const DashboardPage = () => {
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mx-auto">
                   <p className="text-blue-800 text-sm sm:text-base">
                     <Sparkles className="inline w-4 h-4 mr-1" />
-                    You're browsing as a guest. Sign up to post trips and message travelers!
+                    You're browsing as a guest. Sign up to post trips and
+                    message travelers!
                   </p>
                 </div>
               </>
@@ -234,10 +256,12 @@ export const DashboardPage = () => {
                   Discover Amazing Trips
                 </h3>
                 <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
-                  Browse trips posted by travelers around the world. Find your perfect travel partner and split accommodation costs!
+                  Browse trips posted by travelers around the world. Find your
+                  perfect travel partner and split accommodation costs!
                 </p>
                 <div className="flex flex-col gap-3 sm:flex-row sm:gap-3 justify-center">
                   <button
+                    type="button"
                     onClick={() => navigate('/find-partners')}
                     className="flex items-center justify-center gap-2 bg-purple-500 hover:bg-purple-600 text-white px-4 sm:px-6 py-3 rounded-lg transition-colors font-medium text-sm sm:text-base"
                   >
@@ -245,6 +269,7 @@ export const DashboardPage = () => {
                     Browse Trips
                   </button>
                   <button
+                    type="button"
                     onClick={() => navigate('/post-trip')}
                     className="flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 sm:px-6 py-3 rounded-lg transition-colors font-medium text-sm sm:text-base"
                   >
@@ -259,6 +284,7 @@ export const DashboardPage = () => {
                 <div className="border-b border-gray-200">
                   <nav className="flex w-full">
                     <button
+                      type="button"
                       onClick={() => setActiveTab('future')}
                       className={`flex-1 flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-6 py-3 sm:py-5 text-xs sm:text-sm font-medium border-b-2 transition-colors ${
                         activeTab === 'future'
@@ -271,6 +297,7 @@ export const DashboardPage = () => {
                       <span className="sm:hidden">Future</span>
                     </button>
                     <button
+                      type="button"
                       onClick={() => setActiveTab('past')}
                       className={`flex-1 flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-6 py-3 sm:py-5 text-xs sm:text-sm font-medium border-b-2 transition-colors ${
                         activeTab === 'past'
@@ -285,90 +312,105 @@ export const DashboardPage = () => {
                   </nav>
                 </div>
 
-            {/* Tab Content */}
-            <div className="p-4 sm:p-6 lg:p-8">
-              {tripsLoading ? (
-                <div className="text-center py-8 sm:py-12">
-                  <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-blue-600 mx-auto mb-3 sm:mb-4"></div>
-                  <p className="text-gray-600 text-sm sm:text-base">Loading your trips...</p>
-                </div>
-              ) : (
-                <>
-                  {activeTab === 'future' && (
-                    <div>
-                      {userTrips.filter(trip => {
-                        if (trip.flexible) return true;
-                        return trip.startDate ? new Date(trip.startDate) >= new Date() : true;
-                      }).length > 0 ? (
-                        <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 auto-rows-fr">
-                          {userTrips.filter(trip => {
+                {/* Tab Content */}
+                <div className="p-4 sm:p-6 lg:p-8">
+                  {tripsLoading ? (
+                    <div className="text-center py-8 sm:py-12">
+                      <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-blue-600 mx-auto mb-3 sm:mb-4"></div>
+                      <p className="text-gray-600 text-sm sm:text-base">
+                        Loading your trips...
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      {activeTab === 'future' && (
+                        <div>
+                          {userTrips.filter((trip) => {
                             if (trip.flexible) return true;
-                            return trip.startDate ? new Date(trip.startDate) >= new Date() : true;
-                          }).map((trip) => (
-                            <TripCard
-                              key={trip.id}
-                              trip={trip}
-                              onClick={() => navigate(`/trip/${trip.id}`)}
-                            />
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="text-center py-8 sm:py-12">
-                          <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-full mb-3 sm:mb-4">
-                            <Plane className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
-                          </div>
-                          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
-                            No upcoming trips yet
-                          </h3>
-                          <p className="text-sm sm:text-base text-gray-600 mb-4">
-                            Create your first trip and find travel partners!
-                          </p>
-                          <button
-                            onClick={() => navigate('/post-trip')}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors text-sm sm:text-base"
-                          >
-                            Post Your First Trip
-                          </button>
+                            return trip.startDate
+                              ? new Date(trip.startDate) >= new Date()
+                              : true;
+                          }).length > 0 ? (
+                            <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 auto-rows-fr">
+                              {userTrips
+                                .filter((trip) => {
+                                  if (trip.flexible) return true;
+                                  return trip.startDate
+                                    ? new Date(trip.startDate) >= new Date()
+                                    : true;
+                                })
+                                .map((trip) => (
+                                  <TripCard
+                                    key={trip.id}
+                                    trip={trip}
+                                    onClick={() => navigate(`/trip/${trip.id}`)}
+                                  />
+                                ))}
+                            </div>
+                          ) : (
+                            <div className="text-center py-8 sm:py-12">
+                              <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-full mb-3 sm:mb-4">
+                                <Plane className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
+                              </div>
+                              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
+                                No upcoming trips yet
+                              </h3>
+                              <p className="text-sm sm:text-base text-gray-600 mb-4">
+                                Create your first trip and find travel partners!
+                              </p>
+                              <button
+                                type="button"
+                                onClick={() => navigate('/post-trip')}
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors text-sm sm:text-base"
+                              >
+                                Post Your First Trip
+                              </button>
+                            </div>
+                          )}
                         </div>
                       )}
-                    </div>
-                  )}
-                  {activeTab === 'past' && (
-                    <div>
-                      {userTrips.filter(trip => {
-                        if (trip.flexible) return false;
-                        return trip.endDate ? new Date(trip.endDate) < new Date() : false;
-                      }).length > 0 ? (
-                        <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 auto-rows-fr">
-                          {userTrips.filter(trip => {
+                      {activeTab === 'past' && (
+                        <div>
+                          {userTrips.filter((trip) => {
                             if (trip.flexible) return false;
-                            return trip.endDate ? new Date(trip.endDate) < new Date() : false;
-                          }).map((trip) => (
-                            <TripCard
-                              key={trip.id}
-                              trip={trip}
-                              onClick={() => navigate(`/trip/${trip.id}`)}
-                            />
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="text-center py-8 sm:py-12">
-                          <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-full mb-3 sm:mb-4">
-                            <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
-                          </div>
-                          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
-                            No past trips yet
-                          </h3>
-                          <p className="text-sm sm:text-base text-gray-600">
-                            Your completed trips will appear here.
-                          </p>
+                            return trip.endDate
+                              ? new Date(trip.endDate) < new Date()
+                              : false;
+                          }).length > 0 ? (
+                            <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 auto-rows-fr">
+                              {userTrips
+                                .filter((trip) => {
+                                  if (trip.flexible) return false;
+                                  return trip.endDate
+                                    ? new Date(trip.endDate) < new Date()
+                                    : false;
+                                })
+                                .map((trip) => (
+                                  <TripCard
+                                    key={trip.id}
+                                    trip={trip}
+                                    onClick={() => navigate(`/trip/${trip.id}`)}
+                                  />
+                                ))}
+                            </div>
+                          ) : (
+                            <div className="text-center py-8 sm:py-12">
+                              <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-full mb-3 sm:mb-4">
+                                <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
+                              </div>
+                              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
+                                No past trips yet
+                              </h3>
+                              <p className="text-sm sm:text-base text-gray-600">
+                                Your completed trips will appear here.
+                              </p>
+                            </div>
+                          )}
                         </div>
                       )}
-                    </div>
+                    </>
                   )}
-                </>
-              )}
-            </div>
+                </div>
               </>
             )}
           </div>
@@ -376,44 +418,45 @@ export const DashboardPage = () => {
           {/* Trip Requests Section - Only for authenticated users */}
           {!isGuest && (
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="inline-flex items-center justify-center w-8 h-8 bg-orange-100 rounded-lg">
-                    <Bell className="w-4 h-4 text-orange-600" />
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="inline-flex items-center justify-center w-8 h-8 bg-orange-100 rounded-lg">
+                      <Bell className="w-4 h-4 text-orange-600" />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-semibold text-gray-900">
+                        Trip Requests Received
+                      </h2>
+                      <p className="text-sm text-gray-600">
+                        People wanting to join your trips
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-900">
-                      Trip Requests Received
-                    </h2>
-                    <p className="text-sm text-gray-600">
-                      People wanting to join your trips
-                    </p>
-                  </div>
+                  {/* Requests count badge (hidden when 0) */}
+                  {/* TODO: wire actual count from API when available */}
+                  {false && (
+                    <div className="flex items-center justify-center w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full">
+                      0
+                    </div>
+                  )}
                 </div>
-                {/* Requests count badge (hidden when 0) */}
-                {/* TODO: wire actual count from API when available */}
-                {false && (
-                  <div className="flex items-center justify-center w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full">
-                    0
+              </div>
+
+              <div className="p-8">
+                <div className="text-center py-12">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-lg mb-6">
+                    <Bell className="w-8 h-8 text-gray-400" />
                   </div>
-                )}
-              </div>
-            </div>
-            
-            <div className="p-8">
-              <div className="text-center py-12">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-lg mb-6">
-                  <Bell className="w-8 h-8 text-gray-400" />
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    No Trip Requests Yet
+                  </h3>
+                  <p className="text-gray-600">
+                    When people want to join your trips, you'll see their
+                    requests here.
+                  </p>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  No Trip Requests Yet
-                </h3>
-                <p className="text-gray-600">
-                  When people want to join your trips, you'll see their requests here.
-                </p>
               </div>
-            </div>
             </div>
           )}
         </div>
@@ -426,5 +469,5 @@ export const DashboardPage = () => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};

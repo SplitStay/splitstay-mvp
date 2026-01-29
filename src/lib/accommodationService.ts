@@ -17,15 +17,15 @@ export interface RoomConfiguration {
 
 export const BED_TYPES = [
   'Single Bed',
-  'Double Bed', 
+  'Double Bed',
   'Queen Bed',
   'King Bed',
   'Twin Bed',
   'Sofa Bed',
-  'Bunk Bed'
+  'Bunk Bed',
 ] as const;
 
-export type BedType = typeof BED_TYPES[number];
+export type BedType = (typeof BED_TYPES)[number];
 
 /**
  * Fetches all accommodation types from the database
@@ -47,19 +47,23 @@ export const getAccommodationTypes = async (): Promise<AccommodationType[]> => {
 /**
  * Creates a default room configuration based on number of rooms
  */
-export const createDefaultRooms = (numberOfRooms: number): RoomConfiguration[] => {
+export const createDefaultRooms = (
+  numberOfRooms: number,
+): RoomConfiguration[] => {
   return Array.from({ length: numberOfRooms }, (_, index) => ({
     id: index + 1,
     numberOfBeds: index === 0 ? 2 : 1, // First room has 2 beds, others have 1
     bedType: 'Double Bed' as BedType,
-    ensuiteBathroom: index === 0 // Only first room has ensuite by default
+    ensuiteBathroom: index === 0, // Only first room has ensuite by default
   }));
 };
 
 /**
  * Validates room configuration data
  */
-export const validateRoomConfiguration = (rooms: RoomConfiguration[]): string | null => {
+export const validateRoomConfiguration = (
+  rooms: RoomConfiguration[],
+): string | null => {
   if (!rooms || rooms.length === 0) {
     return 'At least one room is required';
   }
@@ -68,7 +72,7 @@ export const validateRoomConfiguration = (rooms: RoomConfiguration[]): string | 
     if (!room.numberOfBeds || room.numberOfBeds < 1 || room.numberOfBeds > 10) {
       return `Room ${room.id}: Number of beds must be between 1 and 10`;
     }
-    
+
     if (!room.bedType || !BED_TYPES.includes(room.bedType as BedType)) {
       return `Room ${room.id}: Invalid bed type`;
     }

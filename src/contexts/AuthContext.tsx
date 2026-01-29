@@ -1,42 +1,52 @@
-import { createContext, useContext, useEffect, useState } from 'react'
-import type { User, Session, AuthError } from '@supabase/supabase-js'
-import { supabase } from '../lib/supabase'
-import { useNavigate } from 'react-router-dom'
-import { identifyUser, amplitudeService } from '../lib/amplitude'
+import type { AuthError, Session, User } from '@supabase/supabase-js';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { amplitudeService, identifyUser } from '../lib/amplitude';
+import { supabase } from '../lib/supabase';
 
 interface AuthContextType {
-  user: User | null
-  session: Session | null
-  loading: boolean
-  signUp: (email: string, password: string, options?: { data?: Record<string, unknown> }) => Promise<{ error: AuthError | null }>
-  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>
-  signInWithOAuth: (provider: 'google' | 'facebook', redirectAfterLogin?: string) => Promise<{ error: AuthError | null }>
-  signOut: () => Promise<{ error: AuthError | null }>
-  resetPassword: (email: string) => Promise<{ error: AuthError | null }>
-  updatePassword: (password: string) => Promise<{ error: AuthError | null }>
-  resendConfirmation: (email: string) => Promise<{ error: AuthError | null }>
+  user: User | null;
+  session: Session | null;
+  loading: boolean;
+  signUp: (
+    email: string,
+    password: string,
+    options?: { data?: Record<string, unknown> },
+  ) => Promise<{ error: AuthError | null }>;
+  signIn: (
+    email: string,
+    password: string,
+  ) => Promise<{ error: AuthError | null }>;
+  signInWithOAuth: (
+    provider: 'google' | 'facebook',
+    redirectAfterLogin?: string,
+  ) => Promise<{ error: AuthError | null }>;
+  signOut: () => Promise<{ error: AuthError | null }>;
+  resetPassword: (email: string) => Promise<{ error: AuthError | null }>;
+  updatePassword: (password: string) => Promise<{ error: AuthError | null }>;
+  resendConfirmation: (email: string) => Promise<{ error: AuthError | null }>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
-  const context = useContext(AuthContext)
+  const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider')
+    throw new Error('useAuth must be used within an AuthProvider');
   }
-  return context
-}
+  return context;
+};
 
 interface AuthProviderProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null)
-  const [session, setSession] = useState<Session | null>(null)
-  const [loading, setLoading] = useState(true)
-  const navigate = useNavigate()
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
   const isLocalhost = window.location.hostname === 'localhost';
   const redirectTo = isLocalhost
     ? 'http://localhost:5173'
@@ -45,17 +55,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session)
-      setUser(session?.user ?? null)
-      setLoading(false)
-      
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+
       // Check if user needs to be redirected on initial load
       if (session?.user) {
         const urlParams = new URLSearchParams(window.location.search);
         const signupType = urlParams.get('type');
         const currentPath = window.location.pathname;
-        const hasAuthTokens = window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token');
-        
+        const hasAuthTokens =
+          window.location.hash.includes('access_token') ||
+          window.location.hash.includes('refresh_token');
+
         if (signupType === 'signup') {
           // This is an email confirmation, redirect to profile creation
           window.history.replaceState({}, document.title, '/');
@@ -68,20 +80,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           if (urlParams.get('oauth') === 'true') {
             urlParams.delete('oauth');
             const newSearch = urlParams.toString();
-            const newUrl = currentPath + (newSearch ? '?' + newSearch : '');
+            const newUrl = currentPath + (newSearch ? `?${newSearch}` : '');
             window.history.replaceState({}, document.title, newUrl);
           }
-          
+
           // Check for stored OAuth redirect URL first
-          const oauthRedirect = localStorage.getItem('splitstay_oauth_redirect');
-          
+          const oauthRedirect = localStorage.getItem(
+            'splitstay_oauth_redirect',
+          );
+
           try {
             const { data: userData, error } = await supabase
               .from('user')
               .select('profileCreated')
               .eq('id', session.user.id)
               .single();
-            
+
             if (!error && userData?.profileCreated) {
               // User has profile
               if (oauthRedirect) {
@@ -97,208 +111,230 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               // User needs to create profile or doesn't exist
               setTimeout(() => navigate('/create-profile'), 100);
             }
-          } catch (error) {
+          } catch (_error) {
             // If user doesn't exist in our table, they need to create profile
             setTimeout(() => navigate('/create-profile'), 100);
           }
         }
       }
-    })
+    });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session)
-        setUser(session?.user ?? null)
-        setLoading(false)
-        
-        // Handle Amplitude user identification (non-blocking)
-        if (event === 'SIGNED_IN' && session?.user) {
-          // Identify user in Amplitude asynchronously
-          setTimeout(async () => {
-            try {
-              const { data: userData } = await supabase
-                .from('user')
-                .select('name, email, currentPlace')
-                .eq('id', session.user.id)
-                .single()
-              
-              identifyUser(session.user.id, {
-                email: session.user.email,
-                name: userData?.name,
-                location: userData?.currentPlace,
-                sign_up_method: session.user.app_metadata?.provider || 'email'
-              })
-            } catch (error) {
-              // Fallback identification with minimal data
-              identifyUser(session.user.id, {
-                email: session.user.email,
-                sign_up_method: session.user.app_metadata?.provider || 'email'
-              })
-            }
-          }, 0)
-        } else if (event === 'SIGNED_OUT') {
-          // Reset Amplitude asynchronously
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+
+      // Handle Amplitude user identification (non-blocking)
+      if (event === 'SIGNED_IN' && session?.user) {
+        // Identify user in Amplitude asynchronously
+        setTimeout(async () => {
+          try {
+            const { data: userData } = await supabase
+              .from('user')
+              .select('name, email, currentPlace')
+              .eq('id', session.user.id)
+              .single();
+
+            identifyUser(session.user.id, {
+              email: session.user.email,
+              name: userData?.name,
+              location: userData?.currentPlace,
+              sign_up_method: session.user.app_metadata?.provider || 'email',
+            });
+          } catch (_error) {
+            // Fallback identification with minimal data
+            identifyUser(session.user.id, {
+              email: session.user.email,
+              sign_up_method: session.user.app_metadata?.provider || 'email',
+            });
+          }
+        }, 0);
+      } else if (event === 'SIGNED_OUT') {
+        // Reset Amplitude asynchronously
+        setTimeout(() => {
+          amplitudeService.reset();
+        }, 0);
+      }
+
+      // Handle post-authentication redirect
+      if (event === 'SIGNED_IN' && session?.user) {
+        const currentPath = window.location.pathname;
+        const hasAuthTokens =
+          window.location.hash.includes('access_token') ||
+          window.location.hash.includes('refresh_token');
+        const urlParams = new URLSearchParams(window.location.search);
+        const signupType = urlParams.get('type');
+        const isEmailConfirmation = signupType === 'signup';
+        const isPasswordRecovery = signupType === 'recovery';
+
+        // Handle email confirmation specifically
+        if (isEmailConfirmation) {
+          // Clear URL parameters and redirect to profile creation
+          window.history.replaceState({}, document.title, '/');
           setTimeout(() => {
-            amplitudeService.reset()
-          }, 0)
+            navigate('/create-profile');
+          }, 100);
+          return;
         }
-        
-        // Handle post-authentication redirect
-        if (event === 'SIGNED_IN' && session?.user) {
-          const currentPath = window.location.pathname;
-          const hasAuthTokens = window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token');
-          const urlParams = new URLSearchParams(window.location.search);
-          const signupType = urlParams.get('type');
-          const isEmailConfirmation = signupType === 'signup';
-          const isPasswordRecovery = signupType === 'recovery';
-          
-          // Handle email confirmation specifically
-          if (isEmailConfirmation) {
-            // Clear URL parameters and redirect to profile creation
-            window.history.replaceState({}, document.title, '/');
-            setTimeout(() => {
-              navigate('/create-profile');
-            }, 100);
-            return;
+
+        // Handle password recovery
+        if (isPasswordRecovery) {
+          window.history.replaceState({}, document.title, '/reset-password');
+          return;
+        }
+
+        // Handle OAuth callback - when we have auth tokens or oauth=true parameter
+        if (hasAuthTokens || urlParams.get('oauth') === 'true') {
+          // Clear the URL of auth tokens and oauth parameter
+          if (hasAuthTokens) {
+            window.history.replaceState({}, document.title, currentPath);
+          } else if (urlParams.get('oauth') === 'true') {
+            urlParams.delete('oauth');
+            const newSearch = urlParams.toString();
+            const newUrl = currentPath + (newSearch ? `?${newSearch}` : '');
+            window.history.replaceState({}, document.title, newUrl);
           }
-          
-          // Handle password recovery
-          if (isPasswordRecovery) {
-            window.history.replaceState({}, document.title, '/reset-password');
-            return;
-          }
-          
-          // Handle OAuth callback - when we have auth tokens or oauth=true parameter
-          if (hasAuthTokens || urlParams.get('oauth') === 'true') {
-            // Clear the URL of auth tokens and oauth parameter
-            if (hasAuthTokens) {
-              window.history.replaceState({}, document.title, currentPath);
-            } else if (urlParams.get('oauth') === 'true') {
-              urlParams.delete('oauth');
-              const newSearch = urlParams.toString();
-              const newUrl = currentPath + (newSearch ? '?' + newSearch : '');
-              window.history.replaceState({}, document.title, newUrl);
-            }
-            
-            setTimeout(async () => {
-              console.log('[OAuth Debug] Checking user profile for:', session.user.id);
-              try {
-                const { data: userData, error } = await supabase
-                  .from('user')
-                  .select('profileCreated')
-                  .eq('id', session.user.id)
-                  .single();
-                
-                console.log('[OAuth Debug] User query result:', { userData, error });
-                
-                // Check for stored OAuth redirect URL
-                const oauthRedirect = localStorage.getItem('splitstay_oauth_redirect');
-                
-                if (!error && userData?.profileCreated) {
-                  // User has profile
-                  console.log('[OAuth Debug] User has profile, redirecting to dashboard or stored URL');
-                  if (oauthRedirect) {
-                    // Clear the stored redirect and navigate to it
-                    localStorage.removeItem('splitstay_oauth_redirect');
-                    navigate(oauthRedirect);
-                  } else if (currentPath === '/') {
-                    // Only redirect to dashboard if we're on homepage
-                    navigate('/dashboard');
-                  }
-                  // Otherwise stay on current page
-                } else {
-                  // User needs to create profile or doesn't exist
-                  // Keep the redirect URL for after profile creation
-                  console.log('[OAuth Debug] User needs profile creation:', { error, userData });
-                  navigate('/create-profile');
+
+          setTimeout(async () => {
+            console.log(
+              '[OAuth Debug] Checking user profile for:',
+              session.user.id,
+            );
+            try {
+              const { data: userData, error } = await supabase
+                .from('user')
+                .select('profileCreated')
+                .eq('id', session.user.id)
+                .single();
+
+              console.log('[OAuth Debug] User query result:', {
+                userData,
+                error,
+              });
+
+              // Check for stored OAuth redirect URL
+              const oauthRedirect = localStorage.getItem(
+                'splitstay_oauth_redirect',
+              );
+
+              if (!error && userData?.profileCreated) {
+                // User has profile
+                console.log(
+                  '[OAuth Debug] User has profile, redirecting to dashboard or stored URL',
+                );
+                if (oauthRedirect) {
+                  // Clear the stored redirect and navigate to it
+                  localStorage.removeItem('splitstay_oauth_redirect');
+                  navigate(oauthRedirect);
+                } else if (currentPath === '/') {
+                  // Only redirect to dashboard if we're on homepage
+                  navigate('/dashboard');
                 }
-              } catch (error) {
-                // If user doesn't exist in our table, they need to create profile
-                console.log('[OAuth Debug] Error checking user:', error);
+                // Otherwise stay on current page
+              } else {
+                // User needs to create profile or doesn't exist
+                // Keep the redirect URL for after profile creation
+                console.log('[OAuth Debug] User needs profile creation:', {
+                  error,
+                  userData,
+                });
                 navigate('/create-profile');
               }
-            }, 100);
-          }
+            } catch (error) {
+              // If user doesn't exist in our table, they need to create profile
+              console.log('[OAuth Debug] Error checking user:', error);
+              navigate('/create-profile');
+            }
+          }, 100);
         }
       }
-    )
+    });
 
-    return () => subscription.unsubscribe()
-  }, [])
+    return () => subscription.unsubscribe();
+  }, [navigate]);
 
-  const signUp = async (email: string, password: string, options?: { data?: Record<string, unknown> }) => {
+  const signUp = async (
+    email: string,
+    password: string,
+    options?: { data?: Record<string, unknown> },
+  ) => {
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         ...options,
-        emailRedirectTo: `${redirectTo}/?type=signup#`
-      }
-    })
-    return { error }
-  }
+        emailRedirectTo: `${redirectTo}/?type=signup#`,
+      },
+    });
+    return { error };
+  };
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
       email,
-      password
-    })
-    return { error }
-  }
+      password,
+    });
+    return { error };
+  };
 
-  const signInWithOAuth = async (provider: 'google' | 'facebook', redirectAfterLogin?: string) => {
+  const signInWithOAuth = async (
+    provider: 'google' | 'facebook',
+    redirectAfterLogin?: string,
+  ) => {
     // Store the intended redirect URL in localStorage for OAuth callback
     if (redirectAfterLogin) {
-      localStorage.setItem('splitstay_oauth_redirect', redirectAfterLogin)
+      localStorage.setItem('splitstay_oauth_redirect', redirectAfterLogin);
     }
-    
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${redirectTo}/?oauth=true`
-      }
-    })
-    return { error }
-  }
+        redirectTo: `${redirectTo}/?oauth=true`,
+      },
+    });
+    return { error };
+  };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut()
-    
-    setUser(null)
-    setSession(null)
-    
-    window.localStorage.removeItem('supabase.auth.token')
-    
+    const { error } = await supabase.auth.signOut();
+
+    setUser(null);
+    setSession(null);
+
+    window.localStorage.removeItem('supabase.auth.token');
+
     setTimeout(() => {
-      navigate('/')
-      window.location.reload()
-    }, 100)
-    
-    return { error }
-  }
+      navigate('/');
+      window.location.reload();
+    }, 100);
+
+    return { error };
+  };
 
   const resetPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password?type=recovery`
-    })
-    return { error }
-  }
+      redirectTo: `${window.location.origin}/reset-password?type=recovery`,
+    });
+    return { error };
+  };
 
   const updatePassword = async (password: string) => {
     const { error } = await supabase.auth.updateUser({
-      password
-    })
-    return { error }
-  }
+      password,
+    });
+    return { error };
+  };
 
   const resendConfirmation = async (email: string) => {
     const { error } = await supabase.auth.resend({
       type: 'signup',
-      email
-    })
-    return { error }
-  }
+      email,
+    });
+    return { error };
+  };
 
   const value = {
     user,
@@ -310,8 +346,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signOut,
     resetPassword,
     updatePassword,
-    resendConfirmation
-  }
+    resendConfirmation,
+  };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-}
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};

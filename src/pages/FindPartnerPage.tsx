@@ -1,33 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Filter, MapPin, Calendar, X, ChevronDown } from 'lucide-react';
-import { useNavigate, Link } from 'react-router-dom';
-import { searchTrips, type Trip } from '../lib/tripService';
-import { TripCard } from '../components/TripCard';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Calendar, ChevronDown, Filter, MapPin, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import CityAutocomplete from '../components/CityAutocomplete';
+import { TripCard } from '../components/TripCard';
 import { useAuth } from '../contexts/AuthContext';
+import { searchTrips, type Trip } from '../lib/tripService';
 
 const FindPartnerPage = () => {
   const navigate = useNavigate();
+  // biome-ignore lint/correctness/noUnusedVariables: User may be used for filtering
   const { user } = useAuth();
   const [destinationQuery, setDestinationQuery] = useState('');
   const [selectedStartDate, setSelectedStartDate] = useState('');
   const [selectedEndDate, setSelectedEndDate] = useState('');
   const [isFlexible, setIsFlexible] = useState(false);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-  
+
   // Advanced filters
   const [selectedRegion, setSelectedRegion] = useState('');
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
-  const [selectedAccommodationType, setSelectedAccommodationType] = useState('');
+  const [selectedAccommodationType, setSelectedAccommodationType] =
+    useState('');
   const [selectedGroupSize, setSelectedGroupSize] = useState('');
   const [selectedVibe, setSelectedVibe] = useState('');
-  
-  const [trips, setTrips] = useState<Trip[]>([]);
+
+  const [_trips, setTrips] = useState<Trip[]>([]);
   const [filteredTrips, setFilteredTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Initial data load only
   useEffect(() => {
     loadTrips();
   }, []);
@@ -61,23 +64,28 @@ const FindPartnerPage = () => {
 
   const getActiveFilters = () => {
     const filters = [];
-    if (destinationQuery) filters.push({ label: destinationQuery, key: 'destination' });
+    if (destinationQuery)
+      filters.push({ label: destinationQuery, key: 'destination' });
     if (selectedStartDate || selectedEndDate) {
-      const dateLabel = isFlexible ? 'Flexible Dates' : 
-        `${selectedStartDate || 'Any'} - ${selectedEndDate || 'Any'}`;
+      const dateLabel = isFlexible
+        ? 'Flexible Dates'
+        : `${selectedStartDate || 'Any'} - ${selectedEndDate || 'Any'}`;
       filters.push({ label: dateLabel, key: 'dates' });
     }
     if (selectedRegion) filters.push({ label: selectedRegion, key: 'region' });
-    if (selectedCountry) filters.push({ label: selectedCountry, key: 'country' });
+    if (selectedCountry)
+      filters.push({ label: selectedCountry, key: 'country' });
     if (selectedCity) filters.push({ label: selectedCity, key: 'city' });
-    if (selectedAccommodationType) filters.push({ label: selectedAccommodationType, key: 'type' });
-    if (selectedGroupSize) filters.push({ label: `${selectedGroupSize} people`, key: 'groupSize' });
+    if (selectedAccommodationType)
+      filters.push({ label: selectedAccommodationType, key: 'type' });
+    if (selectedGroupSize)
+      filters.push({ label: `${selectedGroupSize} people`, key: 'groupSize' });
     if (selectedVibe) filters.push({ label: selectedVibe, key: 'vibe' });
     return filters;
   };
 
   const removeFilter = (key: string) => {
-    switch(key) {
+    switch (key) {
       case 'destination':
         setDestinationQuery('');
         break;
@@ -124,73 +132,155 @@ const FindPartnerPage = () => {
   const handleApplyFilters = async () => {
     try {
       setLoading(true);
+      // biome-ignore lint/suspicious/noExplicitAny: Dynamic filter object
       const filters: any = {};
-      
+
       if (destinationQuery) {
         filters.location = destinationQuery;
       }
-      
+
       if (selectedAccommodationType) {
         const typeMap: { [key: string]: string } = {
           'Hostel Room': 'hostel-room',
           'Hotel Room': 'hotel-room',
-          'Apartment': 'apartment',
-          'House': 'house'
+          Apartment: 'apartment',
+          House: 'house',
         };
-        filters.accommodationTypeId = typeMap[selectedAccommodationType] || selectedAccommodationType;
+        filters.accommodationTypeId =
+          typeMap[selectedAccommodationType] || selectedAccommodationType;
       }
-      
+
       if (isFlexible) {
         filters.flexible = true;
       }
-      
+
       const baseTrips = await searchTrips(filters);
-      
+
       // Apply client-side filtering for additional criteria
       let clientFilteredTrips = baseTrips;
-      
+
       // Filter by vibe (using description or custom vibe field)
       if (selectedVibe) {
-        clientFilteredTrips = clientFilteredTrips.filter(trip => {
+        clientFilteredTrips = clientFilteredTrips.filter((trip) => {
           const description = (trip.description || '').toLowerCase();
+          // biome-ignore lint/suspicious/noExplicitAny: Optional vibe field
           const vibe = (trip as any).vibe?.toLowerCase() || '';
           const selectedVibeLower = selectedVibe.toLowerCase();
-          return description.includes(selectedVibeLower) || vibe.includes(selectedVibeLower);
+          return (
+            description.includes(selectedVibeLower) ||
+            vibe.includes(selectedVibeLower)
+          );
         });
       }
-      
+
       // Filter by group size (using number of rooms)
       if (selectedGroupSize) {
-        const size = parseInt(selectedGroupSize);
-        clientFilteredTrips = clientFilteredTrips.filter(trip => {
-          const rooms = (trip as any).numberofrooms || (trip as any).numberOfRooms || 1;
+        const size = parseInt(selectedGroupSize, 10);
+        clientFilteredTrips = clientFilteredTrips.filter((trip) => {
+          const rooms =
+            // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
+            (trip as any).numberofrooms || (trip as any).numberOfRooms || 1;
           return rooms >= size - 1 && rooms <= size + 1; // Allow some flexibility
         });
       }
-      
+
       // Filter by region
       if (selectedRegion) {
-        clientFilteredTrips = clientFilteredTrips.filter(trip => {
+        clientFilteredTrips = clientFilteredTrips.filter((trip) => {
           const location = trip.location.toLowerCase();
           switch (selectedRegion) {
             case 'Europe':
-              return ['france', 'spain', 'italy', 'germany', 'uk', 'united kingdom', 'portugal', 'greece', 'netherlands', 'belgium', 'austria', 'switzerland', 'sweden', 'norway', 'denmark', 'finland', 'poland', 'czech', 'hungary', 'croatia', 'romania', 'bulgaria', 'ireland', 'iceland'].some(country => location.includes(country));
+              return [
+                'france',
+                'spain',
+                'italy',
+                'germany',
+                'uk',
+                'united kingdom',
+                'portugal',
+                'greece',
+                'netherlands',
+                'belgium',
+                'austria',
+                'switzerland',
+                'sweden',
+                'norway',
+                'denmark',
+                'finland',
+                'poland',
+                'czech',
+                'hungary',
+                'croatia',
+                'romania',
+                'bulgaria',
+                'ireland',
+                'iceland',
+              ].some((country) => location.includes(country));
             case 'Asia':
-              return ['japan', 'china', 'thailand', 'india', 'singapore', 'malaysia', 'indonesia', 'vietnam', 'korea', 'philippines', 'taiwan', 'hong kong', 'cambodia', 'laos', 'myanmar', 'nepal', 'sri lanka', 'bangladesh'].some(country => location.includes(country));
+              return [
+                'japan',
+                'china',
+                'thailand',
+                'india',
+                'singapore',
+                'malaysia',
+                'indonesia',
+                'vietnam',
+                'korea',
+                'philippines',
+                'taiwan',
+                'hong kong',
+                'cambodia',
+                'laos',
+                'myanmar',
+                'nepal',
+                'sri lanka',
+                'bangladesh',
+              ].some((country) => location.includes(country));
             case 'North America':
-              return ['usa', 'united states', 'canada', 'mexico'].some(country => location.includes(country));
+              return ['usa', 'united states', 'canada', 'mexico'].some(
+                (country) => location.includes(country),
+              );
             case 'South America':
-              return ['brazil', 'argentina', 'chile', 'peru', 'colombia', 'venezuela', 'ecuador', 'bolivia', 'uruguay', 'paraguay'].some(country => location.includes(country));
+              return [
+                'brazil',
+                'argentina',
+                'chile',
+                'peru',
+                'colombia',
+                'venezuela',
+                'ecuador',
+                'bolivia',
+                'uruguay',
+                'paraguay',
+              ].some((country) => location.includes(country));
             case 'Africa':
-              return ['south africa', 'egypt', 'morocco', 'kenya', 'nigeria', 'ghana', 'tunisia', 'tanzania', 'ethiopia', 'uganda'].some(country => location.includes(country));
+              return [
+                'south africa',
+                'egypt',
+                'morocco',
+                'kenya',
+                'nigeria',
+                'ghana',
+                'tunisia',
+                'tanzania',
+                'ethiopia',
+                'uganda',
+              ].some((country) => location.includes(country));
             case 'Oceania':
-              return ['australia', 'new zealand', 'fiji', 'samoa', 'tonga'].some(country => location.includes(country));
+              return [
+                'australia',
+                'new zealand',
+                'fiji',
+                'samoa',
+                'tonga',
+              ].some((country) => location.includes(country));
             default:
               return true;
           }
         });
       }
-      
+
       setFilteredTrips(clientFilteredTrips);
     } catch (error) {
       console.error('Error applying filters:', error);
@@ -212,6 +302,7 @@ const FindPartnerPage = () => {
             SplitStay
           </Link>
           <button
+            type="button"
             onClick={() => navigate('/dashboard')}
             className="text-gray-600 hover:text-gray-900 font-medium"
           >
@@ -256,11 +347,17 @@ const FindPartnerPage = () => {
                     onChange={(e) => setIsFlexible(e.target.checked)}
                     className="sr-only"
                   />
-                  <span className={`text-sm font-medium ${isFlexible ? 'text-blue-600' : 'text-gray-700'}`}>
+                  <span
+                    className={`text-sm font-medium ${isFlexible ? 'text-blue-600' : 'text-gray-700'}`}
+                  >
                     {isFlexible ? 'Flexible dates' : 'Fixed dates'}
                   </span>
-                  <div className={`ml-auto w-10 h-6 rounded-full transition-colors flex-shrink-0 ${isFlexible ? 'bg-blue-600' : 'bg-gray-300'}`}>
-                    <div className={`w-4 h-4 bg-white rounded-full shadow transform transition-transform ${isFlexible ? 'translate-x-5' : 'translate-x-1'} mt-1`} />
+                  <div
+                    className={`ml-auto w-10 h-6 rounded-full transition-colors flex-shrink-0 ${isFlexible ? 'bg-blue-600' : 'bg-gray-300'}`}
+                  >
+                    <div
+                      className={`w-4 h-4 bg-white rounded-full shadow transform transition-transform ${isFlexible ? 'translate-x-5' : 'translate-x-1'} mt-1`}
+                    />
                   </div>
                 </label>
               </div>
@@ -269,19 +366,24 @@ const FindPartnerPage = () => {
             {/* Filters Button */}
             <div className="sm:col-span-1">
               <button
+                type="button"
                 onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
                 className="w-full flex items-center justify-between px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center">
                   <Filter className="w-5 h-5 text-gray-400 mr-2" />
-                  <span className="font-medium text-gray-700">More Filters</span>
+                  <span className="font-medium text-gray-700">
+                    More Filters
+                  </span>
                   {getActiveFilterCount() > 0 && (
                     <span className="ml-2 px-2 py-0.5 bg-blue-600 text-white text-xs rounded-full">
                       {getActiveFilterCount()}
                     </span>
                   )}
                 </div>
-                <ChevronDown className={`w-5 h-5 text-gray-400 transform transition-transform ${showAdvancedFilters ? 'rotate-180' : ''}`} />
+                <ChevronDown
+                  className={`w-5 h-5 text-gray-400 transform transition-transform ${showAdvancedFilters ? 'rotate-180' : ''}`}
+                />
               </button>
             </div>
           </div>
@@ -296,6 +398,7 @@ const FindPartnerPage = () => {
                 >
                   {filter.label}
                   <button
+                    type="button"
                     onClick={() => removeFilter(filter.key)}
                     className="ml-2 hover:text-blue-900"
                   >
@@ -304,6 +407,7 @@ const FindPartnerPage = () => {
                 </span>
               ))}
               <button
+                type="button"
                 onClick={handleClearFilters}
                 className="text-sm text-gray-500 hover:text-gray-700"
               >
@@ -377,7 +481,9 @@ const FindPartnerPage = () => {
                           <input
                             type="date"
                             value={selectedStartDate}
-                            onChange={(e) => setSelectedStartDate(e.target.value)}
+                            onChange={(e) =>
+                              setSelectedStartDate(e.target.value)
+                            }
                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
                             placeholder="Start date"
                           />
@@ -397,7 +503,9 @@ const FindPartnerPage = () => {
                     {/* Accommodation Type */}
                     <select
                       value={selectedAccommodationType}
-                      onChange={(e) => setSelectedAccommodationType(e.target.value)}
+                      onChange={(e) =>
+                        setSelectedAccommodationType(e.target.value)
+                      }
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
                     >
                       <option value="">All Types</option>
@@ -439,16 +547,18 @@ const FindPartnerPage = () => {
               </motion.div>
             )}
           </AnimatePresence>
-          
+
           {/* Apply Filters Button - Always Visible */}
           <div className="flex justify-between items-center mt-4">
             <button
+              type="button"
               onClick={handleClearFilters}
               className="text-sm text-gray-500 hover:text-gray-700"
             >
               Clear all filters
             </button>
             <button
+              type="button"
               onClick={handleApplyFilters}
               className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
             >
@@ -461,7 +571,9 @@ const FindPartnerPage = () => {
         <div className="mb-12">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
-              {loading ? 'Loading trips...' : `${filteredTrips.length} trips found`}
+              {loading
+                ? 'Loading trips...'
+                : `${filteredTrips.length} trips found`}
             </h2>
           </div>
 
@@ -469,7 +581,11 @@ const FindPartnerPage = () => {
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div
+                  // biome-ignore lint/suspicious/noArrayIndexKey: Static skeleton array
+                  key={i}
+                  className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
+                >
                   <div className="h-48 bg-gray-200 animate-pulse" />
                   <div className="p-4">
                     <div className="h-6 bg-gray-200 rounded animate-pulse mb-3" />
@@ -490,9 +606,14 @@ const FindPartnerPage = () => {
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <MapPin className="w-8 h-8 text-gray-400" />
               </div>
-              <h3 className="text-xl font-medium text-gray-900 mb-2">No trips found</h3>
-              <p className="text-gray-500 mb-6">Try adjusting your filters or check back later for new trips.</p>
+              <h3 className="text-xl font-medium text-gray-900 mb-2">
+                No trips found
+              </h3>
+              <p className="text-gray-500 mb-6">
+                Try adjusting your filters or check back later for new trips.
+              </p>
               <button
+                type="button"
                 onClick={() => navigate('/post-trip')}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
               >

@@ -1,10 +1,10 @@
-export { HomePage } from './HomePage'
-export { LoginPage } from './LoginPage'
-export { SignupPage } from './SignupPage'
-export { ForgotPasswordPage } from './ForgotPasswordPage'
-export { ResetPasswordPage } from './ResetPasswordPage'
-export { DashboardPage } from './DashboardPage'
-export { default as TermsPage } from './TermsPage'
-export { default as PrivacyPage } from './PrivacyPage'
-export { default as HowItWorks } from './HowItWorks'
-export { default as FindPartnerPage } from './FindPartnerPage'
+export { DashboardPage } from './DashboardPage';
+export { default as FindPartnerPage } from './FindPartnerPage';
+export { ForgotPasswordPage } from './ForgotPasswordPage';
+export { HomePage } from './HomePage';
+export { default as HowItWorks } from './HowItWorks';
+export { LoginPage } from './LoginPage';
+export { default as PrivacyPage } from './PrivacyPage';
+export { ResetPasswordPage } from './ResetPasswordPage';
+export { SignupPage } from './SignupPage';
+export { default as TermsPage } from './TermsPage';

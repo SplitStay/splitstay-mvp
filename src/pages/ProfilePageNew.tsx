@@ -1,26 +1,44 @@
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { MapPin, Calendar, Languages, Star, Globe, UserPlus, Share2, Edit } from 'lucide-react'
-import { useUser, useUserByIdOrCustomUrl } from '@/hooks/useUser'
-import { useAuth } from '@/contexts/AuthContext'
-import { useNavigate, useParams, Link } from 'react-router-dom'
-import ShareInviteModal from '@/components/ShareInviteModal'
+import { motion } from 'framer-motion';
+import {
+  BookOpen,
+  Camera,
+  Edit,
+  Globe,
+  Heart,
+  Languages,
+  MapPin,
+  Share2,
+  Sparkles,
+  Star,
+  User,
+  UserPlus,
+} from 'lucide-react';
+import { useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import ShareInviteModal from '@/components/ShareInviteModal';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUser, useUserByIdOrCustomUrl } from '@/hooks/useUser';
 
 export default function ProfilePage() {
-  const { id } = useParams<{ id: string }>()
-  const { user: authUser } = useAuth()
-  const { data: currentUser } = useUser()
-  const { data: profileUser, isLoading, error } = useUserByIdOrCustomUrl(id || '')
-  const navigate = useNavigate()
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false)
-  
-  const isOwnProfile = authUser?.id === id || (profileUser && authUser?.id === profileUser.id)
-  const user = isOwnProfile ? currentUser : profileUser
-  const showCreateProfileButton = authUser && !currentUser?.profileCreated
+  const { id } = useParams<{ id: string }>();
+  const { user: authUser } = useAuth();
+  const { data: currentUser } = useUser();
+  const {
+    data: profileUser,
+    isLoading,
+    error,
+  } = useUserByIdOrCustomUrl(id || '');
+  const navigate = useNavigate();
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+
+  const isOwnProfile =
+    authUser?.id === id || (profileUser && authUser?.id === profileUser.id);
+  const user = isOwnProfile ? currentUser : profileUser;
+  const showCreateProfileButton = authUser && !currentUser?.profileCreated;
 
   const handleCreateProfile = () => {
-    navigate('/create-profile')
-  }
+    navigate('/create-profile');
+  };
 
   if (isLoading) {
     return (
@@ -30,16 +48,21 @@ export default function ProfilePage() {
           <p className="mt-4 text-gray-600">Loading profile...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (error || !user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-200 via-white to-purple-200 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Profile not found</h1>
-          <p className="text-gray-600 mb-4">This profile doesn't exist or has been removed.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Profile not found
+          </h1>
+          <p className="text-gray-600 mb-4">
+            This profile doesn't exist or has been removed.
+          </p>
           <button
+            type="button"
             onClick={() => navigate('/dashboard')}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
           >
@@ -47,7 +70,7 @@ export default function ProfilePage() {
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -61,6 +84,7 @@ export default function ProfilePage() {
             </Link>
             {showCreateProfileButton && (
               <button
+                type="button"
                 onClick={handleCreateProfile}
                 className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors font-medium"
               >
@@ -96,12 +120,12 @@ export default function ProfilePage() {
                   </div>
                 )}
               </div>
-              
+
               <div className="text-center md:text-left flex-1">
                 <h1 className="text-3xl lg:text-4xl font-bold mb-2">
                   {user.name || 'Anonymous Traveler'}
                 </h1>
-                
+
                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-white/90">
                   {user.currentPlace && (
                     <div className="flex items-center gap-2">
@@ -127,6 +151,7 @@ export default function ProfilePage() {
               <div className="flex flex-col gap-3">
                 {isOwnProfile && (
                   <button
+                    type="button"
                     onClick={() => navigate('/edit-profile')}
                     className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors font-medium"
                   >
@@ -135,6 +160,7 @@ export default function ProfilePage() {
                   </button>
                 )}
                 <button
+                  type="button"
                   onClick={() => setIsShareModalOpen(true)}
                   className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors font-medium"
                 >
@@ -216,7 +242,9 @@ export default function ProfilePage() {
                     Most Influenced by {user.mostInfluencedCountry}
                   </h3>
                   {user.mostInfluencedCountryDescription && (
-                    <p className="text-gray-700">{user.mostInfluencedCountryDescription}</p>
+                    <p className="text-gray-700">
+                      {user.mostInfluencedCountryDescription}
+                    </p>
                   )}
                 </div>
               )}
@@ -230,7 +258,9 @@ export default function ProfilePage() {
                   Most Impactful Travel Experience
                 </h3>
                 <div className="bg-gray-50 rounded-lg p-6">
-                  <p className="text-gray-700 leading-relaxed">{user.mostInfluencedExperience}</p>
+                  <p className="text-gray-700 leading-relaxed">
+                    {user.mostInfluencedExperience}
+                  </p>
                 </div>
               </div>
             )}
@@ -244,9 +274,14 @@ export default function ProfilePage() {
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {(user.travelPhotos as string[]).map((photo, index) => (
-                    <div key={index} className="aspect-square rounded-lg overflow-hidden">
+                    <div
+                      // biome-ignore lint/suspicious/noArrayIndexKey: Photo array has no unique id
+                      key={index}
+                      className="aspect-square rounded-lg overflow-hidden"
+                    >
                       <img
                         src={photo}
+                        // biome-ignore lint/a11y/noRedundantAlt: Descriptive alt for travel photos
                         alt={`Travel photo ${index + 1}`}
                         className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                       />
@@ -263,8 +298,12 @@ export default function ProfilePage() {
                   Custom Profile URL
                 </h3>
                 <div className="flex items-center gap-2">
-                  <span className="text-gray-600">splitstay.travel/profile/</span>
-                  <span className="font-medium text-blue-600">{user.personalizedLink}</span>
+                  <span className="text-gray-600">
+                    splitstay.travel/profile/
+                  </span>
+                  <span className="font-medium text-blue-600">
+                    {user.personalizedLink}
+                  </span>
                 </div>
               </div>
             )}
@@ -278,5 +317,5 @@ export default function ProfilePage() {
         onClose={() => setIsShareModalOpen(false)}
       />
     </div>
-  )
+  );
 }

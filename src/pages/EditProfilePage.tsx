@@ -1,47 +1,50 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUpdateUser, useUser } from '@/hooks/useUser';
 
-import { motion, AnimatePresence } from "framer-motion";
-import { useAuth } from "@/contexts/AuthContext";
-import { useUser, useUpdateUser } from "@/hooks/useUser";
-import toast from "react-hot-toast";
-
-import { ProgressBar } from "./ProfileCreation/ProgressBar";
-import { Step1BasicInfo } from "./ProfileCreation/Step1BasicInfo";
-import { Step2Location } from "./ProfileCreation/Step2Location";
-import { Step3Languages } from "./ProfileCreation/Step3Languages";
-import { Step4Preferences } from "./ProfileCreation/Step4Preferences";
+import { ProgressBar } from './ProfileCreation/ProgressBar';
+import { Step1BasicInfo } from './ProfileCreation/Step1BasicInfo';
+import { Step2Location } from './ProfileCreation/Step2Location';
+import { Step3Languages } from './ProfileCreation/Step3Languages';
+import { Step4Preferences } from './ProfileCreation/Step4Preferences';
 
 export default function EditProfilePage() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
-  const [selectedLearningLanguages, setSelectedLearningLanguages] = useState<string[]>([]);
+  const [selectedLearningLanguages, setSelectedLearningLanguages] = useState<
+    string[]
+  >([]);
   const [selectedTraits, setSelectedTraits] = useState<string[]>([]);
-  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
+  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
+    null,
+  );
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
   const [travelPhotos, setTravelPhotos] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    fullName: "",
-    birthPlace: "",
-    currentPlace: "",
-    bio: "",
-    dayOfBirth: "",
-    monthOfBirth: "",
-    yearOfBirth: "",
-    gender: "",
-    mostInfluencedCountry: "",
-    mostInfluencedCountryDescription: "",
-    mostInfluencedExperience: "",
-    personalizedLink: ""
+    fullName: '',
+    birthPlace: '',
+    currentPlace: '',
+    bio: '',
+    dayOfBirth: '',
+    monthOfBirth: '',
+    yearOfBirth: '',
+    gender: '',
+    mostInfluencedCountry: '',
+    mostInfluencedCountryDescription: '',
+    mostInfluencedExperience: '',
+    personalizedLink: '',
   });
 
   const { user, loading } = useAuth();
   const { data: userData, refetch: refetchUser } = useUser();
   const updateUserMutation = useUpdateUser();
 
-  const stepTitles = ["Basic Info", "Location", "Languages", "Preferences"];
+  const stepTitles = ['Basic Info', 'Location', 'Languages', 'Preferences'];
   const totalSteps = 4;
 
   useEffect(() => {
@@ -53,18 +56,23 @@ export default function EditProfilePage() {
   useEffect(() => {
     if (userData) {
       setFormData({
-        fullName: userData.name || "",
-        birthPlace: userData.birthPlace || "",
-        currentPlace: userData.currentPlace || "",
-        bio: userData.bio || "",
-        dayOfBirth: userData.dayOfBirth ? userData.dayOfBirth.toString() : "",
-        monthOfBirth: userData.monthOfBirth ? userData.monthOfBirth.toString() : "",
-        yearOfBirth: userData.yearOfBirth ? userData.yearOfBirth.toString() : "",
-        gender: userData.gender || "",
-        mostInfluencedCountry: userData.mostInfluencedCountry || "",
-        mostInfluencedCountryDescription: userData.mostInfluencedCountryDescription || "",
-        mostInfluencedExperience: userData.mostInfluencedExperience || "",
-        personalizedLink: userData.personalizedLink || ""
+        fullName: userData.name || '',
+        birthPlace: userData.birthPlace || '',
+        currentPlace: userData.currentPlace || '',
+        bio: userData.bio || '',
+        dayOfBirth: userData.dayOfBirth ? userData.dayOfBirth.toString() : '',
+        monthOfBirth: userData.monthOfBirth
+          ? userData.monthOfBirth.toString()
+          : '',
+        yearOfBirth: userData.yearOfBirth
+          ? userData.yearOfBirth.toString()
+          : '',
+        gender: userData.gender || '',
+        mostInfluencedCountry: userData.mostInfluencedCountry || '',
+        mostInfluencedCountryDescription:
+          userData.mostInfluencedCountryDescription || '',
+        mostInfluencedExperience: userData.mostInfluencedExperience || '',
+        personalizedLink: userData.personalizedLink || '',
       });
 
       if (userData.languages) {
@@ -104,39 +112,55 @@ export default function EditProfilePage() {
 
   const handleSubmit = async () => {
     if (!user) {
-      toast.error("You must be logged in to update your profile");
+      toast.error('You must be logged in to update your profile');
       return;
     }
 
     setIsLoading(true);
-    
+
     try {
       await updateUserMutation.mutateAsync({
         name: formData.fullName,
         bio: formData.bio || null,
         birthPlace: formData.birthPlace || null,
         currentPlace: formData.currentPlace || null,
-        dayOfBirth: formData.dayOfBirth ? parseInt(formData.dayOfBirth) : null,
-        monthOfBirth: formData.monthOfBirth ? parseInt(formData.monthOfBirth) : null,
-        yearOfBirth: formData.yearOfBirth ? parseInt(formData.yearOfBirth) : null,
+        dayOfBirth: formData.dayOfBirth
+          ? parseInt(formData.dayOfBirth, 10)
+          : null,
+        monthOfBirth: formData.monthOfBirth
+          ? parseInt(formData.monthOfBirth, 10)
+          : null,
+        yearOfBirth: formData.yearOfBirth
+          ? parseInt(formData.yearOfBirth, 10)
+          : null,
         gender: formData.gender || null,
         languages: selectedLanguages.length > 0 ? selectedLanguages : null,
-        learningLanguages: selectedLearningLanguages.length > 0 ? selectedLearningLanguages : null,
+        learningLanguages:
+          selectedLearningLanguages.length > 0
+            ? selectedLearningLanguages
+            : null,
         travelTraits: selectedTraits.length > 0 ? selectedTraits : null,
         mostInfluencedCountry: formData.mostInfluencedCountry || null,
-        mostInfluencedCountryDescription: formData.mostInfluencedCountryDescription || null,
+        mostInfluencedCountryDescription:
+          formData.mostInfluencedCountryDescription || null,
         mostInfluencedExperience: formData.mostInfluencedExperience || null,
-        travelPhotos: travelPhotos.filter(photo => photo !== null).length > 0 ? travelPhotos.filter(photo => photo !== null) : null,
+        travelPhotos:
+          travelPhotos.filter((photo) => photo !== null).length > 0
+            ? travelPhotos.filter((photo) => photo !== null)
+            : null,
         imageUrl: profileImageUrl || null,
         personalizedLink: formData.personalizedLink || null,
         profileCreated: true,
       });
 
       await refetchUser();
-      toast.success("Profile updated successfully!");
+      toast.success('Profile updated successfully!');
       navigate(`/profile/${user.id}`);
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to update profile. Please try again.";
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to update profile. Please try again.';
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
@@ -168,86 +192,101 @@ export default function EditProfilePage() {
           className="w-full max-w-md mx-auto sm:max-w-lg lg:max-w-2xl"
         >
           <div className="w-full bg-white rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-6 lg:p-8">
-            <h1 className="text-2xl sm:text-3xl font-bold text-blue-700 mb-4 sm:mb-6 text-center">Edit Your Profile</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-blue-700 mb-4 sm:mb-6 text-center">
+              Edit Your Profile
+            </h1>
             <ProgressBar
               currentStep={currentStep}
               totalSteps={totalSteps}
               stepTitles={stepTitles}
             />
-          <AnimatePresence mode="wait">
-            {currentStep === 1 && (
-              <Step1BasicInfo
-                key="step1"
-                formData={{
-                  fullName: formData.fullName,
-                  dayOfBirth: formData.dayOfBirth,
-                  monthOfBirth: formData.monthOfBirth,
-                  yearOfBirth: formData.yearOfBirth,
-                  gender: formData.gender
-                }}
-                profileImagePreview={profileImagePreview}
-                profileImageUrl={profileImageUrl}
-                setFormData={(data: any) => setFormData({...formData, ...data})}
-                setProfileImagePreview={setProfileImagePreview}
-                setProfileImageUrl={setProfileImageUrl}
-                onNext={handleNext}
-                userId={user.id}
-              />
-            )}
+            <AnimatePresence mode="wait">
+              {currentStep === 1 && (
+                <Step1BasicInfo
+                  key="step1"
+                  formData={{
+                    fullName: formData.fullName,
+                    dayOfBirth: formData.dayOfBirth,
+                    monthOfBirth: formData.monthOfBirth,
+                    yearOfBirth: formData.yearOfBirth,
+                    gender: formData.gender,
+                  }}
+                  profileImagePreview={profileImagePreview}
+                  profileImageUrl={profileImageUrl}
+                  // biome-ignore lint/suspicious/noExplicitAny: Partial form data
+                  setFormData={(data: any) =>
+                    setFormData({ ...formData, ...data })
+                  }
+                  setProfileImagePreview={setProfileImagePreview}
+                  setProfileImageUrl={setProfileImageUrl}
+                  onNext={handleNext}
+                  userId={user.id}
+                />
+              )}
 
-            {currentStep === 2 && (
-              <Step2Location
-                key="step2"
-                formData={{
-                  birthPlace: formData.birthPlace,
-                  currentPlace: formData.currentPlace,
-                  mostInfluencedCountry: formData.mostInfluencedCountry,
-                  mostInfluencedCountryDescription: formData.mostInfluencedCountryDescription
-                }}
-                setFormData={(data: any) => setFormData({...formData, ...data})}
-                onNext={handleNext}
-                onBack={handleBack}
-              />
-            )}
+              {currentStep === 2 && (
+                <Step2Location
+                  key="step2"
+                  formData={{
+                    birthPlace: formData.birthPlace,
+                    currentPlace: formData.currentPlace,
+                    mostInfluencedCountry: formData.mostInfluencedCountry,
+                    mostInfluencedCountryDescription:
+                      formData.mostInfluencedCountryDescription,
+                  }}
+                  // biome-ignore lint/suspicious/noExplicitAny: Partial form data
+                  setFormData={(data: any) =>
+                    setFormData({ ...formData, ...data })
+                  }
+                  onNext={handleNext}
+                  onBack={handleBack}
+                />
+              )}
 
-            {currentStep === 3 && (
-              <Step3Languages
-                key="step3"
-                selectedLanguages={selectedLanguages}
-                selectedLearningLanguages={selectedLearningLanguages}
-                formData={{
-                  personalizedLink: formData.personalizedLink
-                }}
-                setSelectedLanguages={setSelectedLanguages}
-                setSelectedLearningLanguages={setSelectedLearningLanguages}
-                setFormData={(data: any) => setFormData({...formData, ...data})}
-                onNext={handleNext}
-                onBack={handleBack}
-                originalPersonalizedLink={userData?.personalizedLink || ""}
-              />
-            )}
+              {currentStep === 3 && (
+                <Step3Languages
+                  key="step3"
+                  selectedLanguages={selectedLanguages}
+                  selectedLearningLanguages={selectedLearningLanguages}
+                  formData={{
+                    personalizedLink: formData.personalizedLink,
+                  }}
+                  setSelectedLanguages={setSelectedLanguages}
+                  setSelectedLearningLanguages={setSelectedLearningLanguages}
+                  // biome-ignore lint/suspicious/noExplicitAny: Partial form data
+                  setFormData={(data: any) =>
+                    setFormData({ ...formData, ...data })
+                  }
+                  onNext={handleNext}
+                  onBack={handleBack}
+                  originalPersonalizedLink={userData?.personalizedLink || ''}
+                />
+              )}
 
-            {currentStep === 4 && (
-              <Step4Preferences
-                key="step4"
-                selectedTraits={selectedTraits}
-                formData={{
-                  bio: formData.bio,
-                  mostInfluencedExperience: formData.mostInfluencedExperience
-                }}
-                travelPhotos={travelPhotos}
-                setSelectedTraits={setSelectedTraits}
-                setFormData={(data: any) => setFormData({...formData, ...data})}
-                setTravelPhotos={setTravelPhotos}
-                onBack={handleBack}
-                onSubmit={handleSubmit}
-                isLoading={isLoading}
-                isEditMode={true}
-              />
-            )}
-          </AnimatePresence>
-        </div>
-      </motion.div>
+              {currentStep === 4 && (
+                <Step4Preferences
+                  key="step4"
+                  selectedTraits={selectedTraits}
+                  formData={{
+                    bio: formData.bio,
+                    mostInfluencedExperience: formData.mostInfluencedExperience,
+                  }}
+                  travelPhotos={travelPhotos}
+                  setSelectedTraits={setSelectedTraits}
+                  // biome-ignore lint/suspicious/noExplicitAny: Partial form data
+                  setFormData={(data: any) =>
+                    setFormData({ ...formData, ...data })
+                  }
+                  setTravelPhotos={setTravelPhotos}
+                  onBack={handleBack}
+                  onSubmit={handleSubmit}
+                  isLoading={isLoading}
+                  isEditMode={true}
+                />
+              )}
+            </AnimatePresence>
+          </div>
+        </motion.div>
       </div>
     </div>
   );

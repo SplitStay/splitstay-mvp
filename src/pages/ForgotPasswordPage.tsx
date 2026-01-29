@@ -1,44 +1,44 @@
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
-import { Mail, ArrowLeft } from 'lucide-react'
-import toast from 'react-hot-toast'
-import { useAuth } from '../contexts/AuthContext'
+import { motion } from 'framer-motion';
+import { ArrowLeft, Mail } from 'lucide-react';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 export const ForgotPasswordPage: React.FC = () => {
-  const [email, setEmail] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [message, setMessage] = useState('')
-  const [error, setError] = useState('')
+  const [email, setEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
-  const { resetPassword } = useAuth()
+  const { resetPassword } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setMessage('')
-    setIsLoading(true)
+    e.preventDefault();
+    setError('');
+    setMessage('');
+    setIsLoading(true);
 
     try {
-      const { error } = await resetPassword(email)
+      const { error } = await resetPassword(email);
       if (error) {
-        setError(error.message)
-        toast.error(error.message)
+        setError(error.message);
+        toast.error(error.message);
       } else {
         toast.success('Check your email for password reset instructions!', {
           duration: 6000,
           icon: '📧',
-        })
-        setMessage('Check your email for password reset instructions!')
+        });
+        setMessage('Check your email for password reset instructions!');
       }
     } catch {
-      const errorMsg = 'An unexpected error occurred'
-      setError(errorMsg)
-      toast.error(errorMsg)
+      const errorMsg = 'An unexpected error occurred';
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
@@ -57,14 +57,21 @@ export const ForgotPasswordPage: React.FC = () => {
               <ArrowLeft className="w-5 h-5" />
               Back to Dashboard
             </Link>
-            <Link to="/dashboard" className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <Link
+              to="/dashboard"
+              className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+            >
               SplitStay
             </Link>
           </div>
 
           <div className="text-center mb-6 lg:mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Reset Password</h2>
-            <p className="text-gray-600">Enter your email to receive reset instructions</p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              Reset Password
+            </h2>
+            <p className="text-gray-600">
+              Enter your email to receive reset instructions
+            </p>
           </div>
 
           {error && (
@@ -89,6 +96,7 @@ export const ForgotPasswordPage: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="space-y-3 lg:space-y-4">
             <div>
+              {/* biome-ignore lint/a11y/noLabelWithoutControl: Input nested in relative div */}
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Email
               </label>
@@ -126,5 +134,5 @@ export const ForgotPasswordPage: React.FC = () => {
         </div>
       </motion.div>
     </div>
-  )
-}
+  );
+};

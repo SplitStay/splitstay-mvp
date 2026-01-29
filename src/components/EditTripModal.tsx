@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { X, Calendar, MapPin, Users, Home, Trash2, Save, ExternalLink, AlertCircle } from 'lucide-react'
-import { Button } from './ui/button'
-import { Input } from './ui/input'
-import { Label } from './ui/label'
-import { Textarea } from './ui/textarea'
-import { Select } from './ui/select'
-import { RadioGroup } from './ui/radio-group'
-import { updateTrip, deleteTrip, type Trip } from '@/lib/tripService'
-import { iframelyService, type AccommodationPreview } from '@/lib/iframely'
-import { AccommodationPreview as AccommodationPreviewComponent } from './AccommodationPreview'
-import { createDefaultRooms, BED_TYPES, type RoomConfiguration } from '@/lib/accommodationService'
-import { supabase } from '@/lib/supabase'
+import { AnimatePresence, motion } from 'framer-motion';
+import { AlertCircle, ExternalLink, Home, Save, Trash2, X } from 'lucide-react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
+import {
+  BED_TYPES,
+  createDefaultRooms,
+  type RoomConfiguration,
+} from '@/lib/accommodationService';
+import { type AccommodationPreview, iframelyService } from '@/lib/iframely';
+import { deleteTrip, type Trip, updateTrip } from '@/lib/tripService';
+import { AccommodationPreview as AccommodationPreviewComponent } from './AccommodationPreview';
+import { Button } from './ui/button';
+import { Label } from './ui/label';
 
 interface EditTripModalProps {
-  trip: Trip
-  open: boolean
-  onClose: () => void
-  onUpdate: () => void
-  onDelete: () => void
+  trip: Trip;
+  open: boolean;
+  onClose: () => void;
+  onUpdate: () => void;
+  onDelete: () => void;
 }
 
 export const EditTripModal: React.FC<EditTripModalProps> = ({
@@ -26,24 +26,25 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
   open,
   onClose,
   onUpdate,
-  onDelete
+  onDelete,
 }) => {
-  const [loading, setLoading] = useState(false)
-  const [deleteLoading, setDeleteLoading] = useState(false)
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  const [accommodationPreview, setAccommodationPreview] = useState<AccommodationPreview>({
-    title: '',
-    description: '',
-    image: '',
-    site: '',
-    author: '',
-    url: '',
-    favicon: '',
-    isLoading: false,
-    error: null,
-  })
-  const [previewLoading, setPreviewLoading] = useState(false)
-  
+  const [loading, setLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [accommodationPreview, setAccommodationPreview] =
+    useState<AccommodationPreview>({
+      title: '',
+      description: '',
+      image: '',
+      site: '',
+      author: '',
+      url: '',
+      favicon: '',
+      isLoading: false,
+      error: null,
+    });
+  const [previewLoading, setPreviewLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     name: trip.name || '',
     location: trip.location || '',
@@ -52,17 +53,28 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
     flexible: trip.flexible || false,
     startDate: trip.startDate || '',
     endDate: trip.endDate || '',
-    estimatedMonth: (trip as any).estimatedmonth || (trip as any).estimatedMonth || '',
-    estimatedYear: (trip as any).estimatedyear || (trip as any).estimatedYear || '',
+    estimatedMonth:
+      // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
+      (trip as any).estimatedmonth || (trip as any).estimatedMonth || '',
+    estimatedYear:
+      // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
+      (trip as any).estimatedyear || (trip as any).estimatedYear || '',
     numberOfRooms: trip.numberOfRooms || 1,
+    // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
     matchWith: (trip as any).matchwith || (trip as any).matchWith || 'anyone',
-    isPublic: (trip as any).ispublic !== undefined ? (trip as any).ispublic : true,
-    rooms: (trip.rooms as RoomConfiguration[]) || createDefaultRooms(trip.numberOfRooms || 1)
-  })
+    isPublic:
+      // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
+      (trip as any).ispublic !== undefined ? (trip as any).ispublic : true,
+    rooms:
+      (trip.rooms as RoomConfiguration[]) ||
+      createDefaultRooms(trip.numberOfRooms || 1),
+  });
 
   useEffect(() => {
     if (open && trip) {
-      const tripRooms = (trip.rooms as RoomConfiguration[]) || createDefaultRooms(trip.numberOfRooms || 1)
+      const tripRooms =
+        (trip.rooms as RoomConfiguration[]) ||
+        createDefaultRooms(trip.numberOfRooms || 1);
       setFormData({
         name: trip.name || '',
         location: trip.location || '',
@@ -71,40 +83,50 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
         flexible: trip.flexible || false,
         startDate: trip.startDate || '',
         endDate: trip.endDate || '',
-        estimatedMonth: (trip as any).estimatedmonth || (trip as any).estimatedMonth || '',
-        estimatedYear: (trip as any).estimatedyear || (trip as any).estimatedYear || '',
+        estimatedMonth:
+          // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
+          (trip as any).estimatedmonth || (trip as any).estimatedMonth || '',
+        estimatedYear:
+          // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
+          (trip as any).estimatedyear || (trip as any).estimatedYear || '',
         numberOfRooms: trip.numberOfRooms || 1,
-        matchWith: (trip as any).matchwith || (trip as any).matchWith || 'anyone',
-        isPublic: (trip as any).ispublic !== undefined ? (trip as any).ispublic : true,
-        rooms: tripRooms
-      })
-      
+        matchWith:
+          // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
+          (trip as any).matchwith || (trip as any).matchWith || 'anyone',
+        isPublic:
+          // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
+          (trip as any).ispublic !== undefined ? (trip as any).ispublic : true,
+        rooms: tripRooms,
+      });
+
       if (trip.bookingUrl) {
-        loadAccommodationPreview(trip.bookingUrl)
+        loadAccommodationPreview(trip.bookingUrl);
       }
     }
-  }, [open, trip])
+    // biome-ignore lint/correctness/useExhaustiveDependencies: Function is defined after useEffect
+    // biome-ignore lint/correctness/noInvalidUseBeforeDeclaration: Hoisting pattern
+  }, [open, trip, loadAccommodationPreview]);
 
   useEffect(() => {
     if (formData.numberOfRooms !== formData.rooms.length) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        rooms: createDefaultRooms(formData.numberOfRooms)
-      }))
+        rooms: createDefaultRooms(formData.numberOfRooms),
+      }));
     }
-  }, [formData.numberOfRooms])
+  }, [formData.numberOfRooms, formData.rooms.length]);
 
   useEffect(() => {
     if (formData.startDate && !formData.flexible) {
-      const startDate = new Date(formData.startDate)
-      const endDate = new Date(startDate)
-      endDate.setDate(endDate.getDate() + 1)
-      setFormData(prev => ({
+      const startDate = new Date(formData.startDate);
+      const endDate = new Date(startDate);
+      endDate.setDate(endDate.getDate() + 1);
+      setFormData((prev) => ({
         ...prev,
-        endDate: endDate.toISOString().split('T')[0]
-      }))
+        endDate: endDate.toISOString().split('T')[0],
+      }));
     }
-  }, [formData.startDate, formData.flexible])
+  }, [formData.startDate, formData.flexible]);
 
   const loadAccommodationPreview = async (url: string) => {
     if (!url || !url.trim()) {
@@ -118,17 +140,17 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
         favicon: '',
         isLoading: false,
         error: null,
-      })
-      return
+      });
+      return;
     }
 
-    setPreviewLoading(true)
-    setAccommodationPreview(prev => ({ ...prev, isLoading: true }))
+    setPreviewLoading(true);
+    setAccommodationPreview((prev) => ({ ...prev, isLoading: true }));
     try {
-      const preview = await iframelyService.getAccommodationPreview(url)
-      setAccommodationPreview(preview)
+      const preview = await iframelyService.getAccommodationPreview(url);
+      setAccommodationPreview(preview);
     } catch (error) {
-      console.error('Error loading preview:', error)
+      console.error('Error loading preview:', error);
       setAccommodationPreview({
         title: '',
         description: '',
@@ -139,41 +161,49 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
         favicon: '',
         isLoading: false,
         error: 'Failed to load preview',
-      })
+      });
     } finally {
-      setPreviewLoading(false)
+      setPreviewLoading(false);
     }
-  }
+  };
 
-  const updateRoom = (roomId: number, field: keyof RoomConfiguration, value: any) => {
-    setFormData(prev => ({
+  const updateRoom = (
+    roomId: number,
+    field: keyof RoomConfiguration,
+    // biome-ignore lint/suspicious/noExplicitAny: Room field values vary by type
+    value: any,
+  ) => {
+    setFormData((prev) => ({
       ...prev,
-      rooms: prev.rooms.map(room => 
-        room.id === roomId ? { ...room, [field]: value } : room
-      )
-    }))
-  }
+      rooms: prev.rooms.map((room) =>
+        room.id === roomId ? { ...room, [field]: value } : room,
+      ),
+    }));
+  };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target
-    const checked = (e.target as HTMLInputElement).checked
-    
-    setFormData(prev => ({
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
+
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }))
+      [name]: type === 'checkbox' ? checked : value,
+    }));
 
     if (name === 'bookingUrl') {
       const timeoutId = setTimeout(() => {
-        loadAccommodationPreview(value)
-      }, 500)
-      return () => clearTimeout(timeoutId)
+        loadAccommodationPreview(value);
+      }, 500);
+      return () => clearTimeout(timeoutId);
     }
-  }
+  };
 
   const handleSave = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
+      // biome-ignore lint/suspicious/noExplicitAny: Dynamic update object
       const updateData: any = {
         name: formData.name,
         description: formData.description,
@@ -185,46 +215,48 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
         flexible: formData.flexible,
         ispublic: formData.isPublic,
         thumbnailUrl: accommodationPreview.image || trip.thumbnailUrl,
-        ...(formData.flexible ? {
-          estimatedmonth: formData.estimatedMonth,
-          estimatedyear: formData.estimatedYear,
-          startDate: null,
-          endDate: null,
-        } : {
-          startDate: formData.startDate,
-          endDate: formData.endDate,
-          estimatedmonth: null,
-          estimatedyear: null,
-        })
-      }
+        ...(formData.flexible
+          ? {
+              estimatedmonth: formData.estimatedMonth,
+              estimatedyear: formData.estimatedYear,
+              startDate: null,
+              endDate: null,
+            }
+          : {
+              startDate: formData.startDate,
+              endDate: formData.endDate,
+              estimatedmonth: null,
+              estimatedyear: null,
+            }),
+      };
 
-      await updateTrip(trip.id, updateData)
-      onUpdate()
-      onClose()
+      await updateTrip(trip.id, updateData);
+      onUpdate();
+      onClose();
     } catch (error) {
-      console.error('Error updating trip:', error)
-      alert('Failed to update trip. Please try again.')
+      console.error('Error updating trip:', error);
+      alert('Failed to update trip. Please try again.');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleDelete = async () => {
-    setDeleteLoading(true)
+    setDeleteLoading(true);
     try {
-      await deleteTrip(trip.id)
-      onDelete()
-      onClose()
+      await deleteTrip(trip.id);
+      onDelete();
+      onClose();
     } catch (error) {
-      console.error('Error deleting trip:', error)
-      alert('Failed to delete trip. Please try again.')
+      console.error('Error deleting trip:', error);
+      alert('Failed to delete trip. Please try again.');
     } finally {
-      setDeleteLoading(false)
-      setShowDeleteConfirm(false)
+      setDeleteLoading(false);
+      setShowDeleteConfirm(false);
     }
-  }
+  };
 
-  if (!open) return null
+  if (!open) return null;
 
   return (
     <AnimatePresence>
@@ -238,6 +270,7 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b">
             <h2 className="text-2xl font-bold text-gray-900">Edit Trip</h2>
+            {/* biome-ignore lint/a11y/useButtonType: Modal close button */}
             <button
               onClick={onClose}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -318,21 +351,29 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
               </div>
 
               {/* Accommodation Preview */}
-              {formData.bookingUrl && (accommodationPreview.title || accommodationPreview.image || previewLoading) && (
-                <div className="rounded-lg border border-gray-200 p-4">
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">Accommodation Preview</h3>
-                  {previewLoading ? (
-                    <div className="flex items-center justify-center p-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                      <span className="ml-3 text-gray-600">Loading preview...</span>
-                    </div>
-                  ) : (accommodationPreview.title || accommodationPreview.image) ? (
-                    <AccommodationPreviewComponent
-                      preview={accommodationPreview}
-                    />
-                  ) : null}
-                </div>
-              )}
+              {formData.bookingUrl &&
+                (accommodationPreview.title ||
+                  accommodationPreview.image ||
+                  previewLoading) && (
+                  <div className="rounded-lg border border-gray-200 p-4">
+                    <h3 className="text-sm font-medium text-gray-700 mb-3">
+                      Accommodation Preview
+                    </h3>
+                    {previewLoading ? (
+                      <div className="flex items-center justify-center p-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                        <span className="ml-3 text-gray-600">
+                          Loading preview...
+                        </span>
+                      </div>
+                    ) : accommodationPreview.title ||
+                      accommodationPreview.image ? (
+                      <AccommodationPreviewComponent
+                        preview={accommodationPreview}
+                      />
+                    ) : null}
+                  </div>
+                )}
 
               {/* Date Flexibility */}
               <div>
@@ -360,7 +401,12 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
                       id="estimatedMonth"
                       name="estimatedMonth"
                       value={formData.estimatedMonth}
-                      onChange={(e) => setFormData(prev => ({ ...prev, estimatedMonth: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          estimatedMonth: e.target.value,
+                        }))
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="">Select month</option>
@@ -384,7 +430,12 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
                       id="estimatedYear"
                       name="estimatedYear"
                       value={formData.estimatedYear}
-                      onChange={(e) => setFormData(prev => ({ ...prev, estimatedYear: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          estimatedYear: e.target.value,
+                        }))
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="">Select year</option>
@@ -417,7 +468,10 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
                       type="date"
                       value={formData.endDate}
                       onChange={handleInputChange}
-                      min={formData.startDate || new Date().toISOString().split('T')[0]}
+                      min={
+                        formData.startDate ||
+                        new Date().toISOString().split('T')[0]
+                      }
                       required={!formData.flexible}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
@@ -445,23 +499,34 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
                 <Label>Room Configuration</Label>
                 <div className="space-y-4 mt-3">
                   {formData.rooms.map((room, index) => (
-                    <div key={room.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                    <div
+                      key={room.id}
+                      className="border border-gray-200 rounded-lg p-4 bg-gray-50"
+                    >
                       <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
                         <Home className="w-4 h-4" />
                         Room {index + 1}
                       </h4>
-                      
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         {/* Number of Beds */}
                         <div>
-                          <Label htmlFor={`beds-${room.id}`}>Number of Beds *</Label>
+                          <Label htmlFor={`beds-${room.id}`}>
+                            Number of Beds *
+                          </Label>
                           <input
                             id={`beds-${room.id}`}
                             type="number"
                             min="1"
                             max="10"
                             value={room.numberOfBeds}
-                            onChange={(e) => updateRoom(room.id, 'numberOfBeds', parseInt(e.target.value) || 1)}
+                            onChange={(e) =>
+                              updateRoom(
+                                room.id,
+                                'numberOfBeds',
+                                parseInt(e.target.value, 10) || 1,
+                              )
+                            }
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             required
                           />
@@ -469,16 +534,22 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
 
                         {/* Bed Type */}
                         <div>
-                          <Label htmlFor={`bedType-${room.id}`}>Bed Type *</Label>
+                          <Label htmlFor={`bedType-${room.id}`}>
+                            Bed Type *
+                          </Label>
                           <select
                             id={`bedType-${room.id}`}
                             value={room.bedType}
-                            onChange={(e) => updateRoom(room.id, 'bedType', e.target.value)}
+                            onChange={(e) =>
+                              updateRoom(room.id, 'bedType', e.target.value)
+                            }
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             required
                           >
-                            {BED_TYPES.map(type => (
-                              <option key={type} value={type}>{type}</option>
+                            {BED_TYPES.map((type) => (
+                              <option key={type} value={type}>
+                                {type}
+                              </option>
                             ))}
                           </select>
                         </div>
@@ -490,10 +561,19 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
                           type="checkbox"
                           id={`ensuite-${room.id}`}
                           checked={room.ensuiteBathroom}
-                          onChange={(e) => updateRoom(room.id, 'ensuiteBathroom', e.target.checked)}
+                          onChange={(e) =>
+                            updateRoom(
+                              room.id,
+                              'ensuiteBathroom',
+                              e.target.checked,
+                            )
+                          }
                           className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                         />
-                        <Label htmlFor={`ensuite-${room.id}`} className="text-base font-medium text-gray-700">
+                        <Label
+                          htmlFor={`ensuite-${room.id}`}
+                          className="text-base font-medium text-gray-700"
+                        >
                           Ensuite Bathroom
                         </Label>
                       </div>
@@ -558,9 +638,12 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
               {/* Delete Trip Section */}
               <div className="border-t pt-6">
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                  <h3 className="text-lg font-semibold text-red-900 mb-2">Danger Zone</h3>
+                  <h3 className="text-lg font-semibold text-red-900 mb-2">
+                    Danger Zone
+                  </h3>
                   <p className="text-sm text-red-700 mb-4">
-                    Deleting this trip will permanently remove it and all associated data.
+                    Deleting this trip will permanently remove it and all
+                    associated data.
                   </p>
                   {!showDeleteConfirm ? (
                     <Button
@@ -574,7 +657,9 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
                     <div className="space-y-3">
                       <div className="flex items-center gap-2 text-red-700">
                         <AlertCircle className="w-5 h-5" />
-                        <span className="font-medium">Are you sure? This cannot be undone.</span>
+                        <span className="font-medium">
+                          Are you sure? This cannot be undone.
+                        </span>
                       </div>
                       <div className="flex gap-3">
                         <Button
@@ -584,6 +669,7 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
                         >
                           {deleteLoading ? 'Deleting...' : 'Yes, Delete Trip'}
                         </Button>
+                        {/* biome-ignore lint/a11y/useButtonType: Cancel button */}
                         <button
                           onClick={() => setShowDeleteConfirm(false)}
                           className="px-4 py-2 border border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors"
@@ -600,6 +686,7 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
 
           {/* Footer */}
           <div className="flex items-center justify-end gap-3 p-6 border-t bg-gray-50">
+            {/* biome-ignore lint/a11y/useButtonType: Cancel button */}
             <button
               onClick={onClose}
               className="px-4 py-2 border border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors"
@@ -608,7 +695,12 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
             </button>
             <Button
               onClick={handleSave}
-              disabled={loading || !formData.name || !formData.location || !formData.description}
+              disabled={
+                loading ||
+                !formData.name ||
+                !formData.location ||
+                !formData.description
+              }
               className="bg-blue-600 text-white hover:bg-blue-700"
             >
               {loading ? (
@@ -627,5 +719,5 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
         </motion.div>
       </div>
     </AnimatePresence>
-  )
-}
+  );
+};

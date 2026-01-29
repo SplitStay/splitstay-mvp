@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '@/hooks/useUser';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUser } from '@/hooks/useUser';
 
 interface ProfileGuardProps {
   children: React.ReactNode;

@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { X, Upload, User, Calendar, Users } from "lucide-react";
-import { supabase } from "@/lib/supabase";
-import toast from "react-hot-toast";
+import { motion } from 'framer-motion';
+import { Calendar, Upload, User, Users, X } from 'lucide-react';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { supabase } from '@/lib/supabase';
 
 interface Step1Props {
   formData: {
@@ -14,6 +14,7 @@ interface Step1Props {
   };
   profileImagePreview: string | null;
   profileImageUrl: string | null;
+  // biome-ignore lint/suspicious/noExplicitAny: Partial form data
   setFormData: (data: any) => void;
   setProfileImagePreview: (url: string | null) => void;
   setProfileImageUrl: (url: string | null) => void;
@@ -29,7 +30,7 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
   setProfileImagePreview,
   setProfileImageUrl,
   onNext,
-  userId
+  userId,
 }) => {
   const [isUploading, setIsUploading] = useState(false);
 
@@ -43,7 +44,7 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
         .from('userimages')
         .upload(filePath, file, {
           cacheControl: '3600',
-          upsert: false
+          upsert: false,
         });
 
       if (uploadError) throw uploadError;
@@ -60,7 +61,9 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
     }
   };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -87,7 +90,7 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
       setProfileImageUrl(uploadedUrl);
       toast.success('Image uploaded successfully!');
     }
-    
+
     setIsUploading(false);
   };
 
@@ -96,24 +99,33 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
     onNext();
   };
 
-  const isFormValid = formData.fullName && 
-                      formData.dayOfBirth && 
-                      formData.monthOfBirth && 
-                      formData.yearOfBirth &&
-                      formData.gender &&
-                      (profileImagePreview || profileImageUrl);
+  const isFormValid =
+    formData.fullName &&
+    formData.dayOfBirth &&
+    formData.monthOfBirth &&
+    formData.yearOfBirth &&
+    formData.gender &&
+    (profileImagePreview || profileImageUrl);
 
   const dayOptions = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
   const monthOptions = [
-    { value: "1", label: "January" }, { value: "2", label: "February" },
-    { value: "3", label: "March" }, { value: "4", label: "April" },
-    { value: "5", label: "May" }, { value: "6", label: "June" },
-    { value: "7", label: "July" }, { value: "8", label: "August" },
-    { value: "9", label: "September" }, { value: "10", label: "October" },
-    { value: "11", label: "November" }, { value: "12", label: "December" },
+    { value: '1', label: 'January' },
+    { value: '2', label: 'February' },
+    { value: '3', label: 'March' },
+    { value: '4', label: 'April' },
+    { value: '5', label: 'May' },
+    { value: '6', label: 'June' },
+    { value: '7', label: 'July' },
+    { value: '8', label: 'August' },
+    { value: '9', label: 'September' },
+    { value: '10', label: 'October' },
+    { value: '11', label: 'November' },
+    { value: '12', label: 'December' },
   ];
   const currentYear = new Date().getFullYear();
-  const yearOptions = Array.from({ length: 82 }, (_, i) => (currentYear - 18 - i).toString());
+  const yearOptions = Array.from({ length: 82 }, (_, i) =>
+    (currentYear - 18 - i).toString(),
+  );
 
   return (
     <motion.form
@@ -137,6 +149,7 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
 
       <div className="space-y-6">
         <div className="text-center">
+          {/* biome-ignore lint/a11y/noLabelWithoutControl: Label for photo upload */}
           <label className="block text-sm font-medium text-gray-700 mb-4">
             Profile Photo <span className="text-red-500">*</span>
           </label>
@@ -188,16 +201,23 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
             <label
               htmlFor="profile-image-upload"
               className={`cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-medium mt-3 sm:mt-4 transition-colors ${
-                isUploading ? "opacity-50 cursor-not-allowed" : ""
+                isUploading ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
-              {isUploading ? "Uploading..." : profileImagePreview ? "Change Photo" : "Upload Photo"}
+              {isUploading
+                ? 'Uploading...'
+                : profileImagePreview
+                  ? 'Change Photo'
+                  : 'Upload Photo'}
             </label>
           </div>
         </div>
 
         <div>
-          <label htmlFor="fullName" className="block text-base sm:text-lg font-semibold text-gray-800 mb-2">
+          <label
+            htmlFor="fullName"
+            className="block text-base sm:text-lg font-semibold text-gray-800 mb-2"
+          >
             <User className="inline w-4 h-4 sm:w-5 sm:h-5 mr-2 text-blue-600" />
             What should we call you? <span className="text-red-500">*</span>
           </label>
@@ -205,7 +225,9 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
             id="fullName"
             type="text"
             value={formData.fullName}
-            onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+            onChange={(e) =>
+              setFormData({ ...formData, fullName: e.target.value })
+            }
             placeholder="e.g. Jane"
             className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base sm:text-lg"
             required
@@ -213,6 +235,7 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
         </div>
 
         <div>
+          {/* biome-ignore lint/a11y/noLabelWithoutControl: Label for radio group */}
           <label className="block text-base sm:text-lg font-semibold text-gray-800 mb-2">
             <Users className="inline w-4 h-4 sm:w-5 sm:h-5 mr-2 text-purple-600" />
             Gender <span className="text-red-500">*</span>
@@ -223,8 +246,8 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
                 type="radio"
                 name="gender"
                 value="male"
-                checked={formData.gender === "male"}
-                onChange={() => setFormData({...formData, gender: "male"})}
+                checked={formData.gender === 'male'}
+                onChange={() => setFormData({ ...formData, gender: 'male' })}
                 required
                 className="w-4 h-4"
               />
@@ -235,8 +258,8 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
                 type="radio"
                 name="gender"
                 value="female"
-                checked={formData.gender === "female"}
-                onChange={() => setFormData({...formData, gender: "female"})}
+                checked={formData.gender === 'female'}
+                onChange={() => setFormData({ ...formData, gender: 'female' })}
                 required
                 className="w-4 h-4"
               />
@@ -246,6 +269,7 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
         </div>
 
         <div>
+          {/* biome-ignore lint/a11y/noLabelWithoutControl: Label for date selects */}
           <label className="block text-base sm:text-lg font-semibold text-gray-800 mb-2">
             <Calendar className="inline w-4 h-4 sm:w-5 sm:h-5 mr-2 text-green-600" />
             Date of Birth <span className="text-red-500">*</span>
@@ -254,39 +278,51 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
             <div className="flex-1">
               <select
                 value={formData.dayOfBirth}
-                onChange={(e) => setFormData({...formData, dayOfBirth: e.target.value})}
+                onChange={(e) =>
+                  setFormData({ ...formData, dayOfBirth: e.target.value })
+                }
                 className="w-full px-2 sm:px-4 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-lg bg-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 required
               >
                 <option value="">Day</option>
                 {dayOptions.map((day) => (
-                  <option key={day} value={day}>{day}</option>
+                  <option key={day} value={day}>
+                    {day}
+                  </option>
                 ))}
               </select>
             </div>
             <div className="flex-1">
               <select
                 value={formData.monthOfBirth}
-                onChange={(e) => setFormData({...formData, monthOfBirth: e.target.value})}
+                onChange={(e) =>
+                  setFormData({ ...formData, monthOfBirth: e.target.value })
+                }
                 className="w-full px-2 sm:px-4 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-lg bg-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 required
               >
                 <option value="">Month</option>
                 {monthOptions.map((month) => (
-                  <option key={month.value} value={month.value}>{month.label}</option>
+                  <option key={month.value} value={month.value}>
+                    {month.label}
+                  </option>
                 ))}
               </select>
             </div>
             <div className="flex-1">
               <select
                 value={formData.yearOfBirth}
-                onChange={(e) => setFormData({...formData, yearOfBirth: e.target.value})}
+                onChange={(e) =>
+                  setFormData({ ...formData, yearOfBirth: e.target.value })
+                }
                 className="w-full px-2 sm:px-4 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-lg bg-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 required
               >
                 <option value="">Year</option>
                 {yearOptions.map((year) => (
-                  <option key={year} value={year}>{year}</option>
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
                 ))}
               </select>
             </div>
@@ -309,8 +345,8 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
           disabled={!isFormValid}
           className={`w-1/2 py-3 sm:py-4 rounded-lg font-bold text-sm sm:text-lg shadow-lg transition ${
             isFormValid
-              ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
           }`}
         >
           Continue

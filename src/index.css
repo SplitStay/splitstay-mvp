@@ -4,12 +4,12 @@
 
 /* Hide scrollbar but keep functionality */
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* Internet Explorer 10+ */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
 }
 
 .scrollbar-hide::-webkit-scrollbar {
-  display: none;  /* Safari and Chrome */
+  display: none; /* Safari and Chrome */
 }
 
 /* Line clamp utilities */
@@ -28,12 +28,16 @@
 }
 
 @keyframes fadeOut {
-  0% { opacity: 1; }
-  100% { opacity: 0; }
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 :root {
-  --background: 41 80% 96%;  /* #FDF8ED */
+  --background: 41 80% 96%; /* #FDF8ED */
   --foreground: 240 10% 3.9%;
   --muted: 240 4.8% 95.9%;
   --muted-foreground: 240 3.8% 46.1%;
@@ -93,7 +97,7 @@
   max-width: 500px;
   margin: 0 auto;
   min-height: 100vh;
-  background-color: #F5F1EB;
+  background-color: #f5f1eb;
   position: relative;
 }
 
@@ -103,7 +107,7 @@
 
 /* Custom button styles */
 .navy-button {
-  background-color: #001F3F; 
+  background-color: #001f3f;
   color: white;
   width: 100%;
   padding: 1.5rem 1rem;
@@ -114,8 +118,8 @@
 }
 
 .navy-button:hover {
-  background-color: #00295A;
-  color: #FFD700; /* Dark yellow color on hover */
+  background-color: #00295a;
+  color: #ffd700; /* Dark yellow color on hover */
 }
 
 .text-navy {

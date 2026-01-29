@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export const MVPBanner: React.FC = () => {
   const [isVisible, setIsVisible] = useState(true);
@@ -24,9 +24,11 @@ export const MVPBanner: React.FC = () => {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm">
           <span className="text-blue-800">
-            🚀 <span className="font-medium">You're using SplitStay MVP!</span> Found a bug or have feedback? Let us know in our WhatsApp Community
+            🚀 <span className="font-medium">You're using SplitStay MVP!</span>{' '}
+            Found a bug or have feedback? Let us know in our WhatsApp Community
           </span>
         </div>
+        {/* biome-ignore lint/a11y/useButtonType: Banner dismiss button */}
         <button
           onClick={handleDismiss}
           className="text-blue-600 hover:text-blue-800 transition-colors p-1"

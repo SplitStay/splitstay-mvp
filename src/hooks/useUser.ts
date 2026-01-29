@@ -1,40 +1,52 @@
-import { useQuery, useMutation, useQueryClient, type UseQueryResult } from '@tanstack/react-query'
-import { supabase } from '@/lib/supabase'
-import type { Tables, TablesUpdate } from '@/types/database.types'
+import {
+  type UseQueryResult,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase';
+import type { Tables, TablesUpdate } from '@/types/database.types';
 
-export const useUser = (): UseQueryResult<Tables<'user'> | undefined, Error> => {
+export const useUser = (): UseQueryResult<
+  Tables<'user'> | undefined,
+  Error
+> => {
   return useQuery<Tables<'user'> | undefined, Error>({
     queryKey: ['user'],
     queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
       if (!session) {
-        throw new Error('No active session')
+        throw new Error('No active session');
       }
 
       const { data, error } = await supabase
         .from('user')
         .select('*')
         .eq('id', session.user.id)
-        .single()
+        .single();
 
       if (error) {
         // If the user row doesn't exist yet (new OAuth sign-in), don't throw; let UI render and recover
         // PostgREST not found error code is PGRST116
-        // @ts-expect-error error may have code
+        // biome-ignore lint/suspicious/noExplicitAny: Supabase error type lacks code property
         if ((error as any).code === 'PGRST116') {
-          return undefined
+          return undefined;
         }
-        throw error
+        throw error;
       }
 
-      return data
+      return data;
     },
     retry: false,
-  })
-}
+  });
+};
 
-export const useUserById = (userId: string): UseQueryResult<Tables<'user'>, Error> => {
+export const useUserById = (
+  userId: string,
+): UseQueryResult<Tables<'user'>, Error> => {
   return useQuery<Tables<'user'>, Error>({
     queryKey: ['user', userId],
     queryFn: async () => {
@@ -42,20 +54,22 @@ export const useUserById = (userId: string): UseQueryResult<Tables<'user'>, Erro
         .from('user')
         .select('*')
         .eq('id', userId)
-        .single()
+        .single();
 
       if (error) {
-        throw error
+        throw error;
       }
 
-      return data
+      return data;
     },
     retry: false,
     enabled: !!userId,
-  })
-}
+  });
+};
 
-export const useUserByCustomUrl = (customUrl: string): UseQueryResult<Tables<'user'>, Error> => {
+export const useUserByCustomUrl = (
+  customUrl: string,
+): UseQueryResult<Tables<'user'>, Error> => {
   return useQuery<Tables<'user'>, Error>({
     queryKey: ['user', 'customUrl', customUrl],
     queryFn: async () => {
@@ -63,25 +77,27 @@ export const useUserByCustomUrl = (customUrl: string): UseQueryResult<Tables<'us
         .from('user')
         .select('*')
         .ilike('personalizedLink', customUrl)
-        .single()
+        .single();
 
       if (error) {
-        throw error
+        throw error;
       }
 
-      return data
+      return data;
     },
     retry: false,
     enabled: !!customUrl,
-  })
-}
+  });
+};
 
-export const useUserByIdOrCustomUrl = (identifier: string): UseQueryResult<Tables<'user'>, Error> => {
+export const useUserByIdOrCustomUrl = (
+  identifier: string,
+): UseQueryResult<Tables<'user'>, Error> => {
   return useQuery<Tables<'user'>, Error>({
     queryKey: ['user', 'identifier', identifier],
     queryFn: async () => {
       if (!identifier) {
-        throw new Error('No identifier provided')
+        throw new Error('No identifier provided');
       }
 
       // First try to fetch by customized URL (case-insensitive)
@@ -89,10 +105,10 @@ export const useUserByIdOrCustomUrl = (identifier: string): UseQueryResult<Table
         .from('user')
         .select('*')
         .eq('personalizedLink', identifier)
-        .single()
+        .single();
 
       if (customUrlData && !customUrlError) {
-        return customUrlData
+        return customUrlData;
       }
 
       // If not found by custom URL, try by ID
@@ -100,28 +116,30 @@ export const useUserByIdOrCustomUrl = (identifier: string): UseQueryResult<Table
         .from('user')
         .select('*')
         .eq('id', identifier)
-        .single()
+        .single();
 
       if (idError) {
-        throw idError
+        throw idError;
       }
 
-      return idData
+      return idData;
     },
     retry: false,
     enabled: !!identifier,
-  })
-}
+  });
+};
 
 export const useUpdateUser = () => {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (updates: TablesUpdate<'user'>) => {
-      const { data: { session } } = await supabase.auth.getSession()
-      
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
       if (!session) {
-        throw new Error('No active session')
+        throw new Error('No active session');
       }
 
       const { data, error } = await supabase
@@ -129,16 +147,16 @@ export const useUpdateUser = () => {
         .update(updates)
         .eq('id', session.user.id)
         .select()
-        .single()
+        .single();
 
       if (error) {
-        throw error
+        throw error;
       }
 
-      return data
+      return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user'] })
+      queryClient.invalidateQueries({ queryKey: ['user'] });
     },
-  })
-}
+  });
+};

@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { X, Plus, Upload, Smile, Sparkles, Camera } from "lucide-react";
+import { motion } from 'framer-motion';
+import { Camera, Plus, Smile, Sparkles, Upload, X } from 'lucide-react';
+import { useState } from 'react';
 
 interface Step4Props {
   selectedTraits: string[];
@@ -10,6 +10,7 @@ interface Step4Props {
   };
   travelPhotos: string[];
   setSelectedTraits: (traits: string[]) => void;
+  // biome-ignore lint/suspicious/noExplicitAny: Partial form data
   setFormData: (data: any) => void;
   setTravelPhotos: (photos: string[]) => void;
   onBack: () => void;
@@ -28,49 +29,112 @@ export const Step4Preferences: React.FC<Step4Props> = ({
   onBack,
   onSubmit,
   isLoading,
-  isEditMode = false
+  isEditMode = false,
 }) => {
   const [showTraitModal, setShowTraitModal] = useState(false);
   const [traitSearchTerm, setTraitSearchTerm] = useState('');
 
   const mainTraits = [
-    "Adventurous", "Relaxed", "Social", "Quiet", "Early Bird", "Night Owl",
-    "Foodie", "Culture Lover", "Nature Lover", "Budget Traveler", "Luxury Traveler", "Backpacker"
+    'Adventurous',
+    'Relaxed',
+    'Social',
+    'Quiet',
+    'Early Bird',
+    'Night Owl',
+    'Foodie',
+    'Culture Lover',
+    'Nature Lover',
+    'Budget Traveler',
+    'Luxury Traveler',
+    'Backpacker',
   ];
 
   const allTraits = [
-    "Adventurous", "Relaxed", "Social", "Quiet", "Early Bird", "Night Owl", "Spontaneous", "Planner",
-    "Minimalist", "Culture Lover", "Foodie", "Nature Lover", "Tech Savvy", "Fitness Enthusiast",
-    "Beach Lover", "Mountain Explorer", "City Explorer", "Art Enthusiast", "History Buff", "Photography Lover",
-    "Music Lover", "Dancer", "Swimmer", "Hiker", "Runner", "Cyclist", "Yoga Practitioner", "Meditation Enthusiast",
-    "Budget Traveler", "Luxury Traveler", "Backpacker", "Digital Nomad", "Solo Traveler", "Group Traveler",
-    "Road Tripper", "Train Enthusiast", "Flight Lover", "Cruise Enthusiast", "Camping Lover", "Hostel Hopper",
-    "Bookworm", "Gamer", "Musician", "Artist", "Writer", "Photographer", "Blogger", "Vlogger",
-    "Language Learner", "Cooking Enthusiast", "Wine Lover", "Coffee Connoisseur", "Tea Lover", "Craft Beer Fan"
+    'Adventurous',
+    'Relaxed',
+    'Social',
+    'Quiet',
+    'Early Bird',
+    'Night Owl',
+    'Spontaneous',
+    'Planner',
+    'Minimalist',
+    'Culture Lover',
+    'Foodie',
+    'Nature Lover',
+    'Tech Savvy',
+    'Fitness Enthusiast',
+    'Beach Lover',
+    'Mountain Explorer',
+    'City Explorer',
+    'Art Enthusiast',
+    'History Buff',
+    'Photography Lover',
+    'Music Lover',
+    'Dancer',
+    'Swimmer',
+    'Hiker',
+    'Runner',
+    'Cyclist',
+    'Yoga Practitioner',
+    'Meditation Enthusiast',
+    'Budget Traveler',
+    'Luxury Traveler',
+    'Backpacker',
+    'Digital Nomad',
+    'Solo Traveler',
+    'Group Traveler',
+    'Road Tripper',
+    'Train Enthusiast',
+    'Flight Lover',
+    'Cruise Enthusiast',
+    'Camping Lover',
+    'Hostel Hopper',
+    'Bookworm',
+    'Gamer',
+    'Musician',
+    'Artist',
+    'Writer',
+    'Photographer',
+    'Blogger',
+    'Vlogger',
+    'Language Learner',
+    'Cooking Enthusiast',
+    'Wine Lover',
+    'Coffee Connoisseur',
+    'Tea Lover',
+    'Craft Beer Fan',
   ];
 
   const handleTraitToggle = (trait: string) => {
     if (selectedTraits.includes(trait)) {
-      setSelectedTraits(selectedTraits.filter(t => t !== trait));
+      setSelectedTraits(selectedTraits.filter((t) => t !== trait));
     } else {
       setSelectedTraits([...selectedTraits, trait]);
     }
   };
 
-  const handleTravelPhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTravelPhotoUpload = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const files = event.target.files;
     if (files) {
       const newPhotos: string[] = [];
-      Array.from(files).slice(0, 3 - travelPhotos.length).forEach(file => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          newPhotos.push(reader.result as string);
-          if (newPhotos.length === Math.min(files.length, 3 - travelPhotos.length)) {
-            setTravelPhotos([...travelPhotos, ...newPhotos].slice(0, 3));
-          }
-        };
-        reader.readAsDataURL(file);
-      });
+      Array.from(files)
+        .slice(0, 3 - travelPhotos.length)
+        .forEach((file) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            newPhotos.push(reader.result as string);
+            if (
+              newPhotos.length ===
+              Math.min(files.length, 3 - travelPhotos.length)
+            ) {
+              setTravelPhotos([...travelPhotos, ...newPhotos].slice(0, 3));
+            }
+          };
+          reader.readAsDataURL(file);
+        });
     }
   };
 
@@ -100,14 +164,18 @@ export const Step4Preferences: React.FC<Step4Props> = ({
 
       <div className="space-y-6">
         <div>
-          <label htmlFor="bio" className="block text-lg font-semibold text-gray-800 mb-2">
+          <label
+            htmlFor="bio"
+            className="block text-lg font-semibold text-gray-800 mb-2"
+          >
             <Smile className="inline w-5 h-5 mr-2 text-yellow-500" />
-            What makes you feel alive? <span className="text-gray-400">(optional)</span>
+            What makes you feel alive?{' '}
+            <span className="text-gray-400">(optional)</span>
           </label>
           <textarea
             id="bio"
             value={formData.bio}
-            onChange={(e) => setFormData({...formData, bio: e.target.value})}
+            onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
             placeholder="Travel, music, trying new foods, meeting people..."
             rows={3}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 text-lg resize-none"
@@ -115,11 +183,12 @@ export const Step4Preferences: React.FC<Step4Props> = ({
         </div>
 
         <div>
+          {/* biome-ignore lint/a11y/noLabelWithoutControl: Label for button group */}
           <label className="block text-lg font-semibold text-gray-800 mb-2">
             <Sparkles className="inline w-5 h-5 mr-2 text-purple-600" />
             Travel traits <span className="text-gray-400">(optional)</span>
           </label>
-          
+
           <div className="grid grid-cols-2 gap-2 mb-4">
             {mainTraits.map((trait) => (
               <button
@@ -128,23 +197,23 @@ export const Step4Preferences: React.FC<Step4Props> = ({
                 onClick={() => handleTraitToggle(trait)}
                 className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                   selectedTraits.includes(trait)
-                    ? "bg-purple-600 text-white shadow-md"
-                    : "bg-gray-100 text-gray-700 hover:bg-purple-50 hover:text-purple-700"
+                    ? 'bg-purple-600 text-white shadow-md'
+                    : 'bg-gray-100 text-gray-700 hover:bg-purple-50 hover:text-purple-700'
                 }`}
               >
                 {trait}
               </button>
             ))}
           </div>
-          
+
           <button
             type="button"
             onClick={() => setShowTraitModal(true)}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:border-purple-300 hover:bg-purple-50 transition-all text-left flex items-center justify-between"
           >
             <span>
-              {selectedTraits.length > 0 
-                ? `${selectedTraits.length} selected, add more...` 
+              {selectedTraits.length > 0
+                ? `${selectedTraits.length} selected, add more...`
                 : 'Add traits...'}
             </span>
             <Plus className="w-4 h-4" />
@@ -159,6 +228,7 @@ export const Step4Preferences: React.FC<Step4Props> = ({
                 >
                   {trait}
                   <button
+                    type="button"
                     onClick={() => handleTraitToggle(trait)}
                     className="ml-1 hover:text-purple-600"
                   >
@@ -171,13 +241,22 @@ export const Step4Preferences: React.FC<Step4Props> = ({
         </div>
 
         <div>
-          <label htmlFor="mostInfluencedExperience" className="block text-sm font-medium text-gray-700 mb-2">
-            Most impactful travel experience? <span className="text-gray-400">(optional)</span>
+          <label
+            htmlFor="mostInfluencedExperience"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Most impactful travel experience?{' '}
+            <span className="text-gray-400">(optional)</span>
           </label>
           <textarea
             id="mostInfluencedExperience"
             value={formData.mostInfluencedExperience}
-            onChange={(e) => setFormData({...formData, mostInfluencedExperience: e.target.value})}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                mostInfluencedExperience: e.target.value,
+              })
+            }
             placeholder="Tell us about a moment, encounter, or journey that changed your perspective..."
             rows={3}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
@@ -185,9 +264,11 @@ export const Step4Preferences: React.FC<Step4Props> = ({
         </div>
 
         <div>
+          {/* biome-ignore lint/a11y/noLabelWithoutControl: Label for photo upload section */}
           <label className="block text-lg font-semibold text-gray-800 mb-2">
             <Camera className="inline w-5 h-5 mr-2 text-pink-500" />
-            Travel Photos <span className="text-gray-400">(optional, up to 3)</span>
+            Travel Photos{' '}
+            <span className="text-gray-400">(optional, up to 3)</span>
           </label>
           <div className="grid grid-cols-3 gap-3">
             {[0, 1, 2].map((index) => (
@@ -203,6 +284,7 @@ export const Step4Preferences: React.FC<Step4Props> = ({
                     </button>
                     <img
                       src={travelPhotos[index]}
+                      // biome-ignore lint/a11y/noRedundantAlt: Descriptive alt for travel photos
                       alt={`Travel photo ${index + 1}`}
                       className="w-full h-20 object-cover rounded-lg border-2 border-gray-200"
                     />
@@ -246,26 +328,37 @@ export const Step4Preferences: React.FC<Step4Props> = ({
           disabled={isLoading}
           className={`w-1/2 py-3 rounded-lg font-bold text-lg shadow-lg transition ${
             isLoading
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700"
+              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700'
           }`}
         >
-          {isLoading ? (isEditMode ? "Updating Profile..." : "Creating Profile...") : (isEditMode ? "Update Profile" : "Create Profile")}
+          {isLoading
+            ? isEditMode
+              ? 'Updating Profile...'
+              : 'Creating Profile...'
+            : isEditMode
+              ? 'Update Profile'
+              : 'Create Profile'}
         </motion.button>
       </div>
 
       {showTraitModal && (
-        <div 
+        // biome-ignore lint/a11y/useKeyWithClickEvents: Modal backdrop click
+        // biome-ignore lint/a11y/noStaticElementInteractions: Modal backdrop
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
           onClick={() => setShowTraitModal(false)}
         >
-          <div 
+          {/* biome-ignore lint/a11y/useKeyWithClickEvents: Stop propagation */}
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: Modal content */}
+          <div
             className="bg-white rounded-lg p-6 w-96 max-h-96 overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold">Select Travel Traits</h3>
               <button
+                type="button"
                 onClick={() => setShowTraitModal(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
@@ -281,23 +374,23 @@ export const Step4Preferences: React.FC<Step4Props> = ({
             />
             <div className="max-h-60 overflow-y-auto">
               {allTraits
-                .filter(trait => 
-                  trait.toLowerCase().includes(traitSearchTerm.toLowerCase())
+                .filter((trait) =>
+                  trait.toLowerCase().includes(traitSearchTerm.toLowerCase()),
                 )
-                .map(trait => (
-                <button
-                  key={trait}
-                  type="button"
-                  onClick={() => handleTraitToggle(trait)}
-                  className={`w-full text-left px-3 py-2 rounded transition-all ${
-                    selectedTraits.includes(trait)
-                      ? "bg-purple-600 text-white"
-                      : "hover:bg-purple-50"
-                  }`}
-                >
-                  {trait}
-                </button>
-              ))}
+                .map((trait) => (
+                  <button
+                    key={trait}
+                    type="button"
+                    onClick={() => handleTraitToggle(trait)}
+                    className={`w-full text-left px-3 py-2 rounded transition-all ${
+                      selectedTraits.includes(trait)
+                        ? 'bg-purple-600 text-white'
+                        : 'hover:bg-purple-50'
+                    }`}
+                  >
+                    {trait}
+                  </button>
+                ))}
             </div>
           </div>
         </div>

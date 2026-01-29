@@ -1,11 +1,16 @@
-import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, MapPin, User, Building, Users, Eye } from 'lucide-react';
-import { useUser } from '../../hooks/useUser';
+import { Building, Calendar, Eye, MapPin, User, Users } from 'lucide-react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 import { AccommodationPreview } from '../../components/AccommodationPreview';
-import { iframelyService, type AccommodationPreview as AccommodationPreviewType } from '../../lib/iframely';
+import { useUser } from '../../hooks/useUser';
+import {
+  type AccommodationPreview as AccommodationPreviewType,
+  iframelyService,
+} from '../../lib/iframely';
 
 interface Props {
+  // biome-ignore lint/suspicious/noExplicitAny: Trip form data shape
   trip: any;
   personalNote: string;
   matchWith: string;
@@ -17,6 +22,7 @@ interface Props {
 
 const TripPreview: React.FC<Props> = ({
   trip,
+  // biome-ignore lint/correctness/noUnusedFunctionParameters: Part of step interface
   personalNote,
   matchWith,
   vibe,
@@ -25,29 +31,36 @@ const TripPreview: React.FC<Props> = ({
   loading,
 }) => {
   const { data: user } = useUser();
-  const [accommodationPreview, setAccommodationPreview] = useState<AccommodationPreviewType>({
-    title: '',
-    description: '',
-    image: '',
-    site: '',
-    author: '',
-    url: '',
-    favicon: '',
-    isLoading: false,
-    error: null,
-  });
+  const [accommodationPreview, setAccommodationPreview] =
+    useState<AccommodationPreviewType>({
+      title: '',
+      description: '',
+      image: '',
+      site: '',
+      author: '',
+      url: '',
+      favicon: '',
+      isLoading: false,
+      error: null,
+    });
 
   useEffect(() => {
     if (trip.bookingUrl) {
-      setAccommodationPreview(prev => ({ ...prev, isLoading: true, error: null }));
-      
-      iframelyService.getAccommodationPreview(trip.bookingUrl)
-        .then(preview => setAccommodationPreview(preview))
-        .catch(error => {
-          setAccommodationPreview(prev => ({
+      setAccommodationPreview((prev) => ({
+        ...prev,
+        isLoading: true,
+        error: null,
+      }));
+
+      iframelyService
+        .getAccommodationPreview(trip.bookingUrl)
+        .then((preview) => setAccommodationPreview(preview))
+        .catch((error) => {
+          setAccommodationPreview((prev) => ({
             ...prev,
             isLoading: false,
-            error: error instanceof Error ? error.message : 'Failed to load preview'
+            error:
+              error instanceof Error ? error.message : 'Failed to load preview',
           }));
         });
     }
@@ -59,8 +72,10 @@ const TripPreview: React.FC<Props> = ({
       transition={{ duration: 0.5 }}
       className="bg-gradient-to-br from-blue-100 via-white to-purple-100 rounded-2xl shadow-2xl p-8"
     >
-      <h2 className="text-2xl font-bold mb-6 text-center text-blue-700">Trip Preview</h2>
-      
+      <h2 className="text-2xl font-bold mb-6 text-center text-blue-700">
+        Trip Preview
+      </h2>
+
       {/* Host Profile Section */}
       <div className="bg-white rounded-lg p-4 mb-6 border border-gray-200">
         <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
@@ -80,8 +95,12 @@ const TripPreview: React.FC<Props> = ({
             </div>
           )}
           <div>
-            <p className="font-semibold text-gray-900">{user?.name || 'Your Name'}</p>
-            <p className="text-sm text-gray-600">{user?.currentPlace || user?.birthPlace || 'Location'}</p>
+            <p className="font-semibold text-gray-900">
+              {user?.name || 'Your Name'}
+            </p>
+            <p className="text-sm text-gray-600">
+              {user?.currentPlace || user?.birthPlace || 'Location'}
+            </p>
           </div>
         </div>
       </div>
@@ -101,21 +120,24 @@ const TripPreview: React.FC<Props> = ({
             <Calendar className="w-4 h-4 text-purple-600" />
             <span className="font-semibold text-gray-800">Dates:</span>
             <span className="ml-2 text-gray-700">
-              {trip.flexible 
+              {trip.flexible
                 ? `${trip.estimatedMonth} ${trip.estimatedYear} (Flexible)`
-                : `${trip.startDate?.slice(0, 10)} to ${trip.endDate?.slice(0, 10)}`
-              }
+                : `${trip.startDate?.slice(0, 10)} to ${trip.endDate?.slice(0, 10)}`}
             </span>
           </div>
           <div className="flex items-center gap-2">
             <Users className="w-4 h-4 text-green-600" />
-            <span className="font-semibold text-gray-800">Open to match with:</span>
+            <span className="font-semibold text-gray-800">
+              Open to match with:
+            </span>
             <span className="ml-2 text-gray-700 capitalize">{matchWith}</span>
           </div>
           <div className="flex items-center gap-2">
             <Eye className="w-4 h-4 text-blue-600" />
             <span className="font-semibold text-gray-800">Privacy:</span>
-            <span className="ml-2 text-gray-700">{trip.isPublic ? 'Public' : 'Private'}</span>
+            <span className="ml-2 text-gray-700">
+              {trip.isPublic ? 'Public' : 'Private'}
+            </span>
           </div>
           <div>
             <span className="font-semibold text-gray-800">Vibe:</span>
@@ -132,29 +154,47 @@ const TripPreview: React.FC<Props> = ({
         </h3>
         <div className="space-y-3">
           <div>
-            <span className="font-semibold text-gray-800">Number of Rooms:</span>
+            <span className="font-semibold text-gray-800">
+              Number of Rooms:
+            </span>
             <span className="ml-2 text-gray-700">{trip.numberOfRooms}</span>
           </div>
           {trip.rooms && trip.rooms.length > 0 && (
             <div>
-              <span className="font-semibold text-gray-800">Room Configuration:</span>
+              <span className="font-semibold text-gray-800">
+                Room Configuration:
+              </span>
               <div className="mt-2 space-y-2">
-                {trip.rooms.map((room: any, index: number) => (
-                  <div key={index} className="bg-gray-50 rounded p-3">
-                    <p className="text-sm text-gray-700">
-                      <span className="font-medium">Room {index + 1}:</span> {room.numberOfBeds} bed(s)
-                      {room.ensuiteBathroom && <span className="text-green-600 ml-2">• Ensuite bathroom</span>}
-                    </p>
-                  </div>
-                ))}
+                {trip.rooms.map(
+                  // biome-ignore lint/suspicious/noExplicitAny: Room is JSON column
+                  (room: any, index: number) => (
+                    <div
+                      // biome-ignore lint/suspicious/noArrayIndexKey: Room array has no unique id
+                      key={index}
+                      className="bg-gray-50 rounded p-3"
+                    >
+                      <p className="text-sm text-gray-700">
+                        <span className="font-medium">Room {index + 1}:</span>{' '}
+                        {room.numberOfBeds} bed(s)
+                        {room.ensuiteBathroom && (
+                          <span className="text-green-600 ml-2">
+                            • Ensuite bathroom
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  ),
+                )}
               </div>
             </div>
           )}
           {trip.bookingUrl && (
             <div>
-              <span className="font-semibold text-gray-800">Accommodation Preview:</span>
+              <span className="font-semibold text-gray-800">
+                Accommodation Preview:
+              </span>
               <div className="mt-2">
-                <AccommodationPreview 
+                <AccommodationPreview
                   preview={accommodationPreview}
                   imageAspectRatio="wide"
                   className="max-w-lg"

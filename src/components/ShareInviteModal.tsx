@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import { useUser } from '@/hooks/useUser';
 import type { Tables } from '@/types/database.types';
 
@@ -10,15 +10,16 @@ interface ShareInviteModalProps {
   shareUrl?: string;
 }
 
-const generatePersonalizedMessage = (user: Tables<'user'> | undefined): string => {
+const generatePersonalizedMessage = (
+  user: Tables<'user'> | undefined,
+): string => {
   if (!user) {
     return "Hey! I just created my profile on SplitStay — maybe we should try it sometime. Why don't you create yours as well?";
   }
 
-  
   // Use Vite environment variable for the base URL, fallback to current origin
   const baseUrl = import.meta.env.VITE_APP_URL || window.location.origin;
-  
+
   // Use customized URL if available, otherwise use ID
   const profileIdentifier = user?.personalizedLink || user?.id;
   const message = `Just joined SplitStay — it helps you connect with like-minded travelers to share accommodations and save on costs. Here's my profile — feel free to create yours too! \n${baseUrl}/profile/${profileIdentifier}`;
@@ -99,7 +100,9 @@ const ShareInviteModal: React.FC<ShareInviteModalProps> = ({
   };
 
   return (
-    <div 
+    // biome-ignore lint/a11y/useKeyWithClickEvents: Modal backdrop
+    // biome-ignore lint/a11y/noStaticElementInteractions: Modal backdrop
+    <div
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
       onClick={onClose}
     >
@@ -115,7 +118,8 @@ const ShareInviteModal: React.FC<ShareInviteModalProps> = ({
           Share Your Profile & Invite Friends
         </h2>
         <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 text-center">
-          Invite your friends to join SplitStay! Sharing is optional, but helps us grow.
+          Invite your friends to join SplitStay! Sharing is optional, but helps
+          us grow.
         </p>
         <textarea
           className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg mb-3 sm:mb-4 text-gray-800 resize-none text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -126,6 +130,7 @@ const ShareInviteModal: React.FC<ShareInviteModalProps> = ({
         />
         <div className="flex flex-col gap-2 sm:gap-3 mb-3 sm:mb-4">
           {typeof navigator.share === 'function' && (
+            // biome-ignore lint/a11y/useButtonType: Share action button
             <button
               onClick={handleShare}
               className="w-full bg-blue-600 text-white py-2 sm:py-3 px-3 sm:px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm sm:text-base"
@@ -133,25 +138,31 @@ const ShareInviteModal: React.FC<ShareInviteModalProps> = ({
               Share via Device...
             </button>
           )}
+          {/* biome-ignore lint/a11y/useButtonType: Share action button */}
           <button
             onClick={() => window.open(whatsappUrl, '_blank')}
             className="w-full bg-green-500 text-white py-2 sm:py-3 px-3 sm:px-4 rounded-lg font-medium hover:bg-green-600 transition-colors text-sm sm:text-base"
           >
             Share on WhatsApp
           </button>
+          {/* biome-ignore lint/a11y/useButtonType: Share action button */}
           <button
             onClick={() => window.open(facebookUrl, '_blank')}
             className="w-full bg-blue-800 text-white py-2 sm:py-3 px-3 sm:px-4 rounded-lg font-medium hover:bg-blue-900 transition-colors text-sm sm:text-base"
           >
             Share on Facebook
           </button>
+          {/* biome-ignore lint/a11y/useButtonType: Share action button */}
           <button
             onClick={handleInstagramShare}
             className="w-full bg-pink-500 text-white py-2 sm:py-3 px-3 sm:px-4 rounded-lg font-medium hover:bg-pink-600 transition-colors text-sm sm:text-base"
           >
-            <span className="hidden sm:inline">Share on Instagram (Copy to Clipboard)</span>
+            <span className="hidden sm:inline">
+              Share on Instagram (Copy to Clipboard)
+            </span>
             <span className="sm:hidden">Instagram</span>
           </button>
+          {/* biome-ignore lint/a11y/useButtonType: Copy action button */}
           <button
             onClick={handleCopy}
             className="w-full bg-gray-100 text-gray-700 py-2 sm:py-3 px-3 sm:px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors text-sm sm:text-base"
@@ -159,6 +170,7 @@ const ShareInviteModal: React.FC<ShareInviteModalProps> = ({
             {copied ? 'Copied!' : 'Copy Message'}
           </button>
         </div>
+        {/* biome-ignore lint/a11y/useButtonType: Skip action button */}
         <button
           onClick={onClose}
           className="w-full text-gray-500 hover:text-blue-600 transition-colors text-xs sm:text-sm underline"

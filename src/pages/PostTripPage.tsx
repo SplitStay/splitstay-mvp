@@ -1,18 +1,16 @@
+import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUser } from '@/hooks/useUser';
+import { trackEvent } from '@/lib/amplitude';
+import { createTrip, type TripFormData } from '@/lib/tripService';
+import PostTripSuccessModal from './PostTripSteps/PostTripSuccessModal';
 import Step1Destination from './PostTripSteps/Step1Destination';
 import Step2Accommodation from './PostTripSteps/Step2Accommodation';
 import Step3Preferences from './PostTripSteps/Step3Preferences';
 import TripPreview from './PostTripSteps/TripPreview';
-import PostTripSuccessModal from './PostTripSteps/PostTripSuccessModal';
-
-import { supabase } from '@/lib/supabase';
-import { createTrip, type TripFormData } from '@/lib/tripService';
-import { motion } from 'framer-motion';
-import { useUser } from '@/hooks/useUser';
-import { useAuth } from '@/contexts/AuthContext';
-import { trackEvent } from '@/lib/amplitude';
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -39,19 +37,21 @@ const PostTripPage = () => {
   const [step, setStep] = useState<Step>(1);
   const [trip, setTrip] = useState(defaultTrip);
   const [personalNote, setPersonalNote] = useState('');
-  const [matchWith, setMatchWith] = useState<'male' | 'female' | 'anyone'>('anyone');
+  const [matchWith, setMatchWith] = useState<'male' | 'female' | 'anyone'>(
+    'anyone',
+  );
   const [vibe, setVibe] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { data: user } = useUser();
   const { user: authUser } = useAuth();
-  
+
   const isGuest = !authUser;
 
   // Step navigation
-  const next = () => setStep((s) => (s < 4 ? (s + 1) as Step : s));
-  const back = () => setStep((s) => (s > 1 ? (s - 1) as Step : s));
+  const next = () => setStep((s) => (s < 4 ? ((s + 1) as Step) : s));
+  const back = () => setStep((s) => (s > 1 ? ((s - 1) as Step) : s));
 
   // Handle trip post
   const handlePost = async () => {
@@ -72,19 +72,25 @@ const PostTripPage = () => {
         matchWith: trip.matchWith,
         thumbnailUrl: trip.thumbnailUrl,
       };
-      
+
       localStorage.setItem('splitstay_pending_trip', JSON.stringify(tripData));
-      navigate('/signup', { state: { from: '/post-trip', action: 'create_trip', tripName: trip.name } });
+      navigate('/signup', {
+        state: {
+          from: '/post-trip',
+          action: 'create_trip',
+          tripName: trip.name,
+        },
+      });
       return;
     }
-    
+
     if (!user) {
       toast.error('User not loaded. Please try again.');
       return;
     }
-    
+
     setLoading(true);
-    
+
     try {
       // Prepare trip data for creation
       const tripData: TripFormData = {
@@ -104,30 +110,29 @@ const PostTripPage = () => {
         thumbnailUrl: trip.thumbnailUrl,
       };
 
-
-
       // Create the trip
       await createTrip(tripData);
-      
+
       toast.success('Trip posted successfully!', {
         duration: 4000,
         icon: '✈️',
       });
-      
+
       trackEvent('Add_Trip', {
         location: trip.location,
         flexible: trip.flexible,
         has_booking_url: !!trip.bookingUrl,
         number_of_rooms: trip.numberOfRooms,
         match_with: trip.matchWith,
-        has_vibe: !!vibe
+        has_vibe: !!vibe,
       });
-      
+
       setShowSuccess(true);
-      
     } catch (error) {
       console.error('Error creating trip:', error);
-      toast.error(`Failed to post trip: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      toast.error(
+        `Failed to post trip: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     } finally {
       setLoading(false);
     }
@@ -143,7 +148,9 @@ const PostTripPage = () => {
         className="w-full max-w-2xl lg:max-w-4xl"
       >
         <div className="w-full bg-white rounded-2xl shadow-xl p-6 lg:p-8">
-          <h1 className="text-3xl font-bold text-blue-700 mb-4 lg:mb-6 text-center">Post a Trip</h1>
+          <h1 className="text-3xl font-bold text-blue-700 mb-4 lg:mb-6 text-center">
+            Post a Trip
+          </h1>
           <div className="mb-4 lg:mb-6 flex justify-center gap-2">
             {[1, 2, 3, 4].map((s) => (
               <div
@@ -153,11 +160,7 @@ const PostTripPage = () => {
             ))}
           </div>
           {step === 1 && (
-            <Step1Destination
-              trip={trip}
-              setTrip={setTrip}
-              next={next}
-            />
+            <Step1Destination trip={trip} setTrip={setTrip} next={next} />
           )}
           {step === 2 && (
             <Step2Accommodation
@@ -174,7 +177,9 @@ const PostTripPage = () => {
               trip={trip}
               setTrip={setTrip}
               matchWith={matchWith}
-              setMatchWith={(m) => setMatchWith(m as 'male' | 'female' | 'anyone')}
+              setMatchWith={(m) =>
+                setMatchWith(m as 'male' | 'female' | 'anyone')
+              }
               vibe={vibe}
               setVibe={setVibe}
               back={back}
@@ -202,7 +207,7 @@ const PostTripPage = () => {
         }}
         trip={trip}
       />
-      </div>
+    </div>
   );
 };
 
