@@ -14,6 +14,44 @@ export type Database = {
   };
   public: {
     Tables: {
+      admin_users: {
+        Row: {
+          userId: string;
+          createdAt: string;
+        };
+        Insert: {
+          userId: string;
+          createdAt?: string;
+        };
+        Update: {
+          userId?: string;
+          createdAt?: string;
+        };
+        Relationships: [];
+      };
+      hidden_trips: {
+        Row: {
+          tripId: string;
+          createdAt: string;
+        };
+        Insert: {
+          tripId: string;
+          createdAt?: string;
+        };
+        Update: {
+          tripId?: string;
+          createdAt?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'hidden_trips_tripId_trip_id_fk';
+            columns: ['tripId'];
+            isOneToOne: true;
+            referencedRelation: 'trip';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       chat: {
         Row: {
           createdAt: string;
@@ -400,7 +438,30 @@ export type Database = {
       };
     };
     Views: {
-      [_ in never]: never;
+      searchable_trips: {
+        Row: {
+          bookingUrl: string | null;
+          createdAt: string;
+          description: string;
+          endDate: string | null;
+          estimatedMonth: string | null;
+          estimatedYear: string | null;
+          flexible: boolean;
+          hostId: string | null;
+          id: string;
+          isPublic: boolean;
+          joineeId: string | null;
+          location: string;
+          matchWith: string | null;
+          name: string;
+          numberOfRooms: number | null;
+          rooms: unknown | null;
+          startDate: string | null;
+          thumbnailUrl: string | null;
+          updatedAt: string;
+        };
+        Relationships: [];
+      };
     };
     Functions: {
       [_ in never]: never;

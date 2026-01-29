@@ -5,17 +5,19 @@ import {
   Calendar,
   CalendarDays,
   MapPin,
+  ShieldAlert,
   Users,
 } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import { iframelyService } from '../lib/iframely';
-import type { Trip } from '../lib/tripService';
+import type { Trip, TripWithHiddenStatus } from '../lib/tripService';
 import { parseLocalDate } from '../utils/dateUtils';
 import { Badge } from './ui/badge';
 
 interface TripCardProps {
-  trip: Trip & {
+  // Trip can optionally have isHiddenByAdmin for dashboard view
+  trip: (Trip | TripWithHiddenStatus) & {
     accommodation_type?: { name: string } | null;
     host?: { name: string; imageUrl?: string } | null;
     joinee?: { name: string; imageUrl?: string } | null;
@@ -197,6 +199,17 @@ export const TripCard: React.FC<TripCardProps> = ({
                 Private
               </Badge>
             )}
+
+            {/* Hidden by Admin Badge */}
+            {'isHiddenByAdmin' in trip && trip.isHiddenByAdmin && (
+              <Badge
+                variant="outline"
+                className="absolute top-12 left-3 bg-red-100 text-red-700 border-red-300 flex items-center gap-1"
+              >
+                <ShieldAlert className="w-3 h-3" />
+                Hidden by admin
+              </Badge>
+            )}
           </div>
 
           {/* Trip Details */}
@@ -356,6 +369,17 @@ export const TripCard: React.FC<TripCardProps> = ({
                 className="absolute top-3 left-3 bg-white/90 text-gray-700 border-gray-300"
               >
                 Private
+              </Badge>
+            )}
+
+            {/* Hidden by Admin Badge - Back */}
+            {'isHiddenByAdmin' in trip && trip.isHiddenByAdmin && (
+              <Badge
+                variant="outline"
+                className="absolute top-12 left-3 bg-red-100 text-red-700 border-red-300 flex items-center gap-1"
+              >
+                <ShieldAlert className="w-3 h-3" />
+                Hidden by admin
               </Badge>
             )}
           </div>

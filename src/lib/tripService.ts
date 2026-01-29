@@ -25,6 +25,14 @@ export interface TripFormData {
 export type Trip = Tables<'trip'>;
 export type TripInsert = TablesInsert<'trip'>;
 
+// Extended trip type with hidden status
+export interface TripWithHiddenStatus extends Trip {
+  isHiddenByAdmin: boolean;
+  accommodation_type?: { name: string } | null;
+  host?: { name: string | null; imageUrl: string | null } | null;
+  joinee?: { name: string | null; imageUrl: string | null } | null;
+}
+
 export const createTrip = async (tripData: TripFormData): Promise<Trip> => {
   const {
     data: { user },
@@ -148,8 +156,14 @@ export const updateTrip = async (
   return data;
 };
 
-export const getTripById = async (tripId: string): Promise<Trip | null> => {
-  const { data, error } = await supabase
+/**
+ * Get a trip by ID. Returns null if trip is hidden and user is not the owner.
+ */
+export const getTripById = async (
+  tripId: string,
+): Promise<TripWithHiddenStatus | null> => {
+  // Fetch the trip
+  const { data: trip, error } = await supabase
     .from('trip')
     .select(`
       *,
@@ -168,10 +182,38 @@ export const getTripById = async (tripId: string): Promise<Trip | null> => {
     throw new Error(`Failed to fetch trip: ${error.message}`);
   }
 
-  return data;
+  // Check if trip is hidden
+  const { data: hiddenData, error: hiddenError } = await supabase
+    .from('hidden_trips')
+    .select('tripId')
+    .eq('tripId', tripId)
+    .single();
+
+  const isHidden = hiddenError?.code !== 'PGRST116' && hiddenData !== null;
+
+  // If hidden, check if current user is the owner
+  if (isHidden) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const isOwner = user?.id === trip.hostId;
+
+    if (!isOwner) {
+      // Hidden trip and not the owner - return null (not found)
+      return null;
+    }
+  }
+
+  return {
+    ...trip,
+    isHiddenByAdmin: isHidden,
+  };
 };
 
-export const getUserTrips = async (): Promise<Trip[]> => {
+/**
+ * Get all trips for the current user (as host or joinee), including hidden status.
+ */
+export const getUserTrips = async (): Promise<TripWithHiddenStatus[]> => {
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -180,7 +222,7 @@ export const getUserTrips = async (): Promise<Trip[]> => {
     throw new Error('User must be authenticated to fetch trips');
   }
 
-  const { data, error } = await supabase
+  const { data: trips, error } = await supabase
     .from('trip')
     .select(`
       *,
@@ -196,9 +238,22 @@ export const getUserTrips = async (): Promise<Trip[]> => {
     throw new Error(`Failed to fetch trips: ${error.message}`);
   }
 
-  return data || [];
+  // Fetch hidden trips to determine status
+  const { data: hiddenTrips } = await supabase
+    .from('hidden_trips')
+    .select('tripId');
+
+  const hiddenTripIds = new Set(hiddenTrips?.map((ht) => ht.tripId) ?? []);
+
+  return (trips ?? []).map((trip) => ({
+    ...trip,
+    isHiddenByAdmin: hiddenTripIds.has(trip.id),
+  }));
 };
 
+/**
+ * Search for trips. Uses searchable_trips view to exclude hidden trips.
+ */
 export const searchTrips = async (filters: {
   location?: string;
   flexible?: boolean;
@@ -208,8 +263,9 @@ export const searchTrips = async (filters: {
   estimatedYear?: string;
   accommodationTypeId?: string;
 }): Promise<Trip[]> => {
+  // Use searchable_trips view which excludes hidden trips
   let query = supabase
-    .from('trip')
+    .from('searchable_trips')
     .select(`
       *,
       host:user!hostId(name, imageUrl),

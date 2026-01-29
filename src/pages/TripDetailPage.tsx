@@ -15,6 +15,7 @@ import {
   MessageCircle,
   Share2,
   Shield,
+  ShieldAlert,
   Users,
   X,
 } from 'lucide-react';
@@ -23,17 +24,22 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { EditTripModal } from '../components/EditTripModal';
 import ShareInviteModal from '../components/ShareInviteModal';
+import { Badge } from '../components/ui/badge';
 import { useAuth } from '../contexts/AuthContext';
 import { ChatService } from '../lib/chatService';
 import { iframelyService } from '../lib/iframely';
 import { supabase } from '../lib/supabase';
-import { getTripById, type Trip } from '../lib/tripService';
+import {
+  getTripById,
+  type Trip,
+  type TripWithHiddenStatus,
+} from '../lib/tripService';
 
 export const TripDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [trip, setTrip] = useState<Trip | null>(null);
+  const [trip, setTrip] = useState<TripWithHiddenStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [messageLoading, setMessageLoading] = useState(false);
   const [requestLoading, setRequestLoading] = useState(false);
@@ -316,6 +322,16 @@ export const TripDetailPage: React.FC = () => {
 
         {/* Overlay gradient for better text readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+
+        {/* Hidden by Admin Banner */}
+        {'isHiddenByAdmin' in trip && trip.isHiddenByAdmin && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
+            <Badge className="bg-red-100 text-red-700 border-red-300 flex items-center gap-2 px-4 py-2">
+              <ShieldAlert className="w-4 h-4" />
+              This trip has been hidden by an administrator
+            </Badge>
+          </div>
+        )}
 
         {/* Back button */}
         <button

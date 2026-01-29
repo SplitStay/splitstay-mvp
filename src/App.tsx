@@ -22,6 +22,7 @@ import {
   SignupPage,
   TermsPage,
 } from './pages';
+import { AdminPage } from './pages/AdminPage';
 import CreateProfilePage from './pages/CreateProfilePage';
 import EditProfilePage from './pages/EditProfilePage';
 import { MessagesPage } from './pages/MessagesPage';
@@ -225,6 +226,16 @@ function AppRoutes() {
           <GuestFriendlyRoute>
             <TripDetailPage />
           </GuestFriendlyRoute>
+        }
+      />
+
+      {/* Admin route - URL only, no nav link */}
+      <Route
+        path="/admin"
+        element={
+          <AuthRequiredRoute>
+            <AdminPage />
+          </AuthRequiredRoute>
         }
       />
 

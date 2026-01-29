@@ -18,7 +18,7 @@ import { MobileNavigation } from '../components/MobileNavigation';
 import { MVPBanner } from '../components/MVPBanner';
 import { TripCard } from '../components/TripCard';
 import { useAuth } from '../contexts/AuthContext';
-import { getUserTrips, type Trip } from '../lib/tripService';
+import { getUserTrips, type TripWithHiddenStatus } from '../lib/tripService';
 
 export const DashboardPage = () => {
   const { data: user, isLoading, error } = useUser();
@@ -26,7 +26,7 @@ export const DashboardPage = () => {
   const updateUser = useUpdateUser();
   const [showShareModal, setShowShareModal] = useState(false);
   const [activeTab, setActiveTab] = useState<'future' | 'past'>('future');
-  const [userTrips, setUserTrips] = useState<Trip[]>([]);
+  const [userTrips, setUserTrips] = useState<TripWithHiddenStatus[]>([]);
   const [tripsLoading, setTripsLoading] = useState(false);
   const { signOut } = useAuth();
   const navigate = useNavigate();
