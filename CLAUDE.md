@@ -22,10 +22,10 @@ npm run db:gen       # Regenerate both types and schemas
 
 ### Podman Users
 
-If using podman instead of Docker, set `DOCKER_HOST` in your shell profile:
+If using Podman instead of Docker, add the following to your `.env` file. Replace `<your-user-id>` with your actual user ID (run `id -u` to find it):
 
 ```bash
-export DOCKER_HOST=unix:///run/user/1000/podman/podman.sock
+DOCKER_HOST=unix:///run/user/<your-user-id>/podman/podman.sock
 ```
 
 ### Pre-commit Hooks

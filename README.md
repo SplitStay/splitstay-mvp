@@ -5,7 +5,7 @@ A platform for travelers to share accommodations and split costs.
 ## Prerequisites
 
 - Node.js 20+
-- Docker Desktop or Podman (for local Supabase)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) or [Podman](https://podman.io/) (for local Supabase)
 - npm
 
 ## Getting Started
@@ -19,16 +19,18 @@ npm install
 ### 2. Set up environment variables
 
 ```bash
-cp src/.env.example .env
+cp .env.example .env
 ```
 
-For local development, use these values:
+Edit `.env` with local development values:
 
 ```bash
 VITE_SUPABASE_URL=http://127.0.0.1:54321
 VITE_SUPABASE_ANON_KEY=<from npm run db:start output>
 VITE_APP_URL=http://localhost:5173
 ```
+
+**Podman users:** See the [Podman Users](#podman-users) section before proceeding.
 
 ### 3. Start local Supabase
 
@@ -74,16 +76,15 @@ The pre-commit hook runs:
 2. **Typecheck** — TypeScript compilation
 3. **Test** — Unit tests
 
-To skip hooks in emergencies: `git commit --no-verify`
-
 To run hooks manually: `npx lefthook run pre-commit`
 
 ## Database Migrations
 
+Migrations are SQL files that modify the database schema. They run in order and are tracked so each migration only runs once.
+
 ### Creating a Migration
 
 ```bash
-# Generate a new migration file with timestamp
 npx supabase migration new <migration_name>
 ```
 
@@ -96,9 +97,8 @@ This creates `supabase/migrations/YYYYMMDDHHMMSS_<migration_name>.sql`.
 ### Writing Migrations
 
 - Use `CREATE TABLE IF NOT EXISTS` for new tables
-- Use `DO $$ ... EXCEPTION WHEN duplicate_object THEN NULL; END $$` for idempotent enum/constraint creation
-- Quote camelCase column names: `"isPublic"`, `"createdAt"`
-- Always include `created_at`/`updated_at` timestamps with defaults
+- Quote camelCase column names: `"isPublic"`, `"createdAt"` (PostgreSQL lowercases unquoted identifiers, so `isPublic` becomes `ispublic`)
+- Always include `created_at`/`updated_at` timestamps with defaults (enables sorting by recency and debugging data issues)
 
 ### Testing a Migration
 
@@ -130,12 +130,7 @@ For partial rollbacks, manually edit/remove migration files before reset.
 
 ## Type Generation Workflow
 
-Types and validation schemas are auto-generated from the database:
-
-```
-Database → TypeScript Types → Zod Schemas → Application Schemas
-             (generated)       (generated)     (with transforms)
-```
+TypeScript types and [Zod](https://zod.dev/) validation schemas are auto-generated from the database. Zod validates data at runtime and infers TypeScript types from the same definition.
 
 After modifying database migrations:
 
@@ -144,17 +139,18 @@ npm run db:reset   # Apply migrations
 npm run db:gen     # Regenerate types and schemas
 ```
 
-**Files:**
-- `src/types/database.types.ts` — Auto-generated Supabase types
-- `src/lib/schemas/database.schemas.ts` — Auto-generated Zod schemas (via [supazod](https://github.com/dohooo/supazod))
-- `src/lib/schemas/tripSchema.ts` — Application schemas with transforms (e.g., null defaults)
+**Generated files (do not edit):**
+- `src/types/database.types.ts` — TypeScript types
+- `src/lib/schemas/database.schemas.ts` — Zod schemas
+
+**Application schemas** (e.g., `src/lib/schemas/tripSchema.ts`) import from the generated schemas and add transforms.
 
 ## Podman Users
 
-If using Podman instead of Docker, add this to your shell profile (`~/.bashrc` or `~/.zshrc`):
+If using Podman instead of Docker, add the following to your `.env` file. Replace `<your-user-id>` with your actual user ID (run `id -u` to find it):
 
 ```bash
-export DOCKER_HOST=unix:///run/user/1000/podman/podman.sock
+DOCKER_HOST=unix:///run/user/<your-user-id>/podman/podman.sock
 ```
 
 ## Hosting & Deployment
@@ -164,12 +160,12 @@ export DOCKER_HOST=unix:///run/user/1000/podman/podman.sock
 
 ### Production Migrations
 
-**⚠️ Migrations are not automatically applied to production.**
+**⚠️ Migrations are NOT automatically applied to production. If you merge code that depends on schema changes without running migrations, the app will break.**
 
 Currently, UI deploys (Vercel) and database migrations (Supabase) are independent. After merging to `main`:
 
-1. Vercel auto-deploys the UI
-2. Migrations must be applied manually:
+1. Vercel auto-deploys the UI immediately
+2. **You must manually apply migrations** or the deploy may fail:
    ```bash
    npx supabase link --project-ref <project-ref>
    npx supabase db push
