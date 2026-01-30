@@ -157,6 +157,26 @@ If using Podman instead of Docker, add this to your shell profile (`~/.bashrc` o
 export DOCKER_HOST=unix:///run/user/1000/podman/podman.sock
 ```
 
+## Hosting & Deployment
+
+- **UI:** Hosted on [Vercel](https://vercel.com) (auto-deploys on push to `main`)
+- **Database:** Hosted on [Supabase](https://supabase.com) (PostgreSQL, Auth, Storage, Realtime)
+
+### Production Migrations
+
+**⚠️ Migrations are not automatically applied to production.**
+
+Currently, UI deploys (Vercel) and database migrations (Supabase) are independent. After merging to `main`:
+
+1. Vercel auto-deploys the UI
+2. Migrations must be applied manually:
+   ```bash
+   npx supabase link --project-ref <project-ref>
+   npx supabase db push
+   ```
+
+> **TODO:** Set up CI/CD to atomically deploy UI and migrations together.
+
 ## Tech Stack
 
 - React 19 + TypeScript + Vite
@@ -164,6 +184,7 @@ export DOCKER_HOST=unix:///run/user/1000/podman/podman.sock
 - TanStack Query for server state
 - Supabase (PostgreSQL, Auth, Realtime, Storage)
 - Biome for linting/formatting
+- Vercel for hosting
 
 ## Project Structure
 
