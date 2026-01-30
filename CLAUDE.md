@@ -12,6 +12,17 @@ npm run format       # Biome format with auto-fix
 npm run check        # Biome check (lint + format)
 npm run check:fix    # Biome check with auto-fix
 npm run preview      # Serve production build locally
+npm run db:start     # Start local Supabase
+npm run db:stop      # Stop local Supabase
+npm run db:reset     # Reset database and apply migrations
+```
+
+### Podman Users
+
+If using podman instead of Docker, set `DOCKER_HOST` in your shell profile:
+
+```bash
+export DOCKER_HOST=unix:///run/user/1000/podman/podman.sock
 ```
 
 No test framework is currently configured.
