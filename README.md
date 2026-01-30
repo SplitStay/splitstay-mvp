@@ -65,6 +65,19 @@ The app will be available at http://localhost:5173
 | `npm run db:reset` | Reset database and apply migrations |
 | `npm run db:gen` | Regenerate TypeScript types and Zod schemas |
 
+## Pre-commit Hooks
+
+Git hooks are managed by [Lefthook](https://github.com/evilmartians/lefthook) and installed automatically via `npm install`.
+
+The pre-commit hook runs:
+1. **Lint** — Biome lint + format check
+2. **Typecheck** — TypeScript compilation
+3. **Test** — Unit tests
+
+To skip hooks in emergencies: `git commit --no-verify`
+
+To run hooks manually: `npx lefthook run pre-commit`
+
 ## Database Migrations
 
 ### Creating a Migration

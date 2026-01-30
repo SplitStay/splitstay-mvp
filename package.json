@@ -19,7 +19,8 @@
     "db:stop": "npx supabase stop",
     "db:types": "npx supabase gen types typescript --local > src/types/database.types.ts",
     "db:schemas": "npx supazod -i src/types/database.types.ts -o src/lib/schemas/database.schemas.ts",
-    "db:gen": "npm run db:types && npm run db:schemas"
+    "db:gen": "npm run db:types && npm run db:schemas",
+    "prepare": "lefthook install"
   },
   "dependencies": {
     "@amplitude/analytics-browser": "^2.11.8",
@@ -63,6 +64,7 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
     "jsdom": "^27.4.0",
+    "lefthook": "^2.0.16",
     "pg": "^8.16.3",
     "postcss": "^8.5.6",
     "supazod": "^4.5.0",

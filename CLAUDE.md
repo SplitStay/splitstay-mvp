@@ -28,7 +28,9 @@ If using podman instead of Docker, set `DOCKER_HOST` in your shell profile:
 export DOCKER_HOST=unix:///run/user/1000/podman/podman.sock
 ```
 
-No test framework is currently configured.
+### Pre-commit Hooks
+
+Managed by Lefthook (`lefthook.yml`). Runs lint, typecheck, and tests before each commit.
 
 ## Architecture
 

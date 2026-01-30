@@ -1,0 +1,14 @@
+# Lefthook configuration
+# https://github.com/evilmartians/lefthook
+
+pre-commit:
+  parallel: false
+  commands:
+    lint:
+      glob: "*.{js,jsx,ts,tsx,json,md}"
+      run: npm run check
+    typecheck:
+      glob: "*.{ts,tsx}"
+      run: npx tsc --noEmit
+    test:
+      run: npm run test:run
