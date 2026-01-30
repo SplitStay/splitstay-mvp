@@ -1,10 +1,7 @@
+import type { z } from 'zod';
 import type { TablesInsert } from '../types/database.types';
 import type { RoomConfiguration } from './accommodationService';
-import {
-  type ParsedTrip,
-  type ParsedTripWithRelations,
-  parseTripWithRelations,
-} from './schemas/tripSchema';
+import { type TripSchema, TripWithRelationsSchema } from './schemas/tripSchema';
 import { supabase } from './supabase';
 
 export interface TripFormData {
@@ -27,14 +24,12 @@ export interface TripFormData {
   thumbnailUrl?: string | null;
 }
 
-// Use parsed types that have correct camelCase field names
-export type Trip = ParsedTrip;
+export type Trip = z.infer<typeof TripSchema>;
 export type TripInsert = TablesInsert<'trip'>;
 
-// Extended trip type with hidden status
-export interface TripWithHiddenStatus extends ParsedTripWithRelations {
+export type TripWithHiddenStatus = z.infer<typeof TripWithRelationsSchema> & {
   isHiddenByAdmin: boolean;
-}
+};
 
 export const createTrip = async (tripData: TripFormData): Promise<Trip> => {
   const {
@@ -200,7 +195,7 @@ export const getTripById = async (
     }
   }
 
-  const parsedTrip = parseTripWithRelations(trip);
+  const parsedTrip = TripWithRelationsSchema.parse(trip);
   return {
     ...parsedTrip,
     isHiddenByAdmin: isHidden,
@@ -243,7 +238,7 @@ export const getUserTrips = async (): Promise<TripWithHiddenStatus[]> => {
   const hiddenTripIds = new Set(hiddenTrips?.map((ht) => ht.tripId) ?? []);
 
   return (trips ?? []).map((trip) => {
-    const parsedTrip = parseTripWithRelations(trip);
+    const parsedTrip = TripWithRelationsSchema.parse(trip);
     return {
       ...parsedTrip,
       isHiddenByAdmin: hiddenTripIds.has(parsedTrip.id),
@@ -309,7 +304,7 @@ export const searchTrips = async (filters: {
     throw new Error(`Failed to search trips: ${error.message}`);
   }
 
-  return (data ?? []).map((trip) => parseTripWithRelations(trip));
+  return (data ?? []).map((trip) => TripWithRelationsSchema.parse(trip));
 };
 
 export const deleteTrip = async (tripId: string): Promise<void> => {

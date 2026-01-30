@@ -16,6 +16,42 @@ import { getTripById, getUserTrips, searchTrips } from '../tripService';
 const VALID_USER_ID = '660e8400-e29b-41d4-a716-446655440001';
 const VALID_TRIP_ID = '550e8400-e29b-41d4-a716-446655440000';
 
+/**
+ * Creates a complete mock trip with all required fields for schema validation.
+ */
+function createMockTrip(overrides: Record<string, unknown> = {}) {
+  return {
+    id: VALID_TRIP_ID,
+    name: 'Test Trip',
+    description: 'A test trip',
+    location: 'Paris',
+    locationId: null,
+    hostId: VALID_USER_ID,
+    joineeId: null,
+    accommodationTypeId: null,
+    personalNote: null,
+    vibe: null,
+    tripLink: null,
+    estimatedMonth: null,
+    estimatedYear: null,
+    numberOfRooms: null,
+    matchWith: null,
+    isPublic: true,
+    rooms: null,
+    startDate: null,
+    endDate: null,
+    bookingUrl: null,
+    thumbnailUrl: null,
+    flexible: false,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+    host: { name: 'Host Name', imageUrl: null },
+    joinee: null,
+    accommodation_type: null,
+    ...overrides,
+  };
+}
+
 describe('tripService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -23,9 +59,7 @@ describe('tripService', () => {
 
   describe('searchTrips', () => {
     it('queries searchable_trips view to exclude hidden trips', async () => {
-      const mockTrips = [
-        { id: VALID_TRIP_ID, name: 'Visible Trip', location: 'Paris' },
-      ];
+      const mockTrips = [createMockTrip({ name: 'Visible Trip' })];
 
       const mockFrom = vi.fn().mockReturnValue({
         select: vi.fn().mockReturnValue({
@@ -57,12 +91,10 @@ describe('tripService', () => {
         // biome-ignore lint/suspicious/noExplicitAny: Test mock
       } as any);
 
-      const mockTrip = {
-        id: VALID_TRIP_ID,
+      const mockTrip = createMockTrip({
         name: 'My Trip',
-        hostId: VALID_USER_ID,
         host: { name: 'Owner', imageUrl: null },
-      };
+      });
 
       const mockFrom = vi.fn().mockImplementation((table) => {
         if (table === 'trip') {
@@ -107,12 +139,11 @@ describe('tripService', () => {
         // biome-ignore lint/suspicious/noExplicitAny: Test mock
       } as any);
 
-      const mockTrip = {
-        id: VALID_TRIP_ID,
+      const mockTrip = createMockTrip({
         name: 'Someone Else Trip',
         hostId: VALID_USER_ID, // Different from current user
         host: { name: 'Other Owner', imageUrl: null },
-      };
+      });
 
       const mockFrom = vi.fn().mockImplementation((table) => {
         if (table === 'trip') {
@@ -154,12 +185,10 @@ describe('tripService', () => {
         // biome-ignore lint/suspicious/noExplicitAny: Test mock
       } as any);
 
-      const mockTrip = {
-        id: VALID_TRIP_ID,
+      const mockTrip = createMockTrip({
         name: 'Public Trip',
-        hostId: VALID_USER_ID,
         host: { name: 'Host', imageUrl: null },
-      };
+      });
 
       const mockFrom = vi.fn().mockImplementation((table) => {
         if (table === 'trip') {
@@ -205,16 +234,14 @@ describe('tripService', () => {
       } as any);
 
       const mockTrips = [
-        {
+        createMockTrip({
           id: '550e8400-e29b-41d4-a716-446655440001',
           name: 'Trip 1',
-          hostId: VALID_USER_ID,
-        },
-        {
+        }),
+        createMockTrip({
           id: '550e8400-e29b-41d4-a716-446655440002',
           name: 'Trip 2',
-          hostId: VALID_USER_ID,
-        },
+        }),
       ];
       const mockHiddenTrips = [
         { tripId: '550e8400-e29b-41d4-a716-446655440001' },

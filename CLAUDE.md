@@ -15,6 +15,9 @@ npm run preview      # Serve production build locally
 npm run db:start     # Start local Supabase
 npm run db:stop      # Stop local Supabase
 npm run db:reset     # Reset database and apply migrations
+npm run db:types     # Regenerate TypeScript types from database
+npm run db:schemas   # Regenerate Zod schemas from types
+npm run db:gen       # Regenerate both types and schemas
 ```
 
 ### Podman Users
@@ -80,6 +83,20 @@ Routes in `App.tsx` use three guard components:
 Supabase-managed PostgreSQL. Types are auto-generated in `src/types/database.types.ts`. Key entities: users, trips, chats, messages, requests (join requests), reviews. A database trigger (`on_auth_user_created`) syncs `auth.users` inserts to the `public.user` table.
 
 Always use the database types as defined by Supabase.
+
+### Zod Schemas
+
+Zod schemas are auto-generated from the database using [supazod](https://github.com/dohooo/supazod):
+
+1. **Generated schemas** (`src/lib/schemas/database.schemas.ts`) — Auto-generated from Supabase types. Do not edit manually.
+2. **Application schemas** (`src/lib/schemas/tripSchema.ts`, etc.) — Import from generated schemas and add application-level transforms (e.g., null-to-default conversions).
+
+After changing database schema:
+```bash
+npm run db:gen  # Regenerates types and Zod schemas
+```
+
+Use standard Zod 4 (`import { z } from 'zod'`), not `zod/v4-mini`.
 
 ## Conventions
 

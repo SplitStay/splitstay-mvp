@@ -1,99 +1,43 @@
-import { z } from 'zod/v4-mini';
+import {
+  publicAccommodationTypeRowSchema,
+  publicTripRowSchema,
+  publicUserRowSchema,
+} from './database.schemas';
 
 /**
- * Schema for parsing trip data from the database.
+ * Trip schema with application-level defaults.
+ *
+ * Extends the generated schema to handle null-to-default transformations.
  */
-
-// Database row shape (matches PostgreSQL column names)
-const TripRowSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  description: z.string(),
-  location: z.string(),
-  locationId: z.nullable(z.string()),
-  hostId: z.nullable(z.string()),
-  joineeId: z.nullable(z.string()),
-  accommodationTypeId: z.nullable(z.string()),
-  personalNote: z.nullable(z.string()),
-  vibe: z.nullable(z.string()),
-  tripLink: z.nullable(z.string()),
-  estimatedMonth: z.nullable(z.string()),
-  estimatedYear: z.nullable(z.string()),
-  numberOfRooms: z.nullable(z.number()),
-  matchWith: z.nullable(z.string()),
-  isPublic: z.nullable(z.boolean()),
-  rooms: z.nullable(z.unknown()),
-  startDate: z.nullable(z.string()),
-  endDate: z.nullable(z.string()),
-  bookingUrl: z.nullable(z.string()),
-  thumbnailUrl: z.nullable(z.string()),
-  flexible: z.boolean(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
-
-export type ParsedTrip = z.infer<typeof TripRowSchema> & {
-  isPublic: boolean;
-};
-
-// Schema for trip with relations (host, joinee, accommodation_type)
-const TripWithRelationsRowSchema = z.extend(TripRowSchema, {
-  host: z.nullable(
-    z.object({
-      name: z.nullable(z.string()),
-      imageUrl: z.nullable(z.string()),
-    }),
-  ),
-  joinee: z.nullable(
-    z.object({
-      name: z.nullable(z.string()),
-      imageUrl: z.nullable(z.string()),
-    }),
-  ),
-  accommodation_type: z.nullable(
-    z.object({
-      name: z.string(),
-    }),
-  ),
-});
-
-export type ParsedTripWithRelations = z.infer<
-  typeof TripWithRelationsRowSchema
-> & {
-  isPublic: boolean;
-};
-
-export interface ParsedTripWithHiddenStatus extends ParsedTripWithRelations {
-  isHiddenByAdmin: boolean;
-}
+export const TripSchema = publicTripRowSchema.transform((trip) => ({
+  ...trip,
+  isPublic: trip.isPublic ?? true,
+}));
 
 /**
- * Parse a single trip row from the database
+ * Schema for related user data (host/joinee) returned by Supabase joins.
  */
-export function parseTrip(row: unknown): ParsedTrip {
-  const validated = z.parse(TripRowSchema, row);
-  return {
-    ...validated,
-    isPublic: validated.isPublic ?? true,
-  };
-}
+const RelatedUserSchema = publicUserRowSchema
+  .pick({ name: true, imageUrl: true })
+  .nullable();
 
 /**
- * Parse a trip with relations from the database
+ * Schema for related accommodation type returned by Supabase joins.
  */
-export function parseTripWithRelations(row: unknown): ParsedTripWithRelations {
-  const validated = z.parse(TripWithRelationsRowSchema, row);
-  return {
-    ...validated,
-    isPublic: validated.isPublic ?? true,
-  };
-}
+const RelatedAccommodationTypeSchema = publicAccommodationTypeRowSchema
+  .pick({ name: true })
+  .nullable();
 
 /**
- * Parse multiple trips with relations from the database
+ * Trip schema with relations (host, joinee, accommodation_type).
  */
-export function parseTripsWithRelations(
-  rows: unknown[],
-): ParsedTripWithRelations[] {
-  return rows.map((row) => parseTripWithRelations(row));
-}
+export const TripWithRelationsSchema = publicTripRowSchema
+  .extend({
+    host: RelatedUserSchema,
+    joinee: RelatedUserSchema,
+    accommodation_type: RelatedAccommodationTypeSchema,
+  })
+  .transform((trip) => ({
+    ...trip,
+    isPublic: trip.isPublic ?? true,
+  }));

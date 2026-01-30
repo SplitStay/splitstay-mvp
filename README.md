@@ -63,6 +63,78 @@ The app will be available at http://localhost:5173
 | `npm run db:start` | Start local Supabase |
 | `npm run db:stop` | Stop local Supabase |
 | `npm run db:reset` | Reset database and apply migrations |
+| `npm run db:gen` | Regenerate TypeScript types and Zod schemas |
+
+## Database Migrations
+
+### Creating a Migration
+
+```bash
+# Generate a new migration file with timestamp
+npx supabase migration new <migration_name>
+```
+
+This creates `supabase/migrations/YYYYMMDDHHMMSS_<migration_name>.sql`.
+
+**Naming conventions:**
+- Use snake_case: `add_user_preferences`, `fix_trip_constraints`
+- Be descriptive: `add_hidden_trips_table` not `update_schema`
+
+### Writing Migrations
+
+- Use `CREATE TABLE IF NOT EXISTS` for new tables
+- Use `DO $$ ... EXCEPTION WHEN duplicate_object THEN NULL; END $$` for idempotent enum/constraint creation
+- Quote camelCase column names: `"isPublic"`, `"createdAt"`
+- Always include `created_at`/`updated_at` timestamps with defaults
+
+### Testing a Migration
+
+```bash
+# 1. Reset database and apply all migrations
+npm run db:reset
+
+# 2. Verify the schema is correct
+npx supabase db lint
+
+# 3. Test your changes manually or via the app
+npm run dev
+
+# 4. Regenerate types and schemas
+npm run db:gen
+
+# 5. Verify TypeScript compiles
+npm run check
+```
+
+### Rolling Back (Local Development)
+
+```bash
+# Reset to clean state and reapply all migrations
+npm run db:reset
+```
+
+For partial rollbacks, manually edit/remove migration files before reset.
+
+## Type Generation Workflow
+
+Types and validation schemas are auto-generated from the database:
+
+```
+Database → TypeScript Types → Zod Schemas → Application Schemas
+             (generated)       (generated)     (with transforms)
+```
+
+After modifying database migrations:
+
+```bash
+npm run db:reset   # Apply migrations
+npm run db:gen     # Regenerate types and schemas
+```
+
+**Files:**
+- `src/types/database.types.ts` — Auto-generated Supabase types
+- `src/lib/schemas/database.schemas.ts` — Auto-generated Zod schemas (via [supazod](https://github.com/dohooo/supazod))
+- `src/lib/schemas/tripSchema.ts` — Application schemas with transforms (e.g., null defaults)
 
 ## Podman Users
 
