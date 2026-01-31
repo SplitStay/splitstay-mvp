@@ -73,84 +73,6 @@ export type Database = {
         };
         Relationships: [];
       };
-      chat: {
-        Row: {
-          createdAt: string;
-          id: string;
-          title: string;
-          tripId: string | null;
-          updatedAt: string;
-        };
-        Insert: {
-          createdAt?: string;
-          id: string;
-          title: string;
-          tripId?: string | null;
-          updatedAt?: string;
-        };
-        Update: {
-          createdAt?: string;
-          id?: string;
-          title?: string;
-          tripId?: string | null;
-          updatedAt?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'chat_tripId_trip_id_fk';
-            columns: ['tripId'];
-            isOneToOne: false;
-            referencedRelation: 'searchable_trips';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'chat_tripId_trip_id_fk';
-            columns: ['tripId'];
-            isOneToOne: false;
-            referencedRelation: 'trip';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
-      chat_participant: {
-        Row: {
-          chatId: string | null;
-          createdAt: string;
-          id: string;
-          updatedAt: string;
-          userId: string | null;
-        };
-        Insert: {
-          chatId?: string | null;
-          createdAt?: string;
-          id: string;
-          updatedAt?: string;
-          userId?: string | null;
-        };
-        Update: {
-          chatId?: string | null;
-          createdAt?: string;
-          id?: string;
-          updatedAt?: string;
-          userId?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'chat_participant_chatId_chat_id_fk';
-            columns: ['chatId'];
-            isOneToOne: false;
-            referencedRelation: 'chat';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'chat_participant_userId_user_id_fk';
-            columns: ['userId'];
-            isOneToOne: false;
-            referencedRelation: 'user';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
       conversations: {
         Row: {
           created_at: string;
@@ -307,48 +229,6 @@ export type Database = {
         };
         Relationships: [];
       };
-      message: {
-        Row: {
-          chatId: string | null;
-          content: string;
-          createdAt: string;
-          id: string;
-          participantId: string | null;
-          updatedAt: string;
-        };
-        Insert: {
-          chatId?: string | null;
-          content: string;
-          createdAt?: string;
-          id: string;
-          participantId?: string | null;
-          updatedAt?: string;
-        };
-        Update: {
-          chatId?: string | null;
-          content?: string;
-          createdAt?: string;
-          id?: string;
-          participantId?: string | null;
-          updatedAt?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'message_chatId_chat_id_fk';
-            columns: ['chatId'];
-            isOneToOne: false;
-            referencedRelation: 'chat';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'message_participantId_chat_participant_id_fk';
-            columns: ['participantId'];
-            isOneToOne: false;
-            referencedRelation: 'chat_participant';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
       message_delivery_log: {
         Row: {
           event_type: string;
@@ -465,13 +345,6 @@ export type Database = {
           updated_at?: string | null;
         };
         Relationships: [
-          {
-            foreignKeyName: 'messages_conversation_id_fkey';
-            columns: ['conversation_id'];
-            isOneToOne: false;
-            referencedRelation: 'conversations';
-            referencedColumns: ['id'];
-          },
           {
             foreignKeyName: 'messages_sender_id_fkey';
             columns: ['sender_id'];
@@ -759,18 +632,18 @@ export type Database = {
           createdAt: string;
           description: string;
           endDate: string | null;
-          estimatedMonth: string | null;
-          estimatedYear: string | null;
+          estimatedmonth: string | null;
+          estimatedyear: string | null;
           flexible: boolean;
           hostId: string | null;
           id: string;
-          isPublic: boolean | null;
+          ispublic: boolean | null;
           joineeId: string | null;
           location: string;
           locationId: string | null;
-          matchWith: string | null;
+          matchwith: string | null;
           name: string;
-          numberOfRooms: number | null;
+          numberofrooms: number | null;
           personalNote: string | null;
           rooms: Json | null;
           startDate: string | null;
@@ -785,18 +658,18 @@ export type Database = {
           createdAt?: string;
           description: string;
           endDate?: string | null;
-          estimatedMonth?: string | null;
-          estimatedYear?: string | null;
+          estimatedmonth?: string | null;
+          estimatedyear?: string | null;
           flexible?: boolean;
           hostId?: string | null;
           id?: string;
-          isPublic?: boolean | null;
+          ispublic?: boolean | null;
           joineeId?: string | null;
           location: string;
           locationId?: string | null;
-          matchWith?: string | null;
+          matchwith?: string | null;
           name: string;
-          numberOfRooms?: number | null;
+          numberofrooms?: number | null;
           personalNote?: string | null;
           rooms?: Json | null;
           startDate?: string | null;
@@ -811,18 +684,18 @@ export type Database = {
           createdAt?: string;
           description?: string;
           endDate?: string | null;
-          estimatedMonth?: string | null;
-          estimatedYear?: string | null;
+          estimatedmonth?: string | null;
+          estimatedyear?: string | null;
           flexible?: boolean;
           hostId?: string | null;
           id?: string;
-          isPublic?: boolean | null;
+          ispublic?: boolean | null;
           joineeId?: string | null;
           location?: string;
           locationId?: string | null;
-          matchWith?: string | null;
+          matchwith?: string | null;
           name?: string;
-          numberOfRooms?: number | null;
+          numberofrooms?: number | null;
           personalNote?: string | null;
           rooms?: Json | null;
           startDate?: string | null;
@@ -870,7 +743,6 @@ export type Database = {
           currentPlace: string | null;
           dayOfBirth: number | null;
           email: string;
-          fullName: string | null;
           gender: string | null;
           id: string;
           imageUrl: string | null;
@@ -900,7 +772,6 @@ export type Database = {
           currentPlace?: string | null;
           dayOfBirth?: number | null;
           email: string;
-          fullName?: string | null;
           gender?: string | null;
           id: string;
           imageUrl?: string | null;
@@ -930,7 +801,6 @@ export type Database = {
           currentPlace?: string | null;
           dayOfBirth?: number | null;
           email?: string;
-          fullName?: string | null;
           gender?: string | null;
           id?: string;
           imageUrl?: string | null;
@@ -1058,18 +928,18 @@ export type Database = {
           createdAt: string | null;
           description: string | null;
           endDate: string | null;
-          estimatedMonth: string | null;
-          estimatedYear: string | null;
+          estimatedmonth: string | null;
+          estimatedyear: string | null;
           flexible: boolean | null;
           hostId: string | null;
           id: string | null;
-          isPublic: boolean | null;
+          ispublic: boolean | null;
           joineeId: string | null;
           location: string | null;
           locationId: string | null;
-          matchWith: string | null;
+          matchwith: string | null;
           name: string | null;
-          numberOfRooms: number | null;
+          numberofrooms: number | null;
           personalNote: string | null;
           rooms: Json | null;
           startDate: string | null;
@@ -1084,18 +954,18 @@ export type Database = {
           createdAt?: string | null;
           description?: string | null;
           endDate?: string | null;
-          estimatedMonth?: string | null;
-          estimatedYear?: string | null;
+          estimatedmonth?: string | null;
+          estimatedyear?: string | null;
           flexible?: boolean | null;
           hostId?: string | null;
           id?: string | null;
-          isPublic?: boolean | null;
+          ispublic?: boolean | null;
           joineeId?: string | null;
           location?: string | null;
           locationId?: string | null;
-          matchWith?: string | null;
+          matchwith?: string | null;
           name?: string | null;
-          numberOfRooms?: number | null;
+          numberofrooms?: number | null;
           personalNote?: string | null;
           rooms?: Json | null;
           startDate?: string | null;
@@ -1110,18 +980,18 @@ export type Database = {
           createdAt?: string | null;
           description?: string | null;
           endDate?: string | null;
-          estimatedMonth?: string | null;
-          estimatedYear?: string | null;
+          estimatedmonth?: string | null;
+          estimatedyear?: string | null;
           flexible?: boolean | null;
           hostId?: string | null;
           id?: string | null;
-          isPublic?: boolean | null;
+          ispublic?: boolean | null;
           joineeId?: string | null;
           location?: string | null;
           locationId?: string | null;
-          matchWith?: string | null;
+          matchwith?: string | null;
           name?: string | null;
-          numberOfRooms?: number | null;
+          numberofrooms?: number | null;
           personalNote?: string | null;
           rooms?: Json | null;
           startDate?: string | null;
@@ -1163,22 +1033,348 @@ export type Database = {
       };
     };
     Functions: {
+      accept_room_request: {
+        Args: { p_request_id: string; p_room_id: string; p_user_id: string };
+        Returns: Json;
+      };
+      accept_trip_request: {
+        Args: { p_request_id: string; p_trip_id: string; p_user_id: string };
+        Returns: Json;
+      };
+      bytea_to_text: { Args: { data: string }; Returns: string };
+      check_message_rate_limit: {
+        Args: { p_user_id: string };
+        Returns: boolean;
+      };
+      delete_message: {
+        Args: { p_message_id: string; p_user_id: string };
+        Returns: boolean;
+      };
+      delete_user_account: { Args: never; Returns: undefined };
+      edit_message: {
+        Args: {
+          p_message_id: string;
+          p_new_content: string;
+          p_user_id: string;
+        };
+        Returns: boolean;
+      };
+      get_conversation_messages: {
+        Args: {
+          p_conversation_id: string;
+          p_limit?: number;
+          p_offset?: number;
+          p_user_id: string;
+        };
+        Returns: {
+          content: string;
+          created_at: string;
+          edited_at: string;
+          is_deleted: boolean;
+          is_read: boolean;
+          message_id: string;
+          message_type: string;
+          metadata: Json;
+          sender_id: string;
+          sender_image_url: string;
+          sender_name: string;
+          updated_at: string;
+        }[];
+      };
+      get_or_create_conversation: {
+        Args: { p_user1_id: string; p_user2_id: string };
+        Returns: string;
+      };
       get_unread_message_count: {
         Args: { p_conversation_id: string; p_user_id: string };
         Returns: number;
       };
+      get_user_conversations:
+        | {
+            Args: { p_user_id: string };
+            Returns: {
+              created_at: string;
+              id: string;
+              last_message_at: string;
+              last_message_content: string;
+              last_message_sender_id: string;
+              other_user_email: string;
+              other_user_id: string;
+              other_user_image_url: string;
+              other_user_name: string;
+              participant1_id: string;
+              participant2_id: string;
+              updated_at: string;
+            }[];
+          }
+        | {
+            Args: { p_limit?: number; p_offset?: number; p_user_id: string };
+            Returns: {
+              conversation_id: string;
+              is_archived: boolean;
+              last_message_content: string;
+              last_message_created_at: string;
+              last_message_id: string;
+              last_message_sender_id: string;
+              other_user_id: string;
+              other_user_image_url: string;
+              other_user_is_online: boolean;
+              other_user_name: string;
+              unread_count: number;
+            }[];
+          };
+      get_user_conversations_fast: {
+        Args: { p_limit?: number; p_offset?: number; p_user_id: string };
+        Returns: {
+          conversation_id: string;
+          is_archived: boolean;
+          last_message_content: string;
+          last_message_created_at: string;
+          last_message_id: string;
+          last_message_sender_id: string;
+          other_user_id: string;
+          other_user_image_url: string;
+          other_user_is_online: boolean;
+          other_user_name: string;
+          unread_count: number;
+        }[];
+      };
+      http: {
+        Args: { request: Database['public']['CompositeTypes']['http_request'] };
+        Returns: Database['public']['CompositeTypes']['http_response'];
+        SetofOptions: {
+          from: 'http_request';
+          to: 'http_response';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      http_delete:
+        | {
+            Args: { uri: string };
+            Returns: Database['public']['CompositeTypes']['http_response'];
+            SetofOptions: {
+              from: '*';
+              to: 'http_response';
+              isOneToOne: true;
+              isSetofReturn: false;
+            };
+          }
+        | {
+            Args: { content: string; content_type: string; uri: string };
+            Returns: Database['public']['CompositeTypes']['http_response'];
+            SetofOptions: {
+              from: '*';
+              to: 'http_response';
+              isOneToOne: true;
+              isSetofReturn: false;
+            };
+          };
+      http_get:
+        | {
+            Args: { uri: string };
+            Returns: Database['public']['CompositeTypes']['http_response'];
+            SetofOptions: {
+              from: '*';
+              to: 'http_response';
+              isOneToOne: true;
+              isSetofReturn: false;
+            };
+          }
+        | {
+            Args: { data: Json; uri: string };
+            Returns: Database['public']['CompositeTypes']['http_response'];
+            SetofOptions: {
+              from: '*';
+              to: 'http_response';
+              isOneToOne: true;
+              isSetofReturn: false;
+            };
+          };
+      http_head: {
+        Args: { uri: string };
+        Returns: Database['public']['CompositeTypes']['http_response'];
+        SetofOptions: {
+          from: '*';
+          to: 'http_response';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      http_header: {
+        Args: { field: string; value: string };
+        Returns: Database['public']['CompositeTypes']['http_header'];
+        SetofOptions: {
+          from: '*';
+          to: 'http_header';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      http_list_curlopt: {
+        Args: never;
+        Returns: {
+          curlopt: string;
+          value: string;
+        }[];
+      };
+      http_patch: {
+        Args: { content: string; content_type: string; uri: string };
+        Returns: Database['public']['CompositeTypes']['http_response'];
+        SetofOptions: {
+          from: '*';
+          to: 'http_response';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      http_post:
+        | {
+            Args: { content: string; content_type: string; uri: string };
+            Returns: Database['public']['CompositeTypes']['http_response'];
+            SetofOptions: {
+              from: '*';
+              to: 'http_response';
+              isOneToOne: true;
+              isSetofReturn: false;
+            };
+          }
+        | {
+            Args: { data: Json; uri: string };
+            Returns: Database['public']['CompositeTypes']['http_response'];
+            SetofOptions: {
+              from: '*';
+              to: 'http_response';
+              isOneToOne: true;
+              isSetofReturn: false;
+            };
+          };
+      http_put: {
+        Args: { content: string; content_type: string; uri: string };
+        Returns: Database['public']['CompositeTypes']['http_response'];
+        SetofOptions: {
+          from: '*';
+          to: 'http_response';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      http_reset_curlopt: { Args: never; Returns: boolean };
+      http_set_curlopt: {
+        Args: { curlopt: string; value: string };
+        Returns: boolean;
+      };
       is_user_online: { Args: { p_user_id: string }; Returns: boolean };
+      log_messaging_performance: {
+        Args: {
+          p_conversation_id?: string;
+          p_duration_ms: number;
+          p_metadata?: Json;
+          p_operation: string;
+          p_user_id?: string;
+        };
+        Returns: undefined;
+      };
       mark_messages_as_read: {
         Args: { p_conversation_id: string };
         Returns: undefined;
       };
+      process_pending_emails: { Args: never; Returns: undefined };
+      raise_messaging_error: {
+        Args: {
+          p_details?: Json;
+          p_error_code: string;
+          p_error_message: string;
+        };
+        Returns: undefined;
+      };
+      send_message:
+        | {
+            Args: {
+              p_content: string;
+              p_conversation_id: string;
+              p_message_type?: string;
+              p_sender_id: string;
+            };
+            Returns: string;
+          }
+        | {
+            Args: {
+              p_content: string;
+              p_conversation_id: string;
+              p_message_type?: string;
+              p_metadata?: Json;
+              p_sender_id: string;
+            };
+            Returns: string;
+          };
+      text_to_bytea: { Args: { data: string }; Returns: string };
+      update_request_status: {
+        Args: { new_status: string; request_id: string };
+        Returns: Json;
+      };
+      update_user_presence: {
+        Args: {
+          p_device_info?: Json;
+          p_is_online: boolean;
+          p_typing_in_conversation_id?: string;
+          p_user_id: string;
+        };
+        Returns: boolean;
+      };
+      urlencode:
+        | { Args: { data: Json }; Returns: string }
+        | {
+            Args: { string: string };
+            Returns: {
+              error: true;
+            } & 'Could not choose the best candidate function between: public.urlencode(string => bytea), public.urlencode(string => varchar). Try renaming the parameters or the function itself in the database so function overloading can be resolved';
+          }
+        | {
+            Args: { string: string };
+            Returns: {
+              error: true;
+            } & 'Could not choose the best candidate function between: public.urlencode(string => bytea), public.urlencode(string => varchar). Try renaming the parameters or the function itself in the database so function overloading can be resolved';
+          };
+      user_can_access_conversation: {
+        Args: { p_conversation_id: string; p_user_id: string };
+        Returns: boolean;
+      };
+      user_has_min_role_level: {
+        Args: { min_level: number; user_id: string };
+        Returns: boolean;
+      };
+      user_has_role: {
+        Args: { role_name: string; user_id: string };
+        Returns: boolean;
+      };
+      validate_message_content: {
+        Args: { p_content: string };
+        Returns: string;
+      };
     };
     Enums: {
-      request_status: 'pending' | 'active' | 'declined';
+      request_status: 'active' | 'pending' | 'declined';
       review_stars: '1' | '2' | '3' | '4' | '5';
     };
     CompositeTypes: {
-      [_ in never]: never;
+      http_header: {
+        field: string | null;
+        value: string | null;
+      };
+      http_request: {
+        method: unknown;
+        uri: string | null;
+        headers: Database['public']['CompositeTypes']['http_header'][] | null;
+        content_type: string | null;
+        content: string | null;
+      };
+      http_response: {
+        status: number | null;
+        content_type: string | null;
+        headers: Database['public']['CompositeTypes']['http_header'][] | null;
+        content: string | null;
+      };
     };
   };
 };
@@ -1309,7 +1505,7 @@ export const Constants = {
   },
   public: {
     Enums: {
-      request_status: ['pending', 'active', 'declined'],
+      request_status: ['active', 'pending', 'declined'],
       review_stars: ['1', '2', '3', '4', '5'],
     },
   },

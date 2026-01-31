@@ -18,6 +18,9 @@ const VALID_TRIP_ID = '550e8400-e29b-41d4-a716-446655440000';
 
 /**
  * Creates a complete mock trip with all required fields for schema validation.
+ *
+ * Uses lowercase field names to match the actual database column names
+ * (PostgreSQL lowercases unquoted identifiers).
  */
 function createMockTrip(overrides: Record<string, unknown> = {}) {
   return {
@@ -32,11 +35,11 @@ function createMockTrip(overrides: Record<string, unknown> = {}) {
     personalNote: null,
     vibe: null,
     tripLink: null,
-    estimatedMonth: null,
-    estimatedYear: null,
-    numberOfRooms: null,
-    matchWith: null,
-    isPublic: true,
+    estimatedmonth: null,
+    estimatedyear: null,
+    numberofrooms: null,
+    matchwith: null,
+    ispublic: true,
     rooms: null,
     startDate: null,
     endDate: null,

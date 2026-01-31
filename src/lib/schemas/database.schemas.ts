@@ -8,8 +8,8 @@ import { z } from 'zod';
 import type { Json } from './../../types/database.types';
 
 export const publicRequestStatusSchema = z.enum([
-  'pending',
   'active',
+  'pending',
   'declined',
 ]);
 
@@ -74,88 +74,6 @@ export const publicAdminUsersUpdateSchema = z.object({
   createdAt: z.string().optional(),
   userId: z.string().optional(),
 });
-
-export const publicChatRowSchema = z.object({
-  createdAt: z.string(),
-  id: z.string(),
-  title: z.string(),
-  tripId: z.string().nullable(),
-  updatedAt: z.string(),
-});
-
-export const publicChatInsertSchema = z.object({
-  createdAt: z.string().optional(),
-  id: z.string(),
-  title: z.string(),
-  tripId: z.string().optional().nullable(),
-  updatedAt: z.string().optional(),
-});
-
-export const publicChatUpdateSchema = z.object({
-  createdAt: z.string().optional(),
-  id: z.string().optional(),
-  title: z.string().optional(),
-  tripId: z.string().optional().nullable(),
-  updatedAt: z.string().optional(),
-});
-
-export const publicChatRelationshipsSchema = z.tuple([
-  z.object({
-    foreignKeyName: z.literal('chat_tripId_trip_id_fk'),
-    columns: z.tuple([z.literal('tripId')]),
-    isOneToOne: z.literal(false),
-    referencedRelation: z.literal('searchable_trips'),
-    referencedColumns: z.tuple([z.literal('id')]),
-  }),
-  z.object({
-    foreignKeyName: z.literal('chat_tripId_trip_id_fk'),
-    columns: z.tuple([z.literal('tripId')]),
-    isOneToOne: z.literal(false),
-    referencedRelation: z.literal('trip'),
-    referencedColumns: z.tuple([z.literal('id')]),
-  }),
-]);
-
-export const publicChatParticipantRowSchema = z.object({
-  chatId: z.string().nullable(),
-  createdAt: z.string(),
-  id: z.string(),
-  updatedAt: z.string(),
-  userId: z.string().nullable(),
-});
-
-export const publicChatParticipantInsertSchema = z.object({
-  chatId: z.string().optional().nullable(),
-  createdAt: z.string().optional(),
-  id: z.string(),
-  updatedAt: z.string().optional(),
-  userId: z.string().optional().nullable(),
-});
-
-export const publicChatParticipantUpdateSchema = z.object({
-  chatId: z.string().optional().nullable(),
-  createdAt: z.string().optional(),
-  id: z.string().optional(),
-  updatedAt: z.string().optional(),
-  userId: z.string().optional().nullable(),
-});
-
-export const publicChatParticipantRelationshipsSchema = z.tuple([
-  z.object({
-    foreignKeyName: z.literal('chat_participant_chatId_chat_id_fk'),
-    columns: z.tuple([z.literal('chatId')]),
-    isOneToOne: z.literal(false),
-    referencedRelation: z.literal('chat'),
-    referencedColumns: z.tuple([z.literal('id')]),
-  }),
-  z.object({
-    foreignKeyName: z.literal('chat_participant_userId_user_id_fk'),
-    columns: z.tuple([z.literal('userId')]),
-    isOneToOne: z.literal(false),
-    referencedRelation: z.literal('user'),
-    referencedColumns: z.tuple([z.literal('id')]),
-  }),
-]);
 
 export const publicConversationsRowSchema = z.object({
   created_at: z.string(),
@@ -317,50 +235,6 @@ export const publicLocationUpdateSchema = z.object({
   updatedAt: z.string().optional(),
 });
 
-export const publicMessageRowSchema = z.object({
-  chatId: z.string().nullable(),
-  content: z.string(),
-  createdAt: z.string(),
-  id: z.string(),
-  participantId: z.string().nullable(),
-  updatedAt: z.string(),
-});
-
-export const publicMessageInsertSchema = z.object({
-  chatId: z.string().optional().nullable(),
-  content: z.string(),
-  createdAt: z.string().optional(),
-  id: z.string(),
-  participantId: z.string().optional().nullable(),
-  updatedAt: z.string().optional(),
-});
-
-export const publicMessageUpdateSchema = z.object({
-  chatId: z.string().optional().nullable(),
-  content: z.string().optional(),
-  createdAt: z.string().optional(),
-  id: z.string().optional(),
-  participantId: z.string().optional().nullable(),
-  updatedAt: z.string().optional(),
-});
-
-export const publicMessageRelationshipsSchema = z.tuple([
-  z.object({
-    foreignKeyName: z.literal('message_chatId_chat_id_fk'),
-    columns: z.tuple([z.literal('chatId')]),
-    isOneToOne: z.literal(false),
-    referencedRelation: z.literal('chat'),
-    referencedColumns: z.tuple([z.literal('id')]),
-  }),
-  z.object({
-    foreignKeyName: z.literal('message_participantId_chat_participant_id_fk'),
-    columns: z.tuple([z.literal('participantId')]),
-    isOneToOne: z.literal(false),
-    referencedRelation: z.literal('chat_participant'),
-    referencedColumns: z.tuple([z.literal('id')]),
-  }),
-]);
-
 export const publicMessageDeliveryLogRowSchema = z.object({
   event_type: z.string(),
   id: z.string(),
@@ -483,13 +357,6 @@ export const publicMessagesUpdateSchema = z.object({
 });
 
 export const publicMessagesRelationshipsSchema = z.tuple([
-  z.object({
-    foreignKeyName: z.literal('messages_conversation_id_fkey'),
-    columns: z.tuple([z.literal('conversation_id')]),
-    isOneToOne: z.literal(false),
-    referencedRelation: z.literal('conversations'),
-    referencedColumns: z.tuple([z.literal('id')]),
-  }),
   z.object({
     foreignKeyName: z.literal('messages_sender_id_fkey'),
     columns: z.tuple([z.literal('sender_id')]),
@@ -786,18 +653,18 @@ export const publicTripRowSchema = z.object({
   createdAt: z.string(),
   description: z.string(),
   endDate: z.string().nullable(),
-  estimatedMonth: z.string().nullable(),
-  estimatedYear: z.string().nullable(),
+  estimatedmonth: z.string().nullable(),
+  estimatedyear: z.string().nullable(),
   flexible: z.boolean(),
   hostId: z.string().nullable(),
   id: z.string(),
-  isPublic: z.boolean().nullable(),
+  ispublic: z.boolean().nullable(),
   joineeId: z.string().nullable(),
   location: z.string(),
   locationId: z.string().nullable(),
-  matchWith: z.string().nullable(),
+  matchwith: z.string().nullable(),
   name: z.string(),
-  numberOfRooms: z.number().nullable(),
+  numberofrooms: z.number().nullable(),
   personalNote: z.string().nullable(),
   rooms: jsonSchema.nullable(),
   startDate: z.string().nullable(),
@@ -813,18 +680,18 @@ export const publicTripInsertSchema = z.object({
   createdAt: z.string().optional(),
   description: z.string(),
   endDate: z.string().optional().nullable(),
-  estimatedMonth: z.string().optional().nullable(),
-  estimatedYear: z.string().optional().nullable(),
+  estimatedmonth: z.string().optional().nullable(),
+  estimatedyear: z.string().optional().nullable(),
   flexible: z.boolean().optional(),
   hostId: z.string().optional().nullable(),
   id: z.string().optional(),
-  isPublic: z.boolean().optional().nullable(),
+  ispublic: z.boolean().optional().nullable(),
   joineeId: z.string().optional().nullable(),
   location: z.string(),
   locationId: z.string().optional().nullable(),
-  matchWith: z.string().optional().nullable(),
+  matchwith: z.string().optional().nullable(),
   name: z.string(),
-  numberOfRooms: z.number().optional().nullable(),
+  numberofrooms: z.number().optional().nullable(),
   personalNote: z.string().optional().nullable(),
   rooms: jsonSchema.optional().nullable(),
   startDate: z.string().optional().nullable(),
@@ -840,18 +707,18 @@ export const publicTripUpdateSchema = z.object({
   createdAt: z.string().optional(),
   description: z.string().optional(),
   endDate: z.string().optional().nullable(),
-  estimatedMonth: z.string().optional().nullable(),
-  estimatedYear: z.string().optional().nullable(),
+  estimatedmonth: z.string().optional().nullable(),
+  estimatedyear: z.string().optional().nullable(),
   flexible: z.boolean().optional(),
   hostId: z.string().optional().nullable(),
   id: z.string().optional(),
-  isPublic: z.boolean().optional().nullable(),
+  ispublic: z.boolean().optional().nullable(),
   joineeId: z.string().optional().nullable(),
   location: z.string().optional(),
   locationId: z.string().optional().nullable(),
-  matchWith: z.string().optional().nullable(),
+  matchwith: z.string().optional().nullable(),
   name: z.string().optional(),
-  numberOfRooms: z.number().optional().nullable(),
+  numberofrooms: z.number().optional().nullable(),
   personalNote: z.string().optional().nullable(),
   rooms: jsonSchema.optional().nullable(),
   startDate: z.string().optional().nullable(),
@@ -899,7 +766,6 @@ export const publicUserRowSchema = z.object({
   currentPlace: z.string().nullable(),
   dayOfBirth: z.number().nullable(),
   email: z.string(),
-  fullName: z.string().nullable(),
   gender: z.string().nullable(),
   id: z.string(),
   imageUrl: z.string().nullable(),
@@ -930,7 +796,6 @@ export const publicUserInsertSchema = z.object({
   currentPlace: z.string().optional().nullable(),
   dayOfBirth: z.number().optional().nullable(),
   email: z.string(),
-  fullName: z.string().optional().nullable(),
   gender: z.string().optional().nullable(),
   id: z.string(),
   imageUrl: z.string().optional().nullable(),
@@ -961,7 +826,6 @@ export const publicUserUpdateSchema = z.object({
   currentPlace: z.string().optional().nullable(),
   dayOfBirth: z.number().optional().nullable(),
   email: z.string().optional(),
-  fullName: z.string().optional().nullable(),
   gender: z.string().optional().nullable(),
   id: z.string().optional(),
   imageUrl: z.string().optional().nullable(),
@@ -1091,18 +955,18 @@ export const publicSearchableTripsRowSchema = z.object({
   createdAt: z.string().nullable(),
   description: z.string().nullable(),
   endDate: z.string().nullable(),
-  estimatedMonth: z.string().nullable(),
-  estimatedYear: z.string().nullable(),
+  estimatedmonth: z.string().nullable(),
+  estimatedyear: z.string().nullable(),
   flexible: z.boolean().nullable(),
   hostId: z.string().nullable(),
   id: z.string().nullable(),
-  isPublic: z.boolean().nullable(),
+  ispublic: z.boolean().nullable(),
   joineeId: z.string().nullable(),
   location: z.string().nullable(),
   locationId: z.string().nullable(),
-  matchWith: z.string().nullable(),
+  matchwith: z.string().nullable(),
   name: z.string().nullable(),
-  numberOfRooms: z.number().nullable(),
+  numberofrooms: z.number().nullable(),
   personalNote: z.string().nullable(),
   rooms: jsonSchema.nullable(),
   startDate: z.string().nullable(),
@@ -1118,18 +982,18 @@ export const publicSearchableTripsInsertSchema = z.object({
   createdAt: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
   endDate: z.string().optional().nullable(),
-  estimatedMonth: z.string().optional().nullable(),
-  estimatedYear: z.string().optional().nullable(),
+  estimatedmonth: z.string().optional().nullable(),
+  estimatedyear: z.string().optional().nullable(),
   flexible: z.boolean().optional().nullable(),
   hostId: z.string().optional().nullable(),
   id: z.string().optional().nullable(),
-  isPublic: z.boolean().optional().nullable(),
+  ispublic: z.boolean().optional().nullable(),
   joineeId: z.string().optional().nullable(),
   location: z.string().optional().nullable(),
   locationId: z.string().optional().nullable(),
-  matchWith: z.string().optional().nullable(),
+  matchwith: z.string().optional().nullable(),
   name: z.string().optional().nullable(),
-  numberOfRooms: z.number().optional().nullable(),
+  numberofrooms: z.number().optional().nullable(),
   personalNote: z.string().optional().nullable(),
   rooms: jsonSchema.optional().nullable(),
   startDate: z.string().optional().nullable(),
@@ -1145,18 +1009,18 @@ export const publicSearchableTripsUpdateSchema = z.object({
   createdAt: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
   endDate: z.string().optional().nullable(),
-  estimatedMonth: z.string().optional().nullable(),
-  estimatedYear: z.string().optional().nullable(),
+  estimatedmonth: z.string().optional().nullable(),
+  estimatedyear: z.string().optional().nullable(),
   flexible: z.boolean().optional().nullable(),
   hostId: z.string().optional().nullable(),
   id: z.string().optional().nullable(),
-  isPublic: z.boolean().optional().nullable(),
+  ispublic: z.boolean().optional().nullable(),
   joineeId: z.string().optional().nullable(),
   location: z.string().optional().nullable(),
   locationId: z.string().optional().nullable(),
-  matchWith: z.string().optional().nullable(),
+  matchwith: z.string().optional().nullable(),
   name: z.string().optional().nullable(),
-  numberOfRooms: z.number().optional().nullable(),
+  numberofrooms: z.number().optional().nullable(),
   personalNote: z.string().optional().nullable(),
   rooms: jsonSchema.optional().nullable(),
   startDate: z.string().optional().nullable(),
@@ -1197,6 +1061,84 @@ export const publicSearchableTripsRelationshipsSchema = z.tuple([
   }),
 ]);
 
+export const publicAcceptRoomRequestArgsSchema = z.object({
+  p_request_id: z.string(),
+  p_room_id: z.string(),
+  p_user_id: z.string(),
+});
+
+export const publicAcceptRoomRequestReturnsSchema = jsonSchema;
+
+export const publicAcceptTripRequestArgsSchema = z.object({
+  p_request_id: z.string(),
+  p_trip_id: z.string(),
+  p_user_id: z.string(),
+});
+
+export const publicAcceptTripRequestReturnsSchema = jsonSchema;
+
+export const publicByteaToTextArgsSchema = z.object({
+  data: z.string(),
+});
+
+export const publicByteaToTextReturnsSchema = z.string();
+
+export const publicCheckMessageRateLimitArgsSchema = z.object({
+  p_user_id: z.string(),
+});
+
+export const publicCheckMessageRateLimitReturnsSchema = z.boolean();
+
+export const publicDeleteMessageArgsSchema = z.object({
+  p_message_id: z.string(),
+  p_user_id: z.string(),
+});
+
+export const publicDeleteMessageReturnsSchema = z.boolean();
+
+export const publicDeleteUserAccountArgsSchema = z.never();
+
+export const publicDeleteUserAccountReturnsSchema = z.undefined();
+
+export const publicEditMessageArgsSchema = z.object({
+  p_message_id: z.string(),
+  p_new_content: z.string(),
+  p_user_id: z.string(),
+});
+
+export const publicEditMessageReturnsSchema = z.boolean();
+
+export const publicGetConversationMessagesArgsSchema = z.object({
+  p_conversation_id: z.string(),
+  p_limit: z.number().optional(),
+  p_offset: z.number().optional(),
+  p_user_id: z.string(),
+});
+
+export const publicGetConversationMessagesReturnsSchema = z.array(
+  z.object({
+    content: z.string(),
+    created_at: z.string(),
+    edited_at: z.string(),
+    is_deleted: z.boolean(),
+    is_read: z.boolean(),
+    message_id: z.string(),
+    message_type: z.string(),
+    metadata: jsonSchema,
+    sender_id: z.string(),
+    sender_image_url: z.string(),
+    sender_name: z.string(),
+    updated_at: z.string(),
+  }),
+);
+
+export const publicGetOrCreateConversationArgsSchema = z.object({
+  p_user1_id: z.string(),
+  p_user2_id: z.string(),
+});
+
+export const publicGetOrCreateConversationReturnsSchema = z.string();
+
 export const publicGetUnreadMessageCountArgsSchema = z.object({
   p_conversation_id: z.string(),
   p_user_id: z.string(),
@@ -1204,14 +1146,182 @@ export const publicGetUnreadMessageCountArgsSchema = z.object({
 
 export const publicGetUnreadMessageCountReturnsSchema = z.number();
 
+export const publicGetUserConversationsFastArgsSchema = z.object({
+  p_limit: z.number().optional(),
+  p_offset: z.number().optional(),
+  p_user_id: z.string(),
+});
+
+export const publicGetUserConversationsFastReturnsSchema = z.array(
+  z.object({
+    conversation_id: z.string(),
+    is_archived: z.boolean(),
+    last_message_content: z.string(),
+    last_message_created_at: z.string(),
+    last_message_id: z.string(),
+    last_message_sender_id: z.string(),
+    other_user_id: z.string(),
+    other_user_image_url: z.string(),
+    other_user_is_online: z.boolean(),
+    other_user_name: z.string(),
+    unread_count: z.number(),
+  }),
+);
+
+export const publicHttpHeadArgsSchema = z.object({
+  uri: z.string(),
+});
+
+export const publicHttpHeaderArgsSchema = z.object({
+  field: z.string(),
+  value: z.string(),
+});
+
+export const publicHttpHeaderSchema = z.object({
+  field: z.string().nullable(),
+  value: z.string().nullable(),
+});
+
+export const publicHttpListCurloptArgsSchema = z.never();
+
+export const publicHttpListCurloptReturnsSchema = z.array(
+  z.object({
+    curlopt: z.string(),
+    value: z.string(),
+  }),
+);
+
+export const publicHttpPatchArgsSchema = z.object({
+  content: z.string(),
+  content_type: z.string(),
+  uri: z.string(),
+});
+
+export const publicHttpResponseSchema = z.object({
+  status: z.number().nullable(),
+  content_type: z.string().nullable(),
+  headers: z.array(publicHttpHeaderSchema).nullable(),
+  content: z.string().nullable(),
+});
+
+export const publicHttpPutArgsSchema = z.object({
+  content: z.string(),
+  content_type: z.string(),
+  uri: z.string(),
+});
+
+export const publicHttpPutReturnsSchema = publicHttpResponseSchema;
+
+export const publicHttpResetCurloptArgsSchema = z.never();
+
+export const publicHttpResetCurloptReturnsSchema = z.boolean();
+
+export const publicHttpSetCurloptArgsSchema = z.object({
+  curlopt: z.string(),
+  value: z.string(),
+});
+
+export const publicHttpSetCurloptReturnsSchema = z.boolean();
+
 export const publicIsUserOnlineArgsSchema = z.object({
   p_user_id: z.string(),
 });
 
 export const publicIsUserOnlineReturnsSchema = z.boolean();
 
+export const publicLogMessagingPerformanceArgsSchema = z.object({
+  p_conversation_id: z.string().optional(),
+  p_duration_ms: z.number(),
+  p_metadata: jsonSchema.optional(),
+  p_operation: z.string(),
+  p_user_id: z.string().optional(),
+});
+
+export const publicLogMessagingPerformanceReturnsSchema = z.undefined();
+
 export const publicMarkMessagesAsReadArgsSchema = z.object({
   p_conversation_id: z.string(),
 });
 
 export const publicMarkMessagesAsReadReturnsSchema = z.undefined();
+
+export const publicProcessPendingEmailsArgsSchema = z.never();
+
+export const publicProcessPendingEmailsReturnsSchema = z.undefined();
+
+export const publicRaiseMessagingErrorArgsSchema = z.object({
+  p_details: jsonSchema.optional(),
+  p_error_code: z.string(),
+  p_error_message: z.string(),
+});
+
+export const publicRaiseMessagingErrorReturnsSchema = z.undefined();
+
+export const publicTextToByteaArgsSchema = z.object({
+  data: z.string(),
+});
+
+export const publicTextToByteaReturnsSchema = z.string();
+
+export const publicUpdateRequestStatusArgsSchema = z.object({
+  new_status: z.string(),
+  request_id: z.string(),
+});
+
+export const publicUpdateRequestStatusReturnsSchema = jsonSchema;
+
+export const publicUpdateUserPresenceArgsSchema = z.object({
+  p_device_info: jsonSchema.optional(),
+  p_is_online: z.boolean(),
+  p_typing_in_conversation_id: z.string().optional(),
+  p_user_id: z.string(),
+});
+
+export const publicUpdateUserPresenceReturnsSchema = z.boolean();
+
+export const publicUserCanAccessConversationArgsSchema = z.object({
+  p_conversation_id: z.string(),
+  p_user_id: z.string(),
+});
+
+export const publicUserCanAccessConversationReturnsSchema = z.boolean();
+
+export const publicUserHasMinRoleLevelArgsSchema = z.object({
+  min_level: z.number(),
+  user_id: z.string(),
+});
+
+export const publicUserHasMinRoleLevelReturnsSchema = z.boolean();
+
+export const publicUserHasRoleArgsSchema = z.object({
+  role_name: z.string(),
+  user_id: z.string(),
+});
+
+export const publicUserHasRoleReturnsSchema = z.boolean();
+
+export const publicValidateMessageContentArgsSchema = z.object({
+  p_content: z.string(),
+});
+
+export const publicValidateMessageContentReturnsSchema = z.string();
+
+export const publicHttpRequestSchema = z.object({
+  method: z.unknown(),
+  uri: z.string().nullable(),
+  headers: z.array(publicHttpHeaderSchema).nullable(),
+  content_type: z.string().nullable(),
+  content: z.string().nullable(),
+});
+
+export const publicHttpArgsSchema = z.object({
+  request: publicHttpRequestSchema,
+});
+
+export const publicHttpReturnsSchema = publicHttpResponseSchema;
+
+export const publicHttpHeadReturnsSchema = publicHttpResponseSchema;
+
+export const publicHttpHeaderReturnsSchema = publicHttpHeaderSchema;
+
+export const publicHttpPatchReturnsSchema = publicHttpResponseSchema;
