@@ -3,6 +3,14 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "packageManager": "pnpm@10.28.2",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@swc/core",
+      "esbuild",
+      "lefthook"
+    ]
+  },
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
@@ -14,12 +22,12 @@
     "list-tables": "node scripts/list-tables.mjs",
     "test": "vitest",
     "test:run": "vitest run",
-    "db:reset": "npx supabase db reset",
-    "db:start": "npx supabase start",
-    "db:stop": "npx supabase stop",
-    "db:types": "npx supabase gen types typescript --local > src/types/database.types.ts",
-    "db:schemas": "npx supazod -i src/types/database.types.ts -o src/lib/schemas/database.schemas.ts",
-    "db:gen": "npm run db:types && npm run db:schemas",
+    "db:reset": "pnpm dlx supabase db reset",
+    "db:start": "pnpm dlx supabase start",
+    "db:stop": "pnpm dlx supabase stop",
+    "db:types": "pnpm dlx supabase gen types typescript --local > src/types/database.types.ts",
+    "db:schemas": "pnpm exec supazod -i src/types/database.types.ts -o src/lib/schemas/database.schemas.ts",
+    "db:gen": "pnpm run db:types && pnpm run db:schemas",
     "prepare": "lefthook install"
   },
   "dependencies": {

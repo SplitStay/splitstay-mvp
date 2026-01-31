@@ -5,19 +5,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Development Commands
 
 ```bash
-npm run dev          # Start Vite dev server with HMR (--host flag exposes to network)
-npm run build        # Production build (TypeScript + Vite)
-npm run lint         # Biome lint across all files
-npm run format       # Biome format with auto-fix
-npm run check        # Biome check (lint + format)
-npm run check:fix    # Biome check with auto-fix
-npm run preview      # Serve production build locally
-npm run db:start     # Start local Supabase
-npm run db:stop      # Stop local Supabase
-npm run db:reset     # Reset database and apply migrations
-npm run db:types     # Regenerate TypeScript types from database
-npm run db:schemas   # Regenerate Zod schemas from types
-npm run db:gen       # Regenerate both types and schemas
+pnpm dev          # Start Vite dev server with HMR (--host flag exposes to network)
+pnpm build        # Production build (TypeScript + Vite)
+pnpm lint         # Biome lint across all files
+pnpm format       # Biome format with auto-fix
+pnpm check        # Biome check (lint + format)
+pnpm check:fix    # Biome check with auto-fix
+pnpm preview      # Serve production build locally
+pnpm db:start     # Start local Supabase
+pnpm db:stop      # Stop local Supabase
+pnpm db:reset     # Reset database and apply migrations
+pnpm db:types     # Regenerate TypeScript types from database
+pnpm db:schemas   # Regenerate Zod schemas from types
+pnpm db:gen       # Regenerate both types and schemas
 ```
 
 ### Podman Users
@@ -95,7 +95,7 @@ Zod schemas are auto-generated from the database using [supazod](https://github.
 
 After changing database schema:
 ```bash
-npm run db:gen  # Regenerates types and Zod schemas
+pnpm db:gen  # Regenerates types and Zod schemas
 ```
 
 Use standard Zod 4 (`import { z } from 'zod'`), not `zod/v4-mini`.
