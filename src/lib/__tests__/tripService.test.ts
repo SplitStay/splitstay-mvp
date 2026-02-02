@@ -1,4 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, vi } from 'vitest';
+import { test } from '@/lib/testing/fixtures';
 
 // Mock supabase before importing the service
 vi.mock('../supabase', () => ({
@@ -87,12 +88,10 @@ describe('tripService', () => {
   });
 
   describe('getTripById', () => {
-    it('returns trip for owner even if hidden', async () => {
-      vi.mocked(supabase.auth.getUser).mockResolvedValue({
-        data: { user: { id: VALID_USER_ID } },
-        error: null,
-        // biome-ignore lint/suspicious/noExplicitAny: Test mock
-      } as any);
+    test('returns trip for owner even if hidden', async ({ fake }) => {
+      vi.mocked(supabase.auth.getUser).mockResolvedValue(
+        fake.createMockUserResponse({ id: VALID_USER_ID }),
+      );
 
       const mockTrip = createMockTrip({
         name: 'My Trip',
@@ -134,13 +133,13 @@ describe('tripService', () => {
       expect(result?.isHiddenByAdmin).toBe(true);
     });
 
-    it('returns null for hidden trip when user is not owner', async () => {
+    test('returns null for hidden trip when user is not owner', async ({
+      fake,
+    }) => {
       const differentUserId = '770e8400-e29b-41d4-a716-446655440002';
-      vi.mocked(supabase.auth.getUser).mockResolvedValue({
-        data: { user: { id: differentUserId } },
-        error: null,
-        // biome-ignore lint/suspicious/noExplicitAny: Test mock
-      } as any);
+      vi.mocked(supabase.auth.getUser).mockResolvedValue(
+        fake.createMockUserResponse({ id: differentUserId }),
+      );
 
       const mockTrip = createMockTrip({
         name: 'Someone Else Trip',
@@ -181,12 +180,12 @@ describe('tripService', () => {
       expect(result).toBeNull();
     });
 
-    it('returns trip for non-hidden trip regardless of user', async () => {
-      vi.mocked(supabase.auth.getUser).mockResolvedValue({
-        data: { user: null },
-        error: null,
-        // biome-ignore lint/suspicious/noExplicitAny: Test mock
-      } as any);
+    test('returns trip for non-hidden trip regardless of user', async ({
+      fake,
+    }) => {
+      vi.mocked(supabase.auth.getUser).mockResolvedValue(
+        fake.createMockUserResponse(null),
+      );
 
       const mockTrip = createMockTrip({
         name: 'Public Trip',
@@ -229,12 +228,10 @@ describe('tripService', () => {
   });
 
   describe('getUserTrips', () => {
-    it('includes hidden status for user trips', async () => {
-      vi.mocked(supabase.auth.getUser).mockResolvedValue({
-        data: { user: { id: VALID_USER_ID } },
-        error: null,
-        // biome-ignore lint/suspicious/noExplicitAny: Test mock
-      } as any);
+    test('includes hidden status for user trips', async ({ fake }) => {
+      vi.mocked(supabase.auth.getUser).mockResolvedValue(
+        fake.createMockUserResponse({ id: VALID_USER_ID }),
+      );
 
       const mockTrips = [
         createMockTrip({

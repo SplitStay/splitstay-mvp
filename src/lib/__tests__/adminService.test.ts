@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { test } from '@/lib/testing/fixtures';
 
 // Mock supabase before importing the service
 vi.mock('../supabase', () => ({
@@ -29,12 +30,10 @@ describe('adminService', () => {
   });
 
   describe('isCurrentUserAdmin', () => {
-    it('returns true when user is an admin', async () => {
-      vi.mocked(supabase.auth.getUser).mockResolvedValue({
-        data: { user: { id: VALID_USER_ID } },
-        error: null,
-        // biome-ignore lint/suspicious/noExplicitAny: Test mock
-      } as any);
+    test('returns true when user is an admin', async ({ fake }) => {
+      vi.mocked(supabase.auth.getUser).mockResolvedValue(
+        fake.createMockUserResponse({ id: VALID_USER_ID }),
+      );
 
       const mockFrom = vi.fn().mockReturnValue({
         select: vi.fn().mockReturnValue({
@@ -52,12 +51,10 @@ describe('adminService', () => {
       expect(result).toBe(true);
     });
 
-    it('returns false when user is not an admin', async () => {
-      vi.mocked(supabase.auth.getUser).mockResolvedValue({
-        data: { user: { id: VALID_USER_ID } },
-        error: null,
-        // biome-ignore lint/suspicious/noExplicitAny: Test mock
-      } as any);
+    test('returns false when user is not an admin', async ({ fake }) => {
+      vi.mocked(supabase.auth.getUser).mockResolvedValue(
+        fake.createMockUserResponse({ id: VALID_USER_ID }),
+      );
 
       const mockFrom = vi.fn().mockReturnValue({
         select: vi.fn().mockReturnValue({
@@ -75,12 +72,10 @@ describe('adminService', () => {
       expect(result).toBe(false);
     });
 
-    it('returns false when user is not authenticated', async () => {
-      vi.mocked(supabase.auth.getUser).mockResolvedValue({
-        data: { user: null },
-        error: null,
-        // biome-ignore lint/suspicious/noExplicitAny: Test mock
-      } as any);
+    test('returns false when user is not authenticated', async ({ fake }) => {
+      vi.mocked(supabase.auth.getUser).mockResolvedValue(
+        fake.createMockUserResponse(null),
+      );
 
       const result = await isCurrentUserAdmin();
       expect(result).toBe(false);
