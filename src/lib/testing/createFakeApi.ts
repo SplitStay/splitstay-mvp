@@ -1,3 +1,4 @@
+import { ACCOMMODATION_TYPES } from './generators/accommodationType';
 import {
   createMockAuthUser,
   createMockUserResponse,
@@ -31,6 +32,9 @@ export const createFakeApi = () => ({
   createUser,
   createTrip,
   createTripWithHost,
+
+  // Reference data
+  ACCOMMODATION_TYPES,
 });
 
 export type FakeApi = ReturnType<typeof createFakeApi>;

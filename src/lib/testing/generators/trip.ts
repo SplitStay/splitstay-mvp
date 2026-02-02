@@ -1,17 +1,16 @@
 import { faker } from '@faker-js/faker';
 import type { z } from 'zod';
 import { publicTripRowSchema } from '@/lib/schemas/database.schemas';
+import { ACCOMMODATION_TYPES } from './accommodationType';
 
 export type Trip = z.infer<typeof publicTripRowSchema>;
 
 /**
  * Creates a mock trip with all required fields.
  *
- * Uses lowercase field names to match database column names
- * (PostgreSQL lowercases unquoted identifiers).
- *
- * Note: The TripSchema transform will convert these to camelCase
- * when the data flows through the application layer.
+ * Field names match the database column names. Some columns use lowercase
+ * (ispublic, estimatedmonth, etc.) while others use camelCase (hostId,
+ * startDate, etc.) depending on how they were defined in the database schema.
  */
 export const createTrip = (overrides: Partial<Trip> = {}): Trip => {
   const now = new Date().toISOString();
@@ -26,7 +25,9 @@ export const createTrip = (overrides: Partial<Trip> = {}): Trip => {
     description: faker.lorem.paragraph(),
     location: faker.location.city(),
     locationId: null,
-    accommodationTypeId: null,
+    accommodationTypeId: faker.helpers.arrayElement(
+      ACCOMMODATION_TYPES.map((t) => t.id),
+    ),
     startDate: startDate.toISOString(),
     endDate: endDate.toISOString(),
     flexible: faker.datatype.boolean(),

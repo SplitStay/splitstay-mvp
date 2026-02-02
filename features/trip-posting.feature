@@ -42,6 +42,16 @@ Feature: Trip Posting
     And I click "Next"
     Then I should advance to step 3 Preferences
 
+  @trip-wizard @accommodation-types
+  Scenario: User can categorize their accommodation when posting a trip
+    Given I am on step 2 Accommodation
+    When I click on the accommodation type dropdown
+    Then I can select from accommodation categories:
+      | Hostel Room |
+      | Hotel Room  |
+      | Apartment   |
+      | House       |
+
   @trip-wizard
   Scenario: Booking URL shows preview
     Given I am on step 2 Accommodation
