@@ -166,11 +166,11 @@ Additional generators (conversation, message) can be added as needed.
 
 ## Tasks
 
-- [ ] Create `src/lib/testing/generators/supabaseAuth.ts`
-- [ ] Create `src/lib/testing/generators/user.ts`
-- [ ] Create `src/lib/testing/generators/trip.ts`
-- [ ] Create `src/lib/testing/createFakeApi.ts`
-- [ ] Create `src/lib/testing/fixtures.ts`
-- [ ] Update existing tests to use fixtures
-- [ ] Remove all 7 `noExplicitAny` directives
-- [ ] Verify all tests pass
+- [x] Create `src/lib/testing/generators/supabaseAuth.ts`
+- [x] Create `src/lib/testing/generators/user.ts`
+- [x] Create `src/lib/testing/generators/trip.ts`
+- [x] Create `src/lib/testing/createFakeApi.ts`
+- [x] Create `src/lib/testing/fixtures.ts`
+- [x] Update existing tests to use fixtures
+- [x] Remove all 7 `noExplicitAny` directives
+- [x] Verify all tests pass
