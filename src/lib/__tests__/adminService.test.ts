@@ -1,3 +1,14 @@
+/**
+ * Additional adminService tests not covered by admin.feature.
+ *
+ * Tests for feature scenarios are in admin.spec.ts which binds to
+ * features/admin.feature via vitest-cucumber.
+ *
+ * This file contains supplementary tests for:
+ * - Edge cases not in the feature file
+ * - Helper functions (isTripHidden)
+ * - getAllTripsForAdmin functionality
+ */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { test } from '@/lib/testing/fixtures';
 
@@ -24,13 +35,24 @@ import { supabase } from '../supabase';
 const VALID_TRIP_ID = '550e8400-e29b-41d4-a716-446655440000';
 const VALID_USER_ID = '660e8400-e29b-41d4-a716-446655440001';
 
-describe('adminService', () => {
+describe('adminService - supplementary tests', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe('isCurrentUserAdmin', () => {
-    test('returns true when user is an admin', async ({ fake }) => {
+  describe('isCurrentUserAdmin - edge cases', () => {
+    test('returns false when user is not authenticated', async ({ fake }) => {
+      vi.mocked(supabase.auth.getUser).mockResolvedValue(
+        fake.createMockUserResponse(null),
+      );
+
+      const result = await isCurrentUserAdmin();
+      expect(result).toBe(false);
+    });
+
+    test('returns false when admin check returns an error', async ({
+      fake,
+    }) => {
       vi.mocked(supabase.auth.getUser).mockResolvedValue(
         fake.createMockUserResponse({ id: VALID_USER_ID }),
       );
@@ -39,8 +61,8 @@ describe('adminService', () => {
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             single: vi.fn().mockResolvedValue({
-              data: { userId: VALID_USER_ID, createdAt: '2026-01-28' },
-              error: null,
+              data: null,
+              error: { code: 'SOME_ERROR', message: 'Database error' },
             }),
           }),
         }),
@@ -48,10 +70,12 @@ describe('adminService', () => {
       vi.mocked(supabase.from).mockImplementation(mockFrom);
 
       const result = await isCurrentUserAdmin();
-      expect(result).toBe(true);
+      expect(result).toBe(false);
     });
 
-    test('returns false when user is not an admin', async ({ fake }) => {
+    test('returns false when user is not an admin (PGRST116)', async ({
+      fake,
+    }) => {
       vi.mocked(supabase.auth.getUser).mockResolvedValue(
         fake.createMockUserResponse({ id: VALID_USER_ID }),
       );
@@ -71,18 +95,9 @@ describe('adminService', () => {
       const result = await isCurrentUserAdmin();
       expect(result).toBe(false);
     });
-
-    test('returns false when user is not authenticated', async ({ fake }) => {
-      vi.mocked(supabase.auth.getUser).mockResolvedValue(
-        fake.createMockUserResponse(null),
-      );
-
-      const result = await isCurrentUserAdmin();
-      expect(result).toBe(false);
-    });
   });
 
-  describe('hideTrip', () => {
+  describe('hideTrip - happy path', () => {
     it('hides a trip successfully', async () => {
       const mockFrom = vi.fn().mockReturnValue({
         insert: vi.fn().mockReturnValue({
@@ -99,47 +114,9 @@ describe('adminService', () => {
       await expect(hideTrip(VALID_TRIP_ID)).resolves.not.toThrow();
       expect(mockFrom).toHaveBeenCalledWith('hidden_trips');
     });
-
-    it('throws error when trip is already hidden', async () => {
-      const mockFrom = vi.fn().mockReturnValue({
-        insert: vi.fn().mockReturnValue({
-          select: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({
-              data: null,
-              error: { code: '23505', message: 'duplicate key' },
-            }),
-          }),
-        }),
-      });
-      vi.mocked(supabase.from).mockImplementation(mockFrom);
-
-      await expect(hideTrip(VALID_TRIP_ID)).rejects.toThrow(
-        'Trip is already hidden',
-      );
-    });
-
-    it('throws user-friendly error for non-existent trip', async () => {
-      const mockFrom = vi.fn().mockReturnValue({
-        insert: vi.fn().mockReturnValue({
-          select: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({
-              data: null,
-              error: { code: '23503', message: 'foreign key violation' },
-            }),
-          }),
-        }),
-      });
-      vi.mocked(supabase.from).mockImplementation(mockFrom);
-
-      await expect(hideTrip(VALID_TRIP_ID)).rejects.toThrow('Trip not found');
-    });
-
-    it('throws error for invalid trip ID format', async () => {
-      await expect(hideTrip('not-a-uuid')).rejects.toThrow('Invalid trip ID');
-    });
   });
 
-  describe('unhideTrip', () => {
+  describe('unhideTrip - happy path', () => {
     it('unhides a trip successfully', async () => {
       const mockFrom = vi.fn().mockReturnValue({
         delete: vi.fn().mockReturnValue({
@@ -153,26 +130,6 @@ describe('adminService', () => {
 
       await expect(unhideTrip(VALID_TRIP_ID)).resolves.not.toThrow();
       expect(mockFrom).toHaveBeenCalledWith('hidden_trips');
-    });
-
-    it('throws error when trip is not hidden', async () => {
-      const mockFrom = vi.fn().mockReturnValue({
-        delete: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({
-            error: null,
-            count: 0,
-          }),
-        }),
-      });
-      vi.mocked(supabase.from).mockImplementation(mockFrom);
-
-      await expect(unhideTrip(VALID_TRIP_ID)).rejects.toThrow(
-        'Trip is not hidden',
-      );
-    });
-
-    it('throws error for invalid trip ID format', async () => {
-      await expect(unhideTrip('invalid')).rejects.toThrow('Invalid trip ID');
     });
   });
 
@@ -224,6 +181,54 @@ describe('adminService', () => {
       expect(result[0].isHidden).toBe(true);
       expect(result[1].isHidden).toBe(false);
     });
+
+    it('throws error when trip fetch fails', async () => {
+      const mockFrom = vi.fn().mockImplementation((table) => {
+        if (table === 'trip') {
+          return {
+            select: vi.fn().mockReturnValue({
+              order: vi.fn().mockResolvedValue({
+                data: null,
+                error: { message: 'Database error' },
+              }),
+            }),
+          };
+        }
+      });
+      vi.mocked(supabase.from).mockImplementation(mockFrom);
+
+      await expect(getAllTripsForAdmin()).rejects.toThrow(
+        'Failed to load trips. Please try again.',
+      );
+    });
+
+    it('throws error when hidden trips fetch fails', async () => {
+      const mockFrom = vi.fn().mockImplementation((table) => {
+        if (table === 'trip') {
+          return {
+            select: vi.fn().mockReturnValue({
+              order: vi.fn().mockResolvedValue({
+                data: [],
+                error: null,
+              }),
+            }),
+          };
+        }
+        if (table === 'hidden_trips') {
+          return {
+            select: vi.fn().mockResolvedValue({
+              data: null,
+              error: { message: 'Database error' },
+            }),
+          };
+        }
+      });
+      vi.mocked(supabase.from).mockImplementation(mockFrom);
+
+      await expect(getAllTripsForAdmin()).rejects.toThrow(
+        'Failed to load trip status. Please try again.',
+      );
+    });
   });
 
   describe('isTripHidden', () => {
@@ -244,13 +249,30 @@ describe('adminService', () => {
       expect(result).toBe(true);
     });
 
-    it('returns false when trip is not hidden', async () => {
+    it('returns false when trip is not hidden (PGRST116)', async () => {
       const mockFrom = vi.fn().mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             single: vi.fn().mockResolvedValue({
               data: null,
               error: { code: 'PGRST116' },
+            }),
+          }),
+        }),
+      });
+      vi.mocked(supabase.from).mockImplementation(mockFrom);
+
+      const result = await isTripHidden(VALID_TRIP_ID);
+      expect(result).toBe(false);
+    });
+
+    it('returns false when there is a database error', async () => {
+      const mockFrom = vi.fn().mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
+              data: null,
+              error: { code: 'SOME_ERROR', message: 'Database error' },
             }),
           }),
         }),
