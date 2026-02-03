@@ -5,7 +5,7 @@
 
 ## User Requirements
 
-<!-- TODO -->
+<!-- DONE -->
 Scenario: User can categorize their accommodation when posting a trip
   Given I am creating a new trip
   When I reach the accommodation details step
@@ -13,7 +13,7 @@ Scenario: User can categorize their accommodation when posting a trip
 
 ## Technical Specifications
 
-<!-- TODO -->
+<!-- DONE -->
 # Living: none (initial implementation)
 # Action: creates
 Scenario: Accommodation types are defined with strict validation
@@ -23,7 +23,7 @@ Scenario: Accommodation types are defined with strict validation
   And validation fails if data is empty
   And validation fails if data does not match expected literal values
 
-<!-- TODO -->
+<!-- DONE -->
 # Living: none (initial implementation)
 # Action: creates
 Scenario: Generator script produces valid seed SQL
@@ -34,7 +34,7 @@ Scenario: Generator script produces valid seed SQL
   And the SQL uses ON CONFLICT for idempotency
   And string values are properly escaped
 
-<!-- TODO -->
+<!-- DONE -->
 # Living: none (initial implementation)
 # Action: creates
 Scenario: Trip generator uses valid accommodation type IDs
@@ -42,7 +42,7 @@ Scenario: Trip generator uses valid accommodation type IDs
   When createTrip is called without an accommodationTypeId override
   Then the generated trip has a valid accommodationTypeId from the defined types
 
-<!-- TODO -->
+<!-- DONE -->
 # Living: none (initial implementation)
 # Action: creates
 Scenario: Fake API exports accommodation types
@@ -50,7 +50,7 @@ Scenario: Fake API exports accommodation types
   When I call createFakeApi()
   Then the returned object includes ACCOMMODATION_TYPES
 
-<!-- TODO -->
+<!-- DONE -->
 # Living: none (initial implementation)
 # Action: creates
 Scenario: TypeScript configuration includes scripts directory
@@ -58,7 +58,7 @@ Scenario: TypeScript configuration includes scripts directory
   When I add scripts to the include array
   Then scripts/*.ts files are type-checked
 
-<!-- TODO -->
+<!-- DONE -->
 # Living: none (initial implementation)
 # Action: creates
 Scenario: npm script runs the generator
@@ -69,7 +69,7 @@ Scenario: npm script runs the generator
   And the script exits with code 0 on success
   And the script exits with code 1 on any error
 
-<!-- TODO -->
+<!-- DONE -->
 # Living: none (initial implementation)
 # Action: creates
 Scenario: Remove manual seed.sql and regenerate
@@ -78,7 +78,7 @@ Scenario: Remove manual seed.sql and regenerate
   Then it overwrites the file with generated content
   And the bug in BUGS.md is removed
 
-<!-- TODO -->
+<!-- DONE -->
 # Living: none (initial implementation)
 # Action: creates
 Scenario: Generated seed SQL applies successfully to database
