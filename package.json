@@ -14,6 +14,7 @@
     "list-tables": "node scripts/list-tables.mjs",
     "test": "vitest",
     "test:run": "vitest run",
+    "typecheck": "tsc --noEmit",
     "db:reset": "npx supabase db reset",
     "db:start": "npx supabase start",
     "db:stop": "npx supabase stop",
