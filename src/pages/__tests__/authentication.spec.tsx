@@ -71,7 +71,7 @@ describeFeature(feature, ({ Background, Scenario }) => {
     test('shows confirmation message after successful signup', async ({
       renderWithProviders,
     }) => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ delay: null });
 
       // Mock successful signup
       vi.mocked(supabase.auth.signUp).mockResolvedValue({
@@ -133,7 +133,7 @@ describeFeature(feature, ({ Background, Scenario }) => {
       test('shows same confirmation message for existing email (security)', async ({
         renderWithProviders,
       }) => {
-        const user = userEvent.setup();
+        const user = userEvent.setup({ delay: null });
 
         // Mock signup - Supabase returns success even for existing emails
         // (confirmation email just won't be sent to prevent email enumeration)
@@ -185,7 +185,7 @@ describeFeature(feature, ({ Background, Scenario }) => {
       test('shows validation error for short password', async ({
         renderWithProviders,
       }) => {
-        const user = userEvent.setup();
+        const user = userEvent.setup({ delay: null });
         renderWithProviders(<SignupPage />, { initialRoute: '/signup' });
 
         // Fill form with short password
@@ -230,7 +230,7 @@ describeFeature(feature, ({ Background, Scenario }) => {
     test('submit button is disabled without terms checkbox', async ({
       renderWithProviders,
     }) => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ delay: null });
       renderWithProviders(<SignupPage />, { initialRoute: '/signup' });
 
       // Fill in all fields
@@ -293,7 +293,7 @@ describeFeature(feature, ({ Background, Scenario }) => {
       renderWithProviders,
       fake,
     }) => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ delay: null });
 
       // Mock successful sign in
       vi.mocked(supabase.auth.signInWithPassword).mockResolvedValue({
@@ -357,7 +357,7 @@ describeFeature(feature, ({ Background, Scenario }) => {
     test('shows error message for invalid credentials', async ({
       renderWithProviders,
     }) => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ delay: null });
 
       // Mock failed sign in
       vi.mocked(supabase.auth.signInWithPassword).mockResolvedValue({
@@ -433,7 +433,7 @@ describeFeature(feature, ({ Background, Scenario }) => {
     test('shows confirmation message after requesting reset', async ({
       renderWithProviders,
     }) => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ delay: null });
 
       // Mock successful password reset request
       vi.mocked(supabase.auth.resetPasswordForEmail).mockResolvedValue({
