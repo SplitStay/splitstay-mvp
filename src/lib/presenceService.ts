@@ -1,10 +1,10 @@
+import type { RealtimeChannel } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 
 // biome-ignore lint/complexity/noStaticOnlyClass: Service pattern
 export class PresenceService {
   private static presenceInterval: NodeJS.Timeout | null = null;
-  // biome-ignore lint/suspicious/noExplicitAny: Supabase channel type
-  private static presenceChannel: any = null;
+  private static presenceChannel: RealtimeChannel | null = null;
 
   // Start tracking user presence
   static async startPresenceTracking(userId: string) {

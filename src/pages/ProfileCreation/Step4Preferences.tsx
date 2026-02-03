@@ -2,16 +2,17 @@ import { motion } from 'framer-motion';
 import { Camera, Plus, Smile, Sparkles, Upload, X } from 'lucide-react';
 import { useState } from 'react';
 
+interface Step4FormData {
+  bio: string;
+  mostInfluencedExperience: string;
+}
+
 interface Step4Props {
   selectedTraits: string[];
-  formData: {
-    bio: string;
-    mostInfluencedExperience: string;
-  };
+  formData: Step4FormData;
   travelPhotos: string[];
   setSelectedTraits: (traits: string[]) => void;
-  // biome-ignore lint/suspicious/noExplicitAny: Partial form data
-  setFormData: (data: any) => void;
+  setFormData: (data: Partial<Step4FormData>) => void;
   setTravelPhotos: (photos: string[]) => void;
   onBack: () => void;
   onSubmit: () => void;

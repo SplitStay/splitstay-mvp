@@ -4,18 +4,19 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { supabase } from '@/lib/supabase';
 
+interface Step1FormData {
+  fullName: string;
+  dayOfBirth: string;
+  monthOfBirth: string;
+  yearOfBirth: string;
+  gender: string;
+}
+
 interface Step1Props {
-  formData: {
-    fullName: string;
-    dayOfBirth: string;
-    monthOfBirth: string;
-    yearOfBirth: string;
-    gender: string;
-  };
+  formData: Step1FormData;
   profileImagePreview: string | null;
   profileImageUrl: string | null;
-  // biome-ignore lint/suspicious/noExplicitAny: Partial form data
-  setFormData: (data: any) => void;
+  setFormData: (data: Partial<Step1FormData>) => void;
   setProfileImagePreview: (url: string | null) => void;
   setProfileImageUrl: (url: string | null) => void;
   onNext: () => void;

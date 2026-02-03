@@ -13,12 +13,12 @@ import {
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import type { Tables } from '../types/database.types';
 
 interface MobileNavigationProps {
   isGuest: boolean;
   onAuthRequired: (action: string) => void;
-  // biome-ignore lint/suspicious/noExplicitAny: User type from auth context
-  user?: any;
+  user?: Tables<'user'>;
 }
 
 export const MobileNavigation: React.FC<MobileNavigationProps> = ({

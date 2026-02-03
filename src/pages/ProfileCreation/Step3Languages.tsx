@@ -4,16 +4,17 @@ import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 
+interface Step3FormData {
+  personalizedLink: string;
+}
+
 interface Step3Props {
   selectedLanguages: string[];
   selectedLearningLanguages: string[];
-  formData: {
-    personalizedLink: string;
-  };
+  formData: Step3FormData;
   setSelectedLanguages: (languages: string[]) => void;
   setSelectedLearningLanguages: (languages: string[]) => void;
-  // biome-ignore lint/suspicious/noExplicitAny: Partial form data
-  setFormData: (data: any) => void;
+  setFormData: (data: Partial<Step3FormData>) => void;
   onNext: () => void;
   onBack: () => void;
   originalPersonalizedLink?: string;

@@ -2,15 +2,16 @@ import { motion } from 'framer-motion';
 import { Globe, Heart, MapPin } from 'lucide-react';
 import CityAutocomplete from '@/components/CityAutocomplete';
 
+interface Step2FormData {
+  birthPlace: string;
+  currentPlace: string;
+  mostInfluencedCountry: string;
+  mostInfluencedCountryDescription: string;
+}
+
 interface Step2Props {
-  formData: {
-    birthPlace: string;
-    currentPlace: string;
-    mostInfluencedCountry: string;
-    mostInfluencedCountryDescription: string;
-  };
-  // biome-ignore lint/suspicious/noExplicitAny: Partial form data
-  setFormData: (data: any) => void;
+  formData: Step2FormData;
+  setFormData: (data: Partial<Step2FormData>) => void;
   onNext: () => void;
   onBack: () => void;
 }

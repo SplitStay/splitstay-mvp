@@ -208,10 +208,7 @@ export default function CreateProfilePage() {
                   }}
                   profileImagePreview={profileImagePreview}
                   profileImageUrl={profileImageUrl}
-                  // biome-ignore lint/suspicious/noExplicitAny: Partial form data
-                  setFormData={(data: any) =>
-                    setFormData({ ...formData, ...data })
-                  }
+                  setFormData={(data) => setFormData({ ...formData, ...data })}
                   setProfileImagePreview={setProfileImagePreview}
                   setProfileImageUrl={setProfileImageUrl}
                   onNext={handleNext}
@@ -229,10 +226,7 @@ export default function CreateProfilePage() {
                     mostInfluencedCountryDescription:
                       formData.mostInfluencedCountryDescription,
                   }}
-                  // biome-ignore lint/suspicious/noExplicitAny: Partial form data
-                  setFormData={(data: any) =>
-                    setFormData({ ...formData, ...data })
-                  }
+                  setFormData={(data) => setFormData({ ...formData, ...data })}
                   onNext={handleNext}
                   onBack={handleBack}
                 />
@@ -248,10 +242,7 @@ export default function CreateProfilePage() {
                   }}
                   setSelectedLanguages={setSelectedLanguages}
                   setSelectedLearningLanguages={setSelectedLearningLanguages}
-                  // biome-ignore lint/suspicious/noExplicitAny: Partial form data
-                  setFormData={(data: any) =>
-                    setFormData({ ...formData, ...data })
-                  }
+                  setFormData={(data) => setFormData({ ...formData, ...data })}
                   onNext={handleNext}
                   onBack={handleBack}
                 />
@@ -267,10 +258,7 @@ export default function CreateProfilePage() {
                   }}
                   travelPhotos={travelPhotos}
                   setSelectedTraits={setSelectedTraits}
-                  // biome-ignore lint/suspicious/noExplicitAny: Partial form data
-                  setFormData={(data: any) =>
-                    setFormData({ ...formData, ...data })
-                  }
+                  setFormData={(data) => setFormData({ ...formData, ...data })}
                   setTravelPhotos={setTravelPhotos}
                   onBack={handleBack}
                   onSubmit={handleSubmit}

@@ -34,20 +34,23 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    submitMessage();
+  };
+
+  const handleKeyPress = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      submitMessage();
+    }
+  };
+
+  const submitMessage = () => {
     if (message.trim() && !disabled) {
       onSendMessage(message);
       setMessage('');
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto';
       }
-    }
-  };
-
-  const handleKeyPress = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      // biome-ignore lint/suspicious/noExplicitAny: Event type coercion
-      handleSubmit(e as any);
     }
   };
 

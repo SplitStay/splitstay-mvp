@@ -2,10 +2,14 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Calendar, ChevronDown, Filter, MapPin, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import type { z } from 'zod';
 import CityAutocomplete from '../components/CityAutocomplete';
 import { TripCard } from '../components/TripCard';
 import { useAuth } from '../contexts/AuthContext';
+import type { TripSearchFiltersSchema } from '../lib/schemas/tripSearchSchema';
 import { searchTrips, type Trip } from '../lib/tripService';
+
+type TripSearchFilters = z.infer<typeof TripSearchFiltersSchema>;
 
 const FindPartnerPage = () => {
   const navigate = useNavigate();
@@ -132,8 +136,7 @@ const FindPartnerPage = () => {
   const handleApplyFilters = async () => {
     try {
       setLoading(true);
-      // biome-ignore lint/suspicious/noExplicitAny: Dynamic filter object
-      const filters: any = {};
+      const filters: TripSearchFilters = {};
 
       if (destinationQuery) {
         filters.location = destinationQuery;
@@ -159,17 +162,12 @@ const FindPartnerPage = () => {
       // Apply client-side filtering for additional criteria
       let clientFilteredTrips = baseTrips;
 
-      // Filter by vibe (using description or custom vibe field)
+      // Filter by vibe (stored in description field)
       if (selectedVibe) {
         clientFilteredTrips = clientFilteredTrips.filter((trip) => {
           const description = (trip.description || '').toLowerCase();
-          // biome-ignore lint/suspicious/noExplicitAny: Optional vibe field
-          const vibe = (trip as any).vibe?.toLowerCase() || '';
           const selectedVibeLower = selectedVibe.toLowerCase();
-          return (
-            description.includes(selectedVibeLower) ||
-            vibe.includes(selectedVibeLower)
-          );
+          return description.includes(selectedVibeLower);
         });
       }
 
@@ -177,9 +175,7 @@ const FindPartnerPage = () => {
       if (selectedGroupSize) {
         const size = parseInt(selectedGroupSize, 10);
         clientFilteredTrips = clientFilteredTrips.filter((trip) => {
-          const rooms =
-            // biome-ignore lint/suspicious/noExplicitAny: DB column name mismatch
-            (trip as any).numberofrooms || (trip as any).numberOfRooms || 1;
+          const rooms = trip.numberOfRooms ?? 1;
           return rooms >= size - 1 && rooms <= size + 1; // Allow some flexibility
         });
       }

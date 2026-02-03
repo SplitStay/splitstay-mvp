@@ -11,7 +11,10 @@ import {
   type Conversation,
   type ConversationWithUser,
   type Message,
+  type MessageWithSender,
 } from '../lib/chatService';
+import { parseUserPresencePayload } from '../lib/schemas/realtimeSchema';
+import { parseUserPresenceRow } from '../lib/schemas/tripSearchSchema';
 import { supabase } from '../lib/supabase';
 
 export const MessagesPage: React.FC = () => {
@@ -75,13 +78,14 @@ export const MessagesPage: React.FC = () => {
               idx !== -1
                 ? { ...prev[idx] }
                 : {
-                    // biome-ignore lint/suspicious/noExplicitAny: Supabase realtime payload
-                    ...(conv as any),
-                    other_user:
-                      prev[idx]?.other_user ||
-                      (prev[0]?.other_user ?? { id: '', name: '', email: '' }),
-                    last_message: prev[idx]?.last_message,
-                    unread_count: prev[idx]?.unread_count ?? 0,
+                    ...conv,
+                    other_user: prev[0]?.other_user ?? {
+                      id: '',
+                      name: '',
+                      email: '',
+                    },
+                    last_message: undefined,
+                    unread_count: 0,
                   };
             mapped.last_message_at = conv.last_message_at;
             mapped.updated_at = conv.updated_at;
@@ -111,12 +115,13 @@ export const MessagesPage: React.FC = () => {
         if (data) {
           const next: Record<string, boolean> = {};
           const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-          // biome-ignore lint/suspicious/noExplicitAny: Supabase query result
-          for (const row of data as any[]) {
-            const last = row.last_active_at
-              ? new Date(row.last_active_at)
+          for (const row of data) {
+            const parsed = parseUserPresenceRow(row);
+            if (!parsed) continue;
+            const last = parsed.last_active_at
+              ? new Date(parsed.last_active_at)
               : new Date(0);
-            next[row.user_id] = !!row.is_online && last > fiveMinutesAgo;
+            next[parsed.user_id] = !!parsed.is_online && last > fiveMinutesAgo;
           }
           setOnlineMap((prev) => ({ ...prev, ...next }));
         }
@@ -167,8 +172,7 @@ export const MessagesPage: React.FC = () => {
           'postgres_changes',
           { event: '*', schema: 'public', table: 'user_presence' },
           (payload) => {
-            // biome-ignore lint/suspicious/noExplicitAny: Supabase realtime payload
-            const row = payload.new as any;
+            const row = parseUserPresencePayload(payload.new);
             if (!row?.user_id) return;
             const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
             const last = row.last_active_at
@@ -185,10 +189,8 @@ export const MessagesPage: React.FC = () => {
           if (idx === -1) return prev;
           const updated = [...prev];
           const target = { ...updated[idx] };
-          target.last_message = {
-            ...msg,
-            // biome-ignore lint/suspicious/noExplicitAny: MessageWithSender partial
-          } as any;
+          // Message is a subset of MessageWithSender (missing sender relation)
+          target.last_message = msg as MessageWithSender;
           target.last_message_at = msg.created_at;
           // move to top by last_message_at
           updated[idx] = target;

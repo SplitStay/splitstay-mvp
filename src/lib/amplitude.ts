@@ -1,4 +1,8 @@
 import * as amplitude from '@amplitude/analytics-browser';
+import type { z } from 'zod';
+import type { AnalyticsPropertiesSchema } from './schemas/analyticsSchema';
+
+type AnalyticsProperties = z.infer<typeof AnalyticsPropertiesSchema>;
 
 class AmplitudeService {
   private initialized = false;
@@ -51,8 +55,7 @@ class AmplitudeService {
     }
   }
 
-  // biome-ignore lint/suspicious/noExplicitAny: Amplitude SDK accepts arbitrary properties
-  identify(userId: string, userProperties?: Record<string, any>) {
+  identify(userId: string, userProperties?: AnalyticsProperties) {
     if (!this.initialized) return;
 
     try {
@@ -71,8 +74,7 @@ class AmplitudeService {
     }
   }
 
-  // biome-ignore lint/suspicious/noExplicitAny: Amplitude SDK accepts arbitrary properties
-  track(eventName: string, eventProperties?: Record<string, any>) {
+  track(eventName: string, eventProperties?: AnalyticsProperties) {
     if (!this.initialized) return;
 
     try {
@@ -82,8 +84,7 @@ class AmplitudeService {
     }
   }
 
-  // biome-ignore lint/suspicious/noExplicitAny: Amplitude SDK accepts arbitrary properties
-  setUserProperties(properties: Record<string, any>) {
+  setUserProperties(properties: AnalyticsProperties) {
     if (!this.initialized) return;
 
     try {
@@ -108,16 +109,14 @@ export const amplitudeService = new AmplitudeService();
 
 export const trackEvent = (
   eventName: string,
-  // biome-ignore lint/suspicious/noExplicitAny: Amplitude SDK accepts arbitrary properties
-  properties?: Record<string, any>,
+  properties?: AnalyticsProperties,
 ) => {
   amplitudeService.track(eventName, properties);
 };
 
 export const identifyUser = (
   userId: string,
-  // biome-ignore lint/suspicious/noExplicitAny: Amplitude SDK accepts arbitrary properties
-  properties?: Record<string, any>,
+  properties?: AnalyticsProperties,
 ) => {
   amplitudeService.identify(userId, properties);
 };
