@@ -2,26 +2,27 @@ import { motion } from 'framer-motion';
 import { Building2, Hash, Link, RefreshCw } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
+import type { z } from 'zod';
 import { AccommodationPreview } from '../../components/AccommodationPreview';
 import {
   type AccommodationType,
   BED_TYPES,
   createDefaultRooms,
   getAccommodationTypes,
-  type RoomConfiguration,
 } from '../../lib/accommodationService';
 import {
   type AccommodationPreview as AccommodationPreviewType,
   iframelyService,
 } from '../../lib/iframely';
+import type { RoomConfigurationSchema } from '../../lib/schemas/roomSchema';
+import type { PartialTripFormDataSchema } from '../../lib/schemas/tripFormSchema';
 
-// Remove local Room interface - use RoomConfiguration from service
+type PartialTripFormData = z.infer<typeof PartialTripFormDataSchema>;
+type RoomConfiguration = z.infer<typeof RoomConfigurationSchema>;
 
 interface Props {
-  // biome-ignore lint/suspicious/noExplicitAny: Trip form data shape
-  trip: any;
-  // biome-ignore lint/suspicious/noExplicitAny: Trip form data shape
-  setTrip: (t: any) => void;
+  trip: PartialTripFormData;
+  setTrip: (t: PartialTripFormData) => void;
   personalNote: string;
   setPersonalNote: (n: string) => void;
   back: () => void;
@@ -165,8 +166,7 @@ const Step2Accommodation: React.FC<Props> = ({
   const updateRoom = (
     roomId: number,
     field: keyof RoomConfiguration,
-    // biome-ignore lint/suspicious/noExplicitAny: Room field values vary by type
-    value: any,
+    value: RoomConfiguration[keyof RoomConfiguration],
   ) => {
     setRooms(
       rooms.map((room) =>

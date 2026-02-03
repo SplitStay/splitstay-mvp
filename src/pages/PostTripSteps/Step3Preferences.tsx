@@ -1,12 +1,14 @@
 import { motion } from 'framer-motion';
 import { Eye, Smile, Users } from 'lucide-react';
 import type React from 'react';
+import type { z } from 'zod';
+import type { PartialTripFormDataSchema } from '../../lib/schemas/tripFormSchema';
+
+type PartialTripFormData = z.infer<typeof PartialTripFormDataSchema>;
 
 interface Props {
-  // biome-ignore lint/suspicious/noExplicitAny: Trip form data shape
-  trip: any;
-  // biome-ignore lint/suspicious/noExplicitAny: Trip form data shape
-  setTrip: (t: any) => void;
+  trip: PartialTripFormData;
+  setTrip: (t: PartialTripFormData) => void;
   matchWith: string;
   setMatchWith: (m: string) => void;
   vibe: string;

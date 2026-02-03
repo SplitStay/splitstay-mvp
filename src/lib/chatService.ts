@@ -1,3 +1,9 @@
+import type { z } from 'zod';
+import {
+  getReactions,
+  type MessageMetadataSchema,
+  parseMessageMetadata,
+} from './schemas/messageSchema';
 import { supabase } from './supabase';
 
 // Conversations/messages schema
@@ -22,8 +28,7 @@ export interface Message {
   deleted_at?: string | null;
   edited_at?: string | null;
   message_type: 'text' | 'image' | 'system';
-  // biome-ignore lint/suspicious/noExplicitAny: Message metadata is dynamic JSON
-  metadata: any;
+  metadata: z.infer<typeof MessageMetadataSchema>;
 }
 
 export interface ConversationWithUser extends Conversation {
@@ -64,9 +69,32 @@ export class ChatService {
 
     if (error) throw error;
 
+    // Type for conversation with joined user data
+    type ConversationWithJoins = {
+      id: string;
+      user1_id: string;
+      user2_id: string;
+      created_at: string;
+      updated_at: string;
+      last_message_at: string | null;
+      is_archived_by_user1: boolean;
+      is_archived_by_user2: boolean;
+      user1: {
+        id: string;
+        name: string | null;
+        email: string;
+        imageUrl: string | null;
+      } | null;
+      user2: {
+        id: string;
+        name: string | null;
+        email: string;
+        imageUrl: string | null;
+      } | null;
+    };
+
     const conversationsWithUsers = await Promise.all(
-      // biome-ignore lint/suspicious/noExplicitAny: Supabase join returns dynamic shape
-      (data || []).map(async (conv: any) => {
+      ((data as ConversationWithJoins[]) || []).map(async (conv) => {
         const other_user = conv.user1_id === userId ? conv.user2 : conv.user1;
 
         const { data: lastMessage } = await supabase
@@ -154,8 +182,7 @@ export class ChatService {
     senderId: string,
     content: string,
     messageType: 'text' | 'image' | 'video' | 'document' = 'text',
-    // biome-ignore lint/suspicious/noExplicitAny: Message metadata is dynamic JSON
-    metadata?: any,
+    metadata?: z.infer<typeof MessageMetadataSchema>,
   ): Promise<Message> {
     // Use direct table insert for now (more reliable than RPC)
     const { data, error } = await supabase
@@ -206,8 +233,7 @@ export class ChatService {
       .eq('user_id', readerUserId);
     if (error) throw error;
     const map: Record<string, boolean> = {};
-    // biome-ignore lint/suspicious/noExplicitAny: Supabase row type inference
-    for (const row of data || []) map[(row as any).message_id] = true;
+    for (const row of data || []) map[row.message_id] = true;
     return map;
   }
 
@@ -222,9 +248,8 @@ export class ChatService {
       .eq('id', messageId)
       .single();
     if (fetchError) throw fetchError;
-    // biome-ignore lint/suspicious/noExplicitAny: Message metadata is dynamic JSON
-    const metadata = (msg?.metadata as any) || {};
-    const reactions = metadata.reactions || {};
+    const metadata = parseMessageMetadata(msg?.metadata) ?? {};
+    const reactions = getReactions(metadata);
     const current: string[] = Array.isArray(reactions[emoji])
       ? reactions[emoji]
       : [];
@@ -256,8 +281,12 @@ export class ChatService {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'message_read_status' },
         (payload) => {
-          // biome-ignore lint/suspicious/noExplicitAny: Supabase realtime payload
-          callback(payload.new as any);
+          const row = payload.new as {
+            message_id: string;
+            user_id: string;
+            read_at: string;
+          };
+          callback(row);
         },
       )
       .subscribe();

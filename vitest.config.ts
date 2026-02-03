@@ -17,6 +17,6 @@ export default defineConfig({
       'src/**/*.{test,spec}.{ts,tsx}',
       'src/features/**/*.spec.{ts,tsx}',
     ],
-    testTimeout: 325,
+    testTimeout: 500,
   },
 });

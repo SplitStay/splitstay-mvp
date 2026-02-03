@@ -28,6 +28,7 @@ import { Badge } from '../components/ui/badge';
 import { useAuth } from '../contexts/AuthContext';
 import { ChatService } from '../lib/chatService';
 import { iframelyService } from '../lib/iframely';
+import { getRoomsOrEmpty } from '../lib/schemas/roomSchema';
 import { supabase } from '../lib/supabase';
 import {
   getTripById,
@@ -226,22 +227,19 @@ export const TripDetailPage: React.FC = () => {
   };
 
   const getRoomSummary = () => {
-    if (!trip?.rooms || !Array.isArray(trip.rooms)) return null;
+    const rooms = getRoomsOrEmpty(trip?.rooms);
+    if (rooms.length === 0) return null;
 
-    const totalBeds = trip.rooms.reduce(
-      // biome-ignore lint/suspicious/noExplicitAny: Room is JSON column
-      (sum: number, room: any) => sum + (room.numberOfBeds || 0),
+    const totalBeds = rooms.reduce(
+      (sum, room) => sum + (room.numberOfBeds || 0),
       0,
     );
-    const ensuiteRooms = trip.rooms.filter(
-      // biome-ignore lint/suspicious/noExplicitAny: Room is JSON column
-      (room: any) => room.ensuiteBathroom,
-    ).length;
+    const ensuiteRooms = rooms.filter((room) => room.ensuiteBathroom).length;
 
     return {
       totalBeds,
       ensuiteRooms,
-      totalRooms: trip.numberOfRooms || trip.rooms.length,
+      totalRooms: trip?.numberOfRooms || rooms.length,
     };
   };
 

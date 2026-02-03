@@ -1,12 +1,15 @@
 import { motion } from 'framer-motion';
 import type React from 'react';
 import { useState } from 'react';
+import type { z } from 'zod';
+import type { PartialTripFormDataSchema } from '../../lib/schemas/tripFormSchema';
+
+type PartialTripFormData = z.infer<typeof PartialTripFormDataSchema>;
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  // biome-ignore lint/suspicious/noExplicitAny: Trip form data shape
-  trip: any;
+  trip: PartialTripFormData & { id?: string };
 }
 
 const defaultShareMessage =

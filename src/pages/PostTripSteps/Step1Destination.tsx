@@ -3,15 +3,17 @@ import { MapPin } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
 import DatePicker from 'react-datepicker';
+import type { z } from 'zod';
 import CityAutocomplete from '@/components/CityAutocomplete';
+import type { PartialTripFormDataSchema } from '../../lib/schemas/tripFormSchema';
 import { formatDateForStorage, parseLocalDate } from '../../utils/dateUtils';
 import 'react-datepicker/dist/react-datepicker.css';
 
+type PartialTripFormData = z.infer<typeof PartialTripFormDataSchema>;
+
 interface Props {
-  // biome-ignore lint/suspicious/noExplicitAny: Trip form data shape
-  trip: any;
-  // biome-ignore lint/suspicious/noExplicitAny: Trip form data shape
-  setTrip: (t: any) => void;
+  trip: PartialTripFormData;
+  setTrip: (t: PartialTripFormData) => void;
   next: () => void;
 }
 

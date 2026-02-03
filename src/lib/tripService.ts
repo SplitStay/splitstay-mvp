@@ -1,37 +1,23 @@
 import type { z } from 'zod';
-import type { TablesInsert } from '../types/database.types';
-import type { RoomConfiguration } from './accommodationService';
+import type { TablesInsert, TablesUpdate } from '../types/database.types';
+import type {
+  PartialTripFormDataSchema,
+  TripFormDataSchema,
+} from './schemas/tripFormSchema';
 import { type TripSchema, TripWithRelationsSchema } from './schemas/tripSchema';
 import { supabase } from './supabase';
 
-export interface TripFormData {
-  name: string;
-  location: string;
-  flexible: boolean;
-  startDate?: string | null;
-  endDate?: string | null;
-  estimatedMonth?: string | null;
-  estimatedYear?: string | null;
-
-  bookingUrl?: string | null;
-  numberOfRooms: number;
-  rooms: RoomConfiguration[];
-
-  vibe: string;
-  matchWith: string;
-  isPublic?: boolean;
-
-  thumbnailUrl?: string | null;
-}
-
 export type Trip = z.infer<typeof TripSchema>;
 export type TripInsert = TablesInsert<'trip'>;
+export type TripUpdate = TablesUpdate<'trip'>;
 
 export type TripWithHiddenStatus = z.infer<typeof TripWithRelationsSchema> & {
   isHiddenByAdmin: boolean;
 };
 
-export const createTrip = async (tripData: TripFormData): Promise<Trip> => {
+export const createTrip = async (
+  tripData: z.infer<typeof TripFormDataSchema>,
+): Promise<Trip> => {
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -40,33 +26,31 @@ export const createTrip = async (tripData: TripFormData): Promise<Trip> => {
     throw new Error('User must be authenticated to create a trip');
   }
 
-  // biome-ignore lint/suspicious/noExplicitAny: Dynamic trip data construction
-  const tripInsert: any = {
+  const tripInsert: TripInsert = {
     id: crypto.randomUUID(),
     name: tripData.name,
     description: tripData.vibe,
     location: tripData.location,
     hostId: user.id,
     bookingUrl: tripData.bookingUrl,
-    numberOfRooms: tripData.numberOfRooms,
-    // biome-ignore lint/suspicious/noExplicitAny: Supabase JSON column
-    rooms: tripData.rooms as any,
-    matchWith: tripData.matchWith,
+    numberofrooms: tripData.numberOfRooms,
+    rooms: tripData.rooms,
+    matchwith: tripData.matchWith,
     flexible: tripData.flexible,
-    isPublic: tripData.isPublic ?? true,
+    ispublic: tripData.isPublic ?? true,
     thumbnailUrl: tripData.thumbnailUrl,
     ...(tripData.flexible
       ? {
-          estimatedMonth: tripData.estimatedMonth,
-          estimatedYear: tripData.estimatedYear,
+          estimatedmonth: tripData.estimatedMonth,
+          estimatedyear: tripData.estimatedYear,
           startDate: null,
           endDate: null,
         }
       : {
           startDate: tripData.startDate,
           endDate: tripData.endDate,
-          estimatedMonth: null,
-          estimatedYear: null,
+          estimatedmonth: null,
+          estimatedyear: null,
         }),
   };
 
@@ -86,8 +70,7 @@ export const createTrip = async (tripData: TripFormData): Promise<Trip> => {
 
 export const updateTrip = async (
   tripId: string,
-  // biome-ignore lint/suspicious/noExplicitAny: Partial trip update data
-  tripData: any,
+  tripData: z.infer<typeof PartialTripFormDataSchema>,
 ): Promise<Trip> => {
   const {
     data: { user },
@@ -97,37 +80,34 @@ export const updateTrip = async (
     throw new Error('User must be authenticated to update a trip');
   }
 
-  // biome-ignore lint/suspicious/noExplicitAny: Dynamic update object construction
-  const updateData: any = {};
+  const updateData: TripUpdate = {};
 
   if (tripData.name) updateData.name = tripData.name;
-  if (tripData.description) updateData.description = tripData.description;
   if (tripData.vibe) updateData.description = tripData.vibe;
   if (tripData.location) updateData.location = tripData.location;
   if (tripData.bookingUrl !== undefined)
     updateData.bookingUrl = tripData.bookingUrl;
   if (tripData.numberOfRooms !== undefined)
-    updateData.numberOfRooms = tripData.numberOfRooms;
-  // biome-ignore lint/suspicious/noExplicitAny: Supabase JSON column
-  if (tripData.rooms) updateData.rooms = tripData.rooms as any;
+    updateData.numberofrooms = tripData.numberOfRooms;
+  if (tripData.rooms) updateData.rooms = tripData.rooms;
   if (tripData.matchWith !== undefined)
-    updateData.matchWith = tripData.matchWith;
+    updateData.matchwith = tripData.matchWith;
   if (tripData.flexible !== undefined) updateData.flexible = tripData.flexible;
   if (tripData.thumbnailUrl !== undefined)
     updateData.thumbnailUrl = tripData.thumbnailUrl;
-  if (tripData.isPublic !== undefined) updateData.isPublic = tripData.isPublic;
+  if (tripData.isPublic !== undefined) updateData.ispublic = tripData.isPublic;
 
   if (tripData.flexible !== undefined) {
     if (tripData.flexible) {
-      updateData.estimatedMonth = tripData.estimatedMonth;
-      updateData.estimatedYear = tripData.estimatedYear;
+      updateData.estimatedmonth = tripData.estimatedMonth;
+      updateData.estimatedyear = tripData.estimatedYear;
       updateData.startDate = null;
       updateData.endDate = null;
     } else {
       updateData.startDate = tripData.startDate;
       updateData.endDate = tripData.endDate;
-      updateData.estimatedMonth = null;
-      updateData.estimatedYear = null;
+      updateData.estimatedmonth = null;
+      updateData.estimatedyear = null;
     }
   }
 

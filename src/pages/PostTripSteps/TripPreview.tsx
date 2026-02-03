@@ -2,16 +2,21 @@ import { motion } from 'framer-motion';
 import { Building, Calendar, Eye, MapPin, User, Users } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
+import type { z } from 'zod';
 import { AccommodationPreview } from '../../components/AccommodationPreview';
 import { useUser } from '../../hooks/useUser';
 import {
   type AccommodationPreview as AccommodationPreviewType,
   iframelyService,
 } from '../../lib/iframely';
+import type { RoomConfigurationSchema } from '../../lib/schemas/roomSchema';
+import type { PartialTripFormDataSchema } from '../../lib/schemas/tripFormSchema';
+
+type PartialTripFormData = z.infer<typeof PartialTripFormDataSchema>;
+type RoomConfiguration = z.infer<typeof RoomConfigurationSchema>;
 
 interface Props {
-  // biome-ignore lint/suspicious/noExplicitAny: Trip form data shape
-  trip: any;
+  trip: PartialTripFormData;
   personalNote: string;
   matchWith: string;
   vibe: string;
@@ -165,26 +170,19 @@ const TripPreview: React.FC<Props> = ({
                 Room Configuration:
               </span>
               <div className="mt-2 space-y-2">
-                {trip.rooms.map(
-                  // biome-ignore lint/suspicious/noExplicitAny: Room is JSON column
-                  (room: any, index: number) => (
-                    <div
-                      // biome-ignore lint/suspicious/noArrayIndexKey: Room array has no unique id
-                      key={index}
-                      className="bg-gray-50 rounded p-3"
-                    >
-                      <p className="text-sm text-gray-700">
-                        <span className="font-medium">Room {index + 1}:</span>{' '}
-                        {room.numberOfBeds} bed(s)
-                        {room.ensuiteBathroom && (
-                          <span className="text-green-600 ml-2">
-                            • Ensuite bathroom
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                  ),
-                )}
+                {trip.rooms.map((room: RoomConfiguration) => (
+                  <div key={room.id} className="bg-gray-50 rounded p-3">
+                    <p className="text-sm text-gray-700">
+                      <span className="font-medium">Room {room.id}:</span>{' '}
+                      {room.numberOfBeds} bed(s)
+                      {room.ensuiteBathroom && (
+                        <span className="text-green-600 ml-2">
+                          • Ensuite bathroom
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
           )}

@@ -2,16 +2,17 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { AlertCircle, ExternalLink, Home, Save, Trash2, X } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
-import {
-  BED_TYPES,
-  createDefaultRooms,
-  type RoomConfiguration,
-} from '@/lib/accommodationService';
+import type { z } from 'zod';
+import { BED_TYPES, createDefaultRooms } from '@/lib/accommodationService';
 import { type AccommodationPreview, iframelyService } from '@/lib/iframely';
+import type { RoomConfigurationSchema } from '@/lib/schemas/roomSchema';
+import type { PartialTripFormDataSchema } from '@/lib/schemas/tripFormSchema';
 import { deleteTrip, type Trip, updateTrip } from '@/lib/tripService';
 import { AccommodationPreview as AccommodationPreviewComponent } from './AccommodationPreview';
 import { Button } from './ui/button';
 import { Label } from './ui/label';
+
+type RoomConfiguration = z.infer<typeof RoomConfigurationSchema>;
 
 interface EditTripModalProps {
   trip: Trip;
@@ -154,8 +155,7 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
   const updateRoom = (
     roomId: number,
     field: keyof RoomConfiguration,
-    // biome-ignore lint/suspicious/noExplicitAny: Room field values vary by type
-    value: any,
+    value: RoomConfiguration[keyof RoomConfiguration],
   ) => {
     setFormData((prev) => ({
       ...prev,
@@ -187,10 +187,10 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
   const handleSave = async () => {
     setLoading(true);
     try {
-      // biome-ignore lint/suspicious/noExplicitAny: Dynamic update object
-      const updateData: any = {
+      // Map form fields to TripFormData schema (vibe instead of description)
+      const updateData: z.infer<typeof PartialTripFormDataSchema> = {
         name: formData.name,
-        description: formData.description,
+        vibe: formData.description, // Form uses 'description', schema uses 'vibe'
         location: formData.location,
         bookingUrl: formData.bookingUrl,
         numberOfRooms: formData.numberOfRooms,

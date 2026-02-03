@@ -1,11 +1,8 @@
 import { createContext, type ReactNode, useContext, useState } from 'react';
+import type { z } from 'zod';
+import type { PendingActionSchema } from '../lib/schemas/guestModeSchema';
 
-interface PendingAction {
-  type: 'message' | 'create_trip' | 'join_trip';
-  // biome-ignore lint/suspicious/noExplicitAny: Action data varies by type
-  data?: any;
-  redirectTo?: string;
-}
+type PendingAction = z.infer<typeof PendingActionSchema>;
 
 interface GuestModeContextType {
   isGuestMode: boolean;

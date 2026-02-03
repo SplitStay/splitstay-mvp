@@ -7,8 +7,13 @@ import { useAuth } from '../../contexts/AuthContext';
 import {
   ChatService,
   type ConversationWithUser,
+  type Message,
   type MessageWithSender,
 } from '../../lib/chatService';
+import {
+  getReactions,
+  hasFileAttachment,
+} from '../../lib/schemas/messageSchema';
 import type { UploadResult } from '../../lib/storageService';
 import { supabase } from '../../lib/supabase';
 import { extractUrls } from '../../utils/urlUtils';
@@ -111,24 +116,20 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     // Subscribe to new messages
     const subscription = ChatService.subscribeToMessages(
       conversation.id,
-      (newMessage) => {
-        // Optimistic append
-        setMessages((prev) => [
-          ...prev,
-          {
-            // biome-ignore lint/suspicious/noExplicitAny: Message type coercion
-            ...(newMessage as any),
-            sender:
-              newMessage.sender_id === user?.id
-                ? { id: user?.id || '', name: 'You', email: '' }
-                : otherUser || {
-                    id: newMessage.sender_id,
-                    name: '',
-                    email: '',
-                  },
-            // biome-ignore lint/suspicious/noExplicitAny: MessageWithSender type
-          } as any,
-        ]);
+      (newMessage: Message) => {
+        // Optimistic append with sender info
+        const messageWithSender: MessageWithSender = {
+          ...newMessage,
+          sender:
+            newMessage.sender_id === user?.id
+              ? { id: user?.id || '', name: 'You', email: '' }
+              : otherUser || {
+                  id: newMessage.sender_id,
+                  name: '',
+                  email: '',
+                },
+        };
+        setMessages((prev) => [...prev, messageWithSender]);
 
         // Authoritative re-sync to guarantee consistency under RLS/ordering
         ChatService.getConversationMessages(conversation.id)
@@ -139,13 +140,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 
     const updatesSub = ChatService.subscribeToMessageUpdates(
       conversation.id,
-      (updated) => {
+      (updated: Message) => {
         setMessages((prev) =>
           prev.map((m) =>
-            m.id === updated.id
-              ? // biome-ignore lint/suspicious/noExplicitAny: Message metadata
-                { ...(m as any), metadata: (updated as any).metadata }
-              : m,
+            m.id === updated.id ? { ...m, metadata: updated.metadata } : m,
           ),
         );
       },
@@ -168,8 +166,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           filter: `user_id=eq.${otherUser?.id}`,
         },
         (payload) => {
-          // biome-ignore lint/suspicious/noExplicitAny: Supabase realtime payload
-          const presence = payload.new as any;
+          const presence = payload.new as { is_online?: boolean } | null;
           setIsOtherUserOnline(presence?.is_online || false);
         },
       )
@@ -423,19 +420,14 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                           className={`max-w-xs lg:max-w-md ${isCurrentUser ? 'ml-auto' : 'mr-auto'}`}
                         >
                           {(() => {
-                            // biome-ignore lint/suspicious/noExplicitAny: Message metadata
-                            const hasFile = (message as any).metadata?.file;
-                            if (hasFile) {
+                            if (hasFileAttachment(message.metadata)) {
+                              const { file } = message.metadata;
                               return (
                                 <FilePreview
-                                  // biome-ignore lint/suspicious/noExplicitAny: Message metadata
-                                  fileName={(message as any).metadata.file.name}
-                                  // biome-ignore lint/suspicious/noExplicitAny: Message metadata
-                                  fileSize={(message as any).metadata.file.size}
-                                  // biome-ignore lint/suspicious/noExplicitAny: Message metadata
-                                  mimeType={(message as any).metadata.file.type}
-                                  // biome-ignore lint/suspicious/noExplicitAny: Message metadata
-                                  publicUrl={(message as any).metadata.file.url}
+                                  fileName={file.name}
+                                  fileSize={file.size}
+                                  mimeType={file.type}
+                                  publicUrl={file.url}
                                 />
                               );
                             }
@@ -456,9 +448,9 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                                   const urls = extractUrls(message.content);
                                   return urls.length > 0 ? (
                                     <div className="mt-2 space-y-2">
-                                      {urls.map((url, index) => (
+                                      {urls.map((url, idx) => (
                                         <LinkPreviewCard
-                                          key={`${message.id}-${index}`}
+                                          key={`${message.id}-${idx}`}
                                           url={url}
                                         />
                                       ))}
@@ -484,19 +476,18 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                             className={`flex items-center gap-1 mt-1 ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
                           >
                             {(() => {
-                              const rx =
-                                // biome-ignore lint/suspicious/noExplicitAny: Message metadata
-                                (message as any).metadata?.reactions || {};
-                              const reactionEntries = Object.entries(rx).filter(
+                              const reactions = getReactions(message.metadata);
+                              const reactionEntries = Object.entries(
+                                reactions,
+                              ).filter(
                                 ([_emoji, users]) =>
                                   Array.isArray(users) && users.length > 0,
                               );
                               return (
                                 <>
                                   {reactionEntries.map(([emoji, users]) => {
-                                    const userArray = users as string[];
                                     const active = user?.id
-                                      ? userArray.includes(user.id)
+                                      ? users.includes(user.id)
                                       : false;
                                     return (
                                       // biome-ignore lint/a11y/useButtonType: Emoji reaction button
@@ -516,7 +507,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                                             : 'bg-gray-100 border-gray-200 text-gray-600 hover:bg-gray-200'
                                         }`}
                                       >
-                                        {emoji} {userArray.length}
+                                        {emoji} {users.length}
                                       </button>
                                     );
                                   })}

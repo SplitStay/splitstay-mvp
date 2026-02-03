@@ -31,8 +31,7 @@ export const useUser = (): UseQueryResult<
       if (error) {
         // If the user row doesn't exist yet (new OAuth sign-in), don't throw; let UI render and recover
         // PostgREST not found error code is PGRST116
-        // biome-ignore lint/suspicious/noExplicitAny: Supabase error type lacks code property
-        if ((error as any).code === 'PGRST116') {
+        if (error.code === 'PGRST116') {
           return undefined;
         }
         throw error;
