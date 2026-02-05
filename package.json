@@ -22,6 +22,8 @@
     "db:schemas": "npx supazod -i src/types/database.types.ts -o src/lib/schemas/database.schemas.ts",
     "db:gen": "npm run db:types && npm run db:schemas",
     "db:seed:gen": "npx tsx scripts/generate-seed.ts",
+    "edge:build": "tsx scripts/build-edge-functions.ts",
+    "edge:serve": "npm run edge:build && npx supabase functions serve --env-file .env",
     "prepare": "lefthook install"
   },
   "dependencies": {
@@ -62,6 +64,7 @@
     "@vitejs/plugin-react-swc": "^3.10.2",
     "autoprefixer": "^10.4.21",
     "dotenv": "^17.2.1",
+    "esbuild": "^0.27.2",
     "eslint": "^9.30.1",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",

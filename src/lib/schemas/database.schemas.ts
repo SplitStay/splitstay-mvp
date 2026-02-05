@@ -949,6 +949,76 @@ export const publicVillaRelationshipsSchema = z.tuple([
   }),
 ]);
 
+export const publicWhatsappConversationRowSchema = z.object({
+  content: z.string(),
+  created_at: z.string(),
+  id: z.string(),
+  phone_number: z.string(),
+  role: z.string(),
+  user_id: z.string().nullable(),
+});
+
+export const publicWhatsappConversationInsertSchema = z.object({
+  content: z.string(),
+  created_at: z.string().optional(),
+  id: z.string().optional(),
+  phone_number: z.string(),
+  role: z.string(),
+  user_id: z.string().optional().nullable(),
+});
+
+export const publicWhatsappConversationUpdateSchema = z.object({
+  content: z.string().optional(),
+  created_at: z.string().optional(),
+  id: z.string().optional(),
+  phone_number: z.string().optional(),
+  role: z.string().optional(),
+  user_id: z.string().optional().nullable(),
+});
+
+export const publicWhatsappConversationRelationshipsSchema = z.tuple([
+  z.object({
+    foreignKeyName: z.literal('whatsapp_conversation_user_id_fkey'),
+    columns: z.tuple([z.literal('user_id')]),
+    isOneToOne: z.literal(false),
+    referencedRelation: z.literal('user'),
+    referencedColumns: z.tuple([z.literal('id')]),
+  }),
+]);
+
+export const publicWhatsappRateLimitRowSchema = z.object({
+  message_count: z.number(),
+  phone_number: z.string(),
+  window_start: z.string(),
+});
+
+export const publicWhatsappRateLimitInsertSchema = z.object({
+  message_count: z.number().optional(),
+  phone_number: z.string(),
+  window_start: z.string().optional(),
+});
+
+export const publicWhatsappRateLimitUpdateSchema = z.object({
+  message_count: z.number().optional(),
+  phone_number: z.string().optional(),
+  window_start: z.string().optional(),
+});
+
+export const publicWhatsappSeenSidRowSchema = z.object({
+  message_sid: z.string(),
+  processed_at: z.string(),
+});
+
+export const publicWhatsappSeenSidInsertSchema = z.object({
+  message_sid: z.string(),
+  processed_at: z.string().optional(),
+});
+
+export const publicWhatsappSeenSidUpdateSchema = z.object({
+  message_sid: z.string().optional(),
+  processed_at: z.string().optional(),
+});
+
 export const publicSearchableTripsRowSchema = z.object({
   accommodationTypeId: z.string().nullable(),
   bookingUrl: z.string().nullable(),

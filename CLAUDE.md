@@ -20,6 +20,15 @@ npm run db:schemas   # Regenerate Zod schemas from types
 npm run db:gen       # Regenerate both types and schemas
 ```
 
+### Edge Functions
+
+```bash
+npm run edge:build   # Bundle _src.ts → index.ts (inlines zod + bot modules)
+npm run edge:serve   # Build then serve locally with supabase functions serve
+```
+
+Edge functions in `supabase/functions/*/` use a `_src.ts` → `index.ts` build pattern. The `_src.ts` file is the version-controlled source that imports from `src/lib/bot/`. Running `edge:build` bundles it into a self-contained `index.ts` (gitignored) that the Deno runtime can execute.
+
 ### Podman Users
 
 If using Podman instead of Docker, add the following to your `.env` file. Replace `<your-user-id>` with your actual user ID (run `id -u` to find it):
@@ -31,6 +40,10 @@ DOCKER_HOST=unix:///run/user/<your-user-id>/podman/podman.sock
 ### Pre-commit Hooks
 
 Managed by Lefthook (`lefthook.yml`). Runs lint, typecheck, and tests before each commit.
+
+## Deployment
+
+See [DEPLOYING.md](DEPLOYING.md) for production deployment instructions (database migrations, edge functions, Twilio webhook configuration, environment variables).
 
 ## Architecture
 

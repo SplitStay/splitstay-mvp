@@ -66,6 +66,8 @@ The app will be available at http://localhost:5173
 | `npm run db:stop` | Stop local Supabase |
 | `npm run db:reset` | Reset database and apply migrations |
 | `npm run db:gen` | Regenerate TypeScript types and Zod schemas |
+| `npm run edge:build` | Bundle edge function source into deployable artifact |
+| `npm run edge:serve` | Build and serve edge functions locally |
 
 ## Pre-commit Hooks
 
@@ -153,25 +155,9 @@ If using Podman instead of Docker, add the following to your `.env` file. Replac
 DOCKER_HOST=unix:///run/user/<your-user-id>/podman/podman.sock
 ```
 
-## Hosting & Deployment
+## Deployment
 
-- **UI:** Hosted on [Vercel](https://vercel.com) (auto-deploys on push to `main`)
-- **Database:** Hosted on [Supabase](https://supabase.com) (PostgreSQL, Auth, Storage, Realtime)
-
-### Production Migrations
-
-**⚠️ Migrations are NOT automatically applied to production. If you merge code that depends on schema changes without running migrations, the app will break.**
-
-Currently, UI deploys (Vercel) and database migrations (Supabase) are independent. After merging to `main`:
-
-1. Vercel auto-deploys the UI immediately
-2. **You must manually apply migrations** or the deploy may fail:
-   ```bash
-   npx supabase link --project-ref <project-ref>
-   npx supabase db push
-   ```
-
-> **TODO:** Set up CI/CD to atomically deploy UI and migrations together.
+See [DEPLOYING.md](DEPLOYING.md) for production deployment instructions, including database migrations, edge functions, and environment variable configuration.
 
 ## Tech Stack
 
@@ -196,5 +182,6 @@ src/
 └── utils/          # Utility functions
 
 supabase/
+├── functions/      # Deno edge functions (bundled from _src.ts)
 └── migrations/     # Database migrations
 ```

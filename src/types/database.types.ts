@@ -919,6 +919,74 @@ export type Database = {
           },
         ];
       };
+      whatsapp_conversation: {
+        Row: {
+          content: string;
+          created_at: string;
+          id: string;
+          phone_number: string;
+          role: string;
+          user_id: string | null;
+        };
+        Insert: {
+          content: string;
+          created_at?: string;
+          id?: string;
+          phone_number: string;
+          role: string;
+          user_id?: string | null;
+        };
+        Update: {
+          content?: string;
+          created_at?: string;
+          id?: string;
+          phone_number?: string;
+          role?: string;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'whatsapp_conversation_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      whatsapp_rate_limit: {
+        Row: {
+          message_count: number;
+          phone_number: string;
+          window_start: string;
+        };
+        Insert: {
+          message_count?: number;
+          phone_number: string;
+          window_start?: string;
+        };
+        Update: {
+          message_count?: number;
+          phone_number?: string;
+          window_start?: string;
+        };
+        Relationships: [];
+      };
+      whatsapp_seen_sid: {
+        Row: {
+          message_sid: string;
+          processed_at: string;
+        };
+        Insert: {
+          message_sid: string;
+          processed_at?: string;
+        };
+        Update: {
+          message_sid?: string;
+          processed_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       searchable_trips: {
