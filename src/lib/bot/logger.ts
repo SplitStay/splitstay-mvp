@@ -1,4 +1,4 @@
-interface StructuredLog {
+export interface StructuredLog {
   timestamp: string;
   phone: string;
   stage:
@@ -6,6 +6,7 @@ interface StructuredLog {
     | 'access-control'
     | 'dedup'
     | 'rate-limit'
+    | 'input-validation'
     | 'llm'
     | 'response';
   message: string;

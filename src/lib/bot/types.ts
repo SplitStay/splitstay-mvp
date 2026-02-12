@@ -49,4 +49,5 @@ export interface HandlerDependencies {
   accessControl: AccessControl;
   twilioValidator: TwilioValidator;
   validateOutput?: (content: string) => ValidationResult;
+  validateInput?: (content: string) => ValidationResult;
 }

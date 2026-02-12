@@ -1,6 +1,7 @@
-import { createLog } from './logger';
+import { createLog, type StructuredLog } from './logger';
 import {
   CANNED_REDIRECT_MESSAGE,
+  validateInput as defaultValidateInput,
   validateOutput as defaultValidateOutput,
 } from './outputValidator';
 import type { ConversationMessage } from './schemas';
@@ -27,20 +28,26 @@ const twimlXmlResponse = (message: string, status = 200): Response =>
 const parseFormBody = (body: string): Record<string, string> =>
   Object.fromEntries(new URLSearchParams(body));
 
+type AuditStage = Extract<
+  StructuredLog['stage'],
+  'input-validation' | 'response'
+>;
+
 const auditFlaggedContent = async (
   db: DbClient,
   phone: string,
-  llmContent: string,
+  content: string,
   reason: string,
+  stage: AuditStage = 'response',
 ): Promise<void> => {
   try {
-    await db.saveFlaggedContent(phone, llmContent, reason);
+    await db.saveFlaggedContent(phone, content, reason);
   } catch (auditError) {
     console.error(
       JSON.stringify(
         createLog(
           phone,
-          'response',
+          stage,
           'Failed to save flagged content to audit',
           errorMessage(auditError),
         ),
@@ -55,7 +62,7 @@ const auditFlaggedContent = async (
         JSON.stringify(
           createLog(
             phone,
-            'response',
+            stage,
             `Flag volume spike: ${recentFlags} flags in the last hour, reasons include ${reason}`,
           ),
         ),
@@ -66,7 +73,7 @@ const auditFlaggedContent = async (
       JSON.stringify(
         createLog(
           phone,
-          'response',
+          stage,
           'Failed to check flag volume',
           errorMessage(alertError),
         ),
@@ -78,6 +85,7 @@ const auditFlaggedContent = async (
 export const createHandler = (deps: HandlerDependencies) => {
   const { llm, db, accessControl, twilioValidator } = deps;
   const validateOutput = deps.validateOutput ?? defaultValidateOutput;
+  const validateInput = deps.validateInput ?? defaultValidateInput;
 
   return async (request: Request): Promise<Response> => {
     let phone = 'unknown';
@@ -211,6 +219,74 @@ export const createHandler = (deps: HandlerDependencies) => {
         );
       }
 
+      // Validate user input (fail closed on validator error)
+      try {
+        const inputValidation = validateInput(webhook.Body);
+        if (inputValidation.flagged) {
+          console.log(
+            JSON.stringify(
+              createLog(
+                phone,
+                'input-validation',
+                `Input flagged: ${inputValidation.reason}`,
+              ),
+            ),
+          );
+
+          try {
+            await db.markSidSeen(webhook.MessageSid);
+          } catch (markSeenError) {
+            console.error(
+              JSON.stringify(
+                createLog(
+                  phone,
+                  'dedup',
+                  'Failed to mark SID as seen',
+                  errorMessage(markSeenError),
+                ),
+              ),
+            );
+          }
+
+          try {
+            await auditFlaggedContent(
+              db,
+              phone,
+              webhook.Body,
+              inputValidation.reason,
+              'input-validation',
+            );
+          } catch (auditError) {
+            console.error(
+              JSON.stringify(
+                createLog(
+                  phone,
+                  'input-validation',
+                  'Failed to audit flagged input',
+                  errorMessage(auditError),
+                ),
+              ),
+            );
+          }
+
+          return twimlXmlResponse(CANNED_REDIRECT_MESSAGE);
+        }
+      } catch (inputValidatorError) {
+        console.error(
+          JSON.stringify(
+            createLog(
+              phone,
+              'input-validation',
+              'Input validator error, blocking request',
+              errorMessage(inputValidatorError),
+            ),
+          ),
+        );
+        return twimlXmlResponse(
+          'Sorry, something went wrong. Please try again.',
+        );
+      }
+
       // Build LLM context (fail closed on history fetch error)
       let history: ConversationMessage[];
       try {
@@ -272,12 +348,7 @@ export const createHandler = (deps: HandlerDependencies) => {
             ),
           );
           responseContent = CANNED_REDIRECT_MESSAGE;
-          await auditFlaggedContent(
-            db,
-            phone,
-            llmContent,
-            validation.reason ?? 'unknown',
-          );
+          await auditFlaggedContent(db, phone, llmContent, validation.reason);
         } else {
           responseContent = llmContent;
         }

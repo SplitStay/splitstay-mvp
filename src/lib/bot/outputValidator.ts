@@ -5,10 +5,11 @@ export type FlagReason =
   | 'identity_change'
   | 'professional_advice';
 
-export interface ValidationResult {
-  flagged: boolean;
-  reason?: FlagReason;
-}
+export type InputFlagReason = 'prompt_injection' | 'system_prompt_extraction';
+
+export type ValidationResult =
+  | { flagged: false }
+  | { flagged: true; reason: FlagReason | InputFlagReason };
 
 const FLAG_PATTERNS: ReadonlyArray<{ reason: FlagReason; pattern: RegExp }> = [
   {
@@ -49,3 +50,51 @@ export const validateOutput = (response: string): ValidationResult => {
 
 export const CANNED_REDIRECT_MESSAGE =
   "I can only help with shared accommodation and travel. Try asking me something like 'I need a room in Lisbon for July.'";
+
+const INPUT_FLAG_PATTERNS: ReadonlyArray<{
+  reason: InputFlagReason;
+  pattern: RegExp;
+}> = [
+  {
+    reason: 'prompt_injection',
+    pattern: /ignore (?:all |your )?(?:previous |prior )?instructions/i,
+  },
+  {
+    reason: 'prompt_injection',
+    pattern: /you are now /i,
+  },
+  {
+    reason: 'prompt_injection',
+    pattern: /(?:pretend|act as if) you (?:are|were)/i,
+  },
+  {
+    reason: 'prompt_injection',
+    pattern: /from now on you/i,
+  },
+  {
+    reason: 'prompt_injection',
+    pattern: /new persona/i,
+  },
+  {
+    reason: 'prompt_injection',
+    pattern: /bypass (?:your |all )?(?:safety|restrictions|rules|filters)/i,
+  },
+  {
+    reason: 'system_prompt_extraction',
+    pattern:
+      /(?:repeat|show|tell|reveal|display) (?:me )?(?:your )?(?:system ?prompt|instructions|rules|guidelines)/i,
+  },
+  {
+    reason: 'system_prompt_extraction',
+    pattern: /what (?:are|is) your (?:system ?prompt|instructions|rules)/i,
+  },
+];
+
+export const validateInput = (input: string): ValidationResult => {
+  for (const { reason, pattern } of INPUT_FLAG_PATTERNS) {
+    if (pattern.test(input)) {
+      return { flagged: true, reason };
+    }
+  }
+  return { flagged: false };
+};

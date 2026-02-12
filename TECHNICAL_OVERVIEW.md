@@ -19,6 +19,7 @@ Supabase Edge Function (Deno runtime, globally distributed)
      ├── Check phone number against admin whitelist
      ├── Reject duplicate messages (by Twilio MessageSid)
      ├── Enforce rate limit (30 msgs/hour/phone, atomic DB upsert)
+     ├── Check user input for adversarial patterns (pre-LLM)
      ├── Load conversation history (last 50 messages)
      ├── Send [system prompt + history + new message] → Groq API
      ├── Save user message + assistant response to database
@@ -99,6 +100,24 @@ The system prompt scopes the bot to the accommodation workflow with explicit sec
 
 There are no tools or function-calling capabilities — the model generates text and nothing else.
 
+### Input Validation
+
+Before the user's message reaches the LLM, an input validator checks for adversarial patterns using regex matching:
+
+| Category | Example trigger |
+|----------|----------------|
+| Prompt injection | "Ignore all previous instructions..." |
+| System prompt extraction | "Repeat your system prompt..." |
+
+**Flagged inputs** short-circuit the handler — the LLM is never called and the adversarial message is never saved to conversation history. Instead:
+- A canned redirect message is returned as TwiML
+- The MessageSid is marked as seen (preventing replay)
+- The flagged input is saved to the audit table (`whatsapp_flagged_content`) with the flag reason
+
+This prevents context window poisoning: without input validation, adversarial messages saved to conversation history would corrupt the LLM context on subsequent legitimate requests.
+
+**Validator failures** fail closed — if the input validator throws an error, a generic error TwiML response is returned and the LLM is not called.
+
 ### Output Validation
 
 After the LLM generates a response and before it's delivered to the user, an output validator checks for prohibited content using regex/keyword pattern matching:
@@ -117,7 +136,7 @@ After the LLM generates a response and before it's delivered to the user, an out
 
 **Volume spike alerts** — when flagged content for a single phone number exceeds a threshold within one hour, a warning is logged.
 
-Prompt injection risk is mitigated at three layers: system prompt hardening (input), narrow model scope (processing), and output validation (output). The worst outcome of a successful injection that bypasses all three layers is an off-topic response, not data exfiltration or unauthorized actions.
+Prompt injection risk is mitigated at four layers: input validation (pre-LLM), system prompt hardening (input), narrow model scope (processing), and output validation (output). The worst outcome of a successful injection that bypasses all four layers is an off-topic response, not data exfiltration or unauthorized actions.
 
 ## Conversation Flow
 
@@ -172,18 +191,18 @@ Rate limiting uses a PL/pgSQL function (`check_rate_limit`) with atomic upsert a
 | message_sid | TEXT PK | Twilio's unique message ID |
 | processed_at | TIMESTAMPTZ | |
 
-**`whatsapp_flagged_content`** — Output validation audit log
+**`whatsapp_flagged_content`** — Flagged content audit log (input and output validation)
 | Column | Type | Notes |
 |--------|------|-------|
 | id | UUID PK | |
 | phone_number | TEXT | Indexed |
-| content | TEXT | The flagged LLM response |
-| flag_reason | TEXT | Category (e.g., `system_prompt_disclosure`) |
+| content | TEXT | The flagged content (LLM response or user input) |
+| flag_reason | TEXT | Category (e.g., `system_prompt_disclosure`, `prompt_injection`) |
 | created_at | TIMESTAMPTZ | Composite index with phone_number |
 
 ## Security
 
-Eight layers, built from day one:
+Nine layers, built from day one:
 
 1. **Message authenticity** — Twilio HMAC-SHA1 signature verification on every request (timing-safe comparison)
 2. **Access control** — Phone number whitelist via environment variable
@@ -192,7 +211,8 @@ Eight layers, built from day one:
 5. **Data isolation** — Row-level security on all bot tables
 6. **Privacy in logs** — Phone numbers truncated to last 4 digits
 7. **Input validation** — Zod schemas on all inbound data (webhook payload, LLM response)
-8. **Output validation** — Regex/keyword pattern matching on LLM responses before delivery, with flagged content auditing
+8. **Adversarial input detection** — Regex pattern matching on user messages before LLM invocation, preventing context window poisoning
+9. **Output validation** — Regex/keyword pattern matching on LLM responses before delivery, with flagged content auditing
 
 ## Error Handling Philosophy
 
@@ -203,6 +223,8 @@ The bot is designed to **fail open for the user** — a database hiccup should n
 | Invalid signature / payload | HTTP 400/403, no LLM call |
 | Non-admin phone | Friendly TwiML rejection |
 | Rate limit exceeded | TwiML with retry-after time |
+| Input flagged (adversarial) | Canned redirect delivered, no LLM call, no conversation save, flagged input audited |
+| Input validator fails | **Fail closed** — generic error message, no LLM call |
 | History fetch fails | **Fail closed** — retry message, no LLM call |
 | LLM fails | "I'm having trouble thinking right now. Please try again in a moment." |
 | Output validator flags response | Canned redirect delivered, flagged content saved to audit table |
@@ -221,7 +243,7 @@ The bot code lives in `src/lib/bot/` and follows a functional, dependency-inject
 src/lib/bot/
 ├── handler.ts          # Request handler, orchestrates the full flow
 ├── systemPrompt.ts     # System prompt (single export)
-├── outputValidator.ts  # Regex/keyword output validation
+├── outputValidator.ts  # Regex/keyword input and output validation
 ├── groqClient.ts       # Groq API client (LlmClient interface)
 ├── supabaseDb.ts       # Database operations (DbClient interface)
 ├── accessControl.ts    # Phone whitelist (AccessControl interface)
@@ -241,9 +263,10 @@ Edge functions run on Deno, but the bot code is written as standard TypeScript m
 
 ## Testing
 
-108 test scenarios across 10 test files covering:
+156 test scenarios across 10 test files covering:
 
-- Full handler flow (valid messages, signature failures, access control, dedup, rate limiting, media rejection, LLM failures, DB failures, output validation, flagged content handling)
+- Full handler flow (valid messages, signature failures, access control, dedup, rate limiting, media rejection, input validation, LLM failures, DB failures, output validation, flagged content handling)
+- Input validation (prompt injection detection, system prompt extraction detection, legitimate message pass-through)
 - Output validation (prohibited content detection, legitimate content pass-through)
 - Groq client (response parsing, error handling, timeout)
 - Database operations (dedup, rate limit, history, save, flagged content audit, flag volume counting)
