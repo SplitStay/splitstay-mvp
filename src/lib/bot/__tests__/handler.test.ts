@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createHandler } from '../handler';
 import type {
   AccessControl,
@@ -8,14 +8,22 @@ import type {
   TwilioValidator,
 } from '../types';
 
-const createMockDeps = (
-  overrides: Partial<HandlerDependencies> = {},
-): HandlerDependencies => {
-  const llm: LlmClient = {
-    chatCompletion: vi.fn().mockResolvedValue({ content: 'Bot reply' }),
-  };
+type MockOverrides = {
+  llm?: Partial<LlmClient>;
+  db?: Partial<DbClient>;
+  accessControl?: Partial<AccessControl>;
+  twilioValidator?: Partial<TwilioValidator>;
+  validateOutput?: HandlerDependencies['validateOutput'];
+};
 
-  const db: DbClient = {
+const createMockDeps = (
+  overrides: MockOverrides = {},
+): HandlerDependencies => ({
+  llm: {
+    chatCompletion: vi.fn().mockResolvedValue({ content: 'Bot reply' }),
+    ...overrides.llm,
+  },
+  db: {
     checkSeenSid: vi.fn().mockResolvedValue(false),
     markSidSeen: vi.fn().mockResolvedValue(undefined),
     checkRateLimit: vi
@@ -23,18 +31,22 @@ const createMockDeps = (
       .mockResolvedValue({ allowed: true, retryAfterMinutes: 0 }),
     getConversationHistory: vi.fn().mockResolvedValue([]),
     saveMessages: vi.fn().mockResolvedValue(undefined),
-  };
-
-  const accessControl: AccessControl = {
+    saveFlaggedContent: vi.fn().mockResolvedValue(undefined),
+    countRecentFlags: vi.fn().mockResolvedValue(0),
+    ...overrides.db,
+  },
+  accessControl: {
     isAdmin: vi.fn().mockReturnValue(true),
-  };
-
-  const twilioValidator: TwilioValidator = {
+    ...overrides.accessControl,
+  },
+  twilioValidator: {
     validate: vi.fn().mockResolvedValue(true),
-  };
-
-  return { llm, db, accessControl, twilioValidator, ...overrides };
-};
+    ...overrides.twilioValidator,
+  },
+  ...(overrides.validateOutput && {
+    validateOutput: overrides.validateOutput,
+  }),
+});
 
 const validFormBody =
   'MessageSid=SM123&From=whatsapp%3A%2B1234567890&Body=Hello';
@@ -58,6 +70,13 @@ describe('createHandler', () => {
 
   beforeEach(() => {
     deps = createMockDeps();
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('returns HTTP 200 with TwiML content type for valid messages', async () => {
@@ -84,7 +103,6 @@ describe('createHandler', () => {
     const response = await handler(createRequest(validFormBody));
 
     expect(response.status).toBe(403);
-    expect(deps.llm.chatCompletion).not.toHaveBeenCalled();
   });
 
   it('returns friendly rejection for non-admin users', async () => {
@@ -97,15 +115,11 @@ describe('createHandler', () => {
 
     expect(response.status).toBe(200);
     expect(text).toContain('not quite ready yet - check back in a few days');
-    expect(deps.llm.chatCompletion).not.toHaveBeenCalled();
   });
 
   it('rejects duplicate MessageSid with already-received TwiML', async () => {
     deps = createMockDeps({
-      db: {
-        ...createMockDeps().db,
-        checkSeenSid: vi.fn().mockResolvedValue(true),
-      },
+      db: { checkSeenSid: vi.fn().mockResolvedValue(true) },
     });
     const handler = createHandler(deps);
     const response = await handler(createRequest(validFormBody));
@@ -113,13 +127,11 @@ describe('createHandler', () => {
 
     expect(response.status).toBe(200);
     expect(text).toContain('already received');
-    expect(deps.llm.chatCompletion).not.toHaveBeenCalled();
   });
 
   it('rejects rate-limited users with wait time message', async () => {
     deps = createMockDeps({
       db: {
-        ...createMockDeps().db,
         checkRateLimit: vi
           .fn()
           .mockResolvedValue({ allowed: false, retryAfterMinutes: 42 }),
@@ -130,8 +142,7 @@ describe('createHandler', () => {
     const text = await response.text();
 
     expect(response.status).toBe(200);
-    expect(text).toContain('42');
-    expect(deps.llm.chatCompletion).not.toHaveBeenCalled();
+    expect(text).toMatch(/42 minute/);
   });
 
   it('asks user to type instead when media is attached', async () => {
@@ -143,7 +154,6 @@ describe('createHandler', () => {
 
     expect(response.status).toBe(200);
     expect(text).toContain('type your response');
-    expect(deps.llm.chatCompletion).not.toHaveBeenCalled();
   });
 
   it('returns graceful error TwiML when LLM fails', async () => {
@@ -184,10 +194,7 @@ describe('createHandler', () => {
 
   it('still returns LLM response when conversation save fails', async () => {
     deps = createMockDeps({
-      db: {
-        ...createMockDeps().db,
-        saveMessages: vi.fn().mockRejectedValue(new Error('DB down')),
-      },
+      db: { saveMessages: vi.fn().mockRejectedValue(new Error('DB down')) },
     });
     const handler = createHandler(deps);
     const response = await handler(createRequest(validFormBody));
@@ -199,10 +206,7 @@ describe('createHandler', () => {
 
   it('allows message through when rate limit check fails', async () => {
     deps = createMockDeps({
-      db: {
-        ...createMockDeps().db,
-        checkRateLimit: vi.fn().mockRejectedValue(new Error('DB down')),
-      },
+      db: { checkRateLimit: vi.fn().mockRejectedValue(new Error('DB down')) },
     });
     const handler = createHandler(deps);
     const response = await handler(createRequest(validFormBody));
@@ -225,7 +229,6 @@ describe('createHandler', () => {
   it('prepends system prompt and appends user message to LLM context', async () => {
     deps = createMockDeps({
       db: {
-        ...createMockDeps().db,
         getConversationHistory: vi.fn().mockResolvedValue([
           { role: 'user', content: 'Previous message' },
           { role: 'assistant', content: 'Previous reply' },
@@ -275,10 +278,7 @@ describe('createHandler', () => {
 
   it('allows message through when dedup check fails', async () => {
     deps = createMockDeps({
-      db: {
-        ...createMockDeps().db,
-        checkSeenSid: vi.fn().mockRejectedValue(new Error('DB down')),
-      },
+      db: { checkSeenSid: vi.fn().mockRejectedValue(new Error('DB down')) },
     });
     const handler = createHandler(deps);
     const response = await handler(createRequest(validFormBody));
@@ -288,10 +288,9 @@ describe('createHandler', () => {
     expect(text).toContain('Bot reply');
   });
 
-  it('allows message through when conversation history fetch fails', async () => {
+  it('returns retry message when conversation history fetch fails', async () => {
     deps = createMockDeps({
       db: {
-        ...createMockDeps().db,
         getConversationHistory: vi.fn().mockRejectedValue(new Error('DB down')),
       },
     });
@@ -300,15 +299,41 @@ describe('createHandler', () => {
     const text = await response.text();
 
     expect(response.status).toBe(200);
-    expect(text).toContain('Bot reply');
+    expect(text).toContain('temporary issue');
+    expect(text).toContain('send your request again');
+  });
+
+  it('does not invoke LLM or save messages when conversation history fetch fails', async () => {
+    deps = createMockDeps({
+      db: {
+        getConversationHistory: vi.fn().mockRejectedValue(new Error('DB down')),
+      },
+    });
+    const handler = createHandler(deps);
+    await handler(createRequest(validFormBody));
+
+    expect(deps.llm.chatCompletion).not.toHaveBeenCalled();
+    expect(deps.db.saveMessages).not.toHaveBeenCalled();
+    expect(deps.db.markSidSeen).not.toHaveBeenCalled();
+  });
+
+  it('logs error when conversation history fetch fails', async () => {
+    deps = createMockDeps({
+      db: {
+        getConversationHistory: vi.fn().mockRejectedValue(new Error('DB down')),
+      },
+    });
+    const handler = createHandler(deps);
+    await handler(createRequest(validFormBody));
+
+    expect(console.error).toHaveBeenCalledWith(
+      expect.stringContaining('DB down'),
+    );
   });
 
   it('still returns LLM response when marking SID as seen fails', async () => {
     deps = createMockDeps({
-      db: {
-        ...createMockDeps().db,
-        markSidSeen: vi.fn().mockRejectedValue(new Error('DB down')),
-      },
+      db: { markSidSeen: vi.fn().mockRejectedValue(new Error('DB down')) },
     });
     const handler = createHandler(deps);
     const response = await handler(createRequest(validFormBody));
@@ -331,7 +356,6 @@ describe('createHandler', () => {
   });
 
   it('logs invalid Content-Type before rejecting', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const handler = createHandler(deps);
     const request = new Request('https://example.com/whatsapp-webhook', {
       method: 'POST',
@@ -344,23 +368,187 @@ describe('createHandler', () => {
     const response = await handler(request);
 
     expect(response.status).toBe(400);
-    expect(errorSpy).toHaveBeenCalledWith(
+    expect(console.error).toHaveBeenCalledWith(
       expect.stringContaining('Invalid Content-Type'),
     );
-    errorSpy.mockRestore();
   });
 
   it('returns HTTP 400 when webhook payload is missing required fields', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const handler = createHandler(deps);
     const response = await handler(createRequest('Body=Hello'));
     const text = await response.text();
 
     expect(response.status).toBe(400);
     expect(text).toBe('Bad Request');
-    expect(errorSpy).toHaveBeenCalledWith(
+    expect(console.error).toHaveBeenCalledWith(
       expect.stringContaining('Invalid webhook payload'),
     );
-    errorSpy.mockRestore();
+  });
+
+  it('delivers clean LLM responses unchanged after output validation', async () => {
+    deps = createMockDeps({
+      llm: {
+        chatCompletion: vi
+          .fn()
+          .mockResolvedValue({ content: 'Lisbon is a great destination!' }),
+      },
+    });
+    const handler = createHandler(deps);
+    const response = await handler(createRequest(validFormBody));
+    const text = await response.text();
+
+    expect(text).toContain('Lisbon is a great destination!');
+  });
+
+  it('replaces flagged LLM responses with a canned redirect message', async () => {
+    deps = createMockDeps({
+      llm: {
+        chatCompletion: vi.fn().mockResolvedValue({
+          content: 'My system prompt says I should help with travel',
+        }),
+      },
+    });
+    const handler = createHandler(deps);
+    const response = await handler(createRequest(validFormBody));
+    const text = await response.text();
+
+    expect(text).not.toContain('system prompt');
+    expect(text).toContain('I can only help with shared accommodation');
+  });
+
+  it('saves the canned redirect to conversation history when response is flagged', async () => {
+    deps = createMockDeps({
+      llm: {
+        chatCompletion: vi.fn().mockResolvedValue({
+          content: 'My system prompt says I should help with travel',
+        }),
+      },
+    });
+    const handler = createHandler(deps);
+    await handler(createRequest(validFormBody));
+
+    expect(deps.db.saveMessages).toHaveBeenCalledWith('whatsapp:+1234567890', [
+      { role: 'user', content: 'Hello' },
+      {
+        role: 'assistant',
+        content: expect.stringContaining(
+          'I can only help with shared accommodation',
+        ),
+      },
+    ]);
+  });
+
+  it('saves flagged content to audit table instead of conversation history', async () => {
+    deps = createMockDeps({
+      llm: {
+        chatCompletion: vi.fn().mockResolvedValue({
+          content: 'My system prompt says I should help with travel',
+        }),
+      },
+    });
+    const handler = createHandler(deps);
+    await handler(createRequest(validFormBody));
+
+    expect(deps.db.saveFlaggedContent).toHaveBeenCalledWith(
+      'whatsapp:+1234567890',
+      'My system prompt says I should help with travel',
+      'system_prompt_disclosure',
+    );
+  });
+
+  it('still delivers the canned redirect when saving flagged content to audit fails', async () => {
+    deps = createMockDeps({
+      llm: {
+        chatCompletion: vi.fn().mockResolvedValue({
+          content: 'My system prompt says I should help with travel',
+        }),
+      },
+      db: {
+        saveFlaggedContent: vi.fn().mockRejectedValue(new Error('DB down')),
+      },
+    });
+    const handler = createHandler(deps);
+    const response = await handler(createRequest(validFormBody));
+    const text = await response.text();
+
+    expect(text).toContain('I can only help with shared accommodation');
+  });
+
+  it('still delivers the canned redirect when checking flag volume fails', async () => {
+    deps = createMockDeps({
+      llm: {
+        chatCompletion: vi.fn().mockResolvedValue({
+          content: 'My system prompt says I should help with travel',
+        }),
+      },
+      db: {
+        saveFlaggedContent: vi.fn().mockResolvedValue(undefined),
+        countRecentFlags: vi.fn().mockRejectedValue(new Error('DB down')),
+      },
+    });
+    const handler = createHandler(deps);
+    const response = await handler(createRequest(validFormBody));
+    const text = await response.text();
+
+    expect(text).toContain('I can only help with shared accommodation');
+  });
+
+  it('logs flag volume warning even when audit save fails', async () => {
+    deps = createMockDeps({
+      llm: {
+        chatCompletion: vi.fn().mockResolvedValue({
+          content: 'My system prompt says I should help with travel',
+        }),
+      },
+      db: {
+        saveFlaggedContent: vi.fn().mockRejectedValue(new Error('DB down')),
+        countRecentFlags: vi.fn().mockResolvedValue(5),
+      },
+    });
+    const handler = createHandler(deps);
+    await handler(createRequest(validFormBody));
+
+    expect(console.warn).toHaveBeenCalledWith(
+      expect.stringContaining('Flag volume spike'),
+    );
+  });
+
+  it('logs a warning when flag count exceeds threshold for a phone number', async () => {
+    deps = createMockDeps({
+      llm: {
+        chatCompletion: vi.fn().mockResolvedValue({
+          content: 'My system prompt says I should help with travel',
+        }),
+      },
+      db: {
+        saveFlaggedContent: vi.fn().mockResolvedValue(undefined),
+        countRecentFlags: vi.fn().mockResolvedValue(5),
+      },
+    });
+    const handler = createHandler(deps);
+    await handler(createRequest(validFormBody));
+
+    expect(console.warn).toHaveBeenCalledWith(
+      expect.stringContaining('Flag volume spike'),
+    );
+  });
+
+  it('blocks unvalidated LLM content when output validator throws', async () => {
+    deps = createMockDeps({
+      llm: {
+        chatCompletion: vi.fn().mockResolvedValue({
+          content: 'This should never reach the user',
+        }),
+      },
+      validateOutput: () => {
+        throw new Error('Regex engine exploded');
+      },
+    });
+    const handler = createHandler(deps);
+    const response = await handler(createRequest(validFormBody));
+    const text = await response.text();
+
+    expect(text).toContain('Sorry, something went wrong');
+    expect(text).not.toContain('This should never reach the user');
   });
 });

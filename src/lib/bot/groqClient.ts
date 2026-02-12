@@ -12,11 +12,14 @@ const GroqChatResponseSchema = z.object({
   ),
 });
 
-export const createGroqClient = (apiKey: string): LlmClient => ({
+export const createGroqClient = (
+  apiKey: string,
+  fetchFn: typeof fetch = globalThis.fetch,
+): LlmClient => ({
   chatCompletion: async (
     messages: ConversationMessage[],
   ): Promise<{ content: string }> => {
-    const response = await fetch(
+    const response = await fetchFn(
       'https://api.groq.com/openai/v1/chat/completions',
       {
         method: 'POST',

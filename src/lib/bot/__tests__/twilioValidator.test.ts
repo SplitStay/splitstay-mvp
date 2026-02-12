@@ -42,4 +42,15 @@ describe('createTwilioValidator', () => {
     );
     expect(result).toBe(false);
   });
+
+  it('bypasses signature check when skipValidation is enabled', async () => {
+    const validator = createTwilioValidator(authToken, true);
+
+    const result = await validator.validate(
+      'completely-wrong-signature',
+      'https://example.com/webhook',
+      { Body: 'Hello' },
+    );
+    expect(result).toBe(true);
+  });
 });

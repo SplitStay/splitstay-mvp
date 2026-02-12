@@ -1,9 +1,13 @@
 import { createLog } from './logger';
+import {
+  CANNED_REDIRECT_MESSAGE,
+  validateOutput as defaultValidateOutput,
+} from './outputValidator';
 import type { ConversationMessage } from './schemas';
 import { TwilioWebhookSchema } from './schemas';
 import { SYSTEM_PROMPT } from './systemPrompt';
 import { twimlResponse } from './twiml';
-import type { HandlerDependencies } from './types';
+import type { DbClient, HandlerDependencies } from './types';
 
 const errorMessage = (error: unknown): string =>
   error instanceof Error ? error.message : String(error);
@@ -11,6 +15,8 @@ const errorMessage = (error: unknown): string =>
 const RATE_LIMIT_MAX = 30;
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
 const CONVERSATION_HISTORY_LIMIT = 50;
+const FLAG_ALERT_THRESHOLD = 3;
+const FLAG_ALERT_WINDOW_MS = 60 * 60 * 1000;
 
 const twimlXmlResponse = (message: string, status = 200): Response =>
   new Response(twimlResponse(message), {
@@ -21,8 +27,57 @@ const twimlXmlResponse = (message: string, status = 200): Response =>
 const parseFormBody = (body: string): Record<string, string> =>
   Object.fromEntries(new URLSearchParams(body));
 
+const auditFlaggedContent = async (
+  db: DbClient,
+  phone: string,
+  llmContent: string,
+  reason: string,
+): Promise<void> => {
+  try {
+    await db.saveFlaggedContent(phone, llmContent, reason);
+  } catch (auditError) {
+    console.error(
+      JSON.stringify(
+        createLog(
+          phone,
+          'response',
+          'Failed to save flagged content to audit',
+          errorMessage(auditError),
+        ),
+      ),
+    );
+  }
+
+  try {
+    const recentFlags = await db.countRecentFlags(phone, FLAG_ALERT_WINDOW_MS);
+    if (recentFlags >= FLAG_ALERT_THRESHOLD) {
+      console.warn(
+        JSON.stringify(
+          createLog(
+            phone,
+            'response',
+            `Flag volume spike: ${recentFlags} flags in the last hour, reasons include ${reason}`,
+          ),
+        ),
+      );
+    }
+  } catch (alertError) {
+    console.error(
+      JSON.stringify(
+        createLog(
+          phone,
+          'response',
+          'Failed to check flag volume',
+          errorMessage(alertError),
+        ),
+      ),
+    );
+  }
+};
+
 export const createHandler = (deps: HandlerDependencies) => {
   const { llm, db, accessControl, twilioValidator } = deps;
+  const validateOutput = deps.validateOutput ?? defaultValidateOutput;
 
   return async (request: Request): Promise<Response> => {
     let phone = 'unknown';
@@ -156,8 +211,8 @@ export const createHandler = (deps: HandlerDependencies) => {
         );
       }
 
-      // Build LLM context (fail open on history fetch error)
-      let history: ConversationMessage[] = [];
+      // Build LLM context (fail closed on history fetch error)
+      let history: ConversationMessage[];
       try {
         history = await db.getConversationHistory(
           phone,
@@ -169,10 +224,13 @@ export const createHandler = (deps: HandlerDependencies) => {
             createLog(
               phone,
               'llm',
-              'Failed to fetch conversation history, continuing without it',
+              'Failed to fetch conversation history',
               errorMessage(historyError),
             ),
           ),
+        );
+        return twimlXmlResponse(
+          "There's a temporary issue accessing your conversation. Please send your request again.",
         );
       }
 
@@ -199,11 +257,49 @@ export const createHandler = (deps: HandlerDependencies) => {
         );
       }
 
-      // Save conversation (don't drop LLM response on failure)
+      // Validate LLM output before delivery (fail closed on validator error)
+      let responseContent: string;
+      try {
+        const validation = validateOutput(llmContent);
+        if (validation.flagged) {
+          console.log(
+            JSON.stringify(
+              createLog(
+                phone,
+                'response',
+                `Output flagged: ${validation.reason}`,
+              ),
+            ),
+          );
+          responseContent = CANNED_REDIRECT_MESSAGE;
+          await auditFlaggedContent(
+            db,
+            phone,
+            llmContent,
+            validation.reason ?? 'unknown',
+          );
+        } else {
+          responseContent = llmContent;
+        }
+      } catch (validatorError) {
+        console.error(
+          JSON.stringify(
+            createLog(
+              phone,
+              'response',
+              'Output validator error, blocking unvalidated content',
+              errorMessage(validatorError),
+            ),
+          ),
+        );
+        responseContent = 'Sorry, something went wrong. Please try again.';
+      }
+
+      // Save conversation (don't drop response on failure)
       try {
         await db.saveMessages(phone, [
           { role: 'user', content: webhook.Body },
-          { role: 'assistant', content: llmContent },
+          { role: 'assistant', content: responseContent },
         ]);
       } catch (saveError) {
         console.error(
@@ -218,7 +314,7 @@ export const createHandler = (deps: HandlerDependencies) => {
         );
       }
 
-      // Mark SID as seen (don't drop LLM response on failure)
+      // Mark SID as seen (don't drop response on failure)
       try {
         await db.markSidSeen(webhook.MessageSid);
       } catch (markSeenError) {
@@ -237,7 +333,7 @@ export const createHandler = (deps: HandlerDependencies) => {
       console.log(
         JSON.stringify(createLog(phone, 'response', 'Response sent')),
       );
-      return twimlXmlResponse(llmContent);
+      return twimlXmlResponse(responseContent);
     } catch (error) {
       console.error(
         JSON.stringify(

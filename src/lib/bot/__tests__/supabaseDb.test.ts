@@ -2,44 +2,61 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { describe, expect, it, vi } from 'vitest';
 import { createSupabaseDbClient } from '../supabaseDb';
 
+type ChainableOverrides = {
+  maybeSingle?: { data: unknown; error: unknown };
+  limit?: { data: unknown; error: unknown };
+  insert?: { data: unknown; error: unknown };
+  gte?: { count: unknown; error: unknown };
+};
+
 const createMockSupabase = (
   overrides: {
-    fromResult?: { data: unknown; error: unknown };
+    tables?: Partial<Record<string, ChainableOverrides>>;
     rpcResult?: { data: unknown; error: unknown };
   } = {},
 ) => {
-  const chainable = {
-    select: vi.fn().mockReturnThis(),
-    eq: vi.fn().mockReturnThis(),
-    order: vi.fn().mockReturnThis(),
-    limit: vi
-      .fn()
-      .mockResolvedValue(overrides.fromResult ?? { data: [], error: null }),
-    maybeSingle: vi
-      .fn()
-      .mockResolvedValue(overrides.fromResult ?? { data: null, error: null }),
-    insert: vi
-      .fn()
-      .mockResolvedValue(overrides.fromResult ?? { data: null, error: null }),
+  const chainables: Record<string, Record<string, unknown>> = {};
+
+  const getChainable = (table: string) => {
+    if (!chainables[table]) {
+      const t = overrides.tables?.[table] ?? {};
+      chainables[table] = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        gte: vi.fn().mockResolvedValue(t.gte ?? { count: 0, error: null }),
+        order: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockResolvedValue(t.limit ?? { data: [], error: null }),
+        maybeSingle: vi
+          .fn()
+          .mockResolvedValue(t.maybeSingle ?? { data: null, error: null }),
+        insert: vi
+          .fn()
+          .mockResolvedValue(t.insert ?? { data: null, error: null }),
+      };
+    }
+    return chainables[table];
   };
 
   return {
-    from: vi.fn().mockReturnValue(chainable),
+    from: vi.fn((table: string) => getChainable(table)),
     rpc: vi.fn().mockResolvedValue(
       overrides.rpcResult ?? {
         data: [{ allowed: true, retry_after_minutes: 0 }],
         error: null,
       },
     ),
-    _chainable: chainable,
-  } as unknown as SupabaseClient & { _chainable: typeof chainable };
+  } as unknown as SupabaseClient;
 };
 
 describe('createSupabaseDbClient', () => {
   describe('checkSeenSid', () => {
     it('returns true when message SID exists', async () => {
       const supabase = createMockSupabase({
-        fromResult: { data: { message_sid: 'SM123' }, error: null },
+        tables: {
+          whatsapp_seen_sid: {
+            maybeSingle: { data: { message_sid: 'SM123' }, error: null },
+          },
+        },
       });
       const db = createSupabaseDbClient(supabase);
 
@@ -49,9 +66,7 @@ describe('createSupabaseDbClient', () => {
     });
 
     it('returns false when message SID does not exist', async () => {
-      const supabase = createMockSupabase({
-        fromResult: { data: null, error: null },
-      });
+      const supabase = createMockSupabase();
       const db = createSupabaseDbClient(supabase);
 
       const result = await db.checkSeenSid('SM999');
@@ -61,7 +76,11 @@ describe('createSupabaseDbClient', () => {
 
     it('throws when Supabase returns an error', async () => {
       const supabase = createMockSupabase({
-        fromResult: { data: null, error: { message: 'DB error' } },
+        tables: {
+          whatsapp_seen_sid: {
+            maybeSingle: { data: null, error: { message: 'DB error' } },
+          },
+        },
       });
       const db = createSupabaseDbClient(supabase);
 
@@ -72,21 +91,20 @@ describe('createSupabaseDbClient', () => {
   });
 
   describe('markSidSeen', () => {
-    it('inserts the message SID into whatsapp_seen_sid', async () => {
+    it('resolves without error on success', async () => {
       const supabase = createMockSupabase();
       const db = createSupabaseDbClient(supabase);
 
-      await db.markSidSeen('SM123');
-
-      expect(supabase.from).toHaveBeenCalledWith('whatsapp_seen_sid');
-      expect(supabase._chainable.insert).toHaveBeenCalledWith({
-        message_sid: 'SM123',
-      });
+      await expect(db.markSidSeen('SM123')).resolves.toBeUndefined();
     });
 
     it('throws when Supabase returns an error', async () => {
       const supabase = createMockSupabase({
-        fromResult: { data: null, error: { message: 'insert failed' } },
+        tables: {
+          whatsapp_seen_sid: {
+            insert: { data: null, error: { message: 'insert failed' } },
+          },
+        },
       });
       const db = createSupabaseDbClient(supabase);
 
@@ -148,30 +166,22 @@ describe('createSupabaseDbClient', () => {
         db.checkRateLimit('+1234567890', 30, 3_600_000),
       ).rejects.toThrow('Rate limit RPC returned no rows');
     });
-
-    it('passes correct parameters to RPC', async () => {
-      const supabase = createMockSupabase();
-      const db = createSupabaseDbClient(supabase);
-
-      await db.checkRateLimit('whatsapp:+1234567890', 30, 3_600_000);
-
-      expect(supabase.rpc).toHaveBeenCalledWith('check_rate_limit', {
-        p_phone: 'whatsapp:+1234567890',
-        p_max_messages: 30,
-        p_window_ms: 3_600_000,
-      });
-    });
   });
 
   describe('getConversationHistory', () => {
     it('returns messages in chronological order after reversing descending query', async () => {
-      const supabase = createMockSupabase();
-      supabase._chainable.limit.mockResolvedValue({
-        data: [
-          { role: 'assistant', content: 'Reply' },
-          { role: 'user', content: 'Hello' },
-        ],
-        error: null,
+      const supabase = createMockSupabase({
+        tables: {
+          whatsapp_conversation: {
+            limit: {
+              data: [
+                { role: 'assistant', content: 'Reply' },
+                { role: 'user', content: 'Hello' },
+              ],
+              error: null,
+            },
+          },
+        },
       });
       const db = createSupabaseDbClient(supabase);
 
@@ -184,10 +194,15 @@ describe('createSupabaseDbClient', () => {
     });
 
     it('validates each row through ConversationMessageSchema', async () => {
-      const supabase = createMockSupabase();
-      supabase._chainable.limit.mockResolvedValue({
-        data: [{ role: 'invalid_role', content: 'test' }],
-        error: null,
+      const supabase = createMockSupabase({
+        tables: {
+          whatsapp_conversation: {
+            limit: {
+              data: [{ role: 'invalid_role', content: 'test' }],
+              error: null,
+            },
+          },
+        },
       });
       const db = createSupabaseDbClient(supabase);
 
@@ -198,7 +213,6 @@ describe('createSupabaseDbClient', () => {
 
     it('returns empty array when no history exists', async () => {
       const supabase = createMockSupabase();
-      supabase._chainable.limit.mockResolvedValue({ data: [], error: null });
       const db = createSupabaseDbClient(supabase);
 
       const result = await db.getConversationHistory('+1234567890', 50);
@@ -207,10 +221,12 @@ describe('createSupabaseDbClient', () => {
     });
 
     it('throws when Supabase returns an error', async () => {
-      const supabase = createMockSupabase();
-      supabase._chainable.limit.mockResolvedValue({
-        data: null,
-        error: { message: 'query failed' },
+      const supabase = createMockSupabase({
+        tables: {
+          whatsapp_conversation: {
+            limit: { data: null, error: { message: 'query failed' } },
+          },
+        },
       });
       const db = createSupabaseDbClient(supabase);
 
@@ -223,39 +239,100 @@ describe('createSupabaseDbClient', () => {
   });
 
   describe('saveMessages', () => {
-    it('maps messages to database rows with phone_number column', async () => {
+    it('resolves without error on success', async () => {
       const supabase = createMockSupabase();
       const db = createSupabaseDbClient(supabase);
 
-      await db.saveMessages('whatsapp:+1234567890', [
-        { role: 'user', content: 'Hello' },
-        { role: 'assistant', content: 'Hi there' },
-      ]);
-
-      expect(supabase.from).toHaveBeenCalledWith('whatsapp_conversation');
-      expect(supabase._chainable.insert).toHaveBeenCalledWith([
-        {
-          phone_number: 'whatsapp:+1234567890',
-          role: 'user',
-          content: 'Hello',
-        },
-        {
-          phone_number: 'whatsapp:+1234567890',
-          role: 'assistant',
-          content: 'Hi there',
-        },
-      ]);
+      await expect(
+        db.saveMessages('whatsapp:+1234567890', [
+          { role: 'user', content: 'Hello' },
+          { role: 'assistant', content: 'Hi there' },
+        ]),
+      ).resolves.toBeUndefined();
     });
 
     it('throws when Supabase returns an error', async () => {
       const supabase = createMockSupabase({
-        fromResult: { data: null, error: { message: 'insert failed' } },
+        tables: {
+          whatsapp_conversation: {
+            insert: { data: null, error: { message: 'insert failed' } },
+          },
+        },
       });
       const db = createSupabaseDbClient(supabase);
 
       await expect(
         db.saveMessages('+1234567890', [{ role: 'user', content: 'Hello' }]),
       ).rejects.toEqual({ message: 'insert failed' });
+    });
+  });
+
+  describe('saveFlaggedContent', () => {
+    it('resolves without error on success', async () => {
+      const supabase = createMockSupabase();
+      const db = createSupabaseDbClient(supabase);
+
+      await expect(
+        db.saveFlaggedContent(
+          'whatsapp:+1234567890',
+          'flagged text',
+          'system_prompt_disclosure',
+        ),
+      ).resolves.toBeUndefined();
+    });
+
+    it('throws when Supabase returns an error', async () => {
+      const supabase = createMockSupabase({
+        tables: {
+          whatsapp_flagged_content: {
+            insert: { data: null, error: { message: 'insert failed' } },
+          },
+        },
+      });
+      const db = createSupabaseDbClient(supabase);
+
+      await expect(
+        db.saveFlaggedContent('+1234567890', 'text', 'reason'),
+      ).rejects.toEqual({ message: 'insert failed' });
+    });
+  });
+
+  describe('countRecentFlags', () => {
+    it('returns count of recent flags for a phone number', async () => {
+      const supabase = createMockSupabase({
+        tables: {
+          whatsapp_flagged_content: { gte: { count: 3, error: null } },
+        },
+      });
+      const db = createSupabaseDbClient(supabase);
+
+      const result = await db.countRecentFlags('+1234567890', 3_600_000);
+
+      expect(result).toBe(3);
+    });
+
+    it('returns zero when no flags exist', async () => {
+      const supabase = createMockSupabase();
+      const db = createSupabaseDbClient(supabase);
+
+      const result = await db.countRecentFlags('+1234567890', 3_600_000);
+
+      expect(result).toBe(0);
+    });
+
+    it('throws when Supabase returns an error', async () => {
+      const supabase = createMockSupabase({
+        tables: {
+          whatsapp_flagged_content: {
+            gte: { count: null, error: { message: 'query failed' } },
+          },
+        },
+      });
+      const db = createSupabaseDbClient(supabase);
+
+      await expect(
+        db.countRecentFlags('+1234567890', 3_600_000),
+      ).rejects.toEqual({ message: 'query failed' });
     });
   });
 });

@@ -78,4 +78,31 @@ export const createSupabaseDbClient = (supabase: SupabaseClient): DbClient => ({
 
     if (error) throw error;
   },
+
+  saveFlaggedContent: async (
+    phone: string,
+    content: string,
+    reason: string,
+  ): Promise<void> => {
+    const { error } = await supabase
+      .from('whatsapp_flagged_content')
+      .insert({ phone_number: phone, content, flag_reason: reason });
+
+    if (error) throw error;
+  },
+
+  countRecentFlags: async (
+    phone: string,
+    windowMs: number,
+  ): Promise<number> => {
+    const since = new Date(Date.now() - windowMs).toISOString();
+    const { count, error } = await supabase
+      .from('whatsapp_flagged_content')
+      .select('*', { count: 'exact', head: true })
+      .eq('phone_number', phone)
+      .gte('created_at', since);
+
+    if (error) throw error;
+    return count ?? 0;
+  },
 });

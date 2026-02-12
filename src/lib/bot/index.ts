@@ -2,6 +2,12 @@ export { createAccessControl } from './accessControl';
 export { createGroqClient } from './groqClient';
 export { createHandler } from './handler';
 export {
+  CANNED_REDIRECT_MESSAGE,
+  type FlagReason,
+  type ValidationResult,
+  validateOutput,
+} from './outputValidator';
+export {
   type ConversationMessage,
   ConversationMessageSchema,
   type TwilioWebhook,
