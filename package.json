@@ -23,7 +23,7 @@
     "db:gen": "npm run db:types && npm run db:schemas",
     "db:seed:gen": "npx tsx scripts/generate-seed.ts",
     "edge:build": "tsx scripts/build-edge-functions.ts",
-    "edge:serve": "npm run edge:build && npx supabase functions serve --env-file .env",
+    "edge:serve": "npm run edge:build && npx supabase functions serve --env-file .env --no-verify-jwt",
     "prepare": "lefthook install"
   },
   "dependencies": {

@@ -22,13 +22,7 @@ npm install
 cp .env.example .env
 ```
 
-Edit `.env` with local development values:
-
-```bash
-VITE_SUPABASE_URL=http://127.0.0.1:54321
-VITE_SUPABASE_ANON_KEY=<from npm run db:start output>
-VITE_APP_URL=http://localhost:5173
-```
+The example defaults to the local Supabase instance. **Never point `.env` at the production database.**
 
 **Podman users:** See the [Podman Users](#podman-users) section before proceeding.
 
@@ -38,7 +32,7 @@ VITE_APP_URL=http://localhost:5173
 npm run db:start
 ```
 
-This starts PostgreSQL, Auth, Storage, and other Supabase services locally. Copy the `anon key` from the output into your `.env` file.
+This starts PostgreSQL, Auth, Storage, and other Supabase services locally. Copy the `anon key` from the output into your `.env` file as `VITE_SUPABASE_ANON_KEY`.
 
 ### 4. Apply database migrations
 
@@ -154,6 +148,29 @@ If using Podman instead of Docker, add the following to your `.env` file. Replac
 ```bash
 DOCKER_HOST=unix:///run/user/<your-user-id>/podman/podman.sock
 ```
+
+## Testing Edge Functions Locally
+
+Edge functions run against the local Supabase instance. Start local Supabase first (`npm run db:start && npm run db:reset`), then:
+
+1. Start the edge function server:
+   ```bash
+   npm run edge:serve
+   ```
+
+2. In a separate terminal, start an ngrok tunnel:
+   ```bash
+   ngrok http 127.0.0.1:54321
+   ```
+
+3. Configure the external service's webhook URL to the ngrok URL, e.g.:
+   ```
+   https://<your-subdomain>.ngrok-free.app/functions/v1/whatsapp-webhook
+   ```
+
+Edge functions read secrets from `.env` via the `--env-file` flag. The edge function falls back to `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` when `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are not set, so no duplicate env vars are needed.
+
+`TWILIO_SKIP_SIGNATURE_VALIDATION=true` in `.env` disables Twilio HMAC signature checks, which fail locally because the URL seen inside the container doesn't match the public ngrok URL that Twilio signed against. **Never set this in production.**
 
 ## Deployment
 

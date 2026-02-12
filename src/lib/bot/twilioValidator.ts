@@ -37,12 +37,16 @@ const timingSafeEqual = (a: string, b: string): boolean => {
   return result === 0;
 };
 
-export const createTwilioValidator = (authToken: string): TwilioValidator => ({
+export const createTwilioValidator = (
+  authToken: string,
+  skipValidation = false,
+): TwilioValidator => ({
   validate: async (
     signature: string,
     url: string,
     params: Record<string, string>,
   ): Promise<boolean> => {
+    if (skipValidation) return true;
     const dataToSign = url + sortedEntries(params);
     const expected = await hmacSha1(authToken, dataToSign);
     return timingSafeEqual(signature, expected);

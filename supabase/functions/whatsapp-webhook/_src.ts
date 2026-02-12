@@ -5,14 +5,19 @@ import { createHandler } from '../../../src/lib/bot/handler.ts';
 import { createSupabaseDbClient } from '../../../src/lib/bot/supabaseDb.ts';
 import { createTwilioValidator } from '../../../src/lib/bot/twilioValidator.ts';
 
-const requireEnv = (name: string): string => {
-  const value = Deno.env.get(name);
-  if (!value) throw new Error(`Missing required env var: ${name}`);
-  return value;
+const requireEnv = (name: string, ...fallbacks: string[]): string => {
+  for (const key of [name, ...fallbacks]) {
+    const value = Deno.env.get(key);
+    if (value) return value;
+  }
+  throw new Error(`Missing required env var: ${name}`);
 };
 
-const supabaseUrl = requireEnv('SUPABASE_URL');
-const supabaseServiceKey = requireEnv('SUPABASE_SERVICE_ROLE_KEY');
+const supabaseUrl = requireEnv('SUPABASE_URL', 'VITE_SUPABASE_URL');
+const supabaseServiceKey = requireEnv(
+  'SUPABASE_SERVICE_ROLE_KEY',
+  'VITE_SUPABASE_ANON_KEY',
+);
 const groqApiKey = requireEnv('GROQ_API_KEY');
 const twilioAuthToken = requireEnv('TWILIO_AUTH_TOKEN');
 const adminNumbers = Deno.env.get('WHATSAPP_ADMIN_NUMBERS') ?? '';
@@ -21,7 +26,12 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 const llm = createGroqClient(groqApiKey);
 const db = createSupabaseDbClient(supabase);
 const accessControl = createAccessControl(adminNumbers);
-const twilioValidator = createTwilioValidator(twilioAuthToken);
+const skipSignatureValidation =
+  Deno.env.get('TWILIO_SKIP_SIGNATURE_VALIDATION') === 'true';
+const twilioValidator = createTwilioValidator(
+  twilioAuthToken,
+  skipSignatureValidation,
+);
 
 const handler = createHandler({
   llm,

@@ -20,7 +20,13 @@ Deploy in this order. Each step depends on the previous one.
    npx supabase db push
    ```
 
-3. Set edge function secrets in the Supabase dashboard (Project Settings > Edge Functions > Secrets):
+3. Set edge function secrets. Either use the dashboard (Edge Functions > Secrets) or the CLI:
+   ```bash
+   npx supabase secrets set \
+     GROQ_API_KEY=your-key \
+     TWILIO_AUTH_TOKEN=your-token \
+     "WHATSAPP_ADMIN_NUMBERS=whatsapp:+18005551234,whatsapp:+18005555678"
+   ```
 
    | Secret | Source |
    |--------|--------|
@@ -38,7 +44,7 @@ Deploy in this order. Each step depends on the previous one.
 
 5. Configure the Twilio webhook URL in the Twilio console to point to:
    ```
-   https://dhqvohruecmttgfkfdeb.supabase.co/functions/v1/whatsapp-webhook
+   https://api.splitstay.travel/functions/v1/whatsapp-webhook
    ```
 
 6. Push to `main` to trigger the Vercel UI deploy (independent of the above, but listed last because the UI doesn't depend on the other layers being deployed first).
