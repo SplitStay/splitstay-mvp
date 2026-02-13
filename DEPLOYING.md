@@ -25,6 +25,8 @@ Deploy in this order. Each step depends on the previous one.
    npx supabase secrets set \
      GROQ_API_KEY=your-key \
      TWILIO_AUTH_TOKEN=your-token \
+     LLM_BASE_URL=https://api.groq.com/openai/v1 \
+     LLM_MODEL=llama-3.1-8b-instant \
      "WHATSAPP_ADMIN_NUMBERS=whatsapp:+18005551234,whatsapp:+18005555678"
    ```
 
@@ -32,6 +34,8 @@ Deploy in this order. Each step depends on the previous one.
    |--------|--------|
    | `GROQ_API_KEY` | [Groq console](https://console.groq.com) |
    | `TWILIO_AUTH_TOKEN` | Twilio console |
+   | `LLM_BASE_URL` | OpenAI-compatible API base URL (e.g. `https://api.groq.com/openai/v1`) |
+   | `LLM_MODEL` | Model identifier (e.g. `llama-3.1-8b-instant`) |
    | `WHATSAPP_ADMIN_NUMBERS` | Comma-separated list, e.g. `whatsapp:+18005551234` |
 
    `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are provided automatically by Supabase.
@@ -48,6 +52,10 @@ Deploy in this order. Each step depends on the previous one.
    ```
 
 6. Push to `main` to trigger the Vercel UI deploy (independent of the above, but listed last because the UI doesn't depend on the other layers being deployed first).
+
+## PostgreSQL Extensions
+
+The supplier intake migration (`20260212000000_supplier_intake.sql`) enables the `pg_trgm` extension for fuzzy event name matching. This runs automatically via `CREATE EXTENSION IF NOT EXISTS pg_trgm` — no manual setup is needed.
 
 ## Production Migrations
 

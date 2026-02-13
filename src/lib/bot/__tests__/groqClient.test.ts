@@ -20,7 +20,7 @@ describe('createGroqClient', () => {
 
     const body = JSON.parse(options?.body as string);
     expect(body.model).toBe('llama-3.1-8b-instant');
-    expect(body.max_tokens).toBe(500);
+    expect(body.max_tokens).toBe(800);
     expect(body.temperature).toBe(0.7);
   });
 
@@ -77,5 +77,24 @@ describe('createGroqClient', () => {
     await expect(
       client.chatCompletion([{ role: 'user', content: 'Hello' }]),
     ).rejects.toThrow('empty response');
+  });
+
+  it('uses custom base URL and model when provided', async () => {
+    const mockFetch = createMockFetch(
+      jsonResponse({ choices: [{ message: { content: 'Reply' } }] }),
+    );
+    const client = createGroqClient(
+      'test-key',
+      mockFetch,
+      'https://custom-llm.example.com/v1/chat/completions',
+      'custom-model-7b',
+    );
+    await client.chatCompletion([{ role: 'user', content: 'Hello' }]);
+
+    const [url, options] = mockFetch.mock.calls[0];
+    expect(url).toBe('https://custom-llm.example.com/v1/chat/completions');
+
+    const body = JSON.parse(options?.body as string);
+    expect(body.model).toBe('custom-model-7b');
   });
 });

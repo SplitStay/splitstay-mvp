@@ -35,6 +35,41 @@ const accommodationTypeSchema = z.union([
     name: z.literal('House'),
     displayOrder: z.literal(4),
   }),
+  z.object({
+    id: z.literal('cottage'),
+    name: z.literal('Cottage'),
+    displayOrder: z.literal(5),
+  }),
+  z.object({
+    id: z.literal('villa'),
+    name: z.literal('Villa'),
+    displayOrder: z.literal(6),
+  }),
+  z.object({
+    id: z.literal('bungalow'),
+    name: z.literal('Bungalow'),
+    displayOrder: z.literal(7),
+  }),
+  z.object({
+    id: z.literal('farmhouse'),
+    name: z.literal('Farmhouse'),
+    displayOrder: z.literal(8),
+  }),
+  z.object({
+    id: z.literal('cabin'),
+    name: z.literal('Cabin'),
+    displayOrder: z.literal(9),
+  }),
+  z.object({
+    id: z.literal('townhouse'),
+    name: z.literal('Townhouse'),
+    displayOrder: z.literal(10),
+  }),
+  z.object({
+    id: z.literal('chalet'),
+    name: z.literal('Chalet'),
+    displayOrder: z.literal(11),
+  }),
 ]);
 
 /** Schema for the complete array of accommodation types with validation */
@@ -57,6 +92,13 @@ export const ACCOMMODATION_TYPES: AccommodationType[] = [
   { id: 'hotel-room', name: 'Hotel Room', displayOrder: 2 },
   { id: 'apartment', name: 'Apartment', displayOrder: 3 },
   { id: 'house', name: 'House', displayOrder: 4 },
+  { id: 'cottage', name: 'Cottage', displayOrder: 5 },
+  { id: 'villa', name: 'Villa', displayOrder: 6 },
+  { id: 'bungalow', name: 'Bungalow', displayOrder: 7 },
+  { id: 'farmhouse', name: 'Farmhouse', displayOrder: 8 },
+  { id: 'cabin', name: 'Cabin', displayOrder: 9 },
+  { id: 'townhouse', name: 'Townhouse', displayOrder: 10 },
+  { id: 'chalet', name: 'Chalet', displayOrder: 11 },
 ];
 
 // Validate at module load time to catch errors early

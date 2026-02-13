@@ -1,7 +1,16 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { z } from 'zod';
 import type { ConversationMessage } from './schemas';
 import { ConversationMessageSchema } from './schemas';
-import type { DbClient } from './types';
+import type { DbClient, MatchedEvent, SavePropertyListingInput } from './types';
+
+const MatchedEventRowSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  start_date: z.string().date(),
+  end_date: z.string().date(),
+  location: z.string(),
+});
 
 export const createSupabaseDbClient = (supabase: SupabaseClient): DbClient => ({
   checkSeenSid: async (messageSid: string): Promise<boolean> => {
@@ -104,5 +113,69 @@ export const createSupabaseDbClient = (supabase: SupabaseClient): DbClient => ({
 
     if (error) throw error;
     return count ?? 0;
+  },
+
+  findMatchingEvents: async (messageBody: string): Promise<MatchedEvent[]> => {
+    const { data, error } = await supabase.rpc('find_matching_events', {
+      p_message_body: messageBody,
+    });
+
+    if (error) throw error;
+    return (data ?? []).map((row: unknown) => {
+      const parsed = MatchedEventRowSchema.parse(row);
+      return {
+        id: parsed.id,
+        name: parsed.name,
+        startDate: parsed.start_date,
+        endDate: parsed.end_date,
+        location: parsed.location,
+      };
+    });
+  },
+
+  findPropertyListing: async (
+    phone: string,
+    eventId: string,
+  ): Promise<boolean> => {
+    const { data, error } = await supabase.rpc('find_property_listing_exists', {
+      p_phone_number: phone,
+      p_event_id: eventId,
+    });
+
+    if (error) throw error;
+    if (typeof data !== 'boolean') {
+      throw new Error(
+        `Expected boolean from find_property_listing_exists RPC, got ${typeof data}`,
+      );
+    }
+    return data;
+  },
+
+  savePropertyListing: async (
+    input: SavePropertyListingInput,
+  ): Promise<{ propertyListingId: string }> => {
+    const { data, error } = await supabase.rpc('save_property_listing', {
+      p_phone_number: input.phoneNumber,
+      p_supplier_name: input.supplierName,
+      p_event_id: input.eventId,
+      p_location: input.location,
+      p_accommodation_type_id: input.accommodationTypeId,
+      p_num_bedrooms: input.numBedrooms,
+      p_price_per_night: input.pricePerNight,
+      p_house_rules: input.houseRules,
+      p_rooms: input.rooms.map((r) => ({
+        room_number: r.roomNumber,
+        available_from: r.availableFrom,
+        available_to: r.availableTo,
+      })),
+    });
+
+    if (error) throw error;
+    if (typeof data !== 'string') {
+      throw new Error(
+        `Expected string from save_property_listing RPC, got ${typeof data}`,
+      );
+    }
+    return { propertyListingId: data };
   },
 });

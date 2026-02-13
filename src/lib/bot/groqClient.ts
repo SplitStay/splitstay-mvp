@@ -12,30 +12,32 @@ const GroqChatResponseSchema = z.object({
   ),
 });
 
+const DEFAULT_BASE_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const DEFAULT_MODEL = 'llama-3.1-8b-instant';
+
 export const createGroqClient = (
   apiKey: string,
   fetchFn: typeof fetch = globalThis.fetch,
+  baseUrl = DEFAULT_BASE_URL,
+  model = DEFAULT_MODEL,
 ): LlmClient => ({
   chatCompletion: async (
     messages: ConversationMessage[],
   ): Promise<{ content: string }> => {
-    const response = await fetchFn(
-      'https://api.groq.com/openai/v1/chat/completions',
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'llama-3.1-8b-instant',
-          messages,
-          max_tokens: 500,
-          temperature: 0.7,
-        }),
-        signal: AbortSignal.timeout(GROQ_TIMEOUT_MS),
+    const response = await fetchFn(baseUrl, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
       },
-    );
+      body: JSON.stringify({
+        model,
+        messages,
+        max_tokens: 800,
+        temperature: 0.7,
+      }),
+      signal: AbortSignal.timeout(GROQ_TIMEOUT_MS),
+    });
 
     if (!response.ok) {
       let errorText: string;

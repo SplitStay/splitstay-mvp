@@ -97,6 +97,8 @@ Routes in `App.tsx` use three guard components:
 
 Supabase-managed PostgreSQL. Types are auto-generated in `src/types/database.types.ts`. Key entities: users, trips, chats, messages, requests (join requests), reviews. A database trigger (`on_auth_user_created`) syncs `auth.users` inserts to the `public.user` table.
 
+Supplier intake tables (`event`, `supplier`, `property_listing`, `property_room`) store event-scoped property listings from professional STR managers. These are separate from the trip/villa/room model — the two coexist. The `accommodation_type` lookup table is shared. After adding or modifying supplier tables, run `npm run db:gen` to regenerate types and schemas.
+
 Always use the database types as defined by Supabase.
 
 ### Zod Schemas

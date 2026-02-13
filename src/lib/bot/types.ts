@@ -1,10 +1,34 @@
 import type { ValidationResult } from './outputValidator';
 import type { ConversationMessage } from './schemas';
 
+export interface MatchedEvent {
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  location: string;
+}
+
 export interface LlmClient {
   chatCompletion: (
     messages: ConversationMessage[],
   ) => Promise<{ content: string }>;
+}
+
+export interface SavePropertyListingInput {
+  phoneNumber: string;
+  supplierName: string;
+  eventId: string;
+  location: string;
+  accommodationTypeId: string;
+  numBedrooms: number;
+  pricePerNight: number;
+  houseRules: string;
+  rooms: Array<{
+    roomNumber: number;
+    availableFrom: string;
+    availableTo: string;
+  }>;
 }
 
 export interface DbClient {
@@ -29,6 +53,11 @@ export interface DbClient {
     reason: string,
   ) => Promise<void>;
   countRecentFlags: (phone: string, windowMs: number) => Promise<number>;
+  findMatchingEvents: (messageBody: string) => Promise<MatchedEvent[]>;
+  findPropertyListing: (phone: string, eventId: string) => Promise<boolean>;
+  savePropertyListing: (
+    input: SavePropertyListingInput,
+  ) => Promise<{ propertyListingId: string }>;
 }
 
 export interface AccessControl {

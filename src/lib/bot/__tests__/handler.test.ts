@@ -34,6 +34,11 @@ const createMockDeps = (
     saveMessages: vi.fn().mockResolvedValue(undefined),
     saveFlaggedContent: vi.fn().mockResolvedValue(undefined),
     countRecentFlags: vi.fn().mockResolvedValue(0),
+    findMatchingEvents: vi.fn().mockResolvedValue([]),
+    findPropertyListing: vi.fn().mockResolvedValue(false),
+    savePropertyListing: vi
+      .fn()
+      .mockResolvedValue({ propertyListingId: 'pl-mock' }),
     ...overrides.db,
   },
   accessControl: {

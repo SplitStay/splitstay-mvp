@@ -5,7 +5,10 @@ export type FlagReason =
   | 'identity_change'
   | 'professional_advice';
 
-export type InputFlagReason = 'prompt_injection' | 'system_prompt_extraction';
+export type InputFlagReason =
+  | 'prompt_injection'
+  | 'system_prompt_extraction'
+  | 'empty_message';
 
 export type ValidationResult =
   | { flagged: false }
@@ -16,6 +19,10 @@ const FLAG_PATTERNS: ReadonlyArray<{ reason: FlagReason; pattern: RegExp }> = [
     reason: 'system_prompt_disclosure',
     pattern:
       /\b(my (system )?prompt|my instructions|I was (told|instructed|programmed) to|my (internal|hidden) (rules|instructions|configuration))\b/i,
+  },
+  {
+    reason: 'system_prompt_disclosure',
+    pattern: /SUPPLIER INTAKE FLOW:|ON CONFIRMATION \(YES\):|DATA VALIDATION:/i,
   },
   {
     reason: 'identity_change',
@@ -82,15 +89,33 @@ const INPUT_FLAG_PATTERNS: ReadonlyArray<{
   {
     reason: 'system_prompt_extraction',
     pattern:
-      /(?:repeat|show|tell|reveal|display) (?:me )?(?:your )?(?:system ?prompt|instructions|rules|guidelines)/i,
+      /(?:repeat|show|tell|reveal|display|output|print|dump) (?:me )?(?:everything|your |the )?(?:system ?prompt|instructions|rules|guidelines)/i,
   },
   {
     reason: 'system_prompt_extraction',
     pattern: /what (?:are|is) your (?:system ?prompt|instructions|rules)/i,
   },
+  {
+    reason: 'system_prompt_extraction',
+    pattern:
+      /(?:output|print|show) (?:everything|all|the text) (?:between|above|before|after)/i,
+  },
+  {
+    reason: 'system_prompt_extraction',
+    pattern:
+      /(?:replace|convert|encode|transform|rewrite|translate|reverse|rot13|base64).*(?:system ?prompt|instructions|configuration)/i,
+  },
+  {
+    reason: 'system_prompt_extraction',
+    pattern:
+      /(?:system ?prompt|instructions|configuration).*(?:replace|convert|encode|transform|rewrite|translate|reverse)/i,
+  },
 ];
 
 export const validateInput = (input: string): ValidationResult => {
+  if (input.trim().length === 0) {
+    return { flagged: true, reason: 'empty_message' };
+  }
   for (const { reason, pattern } of INPUT_FLAG_PATTERNS) {
     if (pattern.test(input)) {
       return { flagged: true, reason };

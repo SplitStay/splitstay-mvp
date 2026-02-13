@@ -23,7 +23,9 @@ const twilioAuthToken = requireEnv('TWILIO_AUTH_TOKEN');
 const adminNumbers = Deno.env.get('WHATSAPP_ADMIN_NUMBERS') ?? '';
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
-const llm = createGroqClient(groqApiKey);
+const llmBaseUrl = Deno.env.get('LLM_BASE_URL');
+const llmModel = Deno.env.get('LLM_MODEL');
+const llm = createGroqClient(groqApiKey, undefined, llmBaseUrl, llmModel);
 const db = createSupabaseDbClient(supabase);
 const accessControl = createAccessControl(adminNumbers);
 const skipSignatureValidation =

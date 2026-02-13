@@ -34,4 +34,4 @@ supabase/snippets/
 .playwright-mcp/
 
 # Edge function build artifacts
-supabase/functions/whatsapp-webhook/index.ts
+supabase/functions/whatsapp-webhook/index.tscurl-test-log.md

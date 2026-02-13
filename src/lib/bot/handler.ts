@@ -6,18 +6,44 @@ import {
 } from './outputValidator';
 import type { ConversationMessage } from './schemas';
 import { TwilioWebhookSchema } from './schemas';
+import {
+  buildAmbiguousEventPrompt,
+  buildExistingListingPrompt,
+  buildSupplierSystemPrompt,
+  UNRECOGNIZED_EVENT_RESPONSE,
+} from './supplierPrompt';
+import {
+  expandUniformRooms,
+  extractJsonBlock,
+  hasIncompleteJsonBlock,
+  looksLikeConfirmation,
+  looksLikeEventReference,
+  looksLikeUserAffirmative,
+  SupplierListingSchema,
+  stripJsonBlock,
+  toSavePropertyListingInput,
+  validateRoomDatesWithinEvent,
+} from './supplierSchema';
 import { SYSTEM_PROMPT } from './systemPrompt';
 import { twimlResponse } from './twiml';
-import type { DbClient, HandlerDependencies } from './types';
+import type { DbClient, HandlerDependencies, MatchedEvent } from './types';
 
-const errorMessage = (error: unknown): string =>
-  error instanceof Error ? error.message : String(error);
+const errorMessage = (error: unknown): string => {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  try {
+    return JSON.stringify(error);
+  } catch {
+    return String(error);
+  }
+};
 
 const RATE_LIMIT_MAX = 30;
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
 const CONVERSATION_HISTORY_LIMIT = 50;
 const FLAG_ALERT_THRESHOLD = 3;
 const FLAG_ALERT_WINDOW_MS = 60 * 60 * 1000;
+const EXTRACTION_MAX_RETRIES = 3;
 
 const twimlXmlResponse = (message: string, status = 200): Response =>
   new Response(twimlResponse(message), {
@@ -80,6 +106,115 @@ const auditFlaggedContent = async (
       ),
     );
   }
+};
+
+const tryParseAndSave = async (
+  db: DbClient,
+  phone: string,
+  event: MatchedEvent,
+  json: string,
+): Promise<boolean> => {
+  const raw = expandUniformRooms(
+    JSON.parse(json) as Record<string, unknown>,
+    event.startDate,
+    event.endDate,
+  );
+  const listing = SupplierListingSchema.parse(raw);
+  const dateCheck = validateRoomDatesWithinEvent(
+    listing.rooms,
+    event.startDate,
+    event.endDate,
+  );
+  if (!dateCheck.valid) {
+    console.error(
+      JSON.stringify(
+        createLog(
+          phone,
+          'response',
+          `Room date validation failed: ${dateCheck.error}`,
+        ),
+      ),
+    );
+    return false;
+  }
+  await db.savePropertyListing(
+    toSavePropertyListingInput(listing, phone, event.id),
+  );
+  return true;
+};
+
+const handleSupplierExtraction = async (
+  db: DbClient,
+  llm: HandlerDependencies['llm'],
+  phone: string,
+  event: MatchedEvent,
+  llmContent: string,
+  jsonString: string,
+  messages: ConversationMessage[],
+): Promise<string> => {
+  const today = new Date().toISOString().split('T')[0];
+  if (event.endDate < today) {
+    console.log(
+      JSON.stringify(
+        createLog(phone, 'response', 'Event has expired, not saving listing'),
+      ),
+    );
+    return stripJsonBlock(llmContent);
+  }
+
+  // First attempt with the original JSON from the LLM response
+  try {
+    if (await tryParseAndSave(db, phone, event, jsonString)) {
+      return stripJsonBlock(llmContent);
+    }
+  } catch (parseError) {
+    console.error(
+      JSON.stringify(
+        createLog(
+          phone,
+          'response',
+          'Extraction attempt 1 failed',
+          errorMessage(parseError),
+        ),
+      ),
+    );
+  }
+
+  // Retry up to (EXTRACTION_MAX_RETRIES - 1) additional times
+  const retryMsgs: ConversationMessage[] = [
+    ...messages,
+    { role: 'assistant', content: llmContent },
+    {
+      role: 'user',
+      content:
+        'Please include the JSON block with all listing details as specified. The listing cannot be saved without it.',
+    },
+  ];
+  for (let retry = 1; retry < EXTRACTION_MAX_RETRIES; retry++) {
+    try {
+      const retryResult = await llm.chatCompletion(retryMsgs);
+      const retryJson = extractJsonBlock(retryResult.content);
+      if (!retryJson.found) continue;
+      if (await tryParseAndSave(db, phone, event, retryJson.json)) {
+        return stripJsonBlock(retryResult.content);
+      }
+    } catch (retryError) {
+      console.error(
+        JSON.stringify(
+          createLog(
+            phone,
+            'response',
+            `Extraction attempt ${retry + 1} failed`,
+            errorMessage(retryError),
+          ),
+        ),
+      );
+    }
+  }
+
+  // All retries exhausted
+  await auditFlaggedContent(db, phone, llmContent, 'extraction_failed');
+  return 'Your listing details have been received. Our team will follow up with you shortly to confirm everything.';
 };
 
 export const createHandler = (deps: HandlerDependencies) => {
@@ -310,61 +445,232 @@ export const createHandler = (deps: HandlerDependencies) => {
         );
       }
 
-      const messages: ConversationMessage[] = [
-        { role: 'system', content: SYSTEM_PROMPT },
-        ...history,
-        { role: 'user', content: webhook.Body },
-      ];
+      // Event detection: runs on first message using the incoming body,
+      // and on follow-up messages using the first user message in history.
+      // When the first message was ambiguous (multiple matches), also try
+      // the current message to resolve disambiguation.
+      let detectedEvent: MatchedEvent | undefined;
+      let systemPrompt = SYSTEM_PROMPT;
+      let unrecognizedEventRef = false;
 
-      // Call LLM
-      let llmContent: string;
-      try {
-        console.log(JSON.stringify(createLog(phone, 'llm', 'Calling LLM')));
-        const llmResult = await llm.chatCompletion(messages);
-        llmContent = llmResult.content;
-      } catch (llmError) {
-        console.error(
-          JSON.stringify(
-            createLog(phone, 'llm', 'LLM call failed', errorMessage(llmError)),
-          ),
-        );
-        return twimlXmlResponse(
-          "I'm having trouble thinking right now. Please try again in a moment.",
-        );
+      const eventDetectionBody =
+        history.length === 0
+          ? webhook.Body
+          : history.find((m) => m.role === 'user')?.content;
+
+      if (eventDetectionBody) {
+        try {
+          const events = await db.findMatchingEvents(eventDetectionBody);
+          if (events.length === 1) {
+            detectedEvent = events[0];
+            const hasListing = await db.findPropertyListing(
+              phone,
+              detectedEvent.id,
+            );
+            systemPrompt = hasListing
+              ? buildExistingListingPrompt(detectedEvent)
+              : buildSupplierSystemPrompt(detectedEvent);
+          } else if (events.length > 1 && history.length === 0) {
+            systemPrompt = buildAmbiguousEventPrompt(events);
+          } else if (events.length > 1 && history.length > 0) {
+            // First message was ambiguous — try matching the current message
+            // to see if the user clarified which event they mean
+            const currentEvents = await db.findMatchingEvents(webhook.Body);
+            if (currentEvents.length === 1) {
+              detectedEvent = currentEvents[0];
+              const hasListing = await db.findPropertyListing(
+                phone,
+                detectedEvent.id,
+              );
+              systemPrompt = hasListing
+                ? buildExistingListingPrompt(detectedEvent)
+                : buildSupplierSystemPrompt(detectedEvent);
+            }
+          } else if (
+            events.length === 0 &&
+            history.length === 0 &&
+            looksLikeEventReference(webhook.Body)
+          ) {
+            unrecognizedEventRef = true;
+          }
+        } catch (eventError) {
+          console.error(
+            JSON.stringify(
+              createLog(
+                phone,
+                'llm',
+                'Event detection failed, using default prompt',
+                errorMessage(eventError),
+              ),
+            ),
+          );
+        }
       }
 
-      // Validate LLM output before delivery (fail closed on validator error)
+      // Short-circuit for unrecognized event references (bypass LLM)
       let responseContent: string;
-      try {
-        const validation = validateOutput(llmContent);
-        if (validation.flagged) {
-          console.log(
+
+      if (unrecognizedEventRef) {
+        console.log(
+          JSON.stringify(
+            createLog(
+              phone,
+              'llm',
+              'Unrecognized event reference, skipping LLM',
+            ),
+          ),
+        );
+        responseContent = UNRECOGNIZED_EVENT_RESPONSE;
+      } else {
+        const messages: ConversationMessage[] = [
+          { role: 'system', content: systemPrompt },
+          ...history,
+          { role: 'user', content: webhook.Body },
+        ];
+
+        // Call LLM (with retry for supplier JSON extraction)
+        let llmContent: string;
+        try {
+          console.log(JSON.stringify(createLog(phone, 'llm', 'Calling LLM')));
+          const llmResult = await llm.chatCompletion(messages);
+          llmContent = llmResult.content;
+        } catch (llmError) {
+          console.error(
+            JSON.stringify(
+              createLog(
+                phone,
+                'llm',
+                'LLM call failed',
+                errorMessage(llmError),
+              ),
+            ),
+          );
+          return twimlXmlResponse(
+            "I'm having trouble thinking right now. Please try again in a moment.",
+          );
+        }
+
+        // Check for supplier listing JSON in LLM response
+        const jsonResult = extractJsonBlock(llmContent);
+
+        if (jsonResult.found && detectedEvent) {
+          responseContent = await handleSupplierExtraction(
+            db,
+            llm,
+            phone,
+            detectedEvent,
+            llmContent,
+            jsonResult.json,
+            messages,
+          );
+        } else if (
+          !jsonResult.found &&
+          detectedEvent &&
+          (hasIncompleteJsonBlock(llmContent) ||
+            (looksLikeUserAffirmative(webhook.Body) &&
+              looksLikeConfirmation(llmContent)))
+        ) {
+          // LLM confirmed without JSON block or produced truncated JSON — retry to obtain structured data
+          console.error(
             JSON.stringify(
               createLog(
                 phone,
                 'response',
-                `Output flagged: ${validation.reason}`,
+                'LLM confirmed listing without JSON block, retrying',
               ),
             ),
           );
-          responseContent = CANNED_REDIRECT_MESSAGE;
-          await auditFlaggedContent(db, phone, llmContent, validation.reason);
-        } else {
-          responseContent = llmContent;
-        }
-      } catch (validatorError) {
-        console.error(
-          JSON.stringify(
-            createLog(
+
+          let recovered = false;
+          const retryMessages: ConversationMessage[] = [
+            ...messages,
+            { role: 'assistant', content: llmContent },
+            {
+              role: 'user',
+              content:
+                'Please include the JSON block with all listing details as specified. The listing cannot be saved without it.',
+            },
+          ];
+          for (let retry = 0; retry < EXTRACTION_MAX_RETRIES; retry++) {
+            try {
+              const retryResult = await llm.chatCompletion(retryMessages);
+              const retryJson = extractJsonBlock(retryResult.content);
+              if (
+                retryJson.found &&
+                (await tryParseAndSave(
+                  db,
+                  phone,
+                  detectedEvent,
+                  retryJson.json,
+                ))
+              ) {
+                responseContent = stripJsonBlock(retryResult.content);
+                recovered = true;
+                break;
+              }
+            } catch (retryError) {
+              console.error(
+                JSON.stringify(
+                  createLog(
+                    phone,
+                    'response',
+                    `Confirmation recovery attempt ${retry + 1} failed`,
+                    errorMessage(retryError),
+                  ),
+                ),
+              );
+            }
+          }
+
+          if (!recovered) {
+            await auditFlaggedContent(
+              db,
               phone,
-              'response',
-              'Output validator error, blocking unvalidated content',
-              errorMessage(validatorError),
-            ),
-          ),
-        );
-        responseContent = 'Sorry, something went wrong. Please try again.';
-      }
+              llmContent,
+              'extraction_failed',
+            );
+            responseContent =
+              'Your listing details have been received. Our team will follow up with you shortly to confirm everything.';
+          }
+        } else {
+          // Standard output validation flow
+          try {
+            const validation = validateOutput(llmContent);
+            if (validation.flagged) {
+              console.log(
+                JSON.stringify(
+                  createLog(
+                    phone,
+                    'response',
+                    `Output flagged: ${validation.reason}`,
+                  ),
+                ),
+              );
+              responseContent = CANNED_REDIRECT_MESSAGE;
+              await auditFlaggedContent(
+                db,
+                phone,
+                llmContent,
+                validation.reason,
+              );
+            } else {
+              responseContent = llmContent;
+            }
+          } catch (validatorError) {
+            console.error(
+              JSON.stringify(
+                createLog(
+                  phone,
+                  'response',
+                  'Output validator error, blocking unvalidated content',
+                  errorMessage(validatorError),
+                ),
+              ),
+            );
+            responseContent = 'Sorry, something went wrong. Please try again.';
+          }
+        }
+      } // end unrecognizedEventRef else
 
       // Save conversation (don't drop response on failure)
       try {
