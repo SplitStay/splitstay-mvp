@@ -21,7 +21,10 @@ interface TripCardProps {
   trip: (Trip | TripWithHiddenStatus) & {
     accommodation_type?: { name: string } | null;
     host?: { name: string; imageUrl?: string } | null;
-    joinee?: { name: string; imageUrl?: string } | null;
+    members?: Array<{
+      user_id: string;
+      user: { name: string | null; imageUrl: string | null } | null;
+    }>;
   };
   onClick?: () => void;
   className?: string;
@@ -287,7 +290,7 @@ export const TripCard: React.FC<TripCardProps> = ({
 
               {/* Join Status */}
               <div className="text-right">
-                {trip.joinee ? (
+                {(trip.members?.length ?? 0) > 0 ? (
                   <Badge
                     variant="outline"
                     className="text-green-700 border-green-200"
@@ -438,7 +441,7 @@ export const TripCard: React.FC<TripCardProps> = ({
               </div>
 
               <div className="text-right">
-                {trip.joinee ? (
+                {(trip.members?.length ?? 0) > 0 ? (
                   <Badge
                     variant="outline"
                     className="text-green-700 border-green-200"

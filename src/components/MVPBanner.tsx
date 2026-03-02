@@ -5,16 +5,23 @@ export const MVPBanner: React.FC = () => {
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
-    // Check if banner was previously dismissed
-    const dismissed = localStorage.getItem('splitstay_mvp_banner_dismissed');
-    if (dismissed === 'true') {
-      setIsVisible(false);
+    try {
+      const dismissed = localStorage.getItem('splitstay_mvp_banner_dismissed');
+      if (dismissed === 'true') {
+        setIsVisible(false);
+      }
+    } catch {
+      // localStorage may be unavailable in some environments
     }
   }, []);
 
   const handleDismiss = () => {
     setIsVisible(false);
-    localStorage.setItem('splitstay_mvp_banner_dismissed', 'true');
+    try {
+      localStorage.setItem('splitstay_mvp_banner_dismissed', 'true');
+    } catch {
+      // localStorage may be unavailable in some environments
+    }
   };
 
   if (!isVisible) return null;

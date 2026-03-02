@@ -31,7 +31,7 @@ function createMockTrip(overrides: Record<string, unknown> = {}) {
     location: 'Paris',
     locationId: null,
     hostId: VALID_USER_ID,
-    joineeId: null,
+    event_id: null,
     accommodationTypeId: null,
     personalNote: null,
     vibe: null,
@@ -50,7 +50,7 @@ function createMockTrip(overrides: Record<string, unknown> = {}) {
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
     host: { name: 'Host Name', imageUrl: null },
-    joinee: null,
+    trip_member: [],
     accommodation_type: null,
     ...overrides,
   };
@@ -67,12 +67,10 @@ describe('tripService', () => {
 
       const mockFrom = vi.fn().mockReturnValue({
         select: vi.fn().mockReturnValue({
-          is: vi.fn().mockReturnValue({
-            order: vi.fn().mockReturnValue({
-              limit: vi.fn().mockResolvedValue({
-                data: mockTrips,
-                error: null,
-              }),
+          order: vi.fn().mockReturnValue({
+            limit: vi.fn().mockResolvedValue({
+              data: mockTrips,
+              error: null,
             }),
           }),
         }),
@@ -251,11 +249,21 @@ describe('tripService', () => {
         if (table === 'trip') {
           return {
             select: vi.fn().mockReturnValue({
-              or: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
                 order: vi.fn().mockResolvedValue({
                   data: mockTrips,
                   error: null,
                 }),
+              }),
+            }),
+          };
+        }
+        if (table === 'trip_member') {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockResolvedValue({
+                data: [],
+                error: null,
               }),
             }),
           };

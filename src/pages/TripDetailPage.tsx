@@ -417,7 +417,9 @@ export const TripDetailPage: React.FC = () => {
                 <Globe className="w-6 h-6 text-blue-600 mb-2" />
                 <p className="text-xs text-gray-500">Status</p>
                 <p className="font-semibold text-sm">
-                  {trip.joinee ? 'Matched' : 'Open'}
+                  {(trip as { members?: unknown[] }).members?.length
+                    ? 'Matched'
+                    : 'Open'}
                 </p>
               </div>
             </div>
@@ -602,7 +604,7 @@ export const TripDetailPage: React.FC = () => {
                       </span>
                     </button>
 
-                    {!trip.joinee && (
+                    {!(trip as { members?: unknown[] }).members?.length && (
                       <button
                         type="button"
                         onClick={handleRequestToJoin}

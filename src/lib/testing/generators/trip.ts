@@ -20,7 +20,7 @@ export const createTrip = (overrides: Partial<Trip> = {}): Trip => {
   const trip: Trip = {
     id: faker.string.uuid(),
     hostId: overrides.hostId ?? faker.string.uuid(),
-    joineeId: null,
+    event_id: null,
     name: `${faker.location.city()} Getaway`,
     description: faker.lorem.paragraph(),
     location: faker.location.city(),
@@ -74,7 +74,7 @@ export const createTripWithHost = (
   return {
     ...trip,
     host: host ?? { name: faker.person.fullName(), imageUrl: null },
-    joinee: null,
+    members: [],
     accommodation_type: null,
   };
 };

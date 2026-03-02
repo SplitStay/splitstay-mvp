@@ -335,4 +335,84 @@ describe('createSupabaseDbClient', () => {
       ).rejects.toEqual({ message: 'query failed' });
     });
   });
+
+  describe('findUserByPhone', () => {
+    it('queries the whatsapp column to find users by phone number', async () => {
+      const supabase = createMockSupabase();
+      const db = createSupabaseDbClient(supabase);
+
+      await db.findUserByPhone('whatsapp:+1234567890');
+
+      const userChain = (supabase.from as ReturnType<typeof vi.fn>).mock.results
+        .filter(
+          (_r: unknown, i: number) =>
+            (supabase.from as ReturnType<typeof vi.fn>).mock.calls[i][0] ===
+            'user',
+        )
+        .map(
+          (r: { value: Record<string, ReturnType<typeof vi.fn>> }) => r.value,
+        );
+      expect(userChain.length).toBeGreaterThan(0);
+      expect(userChain[0].eq).toHaveBeenCalledWith('whatsapp', '+1234567890');
+    });
+
+    it('selects the name column instead of first_name', async () => {
+      const supabase = createMockSupabase();
+      const db = createSupabaseDbClient(supabase);
+
+      await db.findUserByPhone('whatsapp:+1234567890');
+
+      const userChain = (supabase.from as ReturnType<typeof vi.fn>).mock.results
+        .filter(
+          (_r: unknown, i: number) =>
+            (supabase.from as ReturnType<typeof vi.fn>).mock.calls[i][0] ===
+            'user',
+        )
+        .map(
+          (r: { value: Record<string, ReturnType<typeof vi.fn>> }) => r.value,
+        );
+      expect(userChain.length).toBeGreaterThan(0);
+      const selectArg = userChain[0].select.mock.calls[0][0] as string;
+      expect(selectArg).toContain('name');
+      expect(selectArg).not.toContain('first_name');
+    });
+
+    it('maps the name field to displayName in the result', async () => {
+      const supabase = createMockSupabase({
+        tables: {
+          user: {
+            maybeSingle: {
+              data: {
+                id: 'user-1',
+                name: 'Tommy',
+                match_pref_language: 'dont_care',
+                match_pref_travel_traits: 'dont_care',
+                match_pref_age: 'dont_care',
+                match_pref_gender: 'dont_care',
+              },
+              error: null,
+            },
+          },
+        },
+      });
+      const db = createSupabaseDbClient(supabase);
+
+      const result = await db.findUserByPhone('whatsapp:+1234567890');
+
+      expect(result).toEqual({
+        id: 'user-1',
+        displayName: 'Tommy',
+        preferencesConfigured: false,
+      });
+    });
+
+    it('returns null when no user matches the phone number', async () => {
+      const supabase = createMockSupabase();
+      const db = createSupabaseDbClient(supabase);
+
+      const result = await db.findUserByPhone('whatsapp:+9999999999');
+
+      expect(result).toBeNull();
+    });
+  });
 });

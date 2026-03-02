@@ -19,7 +19,10 @@ export { twimlResponse } from './twiml';
 export type {
   AccessControl,
   DbClient,
+  EventRegistration,
   HandlerDependencies,
   LlmClient,
+  MatchingUser,
+  MatchProfile,
   TwilioValidator,
 } from './types';

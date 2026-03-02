@@ -29,6 +29,7 @@ import { MessagesPage } from './pages/MessagesPage';
 import PostTripPage from './pages/PostTripPage';
 import ProfilePage from './pages/ProfilePage';
 import { TripDetailPage } from './pages/TripDetailPage';
+import { WhatsAppTesterPage } from './pages/WhatsAppTesterPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -226,6 +227,16 @@ function AppRoutes() {
           <GuestFriendlyRoute>
             <TripDetailPage />
           </GuestFriendlyRoute>
+        }
+      />
+
+      {/* WhatsApp bot tester - URL only, no nav link */}
+      <Route
+        path="/whatsapp"
+        element={
+          <PublicRoute>
+            <WhatsAppTesterPage />
+          </PublicRoute>
         }
       />
 

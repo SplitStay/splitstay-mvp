@@ -164,6 +164,89 @@ export const publicEmailNotificationsUpdateSchema = z.object({
   updated_at: z.string().optional().nullable(),
 });
 
+export const publicEventRowSchema = z.object({
+  created_at: z.string(),
+  end_date: z.string(),
+  id: z.string(),
+  location: z.string(),
+  name: z.string(),
+  start_date: z.string(),
+  updated_at: z.string(),
+});
+
+export const publicEventInsertSchema = z.object({
+  created_at: z.string().optional(),
+  end_date: z.string(),
+  id: z.string().optional(),
+  location: z.string(),
+  name: z.string(),
+  start_date: z.string(),
+  updated_at: z.string().optional(),
+});
+
+export const publicEventUpdateSchema = z.object({
+  created_at: z.string().optional(),
+  end_date: z.string().optional(),
+  id: z.string().optional(),
+  location: z.string().optional(),
+  name: z.string().optional(),
+  start_date: z.string().optional(),
+  updated_at: z.string().optional(),
+});
+
+export const publicEventRegistrationRowSchema = z.object({
+  created_at: z.string(),
+  event_id: z.string(),
+  id: z.string(),
+  updated_at: z.string(),
+  user_id: z.string(),
+});
+
+export const publicEventRegistrationInsertSchema = z.object({
+  created_at: z.string().optional(),
+  event_id: z.string(),
+  id: z.string().optional(),
+  updated_at: z.string().optional(),
+  user_id: z.string(),
+});
+
+export const publicEventRegistrationUpdateSchema = z.object({
+  created_at: z.string().optional(),
+  event_id: z.string().optional(),
+  id: z.string().optional(),
+  updated_at: z.string().optional(),
+  user_id: z.string().optional(),
+});
+
+export const publicEventRegistrationRelationshipsSchema = z.tuple([
+  z.object({
+    foreignKeyName: z.literal('event_registration_event_fkey'),
+    columns: z.tuple([z.literal('event_id')]),
+    isOneToOne: z.literal(false),
+    referencedRelation: z.literal('event'),
+    referencedColumns: z.tuple([z.literal('id')]),
+  }),
+  z.object({
+    foreignKeyName: z.literal('event_registration_user_fkey'),
+    columns: z.tuple([z.literal('user_id')]),
+    isOneToOne: z.literal(false),
+    referencedRelation: z.literal('user'),
+    referencedColumns: z.tuple([z.literal('id')]),
+  }),
+]);
+
+export const publicGenderRowSchema = z.object({
+  id: z.string(),
+});
+
+export const publicGenderInsertSchema = z.object({
+  id: z.string(),
+});
+
+export const publicGenderUpdateSchema = z.object({
+  id: z.string().optional(),
+});
+
 export const publicHiddenTripsRowSchema = z.object({
   createdAt: z.string(),
   tripId: z.string(),
@@ -234,6 +317,60 @@ export const publicLocationUpdateSchema = z.object({
   region: z.string().optional().nullable(),
   updatedAt: z.string().optional(),
 });
+
+export const publicMatchInterestRowSchema = z.object({
+  created_at: z.string(),
+  event_id: z.string(),
+  id: z.string(),
+  interested: z.boolean(),
+  target_user_id: z.string(),
+  updated_at: z.string(),
+  user_id: z.string(),
+});
+
+export const publicMatchInterestInsertSchema = z.object({
+  created_at: z.string().optional(),
+  event_id: z.string(),
+  id: z.string().optional(),
+  interested: z.boolean(),
+  target_user_id: z.string(),
+  updated_at: z.string().optional(),
+  user_id: z.string(),
+});
+
+export const publicMatchInterestUpdateSchema = z.object({
+  created_at: z.string().optional(),
+  event_id: z.string().optional(),
+  id: z.string().optional(),
+  interested: z.boolean().optional(),
+  target_user_id: z.string().optional(),
+  updated_at: z.string().optional(),
+  user_id: z.string().optional(),
+});
+
+export const publicMatchInterestRelationshipsSchema = z.tuple([
+  z.object({
+    foreignKeyName: z.literal('match_interest_event_fkey'),
+    columns: z.tuple([z.literal('event_id')]),
+    isOneToOne: z.literal(false),
+    referencedRelation: z.literal('event'),
+    referencedColumns: z.tuple([z.literal('id')]),
+  }),
+  z.object({
+    foreignKeyName: z.literal('match_interest_target_user_fkey'),
+    columns: z.tuple([z.literal('target_user_id')]),
+    isOneToOne: z.literal(false),
+    referencedRelation: z.literal('user'),
+    referencedColumns: z.tuple([z.literal('id')]),
+  }),
+  z.object({
+    foreignKeyName: z.literal('match_interest_user_fkey'),
+    columns: z.tuple([z.literal('user_id')]),
+    isOneToOne: z.literal(false),
+    referencedRelation: z.literal('user'),
+    referencedColumns: z.tuple([z.literal('id')]),
+  }),
+]);
 
 export const publicMessageDeliveryLogRowSchema = z.object({
   event_type: z.string(),
@@ -409,6 +546,112 @@ export const publicMessagingPerformanceLogRelationshipsSchema = z.tuple([
     columns: z.tuple([z.literal('user_id')]),
     isOneToOne: z.literal(false),
     referencedRelation: z.literal('user'),
+    referencedColumns: z.tuple([z.literal('id')]),
+  }),
+]);
+
+export const publicPropertyListingRowSchema = z.object({
+  accommodation_type_id: z.string().nullable(),
+  created_at: z.string(),
+  event_id: z.string(),
+  house_rules: z.string().nullable(),
+  id: z.string(),
+  location: z.string(),
+  num_bedrooms: z.number(),
+  price_per_night: z.number(),
+  status: z.string(),
+  supplier_id: z.string(),
+  updated_at: z.string(),
+});
+
+export const publicPropertyListingInsertSchema = z.object({
+  accommodation_type_id: z.string().optional().nullable(),
+  created_at: z.string().optional(),
+  event_id: z.string(),
+  house_rules: z.string().optional().nullable(),
+  id: z.string().optional(),
+  location: z.string(),
+  num_bedrooms: z.number(),
+  price_per_night: z.number(),
+  status: z.string().optional(),
+  supplier_id: z.string(),
+  updated_at: z.string().optional(),
+});
+
+export const publicPropertyListingUpdateSchema = z.object({
+  accommodation_type_id: z.string().optional().nullable(),
+  created_at: z.string().optional(),
+  event_id: z.string().optional(),
+  house_rules: z.string().optional().nullable(),
+  id: z.string().optional(),
+  location: z.string().optional(),
+  num_bedrooms: z.number().optional(),
+  price_per_night: z.number().optional(),
+  status: z.string().optional(),
+  supplier_id: z.string().optional(),
+  updated_at: z.string().optional(),
+});
+
+export const publicPropertyListingRelationshipsSchema = z.tuple([
+  z.object({
+    foreignKeyName: z.literal('property_listing_accommodation_type_fkey'),
+    columns: z.tuple([z.literal('accommodation_type_id')]),
+    isOneToOne: z.literal(false),
+    referencedRelation: z.literal('accommodation_type'),
+    referencedColumns: z.tuple([z.literal('id')]),
+  }),
+  z.object({
+    foreignKeyName: z.literal('property_listing_event_fkey'),
+    columns: z.tuple([z.literal('event_id')]),
+    isOneToOne: z.literal(false),
+    referencedRelation: z.literal('event'),
+    referencedColumns: z.tuple([z.literal('id')]),
+  }),
+  z.object({
+    foreignKeyName: z.literal('property_listing_supplier_fkey'),
+    columns: z.tuple([z.literal('supplier_id')]),
+    isOneToOne: z.literal(false),
+    referencedRelation: z.literal('supplier'),
+    referencedColumns: z.tuple([z.literal('id')]),
+  }),
+]);
+
+export const publicPropertyRoomRowSchema = z.object({
+  available_from: z.string(),
+  available_to: z.string(),
+  created_at: z.string(),
+  id: z.string(),
+  property_listing_id: z.string(),
+  room_number: z.number(),
+  updated_at: z.string(),
+});
+
+export const publicPropertyRoomInsertSchema = z.object({
+  available_from: z.string(),
+  available_to: z.string(),
+  created_at: z.string().optional(),
+  id: z.string().optional(),
+  property_listing_id: z.string(),
+  room_number: z.number(),
+  updated_at: z.string().optional(),
+});
+
+export const publicPropertyRoomUpdateSchema = z.object({
+  available_from: z.string().optional(),
+  available_to: z.string().optional(),
+  created_at: z.string().optional(),
+  id: z.string().optional(),
+  property_listing_id: z.string().optional(),
+  room_number: z.number().optional(),
+  updated_at: z.string().optional(),
+});
+
+export const publicPropertyRoomRelationshipsSchema = z.tuple([
+  z.object({
+    foreignKeyName: z.literal('property_room_listing_fkey'),
+    columns: z.tuple([z.literal('property_listing_id')]),
+    isOneToOne: z.literal(false),
+    referencedRelation: z.literal('property_listing'),
     referencedColumns: z.tuple([z.literal('id')]),
   }),
 ]);
@@ -647,6 +890,30 @@ export const publicRoomRequestRelationshipsSchema = z.tuple([
   }),
 ]);
 
+export const publicSupplierRowSchema = z.object({
+  created_at: z.string(),
+  id: z.string(),
+  name: z.string(),
+  phone_number: z.string(),
+  updated_at: z.string(),
+});
+
+export const publicSupplierInsertSchema = z.object({
+  created_at: z.string().optional(),
+  id: z.string().optional(),
+  name: z.string(),
+  phone_number: z.string(),
+  updated_at: z.string().optional(),
+});
+
+export const publicSupplierUpdateSchema = z.object({
+  created_at: z.string().optional(),
+  id: z.string().optional(),
+  name: z.string().optional(),
+  phone_number: z.string().optional(),
+  updated_at: z.string().optional(),
+});
+
 export const publicTripRowSchema = z.object({
   accommodationTypeId: z.string().nullable(),
   bookingUrl: z.string().nullable(),
@@ -655,11 +922,11 @@ export const publicTripRowSchema = z.object({
   endDate: z.string().nullable(),
   estimatedmonth: z.string().nullable(),
   estimatedyear: z.string().nullable(),
+  event_id: z.string().nullable(),
   flexible: z.boolean(),
   hostId: z.string().nullable(),
   id: z.string(),
   ispublic: z.boolean().nullable(),
-  joineeId: z.string().nullable(),
   location: z.string(),
   locationId: z.string().nullable(),
   matchwith: z.string().nullable(),
@@ -682,11 +949,11 @@ export const publicTripInsertSchema = z.object({
   endDate: z.string().optional().nullable(),
   estimatedmonth: z.string().optional().nullable(),
   estimatedyear: z.string().optional().nullable(),
+  event_id: z.string().optional().nullable(),
   flexible: z.boolean().optional(),
   hostId: z.string().optional().nullable(),
   id: z.string().optional(),
   ispublic: z.boolean().optional().nullable(),
-  joineeId: z.string().optional().nullable(),
   location: z.string(),
   locationId: z.string().optional().nullable(),
   matchwith: z.string().optional().nullable(),
@@ -709,11 +976,11 @@ export const publicTripUpdateSchema = z.object({
   endDate: z.string().optional().nullable(),
   estimatedmonth: z.string().optional().nullable(),
   estimatedyear: z.string().optional().nullable(),
+  event_id: z.string().optional().nullable(),
   flexible: z.boolean().optional(),
   hostId: z.string().optional().nullable(),
   id: z.string().optional(),
   ispublic: z.boolean().optional().nullable(),
-  joineeId: z.string().optional().nullable(),
   location: z.string().optional(),
   locationId: z.string().optional().nullable(),
   matchwith: z.string().optional().nullable(),
@@ -737,15 +1004,15 @@ export const publicTripRelationshipsSchema = z.tuple([
     referencedColumns: z.tuple([z.literal('id')]),
   }),
   z.object({
-    foreignKeyName: z.literal('trip_hostId_fkey'),
-    columns: z.tuple([z.literal('hostId')]),
+    foreignKeyName: z.literal('trip_event_fkey'),
+    columns: z.tuple([z.literal('event_id')]),
     isOneToOne: z.literal(false),
-    referencedRelation: z.literal('user'),
+    referencedRelation: z.literal('event'),
     referencedColumns: z.tuple([z.literal('id')]),
   }),
   z.object({
-    foreignKeyName: z.literal('trip_joineeId_fkey'),
-    columns: z.tuple([z.literal('joineeId')]),
+    foreignKeyName: z.literal('trip_hostId_fkey'),
+    columns: z.tuple([z.literal('hostId')]),
     isOneToOne: z.literal(false),
     referencedRelation: z.literal('user'),
     referencedColumns: z.tuple([z.literal('id')]),
@@ -755,6 +1022,51 @@ export const publicTripRelationshipsSchema = z.tuple([
     columns: z.tuple([z.literal('locationId')]),
     isOneToOne: z.literal(false),
     referencedRelation: z.literal('location'),
+    referencedColumns: z.tuple([z.literal('id')]),
+  }),
+]);
+
+export const publicTripMemberRowSchema = z.object({
+  id: z.string(),
+  joined_at: z.string(),
+  trip_id: z.string(),
+  user_id: z.string(),
+});
+
+export const publicTripMemberInsertSchema = z.object({
+  id: z.string().optional(),
+  joined_at: z.string().optional(),
+  trip_id: z.string(),
+  user_id: z.string(),
+});
+
+export const publicTripMemberUpdateSchema = z.object({
+  id: z.string().optional(),
+  joined_at: z.string().optional(),
+  trip_id: z.string().optional(),
+  user_id: z.string().optional(),
+});
+
+export const publicTripMemberRelationshipsSchema = z.tuple([
+  z.object({
+    foreignKeyName: z.literal('trip_member_trip_fkey'),
+    columns: z.tuple([z.literal('trip_id')]),
+    isOneToOne: z.literal(false),
+    referencedRelation: z.literal('searchable_trips'),
+    referencedColumns: z.tuple([z.literal('id')]),
+  }),
+  z.object({
+    foreignKeyName: z.literal('trip_member_trip_fkey'),
+    columns: z.tuple([z.literal('trip_id')]),
+    isOneToOne: z.literal(false),
+    referencedRelation: z.literal('trip'),
+    referencedColumns: z.tuple([z.literal('id')]),
+  }),
+  z.object({
+    foreignKeyName: z.literal('trip_member_user_fkey'),
+    columns: z.tuple([z.literal('user_id')]),
+    isOneToOne: z.literal(false),
+    referencedRelation: z.literal('user'),
     referencedColumns: z.tuple([z.literal('id')]),
   }),
 ]);
@@ -772,6 +1084,12 @@ export const publicUserRowSchema = z.object({
   instagramUrl: z.string().nullable(),
   languages: jsonSchema.nullable(),
   learningLanguages: jsonSchema.nullable(),
+  match_age_max: z.number().nullable(),
+  match_age_min: z.number().nullable(),
+  match_pref_age: z.string(),
+  match_pref_gender: z.string(),
+  match_pref_language: z.string(),
+  match_pref_travel_traits: z.string(),
   monthOfBirth: z.number().nullable(),
   mostInfluencedCountry: z.string().nullable(),
   mostInfluencedCountryDescription: z.string().nullable(),
@@ -802,6 +1120,12 @@ export const publicUserInsertSchema = z.object({
   instagramUrl: z.string().optional().nullable(),
   languages: jsonSchema.optional().nullable(),
   learningLanguages: jsonSchema.optional().nullable(),
+  match_age_max: z.number().optional().nullable(),
+  match_age_min: z.number().optional().nullable(),
+  match_pref_age: z.string().optional(),
+  match_pref_gender: z.string().optional(),
+  match_pref_language: z.string().optional(),
+  match_pref_travel_traits: z.string().optional(),
   monthOfBirth: z.number().optional().nullable(),
   mostInfluencedCountry: z.string().optional().nullable(),
   mostInfluencedCountryDescription: z.string().optional().nullable(),
@@ -832,6 +1156,12 @@ export const publicUserUpdateSchema = z.object({
   instagramUrl: z.string().optional().nullable(),
   languages: jsonSchema.optional().nullable(),
   learningLanguages: jsonSchema.optional().nullable(),
+  match_age_max: z.number().optional().nullable(),
+  match_age_min: z.number().optional().nullable(),
+  match_pref_age: z.string().optional(),
+  match_pref_gender: z.string().optional(),
+  match_pref_language: z.string().optional(),
+  match_pref_travel_traits: z.string().optional(),
   monthOfBirth: z.number().optional().nullable(),
   mostInfluencedCountry: z.string().optional().nullable(),
   mostInfluencedCountryDescription: z.string().optional().nullable(),
@@ -855,6 +1185,38 @@ export const publicUserRelationshipsSchema = z.tuple([
     columns: z.tuple([z.literal('role_id')]),
     isOneToOne: z.literal(false),
     referencedRelation: z.literal('role'),
+    referencedColumns: z.tuple([z.literal('id')]),
+  }),
+]);
+
+export const publicUserGenderPreferenceRowSchema = z.object({
+  gender: z.string(),
+  user_id: z.string(),
+});
+
+export const publicUserGenderPreferenceInsertSchema = z.object({
+  gender: z.string(),
+  user_id: z.string(),
+});
+
+export const publicUserGenderPreferenceUpdateSchema = z.object({
+  gender: z.string().optional(),
+  user_id: z.string().optional(),
+});
+
+export const publicUserGenderPreferenceRelationshipsSchema = z.tuple([
+  z.object({
+    foreignKeyName: z.literal('user_gender_preference_gender_fkey'),
+    columns: z.tuple([z.literal('gender')]),
+    isOneToOne: z.literal(false),
+    referencedRelation: z.literal('gender'),
+    referencedColumns: z.tuple([z.literal('id')]),
+  }),
+  z.object({
+    foreignKeyName: z.literal('user_gender_preference_user_fkey'),
+    columns: z.tuple([z.literal('user_id')]),
+    isOneToOne: z.literal(false),
+    referencedRelation: z.literal('user'),
     referencedColumns: z.tuple([z.literal('id')]),
   }),
 ]);
@@ -986,6 +1348,30 @@ export const publicWhatsappConversationRelationshipsSchema = z.tuple([
   }),
 ]);
 
+export const publicWhatsappFlaggedContentRowSchema = z.object({
+  content: z.string(),
+  created_at: z.string(),
+  flag_reason: z.string(),
+  id: z.string(),
+  phone_number: z.string(),
+});
+
+export const publicWhatsappFlaggedContentInsertSchema = z.object({
+  content: z.string(),
+  created_at: z.string().optional(),
+  flag_reason: z.string(),
+  id: z.string().optional(),
+  phone_number: z.string(),
+});
+
+export const publicWhatsappFlaggedContentUpdateSchema = z.object({
+  content: z.string().optional(),
+  created_at: z.string().optional(),
+  flag_reason: z.string().optional(),
+  id: z.string().optional(),
+  phone_number: z.string().optional(),
+});
+
 export const publicWhatsappRateLimitRowSchema = z.object({
   message_count: z.number(),
   phone_number: z.string(),
@@ -1027,11 +1413,11 @@ export const publicSearchableTripsRowSchema = z.object({
   endDate: z.string().nullable(),
   estimatedmonth: z.string().nullable(),
   estimatedyear: z.string().nullable(),
+  event_id: z.string().nullable(),
   flexible: z.boolean().nullable(),
   hostId: z.string().nullable(),
   id: z.string().nullable(),
   ispublic: z.boolean().nullable(),
-  joineeId: z.string().nullable(),
   location: z.string().nullable(),
   locationId: z.string().nullable(),
   matchwith: z.string().nullable(),
@@ -1054,11 +1440,11 @@ export const publicSearchableTripsInsertSchema = z.object({
   endDate: z.string().optional().nullable(),
   estimatedmonth: z.string().optional().nullable(),
   estimatedyear: z.string().optional().nullable(),
+  event_id: z.string().optional().nullable(),
   flexible: z.boolean().optional().nullable(),
   hostId: z.string().optional().nullable(),
   id: z.string().optional().nullable(),
   ispublic: z.boolean().optional().nullable(),
-  joineeId: z.string().optional().nullable(),
   location: z.string().optional().nullable(),
   locationId: z.string().optional().nullable(),
   matchwith: z.string().optional().nullable(),
@@ -1081,11 +1467,11 @@ export const publicSearchableTripsUpdateSchema = z.object({
   endDate: z.string().optional().nullable(),
   estimatedmonth: z.string().optional().nullable(),
   estimatedyear: z.string().optional().nullable(),
+  event_id: z.string().optional().nullable(),
   flexible: z.boolean().optional().nullable(),
   hostId: z.string().optional().nullable(),
   id: z.string().optional().nullable(),
   ispublic: z.boolean().optional().nullable(),
-  joineeId: z.string().optional().nullable(),
   location: z.string().optional().nullable(),
   locationId: z.string().optional().nullable(),
   matchwith: z.string().optional().nullable(),
@@ -1109,15 +1495,15 @@ export const publicSearchableTripsRelationshipsSchema = z.tuple([
     referencedColumns: z.tuple([z.literal('id')]),
   }),
   z.object({
-    foreignKeyName: z.literal('trip_hostId_fkey'),
-    columns: z.tuple([z.literal('hostId')]),
+    foreignKeyName: z.literal('trip_event_fkey'),
+    columns: z.tuple([z.literal('event_id')]),
     isOneToOne: z.literal(false),
-    referencedRelation: z.literal('user'),
+    referencedRelation: z.literal('event'),
     referencedColumns: z.tuple([z.literal('id')]),
   }),
   z.object({
-    foreignKeyName: z.literal('trip_joineeId_fkey'),
-    columns: z.tuple([z.literal('joineeId')]),
+    foreignKeyName: z.literal('trip_hostId_fkey'),
+    columns: z.tuple([z.literal('hostId')]),
     isOneToOne: z.literal(false),
     referencedRelation: z.literal('user'),
     referencedColumns: z.tuple([z.literal('id')]),
@@ -1159,6 +1545,19 @@ export const publicCheckMessageRateLimitArgsSchema = z.object({
 
 export const publicCheckMessageRateLimitReturnsSchema = z.boolean();
 
+export const publicCheckRateLimitArgsSchema = z.object({
+  p_max_messages: z.number(),
+  p_phone: z.string(),
+  p_window_ms: z.number(),
+});
+
+export const publicCheckRateLimitReturnsSchema = z.array(
+  z.object({
+    allowed: z.boolean(),
+    retry_after_minutes: z.number(),
+  }),
+);
+
 export const publicDeleteMessageArgsSchema = z.object({
   p_message_id: z.string(),
   p_user_id: z.string(),
@@ -1170,6 +1569,12 @@ export const publicDeleteUserAccountArgsSchema = z.never();
 
 export const publicDeleteUserAccountReturnsSchema = z.undefined();
 
+export const publicDeleteUserAndDataArgsSchema = z.object({
+  target_user_id: z.string(),
+});
+
+export const publicDeleteUserAndDataReturnsSchema = z.undefined();
+
 export const publicEditMessageArgsSchema = z.object({
   p_message_id: z.string(),
   p_new_content: z.string(),
@@ -1177,6 +1582,35 @@ export const publicEditMessageArgsSchema = z.object({
 });
 
 export const publicEditMessageReturnsSchema = z.boolean();
+
+export const publicExpressInterestArgsSchema = z.object({
+  p_event_id: z.string(),
+  p_interested: z.boolean(),
+  p_target_user_id: z.string(),
+});
+
+export const publicExpressInterestReturnsSchema = jsonSchema;
+
+export const publicFindMatchingEventsArgsSchema = z.object({
+  p_message_body: z.string(),
+});
+
+export const publicFindMatchingEventsReturnsSchema = z.array(
+  z.object({
+    end_date: z.string(),
+    id: z.string(),
+    location: z.string(),
+    name: z.string(),
+    start_date: z.string(),
+  }),
+);
+
+export const publicFindPropertyListingExistsArgsSchema = z.object({
+  p_event_id: z.string(),
+  p_phone_number: z.string(),
+});
+
+export const publicFindPropertyListingExistsReturnsSchema = z.boolean();
 
 export const publicGetConversationMessagesArgsSchema = z.object({
   p_conversation_id: z.string(),
@@ -1199,6 +1633,33 @@ export const publicGetConversationMessagesReturnsSchema = z.array(
     sender_image_url: z.string(),
     sender_name: z.string(),
     updated_at: z.string(),
+  }),
+);
+
+export const publicGetEventMatchesArgsSchema = z.object({
+  p_event_id: z.string(),
+});
+
+export const publicGetEventMatchesReturnsSchema = z.array(
+  z.object({
+    accommodation_type: z.string(),
+    bio: z.string(),
+    compatibility_score: z.number(),
+    gender: z.string(),
+    image_url: z.string(),
+    languages: jsonSchema,
+    name: z.string(),
+    number_of_rooms: z.number(),
+    shared_languages: jsonSchema,
+    shared_traits: jsonSchema,
+    travel_traits: jsonSchema,
+    trip_end_date: z.string(),
+    trip_id: z.string(),
+    trip_location: z.string(),
+    trip_name: z.string(),
+    trip_start_date: z.string(),
+    user_id: z.string(),
+    year_of_birth: z.number(),
   }),
 );
 
@@ -1326,6 +1787,30 @@ export const publicRaiseMessagingErrorArgsSchema = z.object({
 });
 
 export const publicRaiseMessagingErrorReturnsSchema = z.undefined();
+
+export const publicSavePropertyListingArgsSchema = z.object({
+  p_accommodation_type_id: z.string(),
+  p_event_id: z.string(),
+  p_house_rules: z.string(),
+  p_location: z.string(),
+  p_num_bedrooms: z.number(),
+  p_phone_number: z.string(),
+  p_price_per_night: z.number(),
+  p_rooms: jsonSchema,
+  p_supplier_name: z.string(),
+});
+
+export const publicSavePropertyListingReturnsSchema = z.string();
+
+export const publicShowLimitArgsSchema = z.never();
+
+export const publicShowLimitReturnsSchema = z.number();
+
+export const publicShowTrgmArgsSchema = z.object({
+  '': z.string(),
+});
+
+export const publicShowTrgmReturnsSchema = z.array(z.string());
 
 export const publicTextToByteaArgsSchema = z.object({
   data: z.string(),

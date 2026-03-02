@@ -1,5 +1,11 @@
 import { createLog, type StructuredLog } from './logger';
 import {
+  buildMatchingEntryPrompt,
+  buildMatchPresentationPrompt,
+  buildPreferencesWalkthroughPrompt,
+  NO_REGISTRATIONS_MESSAGE,
+} from './matchingPrompt';
+import {
   CANNED_REDIRECT_MESSAGE,
   validateInput as defaultValidateInput,
   validateOutput as defaultValidateOutput,
@@ -26,7 +32,12 @@ import {
 } from './supplierSchema';
 import { SYSTEM_PROMPT } from './systemPrompt';
 import { twimlResponse } from './twiml';
-import type { DbClient, HandlerDependencies, MatchedEvent } from './types';
+import type {
+  DbClient,
+  HandlerDependencies,
+  MatchedEvent,
+  MatchingUser,
+} from './types';
 
 const errorMessage = (error: unknown): string => {
   if (error instanceof Error) return error.message;
@@ -275,15 +286,48 @@ export const createHandler = (deps: HandlerDependencies) => {
         JSON.stringify(createLog(phone, 'validation', 'Webhook validated')),
       );
 
-      // Check access control
-      if (!accessControl.isAdmin(phone)) {
+      // Determine flow: admin → supplier, registered user → matching, else → reject
+      const isAdmin = accessControl.isAdmin(phone);
+      let matchingUser: MatchingUser | null = null;
+
+      if (!isAdmin) {
+        try {
+          matchingUser = await db.findUserByPhone(phone);
+        } catch (lookupError) {
+          console.error(
+            JSON.stringify(
+              createLog(
+                phone,
+                'access-control',
+                'User lookup failed',
+                errorMessage(lookupError),
+              ),
+            ),
+          );
+          return twimlXmlResponse(
+            'Sorry, something went wrong. Please try again.',
+          );
+        }
+
+        if (!matchingUser) {
+          console.log(
+            JSON.stringify(
+              createLog(phone, 'access-control', 'Non-admin rejected'),
+            ),
+          );
+          return twimlXmlResponse(
+            "Thanks for reaching out! We're not quite ready yet - check back in a few days.",
+          );
+        }
+
         console.log(
           JSON.stringify(
-            createLog(phone, 'access-control', 'Non-admin rejected'),
+            createLog(
+              phone,
+              'access-control',
+              `Matching user: ${matchingUser.id}`,
+            ),
           ),
-        );
-        return twimlXmlResponse(
-          "Thanks for reaching out! We're not quite ready yet - check back in a few days.",
         );
       }
 
@@ -445,39 +489,125 @@ export const createHandler = (deps: HandlerDependencies) => {
         );
       }
 
-      // Event detection: runs on first message using the incoming body,
-      // and on follow-up messages using the first user message in history.
-      // When the first message was ambiguous (multiple matches), also try
-      // the current message to resolve disambiguation.
+      // Build system prompt based on flow
       let detectedEvent: MatchedEvent | undefined;
       let systemPrompt = SYSTEM_PROMPT;
       let unrecognizedEventRef = false;
+      let matchingShortCircuit: string | undefined;
 
       const eventDetectionBody =
         history.length === 0
           ? webhook.Body
           : history.find((m) => m.role === 'user')?.content;
 
-      if (eventDetectionBody) {
+      if (matchingUser) {
+        // Matching flow: build prompt from user context
         try {
-          const events = await db.findMatchingEvents(eventDetectionBody);
-          if (events.length === 1) {
-            detectedEvent = events[0];
-            const hasListing = await db.findPropertyListing(
-              phone,
-              detectedEvent.id,
-            );
-            systemPrompt = hasListing
-              ? buildExistingListingPrompt(detectedEvent)
-              : buildSupplierSystemPrompt(detectedEvent);
-          } else if (events.length > 1 && history.length === 0) {
-            systemPrompt = buildAmbiguousEventPrompt(events);
-          } else if (events.length > 1 && history.length > 0) {
-            // First message was ambiguous — try matching the current message
-            // to see if the user clarified which event they mean
-            const currentEvents = await db.findMatchingEvents(webhook.Body);
-            if (currentEvents.length === 1) {
-              detectedEvent = currentEvents[0];
+          const registrations = await db.getUserEventRegistrations(
+            matchingUser.id,
+          );
+
+          if (registrations.length === 0) {
+            matchingShortCircuit = NO_REGISTRATIONS_MESSAGE;
+          } else {
+            // Detect if user mentions a registered event
+            let selectedEventId: string | undefined;
+            let selectedEventName: string | undefined;
+
+            if (eventDetectionBody) {
+              try {
+                const events = await db.findMatchingEvents(eventDetectionBody);
+                if (events.length === 1) {
+                  const match = registrations.find(
+                    (r) => r.eventId === events[0].id,
+                  );
+                  if (match) {
+                    selectedEventId = match.eventId;
+                    selectedEventName = match.eventName;
+                  }
+                }
+              } catch (eventError) {
+                console.error(
+                  JSON.stringify(
+                    createLog(
+                      phone,
+                      'llm',
+                      'Event detection failed for matching',
+                      errorMessage(eventError),
+                    ),
+                  ),
+                );
+              }
+            }
+
+            // Auto-select for single registration
+            if (!selectedEventId && registrations.length === 1) {
+              selectedEventId = registrations[0].eventId;
+              selectedEventName = registrations[0].eventName;
+            }
+
+            if (selectedEventId && selectedEventName) {
+              if (!matchingUser.preferencesConfigured) {
+                systemPrompt = buildPreferencesWalkthroughPrompt(
+                  matchingUser.displayName,
+                  selectedEventName,
+                );
+              } else {
+                try {
+                  const matches = await db.getEventMatchProfiles(
+                    selectedEventId,
+                    matchingUser.id,
+                  );
+                  systemPrompt = buildMatchPresentationPrompt(
+                    selectedEventName,
+                    matches,
+                  );
+                } catch (matchError) {
+                  console.error(
+                    JSON.stringify(
+                      createLog(
+                        phone,
+                        'llm',
+                        'Failed to fetch match profiles',
+                        errorMessage(matchError),
+                      ),
+                    ),
+                  );
+                  systemPrompt = buildMatchingEntryPrompt(
+                    matchingUser.displayName,
+                    registrations,
+                  );
+                }
+              }
+            } else {
+              systemPrompt = buildMatchingEntryPrompt(
+                matchingUser.displayName,
+                registrations,
+              );
+            }
+          }
+        } catch (regError) {
+          console.error(
+            JSON.stringify(
+              createLog(
+                phone,
+                'llm',
+                'Failed to fetch registrations',
+                errorMessage(regError),
+              ),
+            ),
+          );
+          return twimlXmlResponse(
+            'Sorry, something went wrong. Please try again.',
+          );
+        }
+      } else {
+        // Supplier flow: event detection for admin users
+        if (eventDetectionBody) {
+          try {
+            const events = await db.findMatchingEvents(eventDetectionBody);
+            if (events.length === 1) {
+              detectedEvent = events[0];
               const hasListing = await db.findPropertyListing(
                 phone,
                 detectedEvent.id,
@@ -485,32 +615,51 @@ export const createHandler = (deps: HandlerDependencies) => {
               systemPrompt = hasListing
                 ? buildExistingListingPrompt(detectedEvent)
                 : buildSupplierSystemPrompt(detectedEvent);
+            } else if (events.length > 1 && history.length === 0) {
+              systemPrompt = buildAmbiguousEventPrompt(events);
+            } else if (events.length > 1 && history.length > 0) {
+              const currentEvents = await db.findMatchingEvents(webhook.Body);
+              if (currentEvents.length === 1) {
+                detectedEvent = currentEvents[0];
+                const hasListing = await db.findPropertyListing(
+                  phone,
+                  detectedEvent.id,
+                );
+                systemPrompt = hasListing
+                  ? buildExistingListingPrompt(detectedEvent)
+                  : buildSupplierSystemPrompt(detectedEvent);
+              }
+            } else if (
+              events.length === 0 &&
+              history.length === 0 &&
+              looksLikeEventReference(webhook.Body)
+            ) {
+              unrecognizedEventRef = true;
             }
-          } else if (
-            events.length === 0 &&
-            history.length === 0 &&
-            looksLikeEventReference(webhook.Body)
-          ) {
-            unrecognizedEventRef = true;
-          }
-        } catch (eventError) {
-          console.error(
-            JSON.stringify(
-              createLog(
-                phone,
-                'llm',
-                'Event detection failed, using default prompt',
-                errorMessage(eventError),
+          } catch (eventError) {
+            // Reset detectedEvent to prevent prompt/extraction mismatch
+            // when findPropertyListing fails after successful event detection
+            detectedEvent = undefined;
+            console.error(
+              JSON.stringify(
+                createLog(
+                  phone,
+                  'llm',
+                  'Event detection failed, using default prompt',
+                  errorMessage(eventError),
+                ),
               ),
-            ),
-          );
+            );
+          }
         }
       }
 
-      // Short-circuit for unrecognized event references (bypass LLM)
+      // Short-circuit paths (bypass LLM)
       let responseContent: string;
 
-      if (unrecognizedEventRef) {
+      if (matchingShortCircuit) {
+        responseContent = matchingShortCircuit;
+      } else if (unrecognizedEventRef) {
         console.log(
           JSON.stringify(
             createLog(

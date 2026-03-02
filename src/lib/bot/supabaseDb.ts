@@ -2,7 +2,14 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 import type { ConversationMessage } from './schemas';
 import { ConversationMessageSchema } from './schemas';
-import type { DbClient, MatchedEvent, SavePropertyListingInput } from './types';
+import type {
+  DbClient,
+  EventRegistration,
+  MatchedEvent,
+  MatchingUser,
+  MatchProfile,
+  SavePropertyListingInput,
+} from './types';
 
 const MatchedEventRowSchema = z.object({
   id: z.string(),
@@ -12,7 +19,28 @@ const MatchedEventRowSchema = z.object({
   location: z.string(),
 });
 
-export const createSupabaseDbClient = (supabase: SupabaseClient): DbClient => ({
+const jsonStringArray = z
+  .unknown()
+  .transform((v) =>
+    Array.isArray(v) ? v.filter((s) => typeof s === 'string') : [],
+  );
+
+const MatchProfileRowSchema = z.object({
+  user_id: z.string(),
+  name: z.string(),
+  bio: z.string().nullable(),
+  shared_traits: jsonStringArray,
+  shared_languages: jsonStringArray,
+  compatibility_score: z.number().min(0).max(1),
+  accommodation_type: z.string(),
+  number_of_rooms: z.number(),
+  trip_location: z.string(),
+});
+
+export const createSupabaseDbClient = (
+  supabase: SupabaseClient,
+  appUrl?: string,
+): DbClient => ({
   checkSeenSid: async (messageSid: string): Promise<boolean> => {
     const { data, error } = await supabase
       .from('whatsapp_seen_sid')
@@ -177,5 +205,114 @@ export const createSupabaseDbClient = (supabase: SupabaseClient): DbClient => ({
       );
     }
     return { propertyListingId: data };
+  },
+
+  findUserByPhone: async (phone: string): Promise<MatchingUser | null> => {
+    // Strip whatsapp: prefix to get raw phone number
+    const rawPhone = phone.replace(/^whatsapp:/, '');
+    const { data, error } = await supabase
+      .from('user')
+      .select(
+        'id, name, match_pref_language, match_pref_travel_traits, match_pref_age, match_pref_gender',
+      )
+      .eq('whatsapp', rawPhone)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) return null;
+
+    const preferencesConfigured =
+      data.match_pref_language !== 'dont_care' ||
+      data.match_pref_travel_traits !== 'dont_care' ||
+      data.match_pref_age !== 'dont_care' ||
+      data.match_pref_gender !== 'dont_care';
+
+    return {
+      id: data.id,
+      displayName: data.name ?? 'there',
+      preferencesConfigured,
+    };
+  },
+
+  getUserEventRegistrations: async (
+    userId: string,
+  ): Promise<EventRegistration[]> => {
+    const { data, error } = await supabase
+      .from('event_registration')
+      .select('event_id, event(id, name, start_date, end_date, location)')
+      .eq('user_id', userId);
+
+    if (error) throw error;
+
+    // Determine if user is a host at each event (has a trip linked)
+    const eventIds = (data ?? []).map((r: { event_id: string }) => r.event_id);
+    const { data: trips, error: tripError } = await supabase
+      .from('trip')
+      .select('event_id')
+      .eq('hostId', userId)
+      .in('event_id', eventIds);
+
+    if (tripError) throw tripError;
+
+    const hostedEventIds = new Set(
+      (trips ?? []).map((t: { event_id: string }) => t.event_id),
+    );
+
+    return (data ?? []).map(
+      (r: {
+        event_id: string;
+        event: {
+          id: string;
+          name: string;
+          start_date: string;
+          end_date: string;
+          location: string;
+        };
+      }) => ({
+        eventId: r.event_id,
+        eventName: r.event.name,
+        startDate: r.event.start_date,
+        endDate: r.event.end_date,
+        location: r.event.location,
+        isHost: hostedEventIds.has(r.event_id),
+      }),
+    );
+  },
+
+  getEventMatchProfiles: async (
+    eventId: string,
+    userId: string,
+  ): Promise<MatchProfile[]> => {
+    const { data, error } = await supabase.rpc('get_event_matches', {
+      p_event_id: eventId,
+      p_user_id: userId,
+    });
+
+    if (error) throw error;
+
+    return (data ?? [])
+      .map((row: unknown) => {
+        const parsed = MatchProfileRowSchema.parse(row);
+        return {
+          userId: parsed.user_id,
+          displayName: parsed.name,
+          bio: parsed.bio,
+          sharedTraits: parsed.shared_traits,
+          sharedLanguages: parsed.shared_languages,
+          compatibilityScore: parsed.compatibility_score,
+          accommodationSummary:
+            [
+              parsed.number_of_rooms > 0
+                ? `${parsed.number_of_rooms}-bedroom`
+                : null,
+              parsed.accommodation_type,
+              parsed.trip_location ? `in ${parsed.trip_location}` : null,
+            ]
+              .filter(Boolean)
+              .join(' ') || null,
+          profileUrl: appUrl ? `${appUrl}/profile/${parsed.user_id}` : null,
+        };
+      })
+      .filter((m) => m.userId !== userId);
   },
 });

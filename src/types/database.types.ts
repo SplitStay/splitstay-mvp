@@ -160,6 +160,87 @@ export type Database = {
         };
         Relationships: [];
       };
+      event: {
+        Row: {
+          created_at: string;
+          end_date: string;
+          id: string;
+          location: string;
+          name: string;
+          start_date: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          end_date: string;
+          id?: string;
+          location: string;
+          name: string;
+          start_date: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          end_date?: string;
+          id?: string;
+          location?: string;
+          name?: string;
+          start_date?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      event_registration: {
+        Row: {
+          created_at: string;
+          event_id: string;
+          id: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          event_id: string;
+          id?: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          event_id?: string;
+          id?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'event_registration_event_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'event';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'event_registration_user_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      gender: {
+        Row: {
+          id: string;
+        };
+        Insert: {
+          id: string;
+        };
+        Update: {
+          id?: string;
+        };
+        Relationships: [];
+      };
       hidden_trips: {
         Row: {
           createdAt: string;
@@ -228,6 +309,58 @@ export type Database = {
           updatedAt?: string;
         };
         Relationships: [];
+      };
+      match_interest: {
+        Row: {
+          created_at: string;
+          event_id: string;
+          id: string;
+          interested: boolean;
+          target_user_id: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          event_id: string;
+          id?: string;
+          interested: boolean;
+          target_user_id: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          event_id?: string;
+          id?: string;
+          interested?: boolean;
+          target_user_id?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'match_interest_event_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'event';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'match_interest_target_user_fkey';
+            columns: ['target_user_id'];
+            isOneToOne: false;
+            referencedRelation: 'user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'match_interest_user_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'user';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       message_delivery_log: {
         Row: {
@@ -395,6 +528,108 @@ export type Database = {
             columns: ['user_id'];
             isOneToOne: false;
             referencedRelation: 'user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      property_listing: {
+        Row: {
+          accommodation_type_id: string | null;
+          created_at: string;
+          event_id: string;
+          house_rules: string | null;
+          id: string;
+          location: string;
+          num_bedrooms: number;
+          price_per_night: number;
+          status: string;
+          supplier_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          accommodation_type_id?: string | null;
+          created_at?: string;
+          event_id: string;
+          house_rules?: string | null;
+          id?: string;
+          location: string;
+          num_bedrooms: number;
+          price_per_night: number;
+          status?: string;
+          supplier_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          accommodation_type_id?: string | null;
+          created_at?: string;
+          event_id?: string;
+          house_rules?: string | null;
+          id?: string;
+          location?: string;
+          num_bedrooms?: number;
+          price_per_night?: number;
+          status?: string;
+          supplier_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'property_listing_accommodation_type_fkey';
+            columns: ['accommodation_type_id'];
+            isOneToOne: false;
+            referencedRelation: 'accommodation_type';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_listing_event_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'event';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_listing_supplier_fkey';
+            columns: ['supplier_id'];
+            isOneToOne: false;
+            referencedRelation: 'supplier';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      property_room: {
+        Row: {
+          available_from: string;
+          available_to: string;
+          created_at: string;
+          id: string;
+          property_listing_id: string;
+          room_number: number;
+          updated_at: string;
+        };
+        Insert: {
+          available_from: string;
+          available_to: string;
+          created_at?: string;
+          id?: string;
+          property_listing_id: string;
+          room_number: number;
+          updated_at?: string;
+        };
+        Update: {
+          available_from?: string;
+          available_to?: string;
+          created_at?: string;
+          id?: string;
+          property_listing_id?: string;
+          room_number?: number;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'property_room_listing_fkey';
+            columns: ['property_listing_id'];
+            isOneToOne: false;
+            referencedRelation: 'property_listing';
             referencedColumns: ['id'];
           },
         ];
@@ -625,6 +860,30 @@ export type Database = {
           },
         ];
       };
+      supplier: {
+        Row: {
+          created_at: string;
+          id: string;
+          name: string;
+          phone_number: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          name: string;
+          phone_number: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          name?: string;
+          phone_number?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       trip: {
         Row: {
           accommodationTypeId: string | null;
@@ -634,11 +893,11 @@ export type Database = {
           endDate: string | null;
           estimatedmonth: string | null;
           estimatedyear: string | null;
+          event_id: string | null;
           flexible: boolean;
           hostId: string | null;
           id: string;
           ispublic: boolean | null;
-          joineeId: string | null;
           location: string;
           locationId: string | null;
           matchwith: string | null;
@@ -660,11 +919,11 @@ export type Database = {
           endDate?: string | null;
           estimatedmonth?: string | null;
           estimatedyear?: string | null;
+          event_id?: string | null;
           flexible?: boolean;
           hostId?: string | null;
           id?: string;
           ispublic?: boolean | null;
-          joineeId?: string | null;
           location: string;
           locationId?: string | null;
           matchwith?: string | null;
@@ -686,11 +945,11 @@ export type Database = {
           endDate?: string | null;
           estimatedmonth?: string | null;
           estimatedyear?: string | null;
+          event_id?: string | null;
           flexible?: boolean;
           hostId?: string | null;
           id?: string;
           ispublic?: boolean | null;
-          joineeId?: string | null;
           location?: string;
           locationId?: string | null;
           matchwith?: string | null;
@@ -713,15 +972,15 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
-            foreignKeyName: 'trip_hostId_fkey';
-            columns: ['hostId'];
+            foreignKeyName: 'trip_event_fkey';
+            columns: ['event_id'];
             isOneToOne: false;
-            referencedRelation: 'user';
+            referencedRelation: 'event';
             referencedColumns: ['id'];
           },
           {
-            foreignKeyName: 'trip_joineeId_fkey';
-            columns: ['joineeId'];
+            foreignKeyName: 'trip_hostId_fkey';
+            columns: ['hostId'];
             isOneToOne: false;
             referencedRelation: 'user';
             referencedColumns: ['id'];
@@ -731,6 +990,49 @@ export type Database = {
             columns: ['locationId'];
             isOneToOne: false;
             referencedRelation: 'location';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      trip_member: {
+        Row: {
+          id: string;
+          joined_at: string;
+          trip_id: string;
+          user_id: string;
+        };
+        Insert: {
+          id?: string;
+          joined_at?: string;
+          trip_id: string;
+          user_id: string;
+        };
+        Update: {
+          id?: string;
+          joined_at?: string;
+          trip_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'trip_member_trip_fkey';
+            columns: ['trip_id'];
+            isOneToOne: false;
+            referencedRelation: 'searchable_trips';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'trip_member_trip_fkey';
+            columns: ['trip_id'];
+            isOneToOne: false;
+            referencedRelation: 'trip';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'trip_member_user_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'user';
             referencedColumns: ['id'];
           },
         ];
@@ -749,6 +1051,12 @@ export type Database = {
           instagramUrl: string | null;
           languages: Json | null;
           learningLanguages: Json | null;
+          match_age_max: number | null;
+          match_age_min: number | null;
+          match_pref_age: string;
+          match_pref_gender: string;
+          match_pref_language: string;
+          match_pref_travel_traits: string;
           monthOfBirth: number | null;
           mostInfluencedCountry: string | null;
           mostInfluencedCountryDescription: string | null;
@@ -778,6 +1086,12 @@ export type Database = {
           instagramUrl?: string | null;
           languages?: Json | null;
           learningLanguages?: Json | null;
+          match_age_max?: number | null;
+          match_age_min?: number | null;
+          match_pref_age?: string;
+          match_pref_gender?: string;
+          match_pref_language?: string;
+          match_pref_travel_traits?: string;
           monthOfBirth?: number | null;
           mostInfluencedCountry?: string | null;
           mostInfluencedCountryDescription?: string | null;
@@ -807,6 +1121,12 @@ export type Database = {
           instagramUrl?: string | null;
           languages?: Json | null;
           learningLanguages?: Json | null;
+          match_age_max?: number | null;
+          match_age_min?: number | null;
+          match_pref_age?: string;
+          match_pref_gender?: string;
+          match_pref_language?: string;
+          match_pref_travel_traits?: string;
           monthOfBirth?: number | null;
           mostInfluencedCountry?: string | null;
           mostInfluencedCountryDescription?: string | null;
@@ -829,6 +1149,36 @@ export type Database = {
             columns: ['role_id'];
             isOneToOne: false;
             referencedRelation: 'role';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      user_gender_preference: {
+        Row: {
+          gender: string;
+          user_id: string;
+        };
+        Insert: {
+          gender: string;
+          user_id: string;
+        };
+        Update: {
+          gender?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'user_gender_preference_gender_fkey';
+            columns: ['gender'];
+            isOneToOne: false;
+            referencedRelation: 'gender';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'user_gender_preference_user_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'user';
             referencedColumns: ['id'];
           },
         ];
@@ -954,6 +1304,30 @@ export type Database = {
           },
         ];
       };
+      whatsapp_flagged_content: {
+        Row: {
+          content: string;
+          created_at: string;
+          flag_reason: string;
+          id: string;
+          phone_number: string;
+        };
+        Insert: {
+          content: string;
+          created_at?: string;
+          flag_reason: string;
+          id?: string;
+          phone_number: string;
+        };
+        Update: {
+          content?: string;
+          created_at?: string;
+          flag_reason?: string;
+          id?: string;
+          phone_number?: string;
+        };
+        Relationships: [];
+      };
       whatsapp_rate_limit: {
         Row: {
           message_count: number;
@@ -998,11 +1372,11 @@ export type Database = {
           endDate: string | null;
           estimatedmonth: string | null;
           estimatedyear: string | null;
+          event_id: string | null;
           flexible: boolean | null;
           hostId: string | null;
           id: string | null;
           ispublic: boolean | null;
-          joineeId: string | null;
           location: string | null;
           locationId: string | null;
           matchwith: string | null;
@@ -1024,11 +1398,11 @@ export type Database = {
           endDate?: string | null;
           estimatedmonth?: string | null;
           estimatedyear?: string | null;
+          event_id?: string | null;
           flexible?: boolean | null;
           hostId?: string | null;
           id?: string | null;
           ispublic?: boolean | null;
-          joineeId?: string | null;
           location?: string | null;
           locationId?: string | null;
           matchwith?: string | null;
@@ -1050,11 +1424,11 @@ export type Database = {
           endDate?: string | null;
           estimatedmonth?: string | null;
           estimatedyear?: string | null;
+          event_id?: string | null;
           flexible?: boolean | null;
           hostId?: string | null;
           id?: string | null;
           ispublic?: boolean | null;
-          joineeId?: string | null;
           location?: string | null;
           locationId?: string | null;
           matchwith?: string | null;
@@ -1077,15 +1451,15 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
-            foreignKeyName: 'trip_hostId_fkey';
-            columns: ['hostId'];
+            foreignKeyName: 'trip_event_fkey';
+            columns: ['event_id'];
             isOneToOne: false;
-            referencedRelation: 'user';
+            referencedRelation: 'event';
             referencedColumns: ['id'];
           },
           {
-            foreignKeyName: 'trip_joineeId_fkey';
-            columns: ['joineeId'];
+            foreignKeyName: 'trip_hostId_fkey';
+            columns: ['hostId'];
             isOneToOne: false;
             referencedRelation: 'user';
             referencedColumns: ['id'];
@@ -1114,17 +1488,50 @@ export type Database = {
         Args: { p_user_id: string };
         Returns: boolean;
       };
+      check_rate_limit: {
+        Args: { p_max_messages: number; p_phone: string; p_window_ms: number };
+        Returns: {
+          allowed: boolean;
+          retry_after_minutes: number;
+        }[];
+      };
       delete_message: {
         Args: { p_message_id: string; p_user_id: string };
         Returns: boolean;
       };
       delete_user_account: { Args: never; Returns: undefined };
+      delete_user_and_data: {
+        Args: { target_user_id: string };
+        Returns: undefined;
+      };
       edit_message: {
         Args: {
           p_message_id: string;
           p_new_content: string;
           p_user_id: string;
         };
+        Returns: boolean;
+      };
+      express_interest: {
+        Args: {
+          p_event_id: string;
+          p_interested: boolean;
+          p_target_user_id: string;
+        };
+        Returns: Json;
+      };
+      find_matching_events: {
+        Args: { p_message_body: string };
+        Returns: {
+          end_date: string;
+          id: string;
+          location: string;
+          name: string;
+          start_date: string;
+        }[];
+      };
+      find_property_listing_exists: {
+        Args: { p_event_id: string; p_phone_number: string };
         Returns: boolean;
       };
       get_conversation_messages: {
@@ -1147,6 +1554,29 @@ export type Database = {
           sender_image_url: string;
           sender_name: string;
           updated_at: string;
+        }[];
+      };
+      get_event_matches: {
+        Args: { p_event_id: string };
+        Returns: {
+          accommodation_type: string;
+          bio: string;
+          compatibility_score: number;
+          gender: string;
+          image_url: string;
+          languages: Json;
+          name: string;
+          number_of_rooms: number;
+          shared_languages: Json;
+          shared_traits: Json;
+          travel_traits: Json;
+          trip_end_date: string;
+          trip_id: string;
+          trip_location: string;
+          trip_name: string;
+          trip_start_date: string;
+          user_id: string;
+          year_of_birth: number;
         }[];
       };
       get_or_create_conversation: {
@@ -1356,6 +1786,20 @@ export type Database = {
         };
         Returns: undefined;
       };
+      save_property_listing: {
+        Args: {
+          p_accommodation_type_id: string;
+          p_event_id: string;
+          p_house_rules: string;
+          p_location: string;
+          p_num_bedrooms: number;
+          p_phone_number: string;
+          p_price_per_night: number;
+          p_rooms: Json;
+          p_supplier_name: string;
+        };
+        Returns: string;
+      };
       send_message:
         | {
             Args: {
@@ -1376,6 +1820,8 @@ export type Database = {
             };
             Returns: string;
           };
+      show_limit: { Args: never; Returns: number };
+      show_trgm: { Args: { '': string }; Returns: string[] };
       text_to_bytea: { Args: { data: string }; Returns: string };
       update_request_status: {
         Args: { new_status: string; request_id: string };

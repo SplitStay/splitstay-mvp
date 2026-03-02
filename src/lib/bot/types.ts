@@ -31,6 +31,32 @@ export interface SavePropertyListingInput {
   }>;
 }
 
+export interface MatchingUser {
+  id: string;
+  displayName: string;
+  preferencesConfigured: boolean;
+}
+
+export interface EventRegistration {
+  eventId: string;
+  eventName: string;
+  startDate: string;
+  endDate: string;
+  location: string;
+  isHost: boolean;
+}
+
+export interface MatchProfile {
+  userId: string;
+  displayName: string;
+  bio: string | null;
+  sharedTraits: string[];
+  sharedLanguages: string[];
+  compatibilityScore: number;
+  accommodationSummary: string | null;
+  profileUrl: string | null;
+}
+
 export interface DbClient {
   checkSeenSid: (messageSid: string) => Promise<boolean>;
   markSidSeen: (messageSid: string) => Promise<void>;
@@ -58,6 +84,12 @@ export interface DbClient {
   savePropertyListing: (
     input: SavePropertyListingInput,
   ) => Promise<{ propertyListingId: string }>;
+  findUserByPhone: (phone: string) => Promise<MatchingUser | null>;
+  getUserEventRegistrations: (userId: string) => Promise<EventRegistration[]>;
+  getEventMatchProfiles: (
+    eventId: string,
+    userId: string,
+  ) => Promise<MatchProfile[]>;
 }
 
 export interface AccessControl {

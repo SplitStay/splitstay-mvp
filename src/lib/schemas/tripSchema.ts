@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import {
   publicAccommodationTypeRowSchema,
   publicTripRowSchema,
@@ -49,7 +50,7 @@ const transformTripFields = <
 export const TripSchema = publicTripRowSchema.transform(transformTripFields);
 
 /**
- * Schema for related user data (host/joinee) returned by Supabase joins.
+ * Schema for related user data (host) returned by Supabase joins.
  */
 const RelatedUserSchema = publicUserRowSchema
   .pick({ name: true, imageUrl: true })
@@ -63,12 +64,26 @@ const RelatedAccommodationTypeSchema = publicAccommodationTypeRowSchema
   .nullable();
 
 /**
- * Trip schema with relations (host, joinee, accommodation_type).
+ * Schema for trip members returned by Supabase joins.
+ */
+const TripMemberSchema = z.object({
+  user_id: z.string(),
+  user: RelatedUserSchema,
+});
+
+/**
+ * Trip schema with relations (host, members, accommodation_type).
  */
 export const TripWithRelationsSchema = publicTripRowSchema
   .extend({
     host: RelatedUserSchema,
-    joinee: RelatedUserSchema,
+    trip_member: z.array(TripMemberSchema).default([]),
     accommodation_type: RelatedAccommodationTypeSchema,
   })
-  .transform(transformTripFields);
+  .transform((trip) => {
+    const { trip_member, ...rest } = transformTripFields(trip);
+    return {
+      ...rest,
+      members: trip_member,
+    };
+  });

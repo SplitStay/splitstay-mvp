@@ -26,7 +26,8 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 const llmBaseUrl = Deno.env.get('LLM_BASE_URL');
 const llmModel = Deno.env.get('LLM_MODEL');
 const llm = createGroqClient(groqApiKey, undefined, llmBaseUrl, llmModel);
-const db = createSupabaseDbClient(supabase);
+const appUrl = Deno.env.get('APP_URL');
+const db = createSupabaseDbClient(supabase, appUrl);
 const accessControl = createAccessControl(adminNumbers);
 const skipSignatureValidation =
   Deno.env.get('TWILIO_SKIP_SIGNATURE_VALIDATION') === 'true';

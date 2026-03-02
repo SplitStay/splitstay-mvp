@@ -76,6 +76,9 @@ const createMockDeps = (
     savePropertyListing: vi
       .fn()
       .mockResolvedValue({ propertyListingId: 'pl-123' }),
+    findUserByPhone: vi.fn().mockResolvedValue(null),
+    getUserEventRegistrations: vi.fn().mockResolvedValue([]),
+    getEventMatchProfiles: vi.fn().mockResolvedValue([]),
     ...overrides.db,
   },
   accessControl: {
