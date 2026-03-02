@@ -14,7 +14,7 @@ interface Props {
   className?: string;
 }
 
-export const CityAutocomplete: React.FC<Props> = ({
+const CityAutocomplete: React.FC<Props> = ({
   value,
   onChange,
   onSelect,

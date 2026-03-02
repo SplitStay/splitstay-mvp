@@ -206,5 +206,3 @@ export const AccommodationPreview: React.FC<Props> = ({
     </motion.div>
   );
 };
-
-export default AccommodationPreview;
