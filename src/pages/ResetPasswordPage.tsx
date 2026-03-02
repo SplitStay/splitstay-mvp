@@ -79,7 +79,6 @@ export const ResetPasswordPage: React.FC = () => {
             </p>
             <button
               type="button"
-              // biome-ignore lint/suspicious/noAssignInExpressions: Navigation pattern
               onClick={() => (window.location.href = '/')}
               className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
             >
@@ -199,7 +198,6 @@ export const ResetPasswordPage: React.FC = () => {
             <div className="mt-6 text-center">
               <button
                 type="button"
-                // biome-ignore lint/suspicious/noAssignInExpressions: Navigation pattern
                 onClick={() => (window.location.href = '/')}
                 className="text-blue-600 hover:text-blue-700 font-medium"
               >
