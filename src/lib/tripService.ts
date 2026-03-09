@@ -139,7 +139,7 @@ export const getTripById = async (
     .select(`
       *,
       host:user!hostId(name, imageUrl),
-      trip_member(user_id, user:user(name, imageUrl)),
+      joinee:user!joineeId(name, imageUrl),
       accommodation_type(name)
     `)
     .eq('id', tripId)
@@ -194,52 +194,21 @@ export const getUserTrips = async (): Promise<TripWithHiddenStatus[]> => {
     throw new Error('User must be authenticated to fetch trips');
   }
 
-  // Get trips where user is host
-  const { data: hostedTrips, error: hostError } = await supabase
+  const { data: trips, error } = await supabase
     .from('trip')
     .select(`
       *,
       host:user!hostId(name, imageUrl),
-      trip_member(user_id, user:user(name, imageUrl)),
+      joinee:user!joineeId(name, imageUrl),
       accommodation_type(name)
     `)
-    .eq('hostId', user.id)
+    .or(`hostId.eq.${user.id},joineeId.eq.${user.id}`)
     .order('createdAt', { ascending: false });
 
-  if (hostError) {
-    console.error('Error fetching hosted trips:', hostError);
-    throw new Error(`Failed to fetch trips: ${hostError.message}`);
+  if (error) {
+    console.error('Error fetching user trips:', error);
+    throw new Error(`Failed to fetch trips: ${error.message}`);
   }
-
-  // Get trips where user is a member
-  const { data: memberTrips, error: memberError } = await supabase
-    .from('trip_member')
-    .select(`
-      trip:trip(
-        *,
-        host:user!hostId(name, imageUrl),
-        trip_member(user_id, user:user(name, imageUrl)),
-        accommodation_type(name)
-      )
-    `)
-    .eq('user_id', user.id);
-
-  if (memberError) {
-    console.error('Error fetching member trips:', memberError);
-    throw new Error(`Failed to fetch trips: ${memberError.message}`);
-  }
-
-  // Combine and deduplicate
-  const allTrips = [
-    ...(hostedTrips ?? []),
-    ...(memberTrips ?? []).map((m) => m.trip).filter(Boolean),
-  ];
-  const seen = new Set<string>();
-  const trips = allTrips.filter((t) => {
-    if (seen.has(t.id)) return false;
-    seen.add(t.id);
-    return true;
-  });
 
   // Fetch hidden trips to determine status
   const { data: hiddenTrips } = await supabase
@@ -258,7 +227,10 @@ export const getUserTrips = async (): Promise<TripWithHiddenStatus[]> => {
 };
 
 /**
- * Search for trips. Uses searchable_trips view to exclude hidden trips.
+ * Search for public, non-hidden trips.
+ *
+ * Queries the searchable_trips view which filters out private and admin-hidden
+ * trips. Uses joineeId FK join (not trip_member) to match the production schema.
  */
 export const searchTrips = async (filters: {
   location?: string;
@@ -269,11 +241,10 @@ export const searchTrips = async (filters: {
   estimatedYear?: string;
   accommodationTypeId?: string;
 }): Promise<Trip[]> => {
-  // Use searchable_trips view which excludes hidden trips
   let query = supabase.from('searchable_trips').select(`
       *,
       host:user!hostId(name, imageUrl),
-      trip_member(user_id, user:user(name, imageUrl)),
+      joinee:user!joineeId(name, imageUrl),
       accommodation_type(name)
     `);
 

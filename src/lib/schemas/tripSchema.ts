@@ -1,9 +1,19 @@
-import { z } from 'zod';
 import {
+  publicTripRowSchema as generatedTripRowSchema,
   publicAccommodationTypeRowSchema,
-  publicTripRowSchema,
   publicUserRowSchema,
 } from './database.schemas';
+
+/**
+ * Trip row schema adjusted for the current production database.
+ *
+ * The generated schema includes columns from unapplied migrations (event_id)
+ * and omits columns that still exist in production (joineeId). This override
+ * makes the schema match what PostgREST actually returns.
+ */
+const publicTripRowSchema = generatedTripRowSchema
+  .omit({ event_id: true })
+  .extend({ joineeId: generatedTripRowSchema.shape.hostId });
 
 /**
  * Transform database lowercase field names to camelCase for the app.
@@ -64,26 +74,12 @@ const RelatedAccommodationTypeSchema = publicAccommodationTypeRowSchema
   .nullable();
 
 /**
- * Schema for trip members returned by Supabase joins.
- */
-const TripMemberSchema = z.object({
-  user_id: z.string(),
-  user: RelatedUserSchema,
-});
-
-/**
- * Trip schema with relations (host, members, accommodation_type).
+ * Trip schema with relations (host, joinee, accommodation_type).
  */
 export const TripWithRelationsSchema = publicTripRowSchema
   .extend({
     host: RelatedUserSchema,
-    trip_member: z.array(TripMemberSchema).default([]),
+    joinee: RelatedUserSchema,
     accommodation_type: RelatedAccommodationTypeSchema,
   })
-  .transform((trip) => {
-    const { trip_member, ...rest } = transformTripFields(trip);
-    return {
-      ...rest,
-      members: trip_member,
-    };
-  });
+  .transform(transformTripFields);
