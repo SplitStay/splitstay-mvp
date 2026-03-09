@@ -25,10 +25,12 @@ import {
 import { AdminPage } from './pages/AdminPage';
 import CreateProfilePage from './pages/CreateProfilePage';
 import EditProfilePage from './pages/EditProfilePage';
+import { EventLandingPage } from './pages/EventLandingPage';
 import { MessagesPage } from './pages/MessagesPage';
 import PostTripPage from './pages/PostTripPage';
 import ProfilePage from './pages/ProfilePage';
 import { TripDetailPage } from './pages/TripDetailPage';
+import { WhatsAppRedirectPage } from './pages/WhatsAppRedirectPage';
 import { WhatsAppTesterPage } from './pages/WhatsAppTesterPage';
 
 const queryClient = new QueryClient({
@@ -227,6 +229,24 @@ function AppRoutes() {
           <GuestFriendlyRoute>
             <TripDetailPage />
           </GuestFriendlyRoute>
+        }
+      />
+
+      {/* Event landing pages - linked from Instagram campaigns */}
+      <Route
+        path="/events/:slug"
+        element={
+          <PublicRoute>
+            <EventLandingPage />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/go/:slug"
+        element={
+          <PublicRoute>
+            <WhatsAppRedirectPage />
+          </PublicRoute>
         }
       />
 
