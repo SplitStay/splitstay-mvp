@@ -31,7 +31,7 @@ function createMockTrip(overrides: Record<string, unknown> = {}) {
     location: 'Paris',
     locationId: null,
     hostId: VALID_USER_ID,
-    joineeId: null,
+    event_id: null,
     accommodationTypeId: null,
     personalNote: null,
     vibe: null,
@@ -50,46 +50,10 @@ function createMockTrip(overrides: Record<string, unknown> = {}) {
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
     host: { name: 'Host Name', imageUrl: null },
-    joinee: null,
+    trip_member: [],
     accommodation_type: null,
     ...overrides,
   };
-}
-
-/**
- * Builds a Supabase query chain mock where every method returns the chain
- * itself, except the terminal method which resolves with the given data.
- *
- * Pass `spies` to capture calls to specific methods (e.g., `select`).
- */
-function buildSupabaseChain({
-  resolveWith,
-  spies = {},
-}: {
-  resolveWith: { data: unknown; error: unknown };
-  spies?: Record<string, ReturnType<typeof vi.fn>>;
-}) {
-  const chain: Record<string, ReturnType<typeof vi.fn>> = {};
-  const self = () => chain;
-  for (const method of [
-    'select',
-    'eq',
-    'or',
-    'ilike',
-    'gte',
-    'lte',
-    'order',
-    'limit',
-    'single',
-  ]) {
-    chain[method] = spies[method]
-      ? spies[method].mockReturnValue(chain)
-      : vi.fn(self);
-  }
-  // Terminal: limit and single resolve with data
-  chain.limit = vi.fn().mockResolvedValue(resolveWith);
-  chain.single = vi.fn().mockResolvedValue(resolveWith);
-  return chain as unknown as ReturnType<typeof supabase.from>;
 }
 
 describe('tripService', () => {
@@ -98,20 +62,26 @@ describe('tripService', () => {
   });
 
   describe('searchTrips', () => {
-    it('queries searchable_trips with joineeId join, not trip_member', async () => {
-      const selectSpy = vi.fn();
-      const chain = buildSupabaseChain({
-        resolveWith: { data: [createMockTrip()], error: null },
-        spies: { select: selectSpy },
+    it('queries searchable_trips view to exclude hidden trips', async () => {
+      const mockTrips = [createMockTrip({ name: 'Visible Trip' })];
+
+      const mockFrom = vi.fn().mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          order: vi.fn().mockReturnValue({
+            limit: vi.fn().mockResolvedValue({
+              data: mockTrips,
+              error: null,
+            }),
+          }),
+        }),
       });
-      vi.mocked(supabase.from).mockReturnValue(chain);
+      vi.mocked(supabase.from).mockImplementation(mockFrom);
 
-      await searchTrips({});
+      const result = await searchTrips({});
 
-      expect(supabase.from).toHaveBeenCalledWith('searchable_trips');
-      const selectArg = selectSpy.mock.calls[0][0] as string;
-      expect(selectArg).toContain('joinee:user!joineeId');
-      expect(selectArg).not.toContain('trip_member');
+      // Verify it queries the searchable_trips view
+      expect(mockFrom).toHaveBeenCalledWith('searchable_trips');
+      expect(result).toHaveLength(1);
     });
   });
 
@@ -279,11 +249,21 @@ describe('tripService', () => {
         if (table === 'trip') {
           return {
             select: vi.fn().mockReturnValue({
-              or: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
                 order: vi.fn().mockResolvedValue({
                   data: mockTrips,
                   error: null,
                 }),
+              }),
+            }),
+          };
+        }
+        if (table === 'trip_member') {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockResolvedValue({
+                data: [],
+                error: null,
               }),
             }),
           };

@@ -3,7 +3,7 @@ import { TripWithRelationsSchema } from '../tripSchema';
 
 /**
  * Minimal valid trip row matching what PostgREST returns from the
- * searchable_trips view / trip table in production.
+ * trip table with host, trip_member, and accommodation_type joins.
  */
 function buildTripRow(overrides: Record<string, unknown> = {}) {
   return {
@@ -13,7 +13,7 @@ function buildTripRow(overrides: Record<string, unknown> = {}) {
     location: 'Paris',
     locationId: null,
     hostId: '660e8400-e29b-41d4-a716-446655440001',
-    joineeId: null,
+    event_id: null,
     accommodationTypeId: null,
     personalNote: null,
     vibe: null,
@@ -32,7 +32,7 @@ function buildTripRow(overrides: Record<string, unknown> = {}) {
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
     host: { name: 'Host', imageUrl: null },
-    joinee: null,
+    trip_member: [],
     accommodation_type: null,
     ...overrides,
   };
@@ -91,17 +91,23 @@ describe('TripWithRelationsSchema', () => {
     expect(result.success).toBe(false);
   });
 
-  it('preserves host and joinee relations', () => {
+  it('transforms trip_member array to members', () => {
     const result = TripWithRelationsSchema.parse(
       buildTripRow({
-        host: { name: 'Alice', imageUrl: 'https://example.com/a.jpg' },
-        joinee: { name: 'Bob', imageUrl: null },
+        trip_member: [
+          {
+            user_id: '770e8400-e29b-41d4-a716-446655440002',
+            user: { name: 'Bob', imageUrl: null },
+          },
+        ],
       }),
     );
-    expect(result.host).toEqual({
-      name: 'Alice',
-      imageUrl: 'https://example.com/a.jpg',
-    });
-    expect(result.joinee).toEqual({ name: 'Bob', imageUrl: null });
+    expect(result.members).toEqual([
+      {
+        user_id: '770e8400-e29b-41d4-a716-446655440002',
+        user: { name: 'Bob', imageUrl: null },
+      },
+    ]);
+    expect(result).not.toHaveProperty('trip_member');
   });
 });
