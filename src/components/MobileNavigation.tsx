@@ -142,7 +142,7 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
                       Browsing as Guest
                     </p>
                     <p className="text-xs text-blue-600 mt-1">
-                      Sign up to post trips and message travelers!
+                      Sign up to create your profile and connect with travelers!
                     </p>
                   </div>
                 </div>

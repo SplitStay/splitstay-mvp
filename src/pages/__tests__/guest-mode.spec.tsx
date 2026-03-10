@@ -146,7 +146,7 @@ describeFeature(feature, ({ Scenario }) => {
       // Should see guest mode message
       expect(
         screen.getByText(
-          /You're browsing as a guest. Sign up to post trips and message travelers!/i,
+          /You're browsing as a guest. Sign up to create your profile and connect with travelers!/i,
         ),
       ).toBeInTheDocument();
 

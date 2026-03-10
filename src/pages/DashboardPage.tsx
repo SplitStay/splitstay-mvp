@@ -176,8 +176,8 @@ export const DashboardPage = () => {
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mx-auto">
                   <p className="text-blue-800 text-sm sm:text-base">
                     <Sparkles className="inline w-4 h-4 mr-1" />
-                    You're browsing as a guest. Sign up to post trips and
-                    message travelers!
+                    You're browsing as a guest. Sign up to create your profile
+                    and connect with travelers!
                   </p>
                 </div>
               </>
