@@ -137,7 +137,7 @@ export default function CreateProfilePage() {
         } catch (error) {
           console.error('Error creating pending trip:', error);
           toast.error(
-            'Profile created but failed to post trip. You can try posting again from the dashboard.',
+            'Profile created but failed to save pending data. Please try again later.',
           );
         }
       }

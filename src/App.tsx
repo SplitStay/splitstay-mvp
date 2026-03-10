@@ -14,7 +14,6 @@ import {
   DashboardPage,
   ForgotPasswordPage,
   HomePage,
-  HowItWorks,
   LoginPage,
   PrivacyPage,
   ResetPasswordPage,
@@ -194,8 +193,8 @@ function AppRoutes() {
       />
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
-      <Route path="/how-it-works" element={<HowItWorks />} />
       {/* HIDDEN: Web features stripped to focus on WhatsApp bot. Restore route elements to re-enable. */}
+      <Route path="/how-it-works" element={<Navigate to="/" replace />} />
       <Route path="/post-trip" element={<Navigate to="/" replace />} />
       <Route path="/find-partners" element={<Navigate to="/" replace />} />
       <Route path="/messages" element={<Navigate to="/" replace />} />

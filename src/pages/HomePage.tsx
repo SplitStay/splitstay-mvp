@@ -119,20 +119,6 @@ const HomePage: React.FC = () => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-6">
-              <nav className="flex space-x-6">
-                <a
-                  href="/"
-                  className="text-blue-600 font-medium border-b-2 border-blue-600 pb-1"
-                >
-                  Home
-                </a>
-                <a
-                  href="/how-it-works"
-                  className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
-                >
-                  How it Works
-                </a>
-              </nav>
               <button
                 type="button"
                 onClick={handleGetStarted}
@@ -144,12 +130,6 @@ const HomePage: React.FC = () => {
 
             {/* Mobile Navigation */}
             <div className="md:hidden flex items-center space-x-3">
-              <a
-                href="/how-it-works"
-                className="text-gray-700 hover:text-blue-600 font-medium text-sm"
-              >
-                How it Works
-              </a>
               <button
                 type="button"
                 onClick={handleGetStarted}
