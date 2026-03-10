@@ -8,7 +8,9 @@
  * NOTE: vitest-cucumber wraps each step as its own `it` block, so beforeEach
  * runs between steps. All setup must happen inline within scenario steps.
  */
-import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
+
+import fs from 'node:fs';
+import { describeFeature, loadFeatureFromText } from '@amiceli/vitest-cucumber';
 import { expect, vi } from 'vitest';
 import { createHandler } from '../handler';
 import { buildSupplierSystemPrompt } from '../supplierPrompt';
@@ -114,7 +116,9 @@ const createRequest = (
 const formBody = (message: string, phone = 'whatsapp:+1234567890') =>
   `MessageSid=SM${Date.now()}&From=${encodeURIComponent(phone)}&Body=${encodeURIComponent(message)}`;
 
-const feature = await loadFeature('features/supplier-intake.feature');
+const feature = loadFeatureFromText(
+  fs.readFileSync('features/supplier-intake.feature', 'utf-8'),
+);
 
 describeFeature(feature, ({ Scenario }) => {
   // ==========================================================================

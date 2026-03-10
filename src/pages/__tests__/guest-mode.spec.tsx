@@ -4,7 +4,9 @@
  * This spec file binds to features/guest-mode.feature and implements
  * executable tests for the guest browsing user stories.
  */
-import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
+
+import fs from 'node:fs';
+import { describeFeature, loadFeatureFromText } from '@amiceli/vitest-cucumber';
 import { screen, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 
@@ -60,7 +62,9 @@ import HowItWorks from '../HowItWorks';
 import PrivacyPage from '../PrivacyPage';
 import TermsPage from '../TermsPage';
 
-const feature = await loadFeature('features/guest-mode.feature');
+const feature = loadFeatureFromText(
+  fs.readFileSync('features/guest-mode.feature', 'utf-8'),
+);
 
 describeFeature(feature, ({ Scenario }) => {
   // ============================================================================

@@ -8,7 +8,9 @@
  * are complex to test at the unit level. This file focuses on simpler
  * component-level tests.
  */
-import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
+
+import fs from 'node:fs';
+import { describeFeature, loadFeatureFromText } from '@amiceli/vitest-cucumber';
 import { screen, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 
@@ -80,7 +82,9 @@ vi.mock('@/lib/accommodationService', () => ({
 import { test } from '@/test/componentFixtures';
 import PostTripPage from '../PostTripPage';
 
-const feature = await loadFeature('features/trip-posting.feature');
+const feature = loadFeatureFromText(
+  fs.readFileSync('features/trip-posting.feature', 'utf-8'),
+);
 
 describeFeature(feature, ({ Background, Scenario }) => {
   // Handle background - user is signed in with completed profile

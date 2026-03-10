@@ -4,7 +4,9 @@
  * This spec file binds to features/trip-details.feature and implements
  * executable tests for trip viewing scenarios.
  */
-import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
+
+import fs from 'node:fs';
+import { describeFeature, loadFeatureFromText } from '@amiceli/vitest-cucumber';
 import { screen, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 
@@ -77,7 +79,9 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-const feature = await loadFeature('features/trip-details.feature');
+const feature = loadFeatureFromText(
+  fs.readFileSync('features/trip-details.feature', 'utf-8'),
+);
 
 describeFeature(feature, ({ Background, Scenario }) => {
   // Handle background - trip exists

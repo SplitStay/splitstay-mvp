@@ -4,7 +4,9 @@
  * This spec file binds to features/user-profile.feature and implements
  * executable tests for profile management scenarios.
  */
-import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
+
+import fs from 'node:fs';
+import { describeFeature, loadFeatureFromText } from '@amiceli/vitest-cucumber';
 import { screen, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 
@@ -61,7 +63,9 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-const feature = await loadFeature('features/user-profile.feature');
+const feature = loadFeatureFromText(
+  fs.readFileSync('features/user-profile.feature', 'utf-8'),
+);
 
 describeFeature(feature, ({ Background, Scenario }) => {
   // Handle background - user is signed in

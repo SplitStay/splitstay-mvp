@@ -4,7 +4,9 @@
  * This spec file binds to features/admin.feature and implements
  * the @technical service-level scenarios.
  */
-import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
+
+import fs from 'node:fs';
+import { describeFeature, loadFeatureFromText } from '@amiceli/vitest-cucumber';
 import { expect, vi } from 'vitest';
 
 // Mock supabase before importing the service
@@ -20,7 +22,9 @@ vi.mock('../supabase', () => ({
 import { hideTrip, isCurrentUserAdmin, unhideTrip } from '../adminService';
 import { supabase } from '../supabase';
 
-const feature = await loadFeature('features/admin.feature');
+const feature = loadFeatureFromText(
+  fs.readFileSync('features/admin.feature', 'utf-8'),
+);
 
 // Valid UUIDs for tests
 const VALID_TRIP_ID = '550e8400-e29b-41d4-a716-446655440000';

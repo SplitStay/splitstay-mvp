@@ -4,7 +4,9 @@
  * This spec file binds to features/trip-search.feature and implements
  * executable tests for finding travel partners scenarios.
  */
-import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
+
+import fs from 'node:fs';
+import { describeFeature, loadFeatureFromText } from '@amiceli/vitest-cucumber';
 import { screen, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 
@@ -57,7 +59,9 @@ vi.mock('@/lib/tripService', () => ({
 import { test } from '@/test/componentFixtures';
 import FindPartnerPage from '../FindPartnerPage';
 
-const feature = await loadFeature('features/trip-search.feature');
+const feature = loadFeatureFromText(
+  fs.readFileSync('features/trip-search.feature', 'utf-8'),
+);
 
 describeFeature(feature, ({ Background, Scenario }) => {
   // Handle background - trips exist

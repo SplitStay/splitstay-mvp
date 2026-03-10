@@ -4,9 +4,10 @@
  * This spec file binds to features/authentication.feature and implements
  * executable tests for the authentication user stories.
  */
-import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
-import { screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+
+import fs from 'node:fs';
+import { describeFeature, loadFeatureFromText } from '@amiceli/vitest-cucumber';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 
 // Mock supabase before importing components
@@ -54,7 +55,9 @@ import { ForgotPasswordPage } from '../ForgotPasswordPage';
 import { LoginPage } from '../LoginPage';
 import { SignupPage } from '../SignupPage';
 
-const feature = await loadFeature('features/authentication.feature');
+const feature = loadFeatureFromText(
+  fs.readFileSync('features/authentication.feature', 'utf-8'),
+);
 
 describeFeature(feature, ({ Background, Scenario }) => {
   Background(({ Given }) => {
@@ -71,8 +74,6 @@ describeFeature(feature, ({ Background, Scenario }) => {
     test('shows confirmation message after successful signup', async ({
       renderWithProviders,
     }) => {
-      const user = userEvent.setup({ delay: null });
-
       // Mock successful signup
       vi.mocked(supabase.auth.signUp).mockResolvedValue({
         data: { user: null, session: null },
@@ -82,21 +83,22 @@ describeFeature(feature, ({ Background, Scenario }) => {
       renderWithProviders(<SignupPage />, { initialRoute: '/signup' });
 
       // Fill in the form
-      await user.type(screen.getByPlaceholderText('John'), 'Test');
-      await user.type(screen.getByPlaceholderText('Doe'), 'User');
-      await user.type(
-        screen.getByPlaceholderText('john@example.com'),
-        'test@example.com',
-      );
       const passwordInputs = screen.getAllByPlaceholderText('••••••••');
-      await user.type(passwordInputs[0], 'password123');
-      await user.type(passwordInputs[1], 'password123');
+      fireEvent.change(screen.getByPlaceholderText('John'), {
+        target: { value: 'Test' },
+      });
+      fireEvent.change(screen.getByPlaceholderText('Doe'), {
+        target: { value: 'User' },
+      });
+      fireEvent.change(screen.getByPlaceholderText('john@example.com'), {
+        target: { value: 'test@example.com' },
+      });
+      fireEvent.change(passwordInputs[0], { target: { value: 'password123' } });
+      fireEvent.change(passwordInputs[1], { target: { value: 'password123' } });
 
-      // Accept terms
-      await user.click(screen.getByRole('checkbox'));
-
-      // Submit
-      await user.click(screen.getByRole('button', { name: 'Sign up' }));
+      // Accept terms and submit
+      fireEvent.click(screen.getByRole('checkbox'));
+      fireEvent.click(screen.getByRole('button', { name: 'Sign up' }));
 
       // Verify success message appears
       await waitFor(() => {
@@ -133,8 +135,6 @@ describeFeature(feature, ({ Background, Scenario }) => {
       test('shows same confirmation message for existing email (security)', async ({
         renderWithProviders,
       }) => {
-        const user = userEvent.setup({ delay: null });
-
         // Mock signup - Supabase returns success even for existing emails
         // (confirmation email just won't be sent to prevent email enumeration)
         vi.mocked(supabase.auth.signUp).mockResolvedValue({
@@ -145,21 +145,26 @@ describeFeature(feature, ({ Background, Scenario }) => {
         renderWithProviders(<SignupPage />, { initialRoute: '/signup' });
 
         // Fill in the form with any email
-        await user.type(screen.getByPlaceholderText('John'), 'Existing');
-        await user.type(screen.getByPlaceholderText('Doe'), 'User');
-        await user.type(
-          screen.getByPlaceholderText('john@example.com'),
-          'existing@example.com',
-        );
         const passwordInputs = screen.getAllByPlaceholderText('••••••••');
-        await user.type(passwordInputs[0], 'password123');
-        await user.type(passwordInputs[1], 'password123');
+        fireEvent.change(screen.getByPlaceholderText('John'), {
+          target: { value: 'Existing' },
+        });
+        fireEvent.change(screen.getByPlaceholderText('Doe'), {
+          target: { value: 'User' },
+        });
+        fireEvent.change(screen.getByPlaceholderText('john@example.com'), {
+          target: { value: 'existing@example.com' },
+        });
+        fireEvent.change(passwordInputs[0], {
+          target: { value: 'password123' },
+        });
+        fireEvent.change(passwordInputs[1], {
+          target: { value: 'password123' },
+        });
 
-        // Accept terms
-        await user.click(screen.getByRole('checkbox'));
-
-        // Submit
-        await user.click(screen.getByRole('button', { name: 'Sign up' }));
+        // Accept terms and submit
+        fireEvent.click(screen.getByRole('checkbox'));
+        fireEvent.click(screen.getByRole('button', { name: 'Sign up' }));
 
         // Same message shown whether email is new or already registered
         await waitFor(() => {
@@ -185,28 +190,25 @@ describeFeature(feature, ({ Background, Scenario }) => {
       test('shows validation error for short password', async ({
         renderWithProviders,
       }) => {
-        const user = userEvent.setup({ delay: null });
         renderWithProviders(<SignupPage />, { initialRoute: '/signup' });
 
         // Fill form with short password
-        await user.type(screen.getByPlaceholderText('John'), 'Test');
-        await user.type(screen.getByPlaceholderText('Doe'), 'User');
-        await user.type(
-          screen.getByPlaceholderText('john@example.com'),
-          'test@example.com',
-        );
-
-        // Enter a password shorter than 6 characters
         const passwordInputs = screen.getAllByPlaceholderText('••••••••');
-        await user.type(passwordInputs[0], '12345');
-        await user.type(passwordInputs[1], '12345');
+        fireEvent.change(screen.getByPlaceholderText('John'), {
+          target: { value: 'Test' },
+        });
+        fireEvent.change(screen.getByPlaceholderText('Doe'), {
+          target: { value: 'User' },
+        });
+        fireEvent.change(screen.getByPlaceholderText('john@example.com'), {
+          target: { value: 'test@example.com' },
+        });
+        fireEvent.change(passwordInputs[0], { target: { value: '12345' } });
+        fireEvent.change(passwordInputs[1], { target: { value: '12345' } });
 
-        // Check the terms checkbox
-        const termsCheckbox = screen.getByRole('checkbox');
-        await user.click(termsCheckbox);
-
-        // Click sign up
-        await user.click(screen.getByRole('button', { name: 'Sign up' }));
+        // Check the terms checkbox and submit
+        fireEvent.click(screen.getByRole('checkbox'));
+        fireEvent.click(screen.getByRole('button', { name: 'Sign up' }));
 
         // Verify error message appears
         await waitFor(() => {
@@ -230,24 +232,25 @@ describeFeature(feature, ({ Background, Scenario }) => {
     test('submit button is disabled without terms checkbox', async ({
       renderWithProviders,
     }) => {
-      const user = userEvent.setup({ delay: null });
       renderWithProviders(<SignupPage />, { initialRoute: '/signup' });
 
       // Fill in all fields
-      await user.type(screen.getByPlaceholderText('John'), 'Test');
-      await user.type(screen.getByPlaceholderText('Doe'), 'User');
-      await user.type(
-        screen.getByPlaceholderText('john@example.com'),
-        'test@example.com',
-      );
       const passwordInputs = screen.getAllByPlaceholderText('••••••••');
-      await user.type(passwordInputs[0], 'password123');
-      await user.type(passwordInputs[1], 'password123');
+      fireEvent.change(screen.getByPlaceholderText('John'), {
+        target: { value: 'Test' },
+      });
+      fireEvent.change(screen.getByPlaceholderText('Doe'), {
+        target: { value: 'User' },
+      });
+      fireEvent.change(screen.getByPlaceholderText('john@example.com'), {
+        target: { value: 'test@example.com' },
+      });
+      fireEvent.change(passwordInputs[0], { target: { value: 'password123' } });
+      fireEvent.change(passwordInputs[1], { target: { value: 'password123' } });
 
       // Don't check terms checkbox
       // Verify button is disabled
-      const signupButton = screen.getByRole('button', { name: 'Sign up' });
-      expect(signupButton).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Sign up' })).toBeDisabled();
     });
 
     Given('I am on the signup page', () => {});
@@ -293,8 +296,6 @@ describeFeature(feature, ({ Background, Scenario }) => {
       renderWithProviders,
       fake,
     }) => {
-      const user = userEvent.setup({ delay: null });
-
       // Mock successful sign in
       vi.mocked(supabase.auth.signInWithPassword).mockResolvedValue({
         data: {
@@ -327,15 +328,14 @@ describeFeature(feature, ({ Background, Scenario }) => {
 
       renderWithProviders(<LoginPage />, { initialRoute: '/login' });
 
-      // Enter credentials
-      await user.type(
-        screen.getByPlaceholderText('john@example.com'),
-        'test@example.com',
-      );
-      await user.type(screen.getByPlaceholderText('••••••••'), 'password123');
-
-      // Click sign in
-      await user.click(screen.getByRole('button', { name: 'Sign in' }));
+      // Enter credentials and submit
+      fireEvent.change(screen.getByPlaceholderText('john@example.com'), {
+        target: { value: 'test@example.com' },
+      });
+      fireEvent.change(screen.getByPlaceholderText('••••••••'), {
+        target: { value: 'password123' },
+      });
+      fireEvent.click(screen.getByRole('button', { name: 'Sign in' }));
 
       // Verify sign in was called
       await waitFor(() => {
@@ -357,8 +357,6 @@ describeFeature(feature, ({ Background, Scenario }) => {
     test('shows error message for invalid credentials', async ({
       renderWithProviders,
     }) => {
-      const user = userEvent.setup({ delay: null });
-
       // Mock failed sign in
       vi.mocked(supabase.auth.signInWithPassword).mockResolvedValue({
         data: { user: null, session: null },
@@ -371,15 +369,14 @@ describeFeature(feature, ({ Background, Scenario }) => {
 
       renderWithProviders(<LoginPage />, { initialRoute: '/login' });
 
-      // Enter invalid credentials
-      await user.type(
-        screen.getByPlaceholderText('john@example.com'),
-        'wrong@example.com',
-      );
-      await user.type(screen.getByPlaceholderText('••••••••'), 'wrongpassword');
-
-      // Click sign in
-      await user.click(screen.getByRole('button', { name: 'Sign in' }));
+      // Enter invalid credentials and submit
+      fireEvent.change(screen.getByPlaceholderText('john@example.com'), {
+        target: { value: 'wrong@example.com' },
+      });
+      fireEvent.change(screen.getByPlaceholderText('••••••••'), {
+        target: { value: 'wrongpassword' },
+      });
+      fireEvent.click(screen.getByRole('button', { name: 'Sign in' }));
 
       // Verify error message appears
       await waitFor(() => {
@@ -433,8 +430,6 @@ describeFeature(feature, ({ Background, Scenario }) => {
     test('shows confirmation message after requesting reset', async ({
       renderWithProviders,
     }) => {
-      const user = userEvent.setup({ delay: null });
-
       // Mock successful password reset request
       vi.mocked(supabase.auth.resetPasswordForEmail).mockResolvedValue({
         data: {},
@@ -445,14 +440,11 @@ describeFeature(feature, ({ Background, Scenario }) => {
         initialRoute: '/forgot-password',
       });
 
-      // Enter email
-      await user.type(
-        screen.getByPlaceholderText('john@example.com'),
-        'user@example.com',
-      );
-
-      // Click send button
-      await user.click(
+      // Enter email and submit
+      fireEvent.change(screen.getByPlaceholderText('john@example.com'), {
+        target: { value: 'user@example.com' },
+      });
+      fireEvent.click(
         screen.getByRole('button', { name: 'Send Reset Instructions' }),
       );
 

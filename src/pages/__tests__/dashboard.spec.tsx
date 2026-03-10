@@ -4,7 +4,9 @@
  * This spec file binds to features/dashboard.feature and implements
  * executable tests for the user dashboard user stories.
  */
-import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
+
+import fs from 'node:fs';
+import { describeFeature, loadFeatureFromText } from '@amiceli/vitest-cucumber';
 import { screen, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 
@@ -56,7 +58,9 @@ vi.mock('@/lib/tripService', () => ({
 import { test } from '@/test/componentFixtures';
 import { DashboardPage } from '../DashboardPage';
 
-const feature = await loadFeature('features/dashboard.feature');
+const feature = loadFeatureFromText(
+  fs.readFileSync('features/dashboard.feature', 'utf-8'),
+);
 
 describeFeature(feature, ({ Background, Scenario }) => {
   Background(({ Given, And }) => {

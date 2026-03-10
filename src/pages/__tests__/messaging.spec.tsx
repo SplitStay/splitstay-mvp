@@ -7,7 +7,9 @@
  * Note: Most messaging scenarios require real-time features which are better
  * suited for E2E testing. This file focuses on component-level tests.
  */
-import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
+
+import fs from 'node:fs';
+import { describeFeature, loadFeatureFromText } from '@amiceli/vitest-cucumber';
 import { vi } from 'vitest';
 
 // Mock supabase before importing components
@@ -72,7 +74,9 @@ vi.mock('@/lib/presenceService', () => ({
 
 import { test } from '@/test/componentFixtures';
 
-const feature = await loadFeature('features/messaging.feature');
+const feature = loadFeatureFromText(
+  fs.readFileSync('features/messaging.feature', 'utf-8'),
+);
 
 describeFeature(feature, ({ Background, Scenario }) => {
   // Handle background - user is signed in with complete profile

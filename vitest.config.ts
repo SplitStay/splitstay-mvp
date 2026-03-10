@@ -17,6 +17,8 @@ export default defineConfig({
       'src/**/*.{test,spec}.{ts,tsx}',
       'src/features/**/*.spec.{ts,tsx}',
     ],
+    exclude: ['src/**/*.integration.test.ts', 'node_modules'],
     testTimeout: 500,
+    isolate: false,
   },
 });
