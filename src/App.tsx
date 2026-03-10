@@ -12,7 +12,6 @@ import { GuestModeProvider } from './contexts/GuestModeContext';
 import { ChatService } from './lib/chatService';
 import {
   DashboardPage,
-  FindPartnerPage,
   ForgotPasswordPage,
   HomePage,
   HowItWorks,
@@ -26,10 +25,7 @@ import { AdminPage } from './pages/AdminPage';
 import CreateProfilePage from './pages/CreateProfilePage';
 import EditProfilePage from './pages/EditProfilePage';
 import { EventLandingPage } from './pages/EventLandingPage';
-import { MessagesPage } from './pages/MessagesPage';
-import PostTripPage from './pages/PostTripPage';
 import ProfilePage from './pages/ProfilePage';
-import { TripDetailPage } from './pages/TripDetailPage';
 import { WhatsAppRedirectPage } from './pages/WhatsAppRedirectPage';
 import { WhatsAppTesterPage } from './pages/WhatsAppTesterPage';
 
@@ -199,38 +195,11 @@ function AppRoutes() {
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
       <Route path="/how-it-works" element={<HowItWorks />} />
-      <Route
-        path="/post-trip"
-        element={
-          <GuestFriendlyRoute>
-            <PostTripPage />
-          </GuestFriendlyRoute>
-        }
-      />
-      <Route
-        path="/find-partners"
-        element={
-          <GuestFriendlyRoute>
-            <FindPartnerPage />
-          </GuestFriendlyRoute>
-        }
-      />
-      <Route
-        path="/messages"
-        element={
-          <AuthRequiredRoute>
-            <MessagesPage />
-          </AuthRequiredRoute>
-        }
-      />
-      <Route
-        path="/trip/:id"
-        element={
-          <GuestFriendlyRoute>
-            <TripDetailPage />
-          </GuestFriendlyRoute>
-        }
-      />
+      {/* HIDDEN: Web features stripped to focus on WhatsApp bot. Restore route elements to re-enable. */}
+      <Route path="/post-trip" element={<Navigate to="/" replace />} />
+      <Route path="/find-partners" element={<Navigate to="/" replace />} />
+      <Route path="/messages" element={<Navigate to="/" replace />} />
+      <Route path="/trip/:id" element={<Navigate to="/" replace />} />
 
       {/* Event landing pages - linked from Instagram campaigns */}
       <Route

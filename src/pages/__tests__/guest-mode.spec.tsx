@@ -82,12 +82,9 @@ describeFeature(feature, ({ Scenario }) => {
         expect(screen.getByText(/Share your/i)).toBeInTheDocument();
       });
 
-      // Should see CTA buttons (there may be multiple, use getAllBy)
+      // Should see CTA button
       expect(
-        screen.getAllByRole('button', { name: /Post Your Trip/i }).length,
-      ).toBeGreaterThan(0);
-      expect(
-        screen.getAllByRole('button', { name: /Create Profile/i }).length,
+        screen.getAllByRole('button', { name: /Get Started/i }).length,
       ).toBeGreaterThan(0);
     });
 
@@ -153,13 +150,10 @@ describeFeature(feature, ({ Scenario }) => {
         ),
       ).toBeInTheDocument();
 
-      // Should see action buttons
+      // Should see create profile button(s) - in header and CTA section
       expect(
-        screen.getByRole('button', { name: /Browse Trips/i }),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByRole('button', { name: /Post Your Trip/i }),
-      ).toBeInTheDocument();
+        screen.getAllByRole('button', { name: /Create Profile/i }).length,
+      ).toBeGreaterThan(0);
     });
 
     Given('I am not signed in', () => {});

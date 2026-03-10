@@ -1,15 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import {
-  Home,
-  LogOut,
-  Menu,
-  MessageCircle,
-  Plus,
-  Sparkles,
-  User,
-  Users,
-  X,
-} from 'lucide-react';
+import { Home, LogOut, Menu, Sparkles, User, X } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -51,13 +41,6 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
   const menuItems = isGuest
     ? [
         { icon: Home, label: 'Dashboard', path: '/dashboard' },
-        { icon: Users, label: 'Find Partners', path: '/find-partners' },
-        {
-          icon: Plus,
-          label: 'Add Trip',
-          action: 'create_trip',
-          requiresAuth: true,
-        },
         {
           icon: Sparkles,
           label: 'Create Profile',
@@ -67,9 +50,6 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
       ]
     : [
         { icon: Home, label: 'Dashboard', path: '/dashboard' },
-        { icon: Users, label: 'Find Partners', path: '/find-partners' },
-        { icon: Plus, label: 'Add Trip', path: '/post-trip' },
-        { icon: MessageCircle, label: 'Messages', path: '/messages' },
         { icon: User, label: 'My Profile', path: `/profile/${user?.id}` },
       ];
 

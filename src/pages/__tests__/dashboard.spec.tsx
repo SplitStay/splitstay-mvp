@@ -252,11 +252,8 @@ describeFeature(feature, ({ Background, Scenario }) => {
       ).toBeInTheDocument();
 
       expect(
-        screen.getByRole('button', { name: /Browse Trips/i }),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByRole('button', { name: /Post Your Trip/i }),
-      ).toBeInTheDocument();
+        screen.getAllByRole('button', { name: /Create Profile/i }).length,
+      ).toBeGreaterThan(0);
     });
 
     Given('I am not signed in', () => {});

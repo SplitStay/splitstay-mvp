@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import heroImage from '@/assets/hero-2.png';
 import logoImageWhite from '@/assets/logoWhite.jpeg';
@@ -17,11 +17,8 @@ declare global {
   }
 }
 
-type UserPath = 'host' | 'guest' | null;
-
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
-  const [selectedPath, setSelectedPath] = useState<UserPath>(null);
 
   const { user, loading } = useAuth();
 
@@ -201,18 +198,11 @@ const HomePage: React.FC = () => {
                 {/* CTA Buttons */}
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Button
-                    onClick={handleGetStarted}
-                    size="lg"
-                    className="bg-white text-gray-900 hover:bg-gray-100 text-base px-8 py-3 rounded-lg font-semibold transition-all duration-300 shadow-md hover:shadow-lg"
-                  >
-                    Post Your Trip
-                  </Button>
-                  <Button
                     onClick={() => navigate('/signup')}
                     size="lg"
                     className="bg-white text-gray-900 hover:bg-gray-100 text-base px-8 py-3 rounded-lg font-semibold transition-all duration-300 shadow-md hover:shadow-lg"
                   >
-                    Create Profile
+                    Get Started
                   </Button>
                 </div>
 
@@ -234,33 +224,25 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* User Path Selection Cards */}
+      {/* Get Started Section */}
       <section className="py-12 sm:py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-8 sm:mb-12">
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
-              How do you want to travel?
+              Get started with SplitStay
             </h2>
             <p className="text-lg text-gray-600">
-              Choose your path and start your journey
+              Create your profile and join our community of travelers
             </p>
           </div>
-          <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
-            {/* Host Card */}
+          <div className="max-w-md mx-auto">
             {/* biome-ignore lint/a11y/useKeyWithClickEvents: Card click navigation */}
             {/* biome-ignore lint/a11y/noStaticElementInteractions: Interactive card */}
             <div
-              className={`bg-white border-2 rounded-xl p-6 sm:p-8 hover:shadow-xl transition-all duration-300 cursor-pointer group ${
-                selectedPath === 'host'
-                  ? 'border-blue-600 bg-blue-50 shadow-xl'
-                  : 'border-gray-200 hover:border-blue-600 hover:bg-blue-50'
-              }`}
-              onClick={() => {
-                setSelectedPath('host');
-                navigate('/post-trip');
-              }}
+              className="bg-white border-2 rounded-xl p-6 sm:p-8 hover:shadow-xl transition-all duration-300 cursor-pointer group border-gray-200 hover:border-blue-600 hover:bg-blue-50"
+              onClick={() => navigate('/signup')}
             >
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors mx-auto">
                 {/* biome-ignore lint/a11y/noSvgWithoutTitle: Decorative icon */}
                 <svg
                   className="w-6 h-6 text-blue-600"
@@ -272,59 +254,16 @@ const HomePage: React.FC = () => {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4"
+                    d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
                   />
                 </svg>
               </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">
-                Have an accommodation to share?
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 text-center">
+                Create your profile
               </h3>
-              <p className="text-gray-600 leading-relaxed">
-                Already booked a place? Post your stay to find a roommate.
-              </p>
-            </div>
-
-            {/* Guest Card */}
-            {/* biome-ignore lint/a11y/useKeyWithClickEvents: Card click navigation */}
-            {/* biome-ignore lint/a11y/noStaticElementInteractions: Interactive card */}
-            <div
-              className={`bg-white border-2 rounded-xl p-6 sm:p-8 hover:shadow-xl transition-all duration-300 cursor-pointer group ${
-                selectedPath === 'guest'
-                  ? 'border-purple-600 bg-purple-50 shadow-xl'
-                  : 'border-gray-200 hover:border-purple-600 hover:bg-purple-50'
-              }`}
-              onClick={() => {
-                setSelectedPath('guest');
-                navigate('/find-partners');
-              }}
-            >
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-purple-200 transition-colors">
-                {/* biome-ignore lint/a11y/noSvgWithoutTitle: Decorative icon */}
-                <svg
-                  className="w-6 h-6 text-purple-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">
-                Looking to join someone else's trip?
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                Browse open stays and message the traveler.
+              <p className="text-gray-600 leading-relaxed text-center">
+                Sign up and tell us about yourself so we can match you with the
+                right travelers.
               </p>
             </div>
           </div>

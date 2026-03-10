@@ -1,15 +1,5 @@
 import { motion } from 'framer-motion';
-import {
-  Bell,
-  Calendar,
-  LogOut,
-  MessageCircle,
-  Plane,
-  Plus,
-  Sparkles,
-  User,
-  Users,
-} from 'lucide-react';
+import { Bell, Calendar, LogOut, Plane, Sparkles, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ShareInviteModal from '@/components/ShareInviteModal';
@@ -138,58 +128,16 @@ export const DashboardPage = () => {
           </Link>
           <div className="flex gap-3">
             {isGuest ? (
-              <>
-                <button
-                  type="button"
-                  onClick={() => navigate('/post-trip')}
-                  className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full transition-colors font-medium"
-                >
-                  <Plus className="w-4 h-4" />
-                  Add a Trip
-                </button>
-                <button
-                  type="button"
-                  onClick={() => navigate('/find-partners')}
-                  className="flex items-center gap-2 bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-full transition-colors font-medium"
-                >
-                  <Users className="w-4 h-4" />
-                  Find Partners
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleAuthRequired('create_profile')}
-                  className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition-colors font-medium"
-                >
-                  <Sparkles className="w-4 h-4" />
-                  Create Profile
-                </button>
-              </>
+              <button
+                type="button"
+                onClick={() => handleAuthRequired('create_profile')}
+                className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition-colors font-medium"
+              >
+                <Sparkles className="w-4 h-4" />
+                Create Profile
+              </button>
             ) : (
               <>
-                <button
-                  type="button"
-                  onClick={() => navigate('/post-trip')}
-                  className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full transition-colors font-medium"
-                >
-                  <Plus className="w-4 h-4" />
-                  Add a Trip
-                </button>
-                <button
-                  type="button"
-                  onClick={() => navigate('/find-partners')}
-                  className="flex items-center gap-2 bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-full transition-colors font-medium"
-                >
-                  <Users className="w-4 h-4" />
-                  Find Partners
-                </button>
-                <button
-                  type="button"
-                  onClick={() => navigate('/messages')}
-                  className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full transition-colors font-medium"
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  Messages
-                </button>
                 <button
                   type="button"
                   onClick={() => navigate(`/profile/${user?.id}`)}
@@ -253,28 +201,20 @@ export const DashboardPage = () => {
                   <Plane className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
                 </div>
                 <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
-                  Discover Amazing Trips
+                  Get Started
                 </h3>
                 <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
-                  Browse trips posted by travelers around the world. Find your
-                  perfect travel partner and split accommodation costs!
+                  Create your profile to connect with travelers around the
+                  world.
                 </p>
                 <div className="flex flex-col gap-3 sm:flex-row sm:gap-3 justify-center">
                   <button
                     type="button"
-                    onClick={() => navigate('/find-partners')}
-                    className="flex items-center justify-center gap-2 bg-purple-500 hover:bg-purple-600 text-white px-4 sm:px-6 py-3 rounded-lg transition-colors font-medium text-sm sm:text-base"
+                    onClick={() => handleAuthRequired('create_profile')}
+                    className="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 sm:px-6 py-3 rounded-lg transition-colors font-medium text-sm sm:text-base"
                   >
-                    <Users className="w-4 h-4" />
-                    Browse Trips
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => navigate('/post-trip')}
-                    className="flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 sm:px-6 py-3 rounded-lg transition-colors font-medium text-sm sm:text-base"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Post Your Trip
+                    <Sparkles className="w-4 h-4" />
+                    Create Profile
                   </button>
                 </div>
               </div>
@@ -343,7 +283,7 @@ export const DashboardPage = () => {
                                   <TripCard
                                     key={trip.id}
                                     trip={trip}
-                                    onClick={() => navigate(`/trip/${trip.id}`)}
+                                    onClick={() => {}}
                                   />
                                 ))}
                             </div>
@@ -355,16 +295,9 @@ export const DashboardPage = () => {
                               <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
                                 No upcoming trips yet
                               </h3>
-                              <p className="text-sm sm:text-base text-gray-600 mb-4">
-                                Create your first trip and find travel partners!
+                              <p className="text-sm sm:text-base text-gray-600">
+                                Your upcoming trips will appear here.
                               </p>
-                              <button
-                                type="button"
-                                onClick={() => navigate('/post-trip')}
-                                className="bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors text-sm sm:text-base"
-                              >
-                                Post Your First Trip
-                              </button>
                             </div>
                           )}
                         </div>
@@ -389,7 +322,7 @@ export const DashboardPage = () => {
                                   <TripCard
                                     key={trip.id}
                                     trip={trip}
-                                    onClick={() => navigate(`/trip/${trip.id}`)}
+                                    onClick={() => {}}
                                   />
                                 ))}
                             </div>
