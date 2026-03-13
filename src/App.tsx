@@ -25,6 +25,7 @@ import CreateProfilePage from './pages/CreateProfilePage';
 import EditProfilePage from './pages/EditProfilePage';
 import { EventLandingPage } from './pages/EventLandingPage';
 import ProfilePage from './pages/ProfilePage';
+import { WhatsAppLandingPage } from './pages/WhatsAppLandingPage';
 import { WhatsAppRedirectPage } from './pages/WhatsAppRedirectPage';
 import { WhatsAppTesterPage } from './pages/WhatsAppTesterPage';
 
@@ -218,13 +219,23 @@ function AppRoutes() {
         }
       />
 
-      {/* WhatsApp bot tester - URL only, no nav link */}
+      {/* WhatsApp landing page - public, for Meta Business verification */}
       <Route
         path="/whatsapp"
         element={
           <PublicRoute>
-            <WhatsAppTesterPage />
+            <WhatsAppLandingPage />
           </PublicRoute>
+        }
+      />
+
+      {/* WhatsApp bot tester - admin only */}
+      <Route
+        path="/admin/whatsapp-tester"
+        element={
+          <AuthRequiredRoute>
+            <WhatsAppTesterPage />
+          </AuthRequiredRoute>
         }
       />
 
