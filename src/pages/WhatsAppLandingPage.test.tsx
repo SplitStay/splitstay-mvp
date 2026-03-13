@@ -57,13 +57,12 @@ describe('WhatsAppLandingPage', () => {
     ).toHaveAttribute('href', '/privacy');
   });
 
-  it('should link to the WhatsApp chat', () => {
+  it('should show the contact email', () => {
     renderPage();
 
-    const ctaLink = screen.getByRole('link', {
-      name: /message us on whatsapp/i,
-    });
-    expect(ctaLink).toHaveAttribute('href', expect.stringContaining('wa.me'));
+    expect(
+      screen.getByRole('link', { name: /hello@splitstay\.travel/i }),
+    ).toHaveAttribute('href', 'mailto:hello@splitstay.travel');
   });
 
   it('should link back to the main site', () => {
