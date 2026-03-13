@@ -41,9 +41,6 @@ describe('WhatsAppLandingPage', () => {
     expect(
       screen.getByText(/no automated marketing messages/i, { exact: false }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText(/stop anytime/i, { exact: false }),
-    ).toBeInTheDocument();
   });
 
   it('should explain what data is collected and link to the privacy policy', () => {
@@ -67,14 +64,6 @@ describe('WhatsAppLandingPage', () => {
       name: /message us on whatsapp/i,
     });
     expect(ctaLink).toHaveAttribute('href', expect.stringContaining('wa.me'));
-  });
-
-  it('should show the contact email', () => {
-    renderPage();
-
-    expect(
-      screen.getByRole('link', { name: /hello@splitstay\.travel/i }),
-    ).toHaveAttribute('href', 'mailto:hello@splitstay.travel');
   });
 
   it('should link back to the main site', () => {

@@ -20,9 +20,8 @@ const steps = [
 ];
 
 const controlPoints = [
-  'You start the conversation — we never message you first',
-  'No automated marketing messages — ever',
-  'Stop anytime by sending "stop" or blocking the number',
+  'You start the conversation',
+  'No automated marketing messages',
 ];
 
 export function WhatsAppLandingPage() {
@@ -132,21 +131,6 @@ export function WhatsAppLandingPage() {
                   .
                 </p>
               </div>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Questions?
-              </h2>
-              <p className="text-gray-700 leading-relaxed">
-                Get in touch at{' '}
-                <a
-                  href="mailto:hello@splitstay.travel"
-                  className="text-blue-600 hover:text-blue-700 underline"
-                >
-                  hello@splitstay.travel
-                </a>
-              </p>
             </section>
           </div>
 
